@@ -1,1 +1,1 @@
-export const BASE_URL = 'http://10.1.6.68:31729/apiman-gateway/AnetaProvider/default/1.0?apikey=204824a8-b1a2-4d74-8383-7fdd7716d747';
+export const BASE_URL = 'https://api.aneta.id/apiman-gateway/FlowableProvider/default/1.0?apikey=3af5be44-2840-4937-893e-e39b6f427db2';

@@ -364,8 +364,8 @@ function DataGuruAdmin() {
                 </div>
             </div>
             <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
-                <Row>
-                    <Col span={12}>
+                <div className="row">
+                    <div className="col-lg-8 col-md-6 my-2">
                         <Button className="mr-4" type="primary" shape="round" size='middle'
                                 onClick={() => setIsViewGuru(false)}>
                             Tambah Data
@@ -382,24 +382,24 @@ function DataGuruAdmin() {
                                 Sort by <DownOutlined/>
                             </a>
                         </Dropdown>
-                    </Col>
-                    <Col span={12}>
-                        <div className="float-right">
-                            <Search className="mr-5" placeholder="Cari kata kunci" allowClear
-                                    onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
-                            {grid == false ?
-                                <a>
-                                    <AppstoreOutlined style={{fontSize: '30px'}}
-                                                      onClick={() => setGrid(true)}/>
-                                </a> :
-                                <a>
-                                    <MenuOutlined style={{fontSize: '30px'}}
-                                                  onClick={() => setGrid(false)}/>
-                                </a>}
-                        </div>
-                    </Col>
-                </Row>
+                    </div>
+                    <div className="col-lg-4 col-md-6 my-2">
+                        {/*<div className="float-right">*/}
+                        <Search className="mr-3" placeholder="Cari kata kunci" allowClear
+                                onSearch={_onSearch} style={{width: '80%'}}/>
+                        {grid == false ?
+                            <a>
+                                <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                  onClick={() => setGrid(true)}/>
+                            </a> :
+                            <a>
+                                <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                              onClick={() => setGrid(false)}/>
+                            </a>}
+                    </div>
+                </div>
             </Card>
+
             {grid ? <CardDataGuru/> : <TableDataGuru/>}
         </div>
     )
@@ -566,13 +566,13 @@ function DataGuruAdmin() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
-                        {isViewGuru ? <ViewGuru/> : <TambahGuru/>}
-                        <Adminfooter/>
-                    </div>
+                    <Appheader/>
+                    {isViewGuru ? <ViewGuru/> : <TambahGuru/>}
+                    <Adminfooter/>
                 </div>
+            </div>
         </Fragment>
     );
 }

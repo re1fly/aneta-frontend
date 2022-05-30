@@ -58,30 +58,35 @@ function DataSiswaAdmin() {
                     "type": "json",
                     "value": {
                         "tbl_induk": "x_academic_students",
-                        "pagination": 10,
+                        "pagination" : 10,
                         "join": [
                             {
                                 "tbl_join": "x_academic_year",
                                 "foregenkey": "academic_year_id",
-                                "refkey": "id"
-
+                                "refkey" :"id"
                             },
                             {
                                 "tbl_join": "users",
                                 "foregenkey": "user_id",
-                                "refkey": "id"
+                                "refkey" :"id"
                             },
                             {
                                 "tbl_join": "x_academic_class",
                                 "foregenkey": "class_id",
-                                "refkey": "id"
+                                "refkey" :"id"
+                            },
+                            {
+                                "tbl_join" : "m_user_profile",
+                                "foregenkey" : "user_id",
+                                "refkey" : "user_id"
                             }
                         ]
                     }
-                }, {
-                    "name": "page",
-                    "type": "string",
-                    "value": paramsPage
+                },
+                {
+                    "name" : "page",
+                    "type" : "string",
+                    "value" : paramsPage
                 }
             ]
         }, {
@@ -93,7 +98,6 @@ function DataSiswaAdmin() {
             setGetSiswa(siswa.data.data)
 
             const pagination = siswa.data.links;
-
             setBtnPagination(pagination)
         });
     }, [paramsPage])
@@ -236,11 +240,16 @@ function DataSiswaAdmin() {
     ];
 
     const channelList = getSiswa.map((siswa, index) => {
+        const dataBirth = siswa.date_of_birth
+        const [year, month, day] =  dataBirth.split('-');
+        const birthDate = `${day}-${month}-${year}`;
+
         return {
             nis: index + 1,
             imageUrl: 'user.png',
             namaSiswa: siswa.name,
-            tanggalLahir: siswa.periode_start,
+            tanggalLahir: birthDate,
+            tempatLahir: siswa.place_of_birth,
             email: siswa.email,
             tag1: '',
             tag2: siswa.class,
@@ -335,7 +344,7 @@ function DataSiswaAdmin() {
                                         <p className="font-xssss float-left lh-1">TTL</p>
                                     </div>
                                     <div className="col-9">
-                                        <p className="font-xssss float-left lh-1">: {value.tanggalLahir}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.tempatLahir}, {value.tanggalLahir}</p>
                                     </div>
                                 </div>
 
@@ -377,7 +386,7 @@ function DataSiswaAdmin() {
                     }
 
                     return (
-                        <Button className="mr-2 bg-current text-white font-xssss fw-600"
+                        <Button className="btn btn-primary mr-2 font-xssss fw-600"
                                 disabled={linkUrl == null ? true : false}
                                 onClick={() => {setParamsPage(linkUrl)}}>
                             {label}
@@ -404,7 +413,7 @@ function DataSiswaAdmin() {
                 </div>
                 <Card className="card bg-lightblue border-0 text-grey-900">
                     <Row>
-                        <Col span={12}>
+                        <Col lg={12} md={12} sm={3}>
                             <Button className="mr-4" type="primary" shape="round" size='middle'
                                     onClick={() => setIsViewSiswa(false)}>
                                 Tambah Data
@@ -422,7 +431,7 @@ function DataSiswaAdmin() {
                                 </a>
                             </Dropdown>
                         </Col>
-                        <Col span={12}>
+                        <Col lg={12} md={12} sm={3}>
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                         onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
@@ -545,7 +554,7 @@ function DataSiswaAdmin() {
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
-                                                        Alamat
+                                                        Provinsi
                                                     </label>
                                                     <input type="text" className="form-control"/>
                                                 </div>
@@ -554,7 +563,7 @@ function DataSiswaAdmin() {
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
-                                                        Provinsi
+                                                        Kota
                                                     </label>
                                                     <input type="text" className="form-control"/>
                                                 </div>
@@ -577,6 +586,17 @@ function DataSiswaAdmin() {
                                                     </label>
                                                     <input type="text" className="form-control"/>
                                                 </div>
+                                            </div>
+
+                                            <div className="col-lg-12 mb-3">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Alamat
+                                                </label>
+                                                <textarea
+                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                    rows="5"
+                                                    placeholder="Isi alamat detail anda..."
+                                                ></textarea>
                                             </div>
 
                                             <div className="col-lg-12">
@@ -612,7 +632,7 @@ function DataSiswaAdmin() {
                         <div className="middle-wrap">
                             <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                                 <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewSiswa(true)}
+                                    <i onClick={() => setIsViewFormSiswa(true)}
                                        className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                                         Tambah Data Siswa - OrangTua
@@ -683,16 +703,15 @@ function DataSiswaAdmin() {
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
-                                                        Alamat
+                                                        Provinsi
                                                     </label>
                                                     <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
-
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
-                                                        Provinsi
+                                                        Kota
                                                     </label>
                                                     <input type="text" className="form-control"/>
                                                 </div>
@@ -715,6 +734,17 @@ function DataSiswaAdmin() {
                                                     </label>
                                                     <input type="text" className="form-control"/>
                                                 </div>
+                                            </div>
+
+                                            <div className="col-lg-12 mb-3">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Alamat
+                                                </label>
+                                                <textarea
+                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                    rows="5"
+                                                    placeholder="Isi alamat detail anda..."
+                                                ></textarea>
                                             </div>
 
                                             <div className="col-lg-12">

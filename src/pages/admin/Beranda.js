@@ -48,6 +48,8 @@ const lineChart = {
 };
 
 function BerandaAdmin() {
+    const user = localStorage.getItem('user_name');
+
     useEffect(() => {
         axios.post('https://api.aneta.id/apiman-gateway/FlowableProvider/default/1.0?apikey=3af5be44-2840-4937-893e-e39b6f427db2', {
                 "processDefinitionId": "RestVesselVoyage:1:f90ae192-af10-11ec-8f61-3247e0fca94a",
@@ -90,7 +92,7 @@ function BerandaAdmin() {
                                     <div
                                         className="card w-100 bg-lightblue p-lg-5 p-4 mb-5 border-0 rounded-lg d-block float-left">
                                         <h2 className="display1-size display2-md-size d-inline-block float-left mb-0 text-grey-900 fw-700">
-                                            Hi, Administrator
+                                            Hi, {user}
                                             <span className="font-xssss fw-600 text-grey-600 d-block mb-2 ml-1">
                                                     Selamat datang di Aneta, Semoga Harimu Menyenangkan.
                                                 </span>

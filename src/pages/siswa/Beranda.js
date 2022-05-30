@@ -7,7 +7,7 @@ import Appheader from "../../components/Appheader";
 
 
 function BerandaSiswa() {
-
+    const user = localStorage.getItem('user_name');
     const channelList = [
         {
             code: 'TM01',
@@ -87,7 +87,7 @@ function BerandaSiswa() {
                             <div className="col-lg-12">
                                 <div className="card w-100 bg-lightblue p-lg-5 p-4 mb-5 border-0 rounded-lg d-block float-left">
                                     <h2 className="display1-size display2-md-size d-inline-block float-left mb-0 text-grey-900 fw-700">
-                                        Hi, Abygail Anandaru
+                                        Hi, {user}
                                         <span className="font-xssss fw-600 text-grey-600 d-block mb-2 ml-1">
                                             Selamat datang di Aneta, Semoga Harimu Menyenangkan.
                                         </span>

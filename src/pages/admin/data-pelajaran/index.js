@@ -409,45 +409,46 @@ export default function DataPelajaranAdmin() {
       <div className="container px-3 py-4">
         <div className="row">
           <div className="col-lg-12">
-          <PageHeader
-                      className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
-                      onBack={() => window.history.back()}
-                      title="Data Pelajaran"
-          />
-          <Card className="shadow-md mb-4">
-            <Row>
-              <Col span={12}>
-                <Button onClick={() => setIsViewPelajaran(false)} className="mr-2 bg-current" type="primary" shape="round" size='middle'>
-                  Tambah Data
-                </Button>
-                <Dropdown overlay={_filterMenu}>
-                  <a className="ant-dropdown-link mr-2 font-bold" onClick={e => e.preventDefault()}>
-                    Filter by <DownOutlined/>
-                  </a>
-                </Dropdown>
-                <Dropdown overlay={_sortMenu}>
-                  <a className="ant-dropdown-link font-bold" onClick={e => e.preventDefault()}>
-                    Sort by <DownOutlined/>
-                  </a>
-                </Dropdown>
-              </Col>
-              <Col span={12}>
-                <div className="float-right">
-                  <Search className="mr-6" placeholder="Cari kata kunci" allowClear
-                          onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
-                  {grid == false ? 
-                  <a>
-                  <AppstoreOutlined style={{fontSize: '30px'}}
-                                    onClick={() => setGrid(true)}/>
-                  </a> :
-                  <a>
-                  <MenuOutlined style={{fontSize: '30px'}}
-                                onClick={() => setGrid(false)}/>
-                  </a>}
+            <PageHeader
+                        className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
+                        onBack={() => window.history.back()}
+                        title="Data Pelajaran"
+            />
+            <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
+              <div className="row">
+                <div className="col-lg-8 col-md-6 my-2">
+                  <Button className="mr-4" type="primary" shape="round" size='middle'
+                          onClick={() => setIsViewPelajaran(false)}>
+                    Tambah Data
+                  </Button>
+                  <Dropdown overlay={_filterMenu}>
+                    <a className="ant-dropdown-link mr-4 font-bold"
+                    onClick={e => e.preventDefault()}>
+                      Filter by <DownOutlined/>
+                    </a>
+                  </Dropdown>
+                  <Dropdown overlay={_sortMenu}>
+                    <a className="ant-dropdown-link font-bold"
+                    onClick={e => e.preventDefault()}>
+                      Sort by <DownOutlined/>
+                    </a>
+                  </Dropdown>
                 </div>
-              </Col>
-            </Row>
-          </Card>
+                <div className="col-lg-4 col-md-6 my-2">
+                  <Search className="mr-3" placeholder="Cari kata kunci" allowClear
+                          onSearch={_onSearch} style={{width: '80%'}}/>
+                  {grid == false ?
+                    <a>
+                      <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                      onClick={() => setGrid(true)}/>
+                    </a> :
+                    <a>
+                      <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                  onClick={() => setGrid(false)}/>
+                    </a>}
+                </div>
+              </div>
+            </Card>
             <div className="d-flex">
               <div className="mt-1">
                 <h5 className="fw-600 mb-1">

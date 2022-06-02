@@ -1,24 +1,27 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment,  useState, useCallback } from 'react';
 import Header from '../components/Header';
 import Footertwo from '../components/Footertwo';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
+import ParticlesBg from 'particles-bg';
+
+import ImageViewer from "react-simple-image-viewer";
 
 const blogList = [
   {
-    imageUrl: 'blog.png',
+    imageUrl: 'blog-01.jpg',
     title: 'Aenean  Dieting Strategies That Almost Always Backfire',
     meta: 'Lifestyle',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold. We are digital agency.',
   },
   {
-    imageUrl: 'blog.png',
+    imageUrl: 'blog-02.jpg',
     title: 'The doner is a Turkish creation of meat, often lamb.',
     meta: 'Food',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold. We are digital agency.',
   },
   {
-    imageUrl: 'blog.png',
+    imageUrl: 'blog-03.jpg',
     title: 'The only nutrition program follow & supremely effective',
     meta: 'Lifestyle',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold. We are digital agency.',
@@ -34,45 +37,71 @@ const brandList = [
 ];
 const feedbackList = [
   {
-    imageUrl: 'user.png',
+    imageUrl: 'testimoni-03.jpg',
     name: 'Goria Coast',
     status: 'Digital Marketing Executive',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold.',
   },
   {
-    imageUrl: 'user.png',
+    imageUrl: 'testimoni-01.jpg',
     name: 'Thomas Smith',
     status: 'Digital Marketing Executive',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold.',
   },
   {
-    imageUrl: 'user.png',
+    imageUrl: 'testimoni-02.jpg',
     name: 'Hurin Seary',
     status: 'Digital Marketing Executive',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold.',
   },
   {
-    imageUrl: 'user.png',
+    imageUrl: 'testimoni-03.jpg',
     name: 'Goria Coast',
     status: 'Digital Marketing Executive',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold.',
   },
   {
-    imageUrl: 'user.png',
+    imageUrl: 'testimoni-01.jpg',
     name: 'Thomas Smith',
     status: 'Digital Marketing Executive',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold.',
   },
   {
-    imageUrl: 'user.png',
+    imageUrl: 'testimoni-02.jpg',
     name: 'Hurin Seary',
     status: 'Digital Marketing Executive',
     des: 'Human coronaviruses are common and are typically associated with mild illnesses, similar to the common cold.',
   },
 ];
 
-class Homefour extends Component {
-  render() {
+function Homefour() {
+    const [currentImage, setCurrentImage] = useState(0);
+    const [isViewerOpen, setIsViewerOpen] = useState(false);
+
+    const data = [
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum1" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum2" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum3" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum4" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum5" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum6" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum7" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum8" },
+      { thumb: "https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg", title: "Lorem Ipsum9" }
+    ];
+
+    const images = data.map(obj => obj.thumb.replace("-small", "-large"));
+
+    const openImageViewer = useCallback(index => {
+      setCurrentImage(index);
+      setIsViewerOpen(true);
+    }, []);
+
+    const closeImageViewer = () => {
+      setCurrentImage(0);
+      setIsViewerOpen(false);
+    };
+
     const brandsettings = {
       arrows: false,
       dots: false,
@@ -136,31 +165,32 @@ class Homefour extends Component {
     return (
       <Fragment>
         <Header />
-
+      
         <div className="banner-wrapper bg-lightblue-after">
           <div className="container">
+          {/* <ParticlesBg className="" type="circle" bg={{zIndex: 0, width:"100%", position:"absolute", top:0}} /> */}
             <div className="row justify-content-center">
               <div className="col-lg-8 text-center pt-lg--10 pt-7">
                 <h2 className="fw-700 text-grey-900 display4-size display4-xs-size lh-1 mb-3 pt-5 aos-init aos-animate">
                   Aplikasi Sekolah Online Terbaik #1
                 </h2>
                 <p className="fw-300 font-xsss lh-28 text-grey-500 pl-lg--5 pr-lg--5 aos-init aos-animate">
-                  orem ipsum dolor sit amet, consectetur adipisicing elit, sed
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
                   do eiusmod tempor incididunt ut labore et dol ad minim veniam,
                   quis nostrud exercitation
                 </p>
                 <a
-                  href="/"
-                  className="btn border-0 bg-dark text-uppercase p-3 text-white fw-700 ls-3 rounded-lg d-inline-block font-xssss btn-light mt-3 w200 aos-init aos-animate"
+                  href="/register"
+                  className="btn border-0 bg-current text-uppercase mb-4 p-3 text-white fw-700 ls-3 rounded-lg d-inline-block font-xssss btn-light mt-3 w200 aos-init aos-animate"
                 >
                   Daftar Sekarang
                 </a>
               </div>
               <div className="col-lg-12">
                 <img
-                  src="https://via.placeholder.com/1200x650.png"
+                  src="https://img.freepik.com/free-photo/close-up-student-reading-book_23-2148888822.jpg?t=st=1653954403~exp=1653955003~hmac=2322869823d98c923558c462eea894cc758ecab845a861ba24f0725bf2d1f467"
                   alt="banner"
-                  className="img-fluid pt-0 aos-init aos-animate"
+                  className="img-fluid pt-0 w-100 aos-init aos-animate"
                 />
               </div>
             </div>
@@ -252,11 +282,11 @@ class Homefour extends Component {
         <div className="feature-wrapper layer-after pt-lg--7 pt-5">
           <div className="container">
             <div className="row">
-              <div className="col-lg-6">
+              <div className="col-lg-7">
                 <img
-                  src="https://via.placeholder.com/700x550.png"
+                  src="https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178626.jpg?t=st=1653954403~exp=1653955003~hmac=31e5e4881e9551a34c3cdc4269f4c55dad3f7e0e1372f9d97e0ece969a9d27eb"
                   alt="banner"
-                  className="img-fluid aos-init aos-animate"
+                  className="w-100 img-fluid aos-init aos-animate"
                 />
               </div>
               <div className="col-lg-4 offset-lg-1">
@@ -280,7 +310,7 @@ class Homefour extends Component {
                   We enjoy building experiences.
                 </h4>
                 <a
-                  href="/"
+                  href=""
                   className="btn border-0 bg-primary p-3 text-white fw-600 rounded-lg d-inline-block font-xssss btn-light mt-3 w150 aos-init aos-animate"
                 >
                   Learn More
@@ -295,7 +325,7 @@ class Homefour extends Component {
             <div className="row">
               <div className="col-lg-7 order-lg-2 offset-lg-1">
                 <img
-                  src="https://via.placeholder.com/700x550.png"
+                  src="https://img.freepik.com/free-photo/virtual-classroom-study-space_23-2149178640.jpg"
                   alt="banner"
                   className="w-100 aos-init aos-animate"
                 />
@@ -322,7 +352,7 @@ class Homefour extends Component {
                   We enjoy building experiences.
                 </h4>
                 <a
-                  href="/"
+                  href=""
                   className="btn border-0 bg-primary p-3 text-white fw-600 rounded-lg d-inline-block font-xssss btn-light mt-3 w150 aos-init aos-animate"
                 >
                   Learn More
@@ -351,7 +381,7 @@ class Homefour extends Component {
             </div>
             <div className="row">
               {blogList.map((value, index) => (
-                <div className="col-lg-4 col-md-6 col-sm-6 mb-4" key={index}>
+                <div className="col-lg-4 col-md-6 col-sm-6" key={index}>
                   <article className="post-article p-0 border-0 shadow-xss rounded-lg overflow-hidden aos-init aos-animate">
                     <Link to="/blog-single">
                       <img
@@ -396,7 +426,46 @@ class Homefour extends Component {
           </div>
         </div>
 
-        <div className="feedback-wrapper pt-lg--7 pb-lg--7 pb-5 pt-5">
+      <div id="portfolio" className="text-center">
+      <div className="container">
+        <div className="section-title">
+          <span className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xl ls-2 alert-warning d-inline-block text-warning mr-1 mb-3">
+            Gallery
+          </span>
+          <h2 className="text-grey-900 fw-700 font-xxl pb-3 mb-0 mt-3 d-block lh-3">
+            Let's See Our Activity
+          </h2>
+          {/* <h2>Gallery</h2> */}
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit duis sed dapibus leonec.</p>
+        </div>
+        <div className="row">
+          
+            {data.map(({ title, thumb }, index) => (
+              <div key={index} onClick={() => openImageViewer(index)} className="col-sm-6 col-md-4 col-lg-4">
+                <div className="portfolio-item cursor-pointer">
+                  <div className="hover-bg">
+                    <div className="hover-text">
+                      <h4>{title}</h4>
+                    </div>
+                    <img src={thumb} className="img-responsive" alt="Project Title" />{" "}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+          {isViewerOpen && (
+            <ImageViewer
+              src={images}
+              backgroundStyle={{ zIndex: 99999 }}
+              currentIndex={currentImage}
+              onClose={closeImageViewer}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+
+        <div className="feedback-wrapper pb-lg--7 pb-5">
           <div className="container">
             <div className="row">
               <div className="col-lg-6 text-left mb-3 pb-0">
@@ -461,25 +530,21 @@ class Homefour extends Component {
             </div>
           </div>
         </div>
-
-        <div className="blog-page bg-white pt-4 mb-5">
-          <div className="container">
-            <div className="d-flex align-items-center pb-4">
-                <div className="w-50">
-                    <h1 className="text-gray-800 strong font-xxl my-2">Coba Gratis Sekarang?</h1>
-                    <p className="text-gray-700 font-xxl py-2 mb-2">Daftar atau Hubungi Kami .</p>
-                </div>
-                <div className="d-flex justify-content-end w-50">
-                    <button className='bg-black font-sm px-5 py-2 text-white rounded-lg mx-1 shadow-lg' >Daftar Sekarang</button>
-                    <button className='bg-white font-sm px-5 py-2 rounded-lg mx-1 shadow-lg' >Kontak Kami</button>
-                </div>
-            </div>
+        <div className="container">
+          <div className="row align-items-center mb-5 pb-4">
+              <div className="col-lg-6 col-md-8">
+                <h1 className="text-gray-800 strong font-xxl my-2">Coba Gratis Sekarang?</h1>
+                <p className="text-gray-700 font-xxl py-2 mb-2">Daftar atau Hubungi Kami .</p>
+              </div>
+              <div className="col-lg-6 col-md-8">
+                <button className='bg-black font-sm px-5 py-2 text-white rounded-lg mx-1 mb-2'>Daftar Sekarang</button>
+                <button className='bg-white font-sm px-5 py-2 text-black rounded-lg mx-1' >Kontak Kami</button>
+              </div>
           </div>
         </div>
         <Footertwo />
       </Fragment>
     );
-  }
 }
 
 export default Homefour;

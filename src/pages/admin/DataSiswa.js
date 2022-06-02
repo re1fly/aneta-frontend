@@ -22,14 +22,14 @@ import {
     DownOutlined,
     EditOutlined,
     EllipsisOutlined,
-    MenuOutlined, PlusOutlined
+    MenuOutlined, PlusOutlined, SearchOutlined
 } from "@ant-design/icons";
-import Link from "react-router-dom/es/Link";
 import Search from "antd/es/input/Search";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
 import axios from "axios";
 import {BASE_URL} from "../../api/Url";
+import pagination from "../../components/Pagination";
 
 
 function DataSiswaAdmin() {
@@ -58,35 +58,37 @@ function DataSiswaAdmin() {
                     "type": "json",
                     "value": {
                         "tbl_induk": "x_academic_students",
-                        "pagination" : 10,
+                        "pagination": 10,
                         "join": [
                             {
                                 "tbl_join": "x_academic_year",
                                 "foregenkey": "academic_year_id",
-                                "refkey" :"id"
+                                "refkey": "id"
                             },
                             {
                                 "tbl_join": "users",
                                 "foregenkey": "user_id",
-                                "refkey" :"id"
+                                "refkey": "id"
                             },
                             {
                                 "tbl_join": "x_academic_class",
                                 "foregenkey": "class_id",
-                                "refkey" :"id"
+                                "refkey": "id"
                             },
                             {
-                                "tbl_join" : "m_user_profile",
-                                "foregenkey" : "user_id",
-                                "refkey" : "user_id"
+                                "tbl_join": "m_user_profile",
+                                "foregenkey": "user_id",
+                                "refkey": "user_id"
                             }
-                        ]
+                        ],
+                        "order_coloumn": "users.name",
+                        "order_by": "asc"
                     }
                 },
                 {
-                    "name" : "page",
-                    "type" : "string",
-                    "value" : paramsPage
+                    "name": "page",
+                    "type": "string",
+                    "value": paramsPage
                 }
             ]
         }, {
@@ -149,7 +151,98 @@ function DataSiswaAdmin() {
         </Menu>
     );
 
-    const _onSearch = value => console.log(value);
+    const _onSearch = (value) => {
+        if (value == "") {
+            window.location.reload();
+        } else {
+            notification.info({
+                message: 'Search',
+                description: 'Mencari data : ' + value,
+                duration: 1,
+                icon: <SearchOutlined/>
+            });
+            axios.post(BASE_URL, {
+                "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_students",
+                            "paginate": 200,
+                            "join": [
+                                {
+                                    "tbl_join": "x_academic_year",
+                                    "foregenkey": "academic_year_id",
+                                    "refkey": "id"
+                                },
+                                {
+                                    "tbl_join": "users",
+                                    "foregenkey": "user_id",
+                                    "refkey": "id"
+                                },
+                                {
+                                    "tbl_join": "x_academic_class",
+                                    "foregenkey": "class_id",
+                                    "refkey": "id"
+                                },
+                                {
+                                    "tbl_join": "m_user_profile",
+                                    "foregenkey": "user_id",
+                                    "refkey": "user_id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "m_user_profile",
+                                    "tbl_field": "nisn",
+                                    "tbl_value": value,
+                                    "operator": "ILIKE"
+                                },
+                                {
+                                    "tbl_coloumn": "users",
+                                    "tbl_field": "name",
+                                    "tbl_value": value,
+                                    "operator": "ILIKE"
+                                },
+                                {
+                                    "tbl_coloumn": "m_user_profile",
+                                    "tbl_field": "date_of_birth",
+                                    "tbl_value": value,
+                                    "operator": "ILIKE"
+                                },
+                                {
+                                    "tbl_coloumn": "users",
+                                    "tbl_field": "email",
+                                    "tbl_value": value,
+                                    "operator": "ILIKE"
+                                }
+
+                            ],
+                            "order_coloumn": "users.name",
+                            "order_by": "asc"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": paramsPage
+                    }
+                ]
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(function (response) {
+                const siswa = JSON.parse(response.data.variables[3].value);
+                const pagination = siswa.data.links;
+
+                setGetSiswa(siswa.data.data)
+                setBtnPagination(pagination)
+            });
+        }
+    }
 
     const columns = [
         {
@@ -196,7 +289,7 @@ function DataSiswaAdmin() {
                         let color = status.length > 5 ? 'red' : 'green';
                         return (
                             <Tag style={{borderRadius: '15px'}} color={color} key={status}>
-                                {status.toUpperCase()}
+                                {status ? 'Aktif' : 'Nonaktif'}
                             </Tag>
 
                         );
@@ -241,7 +334,7 @@ function DataSiswaAdmin() {
 
     const channelList = getSiswa.map((siswa, index) => {
         const dataBirth = siswa.date_of_birth
-        const [year, month, day] =  dataBirth.split('-');
+        const [year, month, day] = dataBirth.split('-');
         const birthDate = `${day}-${month}-${year}`;
 
         return {
@@ -285,12 +378,6 @@ function DataSiswaAdmin() {
                                       overlay={_Account}>
                                 <EllipsisOutlined/>
                             </Dropdown>
-                            {/*<a*/}
-                            {/*    href="/default-channel"*/}
-                            {/*    className="position-absolute right-0 mr-4 top-0 mt-3"*/}
-                            {/*>*/}
-                            {/*    <i className="ti-more text-grey-500 font-xs"></i>*/}
-                            {/*</a>*/}
 
                             <a
                                 href="/default-channel"
@@ -375,25 +462,27 @@ function DataSiswaAdmin() {
                    scroll={{x: 400}}
             />
             <div className="text-center mt-4">
-            {
-                btnPagination.map(dataBtn => {
-                    const labelBtn = dataBtn.label;
-                    const label = labelBtn.replace(/(&laquo\;)/g, "").replace(/(&raquo\;)/g, "")
-                    let linkUrl = dataBtn.url;
+                {
+                    btnPagination.map(dataBtn => {
+                        const labelBtn = dataBtn.label;
+                        const label = labelBtn.replace(/(&laquo\;)/g, "").replace(/(&raquo\;)/g, "")
+                        let linkUrl = dataBtn.url;
 
-                    if(linkUrl != null){
-                       linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
-                    }
+                        if (linkUrl != null) {
+                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                        }
 
-                    return (
-                        <Button className="btn btn-primary mr-2 font-xssss fw-600"
-                                disabled={linkUrl == null ? true : false}
-                                onClick={() => {setParamsPage(linkUrl)}}>
-                            {label}
-                        </Button>
-                    )
-                })
-            }
+                        return (
+                            <Button className="btn btn-primary mr-2 font-xssss fw-600"
+                                    disabled={linkUrl == null ? true : false}
+                                    onClick={() => {
+                                        setParamsPage(linkUrl)
+                                    }}>
+                                {label}
+                            </Button>
+                        )
+                    })
+                }
             </div>
 
         </>
@@ -410,44 +499,45 @@ function DataSiswaAdmin() {
                             title="Data Siswa"
                         />
                     </div>
-                </div>
-                <Card className="card bg-lightblue border-0 text-grey-900">
-                    <Row>
-                        <Col lg={12} md={12} sm={3}>
-                            <Button className="mr-4" type="primary" shape="round" size='middle'
-                                    onClick={() => setIsViewSiswa(false)}>
-                                Tambah Data
-                            </Button>
-                            <Dropdown overlay={_filterMenu}>
-                                <a className="ant-dropdown-link mr-4 font-bold"
-                                   onClick={e => e.preventDefault()}>
-                                    Filter by <DownOutlined/>
-                                </a>
-                            </Dropdown>
-                            <Dropdown overlay={_sortMenu}>
-                                <a className="ant-dropdown-link font-bold"
-                                   onClick={e => e.preventDefault()}>
-                                    Sort by <DownOutlined/>
-                                </a>
-                            </Dropdown>
-                        </Col>
-                        <Col lg={12} md={12} sm={3}>
-                            <div className="float-right">
-                                <Search className="mr-5" placeholder="Cari kata kunci" allowClear
-                                        onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
-                                {grid == false ?
-                                    <a>
-                                        <AppstoreOutlined style={{fontSize: '30px'}}
-                                                          onClick={() => setGrid(true)}/>
-                                    </a> :
-                                    <a>
-                                        <MenuOutlined style={{fontSize: '30px'}}
-                                                      onClick={() => setGrid(false)}/>
-                                    </a>}
-                            </div>
-                        </Col>
-                    </Row>
-                </Card>
+                </div>{/* <Card className="card bg-lightblue border-0 text-grey-900"> */}
+                <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
+
+            <div className="row">
+                    <div className="col-lg-8 col-md-6 my-2">
+                        <Button className="mr-4" type="primary" shape="round" size='middle'
+                                onClick={() => setIsViewSiswa(false)}>
+                            Tambah Data
+                        </Button>
+                        <Dropdown overlay={_filterMenu}>
+                            <a className="ant-dropdown-link mr-4 font-bold"
+                               onClick={e => e.preventDefault()}>
+                                Filter by <DownOutlined/>
+                            </a>
+                        </Dropdown>
+                        <Dropdown overlay={_sortMenu}>
+                            <a className="ant-dropdown-link font-bold"
+                               onClick={e => e.preventDefault()}>
+                                Sort by <DownOutlined/>
+                            </a>
+                        </Dropdown>
+                    </div>
+                    <div className="col-lg-4 col-md-6 my-2">
+                        {/*<div className="float-right">*/}
+                            <Search className="mr-3" placeholder="Cari kata kunci" allowClear
+                                    onSearch={_onSearch} style={{width: '80%'}}/>
+                            {grid == false ?
+                                <a>
+                                    <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                      onClick={() => setGrid(true)}/>
+                                </a> :
+                                <a>
+                                    <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                  onClick={() => setGrid(false)}/>
+                                </a>}
+                        </div>
+                    {/*</div>*/}
+            </div>
+            </Card>
 
                 {grid ? <CardDataSiswa/> : <TableDataSiswa/>}
             </div>

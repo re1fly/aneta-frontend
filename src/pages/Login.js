@@ -58,6 +58,7 @@ function Login() {
                 setIsLoading(false);
                 notification.error({
                     message: 'Login Failed', description: dataLogin.message,
+                    placement: 'top'
                 })
             }
         }).catch(err => {

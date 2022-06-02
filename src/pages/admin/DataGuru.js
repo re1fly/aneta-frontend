@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import Adminfooter from "../../components/Adminfooter";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
@@ -28,6 +28,8 @@ import Link from "react-router-dom/es/Link";
 import Search from "antd/es/input/Search";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
+import axios from "axios";
+import {BASE_URL} from "../../api/Url";
 
 
 function DataGuruAdmin() {
@@ -41,6 +43,8 @@ function DataGuruAdmin() {
             url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
         },
     ]);
+    const [dataProv, setDataProv] = useState([]);
+    const [dataCity, setDataCity] = useState([]);
 
     const onChange = ({fileList: newFileList}) => {
         setFileList(newFileList);
@@ -255,20 +259,14 @@ function DataGuruAdmin() {
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                         <div
                             className="card mb-4 d-block w-100 shadow-md rounded-lg p-4 border-0 text-center">
-                                                <span
-                                                    className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                                                    Aktif
-                                                </span>
+                                <span
+                                    className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                    Aktif
+                                </span>
                             <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
                                       overlay={_Account}>
                                 <EllipsisOutlined/>
                             </Dropdown>
-                            {/*<a*/}
-                            {/*    href="/default-channel"*/}
-                            {/*    className="position-absolute right-0 mr-4 top-0 mt-3"*/}
-                            {/*>*/}
-                            {/*    <i className="ti-more text-grey-500 font-xs"></i>*/}
-                            {/*</a>*/}
 
                             <a
                                 href="/default-channel"
@@ -403,7 +401,79 @@ function DataGuruAdmin() {
             {grid ? <CardDataGuru/> : <TableDataGuru/>}
         </div>
     )
+    const _getCity = (e) => {
+        const selectedProvince = e.target.value;
+        console.log(selectedProvince)
+
+        axios.post(BASE_URL, {
+            "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_get_where",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "r_city",
+                        "order_coloumn": "city",
+                        "order_by": "asc",
+                        "pagination": false,
+                        "total_result": 2,
+                        "data": [
+                            {
+                                "kondisi": "where",
+                                "tbl_coloumn": "state_id",
+                                "tbl_value": 31,
+                                "operator": "="
+                            }
+                        ],
+                        "tbl_coloumn": [
+                            "*"
+                        ]
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(function (response) {
+            const kota = JSON.parse(response.data.variables[2].value);
+           console.log(kota);
+           // setDataCity(kota)
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+
     const TambahGuru = () => {
+        axios.post(BASE_URL, {
+            "processDefinitionId": "getdataglobal:5:7248a1b1-d5a7-11ec-a658-66fc627bf211",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_getdata",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "r_state",
+                        "tbl_coloumn": [
+                            "*"
+                        ],
+                        "order_coloumn": "state",
+                        "order_by": "asc",
+                        "pagination": false,
+                        "total_result": 2
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(function (response) {
+            const data = JSON.parse(response.data.variables[2].value).data;
+            setDataProv(data);
+        });
+
         return (
             <div className="container px-3 py-4">
                 <div className="row">
@@ -453,71 +523,13 @@ function DataGuruAdmin() {
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
-                                                        Provinsi
-                                                    </label>
-                                                    <input type="text" className="form-control"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
                                                         Nomor Telefon
                                                     </label>
                                                     <input type="number" className="form-control"/>
                                                 </div>
                                             </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kota / Kabupaten
-                                                    </label>
-                                                    <input type="text" className="form-control"/>
-                                                </div>
-                                            </div>
                                         </div>
 
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Fax
-                                                    </label>
-                                                    <input type="text" className="form-control"/>
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kecamatan
-                                                    </label>
-                                                    <input type="text" className="form-control"/>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Address
-                                                    </label>
-                                                    <input type="text" className="form-control"/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kelurahan
-                                                    </label>
-                                                    <input type="text" className="form-control"/>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div className="row">
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
@@ -536,7 +548,77 @@ function DataGuruAdmin() {
                                                     <input type="date" className="form-control"/>
                                                 </div>
                                             </div>
+                                        </div>
 
+                                        <div className="row">
+                                            <div className="col-lg-6 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Provinsi
+                                                    </label>
+                                                    <select className="form-control"
+                                                            aria-label="Default select example"
+                                                            onChange={_getCity}
+                                                    >
+                                                        >
+                                                        <option value="" selected disabled>Pilih Provinsi</option>
+                                                        {dataProv.map(data => (
+                                                            <option value={data.state_code}>{data.state}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-6 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Kota / Kabupaten
+                                                    </label>
+                                                    <select className="form-control"
+                                                            aria-label="Default select example"
+                                                    >
+                                                        >
+                                                        <option value="" selected disabled>Pilih Kota</option>
+                                                        {/*{dataCity.map(data => (*/}
+                                                        {/*    <option value={data.state_id}>{data.city}</option>*/}
+                                                        {/*))}*/}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-lg-6 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Kecamatan
+                                                    </label>
+                                                    <input type="text" className="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-6 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Kelurahan
+                                                    </label>
+                                                    <input type="text" className="form-control"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-lg-12 mb-3">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Alamat
+                                                </label>
+                                                <textarea
+                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                    rows="5"
+                                                    placeholder="Isi alamat detail anda..."
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                        <div className="row">
                                             <div className="col-lg-12">
                                                 <Link
                                                     to="/account-information"
@@ -578,3 +660,4 @@ function DataGuruAdmin() {
 }
 
 export default DataGuruAdmin;
+

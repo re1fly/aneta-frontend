@@ -21,7 +21,7 @@ class Header extends Component {
           <div className="row">
             <div className="col-lg-9 navbar pt-0 pb-0">
               <Link to="/">
-                <img src="https://aneta.id/assets/img/aneta.png"></img>
+                <img className='' src="https://aneta.id/assets/img/aneta.png"></img>
                 {/* <h1 className="fredoka-font ls-3 fw-700 text-current font-xxl">
                   Elomoas
                   <span className="d-block font-xsssss ls-1 text-grey-500 open-font ">
@@ -38,13 +38,16 @@ class Header extends Component {
               >
                 <Navbar
                   expand="lg"
-                  className="dropdown-navbar slide-navmenu nav-menu"
+                  className="dropdown-navbar slide-navmenu nav-menu py-0"
                 >
                   <Navbar id="basic-navbar-nav" className="w-100 d-block">
                     <Nav className={`${colorClass}`}>
-                      <NavDropdown.Item className="mr-3" href="/contact">
+                      <a className="mr-3 navbar-feature" href="">
                         Tentang Kami
-                      </NavDropdown.Item>
+                      </a>
+                      {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
+                        Tentang Kami
+                      </NavDropdown.Item> */}
                       {/* <NavDropdown title="Home" id="basic-nav-dropdown">
                         <NavDropdown.Item href="/home-2">
                           Home One
@@ -62,9 +65,12 @@ class Header extends Component {
                           Home Five
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <NavDropdown.Item className="mr-3" href="/contact">
+                      <a className="mr-3 navbar-feature" href="">
                         Fitur
-                      </NavDropdown.Item>
+                      </a>
+                      {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
+                        Fitur
+                      </NavDropdown.Item> */}
                       {/* <NavDropdown title="Pages" id="basic-nav-dropdown">
                         <NavDropdown.Item href="/about">About</NavDropdown.Item>
                         <NavDropdown.Item href="/contact">
@@ -77,9 +83,12 @@ class Header extends Component {
                           404
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <NavDropdown.Item className="mr-3" href="/contact">
+                      <a className="mr-3 navbar-feature" href="">
                         Cara Pendaftaran
-                      </NavDropdown.Item>
+                      </a>
+                      {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
+                        Cara Pendaftaran
+                      </NavDropdown.Item> */}
                       {/* <NavDropdown title="Blog" id="basic-nav-dropdown">
                         <NavDropdown.Item href="/blog">Blog</NavDropdown.Item>
                         <NavDropdown.Item href="/blog-sidebar">
@@ -89,9 +98,12 @@ class Header extends Component {
                           Blog Single
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <NavDropdown.Item className="mr-3" href="/contact">
+                      <a className="mr-3 navbar-feature" href="">
                         Bantuan
-                      </NavDropdown.Item>
+                      </a>
+                      {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
+                        Bantuan
+                      </NavDropdown.Item> */}
                       {/* <NavDropdown title="Courses" id="basic-nav-dropdown">
                         <NavDropdown.Item href="/courses-grid-1">
                           Course Gird 1
@@ -123,7 +135,7 @@ class Header extends Component {
                 </Navbar>
               </div>
             </div>
-            <div className="col-lg-3 text-right d-none d-lg-block">
+            <div className="col-lg-3 text-right navbar d-none d-lg-block">
               {/* <Link
                 to="#"
                 data-toggle="modal"
@@ -135,14 +147,14 @@ class Header extends Component {
                 <span className="icon-count bg-current">3</span>
               </Link> */}
               <Link
-                to="#"
+                to="/register"
                 className={`float-right text-center mt-1 ml-4 text-grey-800 position-relative ${colorClass}`}
               >
                 <i className="ti-user font-lg"></i>
                 <span className="font-xssss fw-500 d-block lh-1">Register</span>
               </Link>
               <Link
-                to="#"
+                to="/login"
                 className={`float-right d-none d-lg-block text-center mt-1 ml-4 text-grey-800 ${colorClass}`}
               >
                 <i className="ti-shift-right font-lg"></i>

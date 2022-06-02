@@ -68,16 +68,16 @@ export default function TugasiSiswa() {
                                 Ukuran file tidak boleh melebihi 20MB dan berformat PDF, JPG, PNG, DOCS
                             </p>
                         </Dragger>
-                        <div className='items-center mt-5'>
+                        <div className='items-center mt-3'>
                             <Link
                                 to="/account-information"
-                                className="bg-current ml-2 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                className="bg-current ml-2 mb-2 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                 >
                                 Selanjutnya
                             </Link>
                             <Link
                                 to="/account-information"
-                                className="border-0 card ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                className="border-0 ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                 >
                                 Kembali
                             </Link>

@@ -117,12 +117,12 @@ function BerandaSiswa() {
                                         </Button>
                                     </div>
                                 </div>
-                                <div className='px-3'>
+                                <div className=''>
                                     <div className="row">
                                         {channelList.map((value, index) => (
-                                            <div className="col-xl-4 col-lg-6 col-md-6 px-0" key={index}>
+                                            <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                                                 <Link to='/siswa-kelas-materi'>
-                                                    <div className="card d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 text-center">
+                                                    <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center">
                                                         <span
                                                             className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
                                                             Online

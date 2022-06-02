@@ -353,39 +353,40 @@ export default function DataKelasAdmin() {
                         onBack={() => window.history.back()}
                         title="Data Kelas"
                     />
-                    <Card className="shadow-md mb-4">
-                        <Row>
-                            <Col span={12}>
-                                <Button onClick={() => setIsViewKelas(false)} className="bg-current" type="primary" shape="round" size='middle'>
+                    <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
+                        <div className="row">
+                            <div className="col-lg-8 col-md-6 my-2">
+                                <Button className="mr-4" type="primary" shape="round" size='middle'
+                                        onClick={() => setIsViewKelas(false)}>
                                     Tambah Data
                                 </Button>
                                 <Dropdown overlay={_filterMenu}>
-                                    <a className="ant-dropdown-link ml-2 mr-2 font-bold" onClick={e => e.preventDefault()}>
+                                    <a className="ant-dropdown-link mr-4 font-bold"
+                                    onClick={e => e.preventDefault()}>
                                         Filter by <DownOutlined/>
                                     </a>
                                 </Dropdown>
                                 <Dropdown overlay={_sortMenu}>
-                                    <a className="ant-dropdown-link font-bold" onClick={e => e.preventDefault()}>
+                                    <a className="ant-dropdown-link font-bold"
+                                    onClick={e => e.preventDefault()}>
                                         Sort by <DownOutlined/>
                                     </a>
                                 </Dropdown>
-                            </Col>
-                            <Col span={12}>
-                                <div className="float-right">
-                                    <Search className="mr-6" placeholder="Cari kata kunci" allowClear
-                                            onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
-                                    {grid == false ? 
+                            </div>
+                            <div className="col-lg-4 col-md-6 my-2">
+                                <Search className="mr-3" placeholder="Cari kata kunci" allowClear
+                                        onSearch={_onSearch} style={{width: '80%'}}/>
+                                {grid == false ?
                                     <a>
-                                    <AppstoreOutlined style={{fontSize: '30px'}}
+                                        <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
                                                         onClick={() => setGrid(true)}/>
                                     </a> :
                                     <a>
-                                    <MenuOutlined style={{fontSize: '30px'}}
+                                        <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
                                                     onClick={() => setGrid(false)}/>
                                     </a>}
-                                </div>
-                            </Col>
-                        </Row>
+                        </div>
+                        </div>
                     </Card>
                     {grid ? <CardDataKelas/> : <TableKelas/>}
                 </div>

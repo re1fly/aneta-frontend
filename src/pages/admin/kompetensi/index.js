@@ -297,7 +297,7 @@ export default function KompetensiAdmin() {
         ];
     
         return(
-            <div className="row px-3">
+            <div className="row">
                 {channelList.map((value, index) => (
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                         <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
@@ -390,39 +390,40 @@ export default function KompetensiAdmin() {
                         onBack={() => window.history.back()}
                         title="Data Kompetensi"
                         />
-                        <Card className="w-full shadow-md py-0 mb-4">
-                            <Row>
-                                <Col span={12}>
-                                    <Button onClick={() => setIsViewKompetensi(false)} className="mr-2 bg-current" type="primary" shape="round" size='middle'>
-                                    Tambah Data
+                        <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
+                            <div className="row">
+                                <div className="col-lg-8 col-md-6 my-2">
+                                    <Button className="mr-4" type="primary" shape="round" size='middle'
+                                            onClick={() => setIsViewKompetensi(false)}>
+                                        Tambah Data
                                     </Button>
-                                <Dropdown overlay={_filterMenu}>
-                                    <a className="ant-dropdown-link mr-2 font-bold" onClick={e => e.preventDefault()}>
+                                    <Dropdown overlay={_filterMenu}>
+                                        <a className="ant-dropdown-link mr-4 font-bold"
+                                        onClick={e => e.preventDefault()}>
                                         Filter by <DownOutlined/>
-                                    </a>
-                                </Dropdown>
-                                <Dropdown overlay={_sortMenu}>
-                                    <a className="ant-dropdown-link font-bold" onClick={e => e.preventDefault()}>
+                                        </a>
+                                    </Dropdown>
+                                    <Dropdown overlay={_sortMenu}>
+                                        <a className="ant-dropdown-link font-bold"
+                                        onClick={e => e.preventDefault()}>
                                         Sort by <DownOutlined/>
-                                    </a>
-                                </Dropdown>
-                                </Col>
-                                <Col span={12}>
-                                <div className="float-right">
-                                    <Search className="mr-6" placeholder="Cari kata kunci" allowClear
-                                            onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
-                                    {grid == false ? 
-                                    <a>
-                                    <AppstoreOutlined style={{fontSize: '30px'}}
-                                                        onClick={() => setGrid(true)}/>
-                                    </a> :
-                                    <a>
-                                    <MenuOutlined style={{fontSize: '30px'}}
-                                                    onClick={() => setGrid(false)}/>
-                                    </a>}
+                                        </a>
+                                    </Dropdown>
                                 </div>
-                                </Col>
-                            </Row>
+                                <div className="col-lg-4 col-md-6 my-2">
+                                    <Search className="mr-3" placeholder="Cari kata kunci" allowClear
+                                            onSearch={_onSearch} style={{width: '80%'}}/>
+                                    {grid == false ?
+                                        <a>
+                                        <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                        onClick={() => setGrid(true)}/>
+                                        </a> :
+                                        <a>
+                                        <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                    onClick={() => setGrid(false)}/>
+                                        </a>}
+                                </div>
+                            </div>
                         </Card>
                         <div className="py-2">
                             <div className="flex">
@@ -748,7 +749,8 @@ export default function KompetensiAdmin() {
                     dataSource={data}
                     onChange={onChangeTable}
                     pagination={false}
-                    rowClassName="bg-greylight text-grey-900"/>
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{x:400}}/>
                 </div>
               </div>
             </div>

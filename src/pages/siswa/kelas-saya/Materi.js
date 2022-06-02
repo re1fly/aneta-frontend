@@ -39,7 +39,7 @@ export default function MateriSiswa() {
                                 <h4 className="mt-5 strong text-lg">1.1 Kerajaan Kelinci dan Pak Tani</h4>
                                 <img src="https://clickitregistry.com/wp-content/uploads/2020/12/pile-of-books.jpg"
                                     className="w300 rounded-lg mt-2"/>
-                                <h5 className=" mt-4">
+                                <h5 className="lh-24 mt-4 mb-5">
                                     Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type book. t has survived not only five centuries, but also the leap into electronic typesetting.
                                     Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type book. t has survived not only five centuries, but also the leap into electronic typesetting.
                                     <br/>

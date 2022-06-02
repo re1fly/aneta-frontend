@@ -91,6 +91,7 @@ import DataGuruAdmin from "./pages/admin/DataGuru";
 import DataSiswaAdmin from "./pages/admin/DataSiswa";
 import DataKelasAdmin from './pages/admin/data-kelas/index';
 import JadwalPelajaranAdmin from './pages/admin/jadwal-pelajaran/index';
+import JadwalPelajaranAdminDetail from "./pages/admin/jadwal-pelajaran/Detail";
 import DataPelajaranAdmin from './pages/admin/data-pelajaran/index';
 import KompetensiAdmin from './pages/admin/kompetensi';
 
@@ -102,20 +103,19 @@ import GuruDetailPelajaran from "./pages/guru/data-materi/Detail";
 
 // Role siswa
 import TugasiSiswa from './pages/siswa/kelas-saya/TugasHarian';
+import MateriSiswa from "./pages/siswa/kelas-saya/Materi";
 
 // Role Orang Tua
 import BerandaOrangtua from "./pages/orangtua/Beranda";
 import DataAnakOrangtua from "./pages/orangtua/DataAnak";
 import BerandaSiswa from "./pages/siswa/Beranda";
-import JadwalPelajaranAdminDetail from "./pages/admin/jadwal-pelajaran/Detail";
-import MateriSiswa from "./pages/siswa/kelas-saya/Materi";
 
 class Root extends Component {
   render() {
     return (
       <BrowserRouter basename={'/'}>
         <Switch>
-          <Route exact path={`${process.env.PUBLIC_URL}/`} component={Demo} />
+          <Route exact path={`${process.env.PUBLIC_URL}/`} component={Homefour} />
           <Route
               exact
               path={`${process.env.PUBLIC_URL}/admin-beranda`}

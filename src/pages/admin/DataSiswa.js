@@ -47,6 +47,37 @@ function DataSiswaAdmin() {
     const [getSiswa, setGetSiswa] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState('1');
+    const [dataClass, setDataClass] = useState();
+
+    const [newSiswa, setNewSiswa] = useState({
+        nisn: "123",
+        image: "",
+        image_type: "jpeg",
+        nama_siswa: "Budi",
+        email: "budi@gmail.com",
+        tempat_lahir: "jakarta",
+        tanggal_lahir: "2020-09-09 09:00:00",
+        no_hp: "29032932",
+        provinsi: "DKI Jakarta",
+        kota: "Jakarta",
+        kecamatan: "kelapa gading",
+        kelurahan: "kelapa cengkir",
+        alamat: "no 7",
+        academic_year_id: 1,
+        id_class: "2",
+        email_ortu: "tatang@gmail.com",
+        nama_ortu: "tatang",
+        tempat_lahir_ortu: "jakarta",
+        tanggal_lahir_ortu: "2020-09-09 09:00:00",
+        no_hp_ortu: "232321",
+        provinsi_ortu: "DKI Jakarta",
+        kota_ortu: "jakarta",
+        kecamatan_ortu: "kelapa gading",
+        kelurahan_ortu: "kelapa cengkir",
+        alamat_ortu: "no 7",
+        profesi_ortu: "wiraswasta",
+        nik: "a"
+    });
 
     useEffect(() => {
         axios.post(BASE_URL, {
@@ -102,7 +133,104 @@ function DataSiswaAdmin() {
             const pagination = siswa.data.links;
             setBtnPagination(pagination)
         });
+        axios.post(BASE_URL, {
+            "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_get_where",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "x_academic_class",
+                        "pagination": false,
+                        "total_result": 2,
+                        "order_coloumn": "x_academic_class.class",
+                        "order_by": "asc",
+                        "data": [
+                            {
+                                "kondisi": "where",
+                                "tbl_coloumn": "academic_year_id",
+                                "tbl_value": "1",
+                                "operator": "="
+                            }
+                        ],
+                        "tbl_coloumn": [
+                            "*"
+                        ]
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(function (response) {
+            const dataClass = JSON.parse(response.data.variables[2].value);
+            setDataClass(dataClass)
+        }).catch(function (error) {
+            console.log(error);
+        });
+
     }, [paramsPage])
+
+
+    const createSiswa = () => {
+        axios.post(BASE_URL, {
+            "processDefinitionId": "createsiswa:6:f61a59cc-e247-11ec-a2ad-3a00788faff5",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "siswa",
+                    "type": "json",
+                    "value": {
+                        "image": newSiswa.image,
+                        "image_type": newSiswa.image_type,
+                        "nisn": newSiswa.nisn,
+                        "nama_siswa": newSiswa.nama_siswa,
+                        "email": newSiswa.email,
+                        "tempat_lahir": newSiswa.tempat_lahir,
+                        "tanggal_lahir": newSiswa.tanggal_lahir,
+                        "no_hp": newSiswa.no_hp,
+                        "provinsi": newSiswa.provinsi,
+                        "kota": newSiswa.kota,
+                        "kecamatan": newSiswa.kecamatan,
+                        "kelurahan": newSiswa.kelurahan,
+                        "alamat": newSiswa.alamat,
+                        "academic_year_id": newSiswa.academic_year_id,
+                        "id_class": newSiswa.id_class,
+                        "email_ortu": newSiswa.email_ortu,
+                        "nama_ortu": newSiswa.nama_ortu,
+                        "tempat_lahir_ortu": newSiswa.tempat_lahir_ortu,
+                        "tanggal_lahir_ortu": newSiswa.tanggal_lahir_ortu,
+                        "no_hp_ortu": newSiswa.no_hp_ortu,
+                        "provinsi_ortu": newSiswa.provinsi_ortu,
+                        "kota_ortu": newSiswa.kota_ortu,
+                        "kecamatan_ortu": newSiswa.kecamatan_ortu,
+                        "kelurahan_ortu": newSiswa.kelurahan_ortu,
+                        "alamat_ortu": newSiswa.alamat_ortu,
+                        "profesi_ortu": newSiswa.profesi_ortu,
+                        "nik": newSiswa.nik
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(function (response) {
+            const dataStatus = response.data.variables[2].value;
+            // const dataMessage = response.statusText;
+
+
+            // notification.success({
+            //     message: dataStatus,
+            //     description: dataMessage,
+            //     placement: 'top'
+            // })
+            console.log(dataStatus)
+            alert(dataStatus)
+        });
+    }
 
     const onChange = ({fileList: newFileList}) => {
         setFileList(newFileList);
@@ -437,7 +565,7 @@ function DataSiswaAdmin() {
 
                                 <div className="row ml-3">
                                     <div className="col-3">
-                                        <p className="font-xssss float-left lh-1">Email</p>
+                                        <p className="font-xssssa float-left lh-1">Email</p>
                                     </div>
                                     <div className="col-9">
                                         <p className="font-xssss float-left lh-1">: {value.email}</p>
@@ -499,30 +627,31 @@ function DataSiswaAdmin() {
                             title="Data Siswa"
                         />
                     </div>
-                </div>{/* <Card className="card bg-lightblue border-0 text-grey-900"> */}
+                </div>
+                {/* <Card className="card bg-lightblue border-0 text-grey-900"> */}
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
 
-            <div className="row">
-                    <div className="col-lg-8 col-md-6 my-2">
-                        <Button className="mr-4" type="primary" shape="round" size='middle'
-                                onClick={() => setIsViewSiswa(false)}>
-                            Tambah Data
-                        </Button>
-                        <Dropdown overlay={_filterMenu}>
-                            <a className="ant-dropdown-link mr-4 font-bold"
-                               onClick={e => e.preventDefault()}>
-                                Filter by <DownOutlined/>
-                            </a>
-                        </Dropdown>
-                        <Dropdown overlay={_sortMenu}>
-                            <a className="ant-dropdown-link font-bold"
-                               onClick={e => e.preventDefault()}>
-                                Sort by <DownOutlined/>
-                            </a>
-                        </Dropdown>
-                    </div>
-                    <div className="col-lg-4 col-md-6 my-2">
-                        {/*<div className="float-right">*/}
+                    <div className="row">
+                        <div className="col-lg-8 col-md-6 my-2">
+                            <Button className="mr-4" type="primary" shape="round" size='middle'
+                                    onClick={() => setIsViewSiswa(false)}>
+                                Tambah Data
+                            </Button>
+                            <Dropdown overlay={_filterMenu}>
+                                <a className="ant-dropdown-link mr-4 font-bold"
+                                   onClick={e => e.preventDefault()}>
+                                    Filter by <DownOutlined/>
+                                </a>
+                            </Dropdown>
+                            <Dropdown overlay={_sortMenu}>
+                                <a className="ant-dropdown-link font-bold"
+                                   onClick={e => e.preventDefault()}>
+                                    Sort by <DownOutlined/>
+                                </a>
+                            </Dropdown>
+                        </div>
+                        <div className="col-lg-4 col-md-6 my-2">
+                            {/*<div className="float-right">*/}
                             <Search className="mr-3" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{width: '80%'}}/>
                             {grid == false ?
@@ -535,14 +664,24 @@ function DataSiswaAdmin() {
                                                   onClick={() => setGrid(false)}/>
                                 </a>}
                         </div>
-                    {/*</div>*/}
-            </div>
-            </Card>
+                        {/*</div>*/}
+                    </div>
+                </Card>
 
                 {grid ? <CardDataSiswa/> : <TableDataSiswa/>}
             </div>
         )
     }
+
+    const _handleNewSiswa = (e) => {
+        e.preventDefault();
+        const {name, value} = e.target;
+        setNewSiswa(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
+
 
     const DataFormSiswa = () => {
         return (
@@ -587,8 +726,20 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         NISN
                                                     </label>
-                                                    <input type="number" className="form-control"/>
+                                                    <input type="text"
+                                                           // key="form_nisn"
+                                                           className="form-control"
+                                                           value={newSiswa.nisn}
+                                                           name="nisn"
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
+                                                <a
+                                                    onClick={() => console.log(newSiswa)}
+                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                >
+                                                    Batal
+                                                </a>
                                             </div>
 
                                             <div className="col-lg-6 mb-3">
@@ -596,7 +747,34 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Nama Siswa
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           // key="form_nama"
+                                                           className="form-control"
+                                                           name="nama_siswa"
+                                                           value={newSiswa.nama_siswa}
+                                                           onChange={_handleNewSiswa}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-lg-12 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Kelas
+                                                    </label>
+                                                    <select className="form-control"
+                                                            aria-label="Default select example"
+                                                            name="id_class"
+                                                            value={newSiswa.id_class}
+                                                            onChange={_handleNewSiswa}
+                                                    >
+                                                        
+                                                        <option value="" selected disabled>Pilih Kelas</option>
+                                                        {dataClass.map(data => (
+                                                            <option value={data.id}>{data.class}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -607,7 +785,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tempat Lahir
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="tempat_lahir"
+                                                           value={newSiswa.tempat_lahir}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -616,7 +799,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tanggal Lahir
                                                     </label>
-                                                    <input type="date" className="form-control"/>
+                                                    <input type="date"
+                                                           className="form-control"
+                                                           value={newSiswa.tanggal_lahir}
+                                                           name="tanggal_lahir"
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -627,7 +815,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Email
                                                     </label>
-                                                    <input type="email" className="form-control"/>
+                                                    <input type="email"
+                                                           className="form-control"
+                                                           value={newSiswa.email}
+                                                           onChange={_handleNewSiswa}
+                                                           name="email"
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 mb-3">
@@ -635,7 +828,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         No. HP
                                                     </label>
-                                                    <input type="number" className="form-control"/>
+                                                    <input type="number"
+                                                           className="form-control"
+                                                           value={newSiswa.no_hp}
+                                                           onChange={_handleNewSiswa}
+                                                           name="no_hp"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -646,7 +844,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Provinsi
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           value={newSiswa.provinsi}
+                                                           onChange={_handleNewSiswa}
+                                                           name="provinsi"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -655,7 +858,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kota
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           value={newSiswa.kota}
+                                                           onChange={_handleNewSiswa}
+                                                           name="kota"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -665,7 +873,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kecamatan
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           value={newSiswa.kecamatan}
+                                                           onChange={_handleNewSiswa}
+                                                           name="kecamatan"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -674,7 +887,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kelurahan
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           value={newSiswa.kelurahan}
+                                                           onChange={_handleNewSiswa}
+                                                           name="kelurahan"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -686,6 +904,9 @@ function DataSiswaAdmin() {
                                                     className="form-control mb-0 p-3 bg-greylight lh-16"
                                                     rows="5"
                                                     placeholder="Isi alamat detail anda..."
+                                                    value={newSiswa.alamat}
+                                                    onChange={_handleNewSiswa}
+                                                    name="alamat"
                                                 ></textarea>
                                             </div>
 
@@ -736,7 +957,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Nama Orang Tua / Wali
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="nama_ortu"
+                                                           value={newSiswa.nama_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -745,7 +971,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Email
                                                     </label>
-                                                    <input type="email" className="form-control"/>
+                                                    <input type="email"
+                                                           className="form-control"
+                                                           name="email_ortu"
+                                                           value={newSiswa.email_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -756,7 +987,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tempat Lahir
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="tempat_lahir_ortu"
+                                                           value={newSiswa.tempat_lahir_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -765,7 +1001,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tanggal Lahir
                                                     </label>
-                                                    <input type="date" className="form-control"/>
+                                                    <input type="date"
+                                                           className="form-control"
+                                                           name="tanggal_lahir_ortu"
+                                                           value={newSiswa.tanggal_lahir_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -776,7 +1017,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Email
                                                     </label>
-                                                    <input type="email" className="form-control"/>
+                                                    <input type="email"
+                                                           className="form-control"
+                                                           name="email_ortu"
+                                                           value={newSiswa.email_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 mb-3">
@@ -784,7 +1030,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         No. HP
                                                     </label>
-                                                    <input type="number" className="form-control"/>
+                                                    <input type="number"
+                                                           className="form-control"
+                                                           name="no_hp_ortu"
+                                                           value={newSiswa.no_hp_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -795,7 +1046,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Provinsi
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="provinsi_ortu"
+                                                           value={newSiswa.provinsi_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 mb-3">
@@ -803,7 +1059,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kota
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="kota_ortu"
+                                                           value={newSiswa.kota_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -813,7 +1074,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kecamatan
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="kecamatan_ortu"
+                                                           value={newSiswa.kecamatan_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -822,7 +1088,12 @@ function DataSiswaAdmin() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kelurahan
                                                     </label>
-                                                    <input type="text" className="form-control"/>
+                                                    <input type="text"
+                                                           className="form-control"
+                                                           name="kelurahan_ortu"
+                                                           value={newSiswa.kelurahan_ortu}
+                                                           onChange={_handleNewSiswa}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -834,12 +1105,15 @@ function DataSiswaAdmin() {
                                                     className="form-control mb-0 p-3 bg-greylight lh-16"
                                                     rows="5"
                                                     placeholder="Isi alamat detail anda..."
+                                                    name="alamat_ortu"
+                                                    value={newSiswa.alamat_ortu}
+                                                    onChange={_handleNewSiswa}
                                                 ></textarea>
                                             </div>
 
                                             <div className="col-lg-12">
                                                 <a className="bg-current text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                   onClick={() => alert('saved')}
+                                                   onClick={createSiswa}
                                                 >
                                                     Simpan
                                                 </a>
@@ -865,7 +1139,7 @@ function DataSiswaAdmin() {
     const TambahSiswa = () => {
         return (
             <>
-                {isViewFormSiswa ? <DataFormSiswa/> : <DataFormOrangtua/>}
+                {isViewFormSiswa ? DataFormSiswa(): DataFormOrangtua()}
             </>
 
         )

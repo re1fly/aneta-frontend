@@ -32,7 +32,7 @@ export default function MateriSiswa() {
                                 </Link>
                                 <Link
                                     to="/siswa-kelas-tugas"
-                                    className="card w-50 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                    className="card w-50 bg-lightblue text-center font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                 >
                                     Tugas Harian
                                 </Link>

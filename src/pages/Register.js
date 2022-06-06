@@ -1,10 +1,52 @@
 import React, {Fragment, useState} from 'react';
-import {notification} from "antd";
+import {notification, Button, Modal, Card} from "antd";
+import ImgCrop from "antd-img-crop";
+import Upload from "antd/es/upload/Upload";
+import {PlusOutlined} from "@ant-design/icons";
 
 function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Modals
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+    const [fileList, setFileList] = useState([
+        {
+            uid: '-1',
+            name: 'image.png',
+            status: 'done',
+            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        },
+    ]);
+
+    const onChange = ({fileList: newFileList}) => {
+        setFileList(newFileList);
+    };
+
+    const onPreview = async file => {
+        let src = file.url;
+        if (!src) {
+            src = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
+        }
+        const image = new Image();
+        image.src = src;
+        const imgWindow = window.open(src);
+        imgWindow.document.write(image.outerHTML);
+    };
 
     const _handleSubmit = (e) => {
         e.preventDefault();
@@ -103,6 +145,140 @@ function Register() {
                                     </h6>
                                 </div>
                                 </form>
+                                {/* <div>
+                                    <Button type="primary" onClick={showModal}>
+                                        Show Modal
+                                    </Button>
+                                    <Modal title="Register Step 2" 
+                                           visible={isModalVisible}
+                                           onOk={handleOk}
+                                           onCancel={handleCancel}
+                                           closable={false}
+                                           centered={true}
+                                           className="w-50 h-75">
+                                    <div className="card-body p-lg-5 p-4 w-100 border-0 ">
+                                    <div class="row">
+                                        <div className="col-lg-12 mb-5">
+                                            <div className="d-flex justify-content-center">
+                                                <Card className="bg-lightblue" style={{width: 157}}>
+                                                    <ImgCrop rotate>
+                                                        <Upload
+                                                            className="avatar-uploader"
+                                                            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                                            listType="picture-card"
+                                                            fileList={fileList}
+                                                            onChange={onChange}
+                                                            onPreview={onPreview}
+                                                        >
+                                                            {fileList.length < 1 && <PlusOutlined/>}
+                                                        </Upload>
+                                                    </ImgCrop>
+                                                </Card>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form action="#">
+                                        <div className="row">
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Nama
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Email
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Phone
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Fax
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Website
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Type
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Provinsi
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Kecamatan
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-4 mb-1">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Kelurahan
+                                                    </label>
+                                                    <input type="text" className="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-lg-12 mb-1">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Alamat
+                                                </label>
+                                                <textarea
+                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                    rows="5"
+                                                    placeholder="Isi alamat detail anda..."
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                </Modal>
+                                </div> */}
                             </div>
                         </div>
                     </div>

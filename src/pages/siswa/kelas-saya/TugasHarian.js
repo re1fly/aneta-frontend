@@ -48,7 +48,7 @@ export default function TugasiSiswa() {
                       />
                         <Link
                             to="/siswa-kelas-materi"
-                            className="card w-50 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                            className="card w-50 bg-lightblue text-center font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                         >
                             Materi
                         </Link>
@@ -77,7 +77,7 @@ export default function TugasiSiswa() {
                             </Link>
                             <Link
                                 to="/account-information"
-                                className="border-0 ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                className="border-0 ml-2 bg-lightblue text-center font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                 >
                                 Kembali
                             </Link>

@@ -146,14 +146,32 @@ class Footertwo extends Component {
                   </div>
                   <div className="col-md-4 col-lg-2 col-sm-6 col-xs-6">
                     <h5 className="mb-3">Office</h5>
-                    <p className="w-100">
-                      41 madison ave, floor 24 new work, NY 10010 <br />
-                      1-877-932-7111
-                    </p>
-                    <p className="w-100">
-                      41 madison ave, floor 24 new work, NY 10010 <br />
-                      1-877-932-7111
-                    </p>
+                    <div>
+                      <div className='d-flex align-items-start'>
+                        <i className='feather-map-pin text-warning mr-2 mt-2'></i>
+                        <p className="w-100">
+                          Wisma SMR, Jl.Yos Sudarso Kav.89 Jakarta Utara, Indonesia
+                        </p>
+                      </div>
+                      <div className='d-flex align-items-start'>
+                        <i className='feather-phone-call text-warning mr-2 mt-2'></i>
+                        <p className="w-100">
+                          +62 (21) 456 7890
+                        </p>
+                      </div>
+                      <div className='d-flex align-items-start'>
+                        <i className='feather-mail text-warning mr-2 mt-2'></i>
+                        <p className="w-100">
+                          hello@aneta.id
+                        </p>
+                      </div>
+                      <div className='d-flex align-items-start'>
+                        <i className='feather-inbox text-warning mr-2 mt-2'></i>
+                        <p className="w-100">
+                          +62 785 4578964
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

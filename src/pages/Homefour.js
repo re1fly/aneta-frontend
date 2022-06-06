@@ -362,7 +362,7 @@ function Homefour() {
           </div>
         </div>
 
-        <div className="blog-page bg-white pt-5">
+        {/* <div className="blog-page bg-white pt-5">
           <div className="container">
             <div className="row justify-content-center">
               <div className="page-title style1 col-xl-6 col-lg-8 col-md-10 text-center mb-5">
@@ -424,51 +424,49 @@ function Homefour() {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
 
-      <div id="portfolio" className="text-center">
-      <div className="container">
-        <div className="section-title">
-          <span className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xl ls-2 alert-warning d-inline-block text-warning mr-1 mb-3">
-            Gallery
-          </span>
-          <h2 className="text-grey-900 fw-700 font-xxl pb-3 mb-0 mt-3 d-block lh-3">
-            Let's See Our Activity
-          </h2>
-          {/* <h2>Gallery</h2> */}
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit duis sed dapibus leonec.</p>
-        </div>
-        <div className="row">
-          
-            {data.map(({ title, thumb }, index) => (
-              <div key={index} onClick={() => openImageViewer(index)} className="col-sm-6 col-md-4 col-lg-4">
-                <div className="portfolio-item cursor-pointer">
-                  <div className="hover-bg">
-                    <div className="hover-text">
-                      <h4>{title}</h4>
+        {/* <div id="portfolio" className="text-center">
+          <div className="container">
+            <div className="section-title">
+              <span className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xl ls-2 alert-warning d-inline-block text-warning mr-1 mb-3">
+                Gallery
+              </span>
+              <h2 className="text-grey-900 fw-700 font-xxl pb-3 mb-0 mt-3 d-block lh-3">
+                Let's See Our Activity
+              </h2>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit duis sed dapibus leonec.</p>
+            </div>
+            <div className="row">
+              {data.map(({ title, thumb }, index) => (
+                <div key={index} onClick={() => openImageViewer(index)} className="col-sm-6 col-md-4 col-lg-4">
+                  <div className="portfolio-item cursor-pointer">
+                    <div className="hover-bg">
+                      <div className="hover-text">
+                        <h4>{title}</h4>
+                      </div>
+                      <img src={thumb} className="img-responsive" alt="Project Title" />{" "}
                     </div>
-                    <img src={thumb} className="img-responsive" alt="Project Title" />{" "}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-          {isViewerOpen && (
-            <ImageViewer
-              src={images}
-              backgroundStyle={{ zIndex: 99999 }}
-              currentIndex={currentImage}
-              onClose={closeImageViewer}
-            />
-          )}
-        </div>
-      </div>
-    </div>
+              {isViewerOpen && (
+                <ImageViewer
+                  src={images}
+                  backgroundStyle={{ zIndex: 99999 }}
+                  currentIndex={currentImage}
+                  onClose={closeImageViewer}
+                />
+              )}
+            </div>
+          </div>
+        </div> */}
 
-        <div className="feedback-wrapper pb-lg--7 pb-5">
+        <div className="feedback-wrapper pt-lg--7 pt-5">
           <div className="container">
             <div className="row">
-              <div className="col-lg-6 text-left mb-3 pb-0">
+              <div className="col-lg-6 text-left pb-0">
                 <h2 className="text-grey-800 fw-700 font-xl lh-2">
                   Apa Kata Mereka Tentang Aneta ?
                 </h2>
@@ -530,15 +528,16 @@ function Homefour() {
             </div>
           </div>
         </div>
-        <div className="container">
-          <div className="row align-items-center mb-5 pb-4">
+
+        <div className="container pt-lg--5 pb-lg--5 mb-3">
+          <div className="row align-items-center">
               <div className="col-lg-6 col-md-8">
                 <h1 className="text-gray-800 strong font-xxl my-2">Coba Gratis Sekarang?</h1>
                 <p className="text-gray-700 font-xxl py-2 mb-2">Daftar atau Hubungi Kami .</p>
               </div>
-              <div className="col-lg-6 col-md-8">
-                <button className='bg-black font-sm px-5 py-2 text-white rounded-lg mx-1 mb-2'>Daftar Sekarang</button>
-                <button className='bg-white font-sm px-5 py-2 text-black rounded-lg mx-1' >Kontak Kami</button>
+              <div className="col-lg-6 text-center col-md-8">
+                <button className='bg-black font-xs px-5 py-2 text-white rounded-lg mx-1 mb-2'>Daftar Sekarang</button>
+                <button className='bg-white font-xs px-5 py-2 text-black rounded-lg mx-1' >Kontak Kami</button>
               </div>
           </div>
         </div>

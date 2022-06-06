@@ -11,9 +11,9 @@ class Adminfooter extends Component {
                 @ Copyright 2021 All rights reserved.
               </p>
             </div>
-            <div className="col-md-6 text-center text-sm-right">
+            {/* <div className="col-md-6 text-center text-sm-right">
               <img src="assets/images/payments.jpg" alt="payment" />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

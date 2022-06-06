@@ -45,6 +45,7 @@ function DataGuruAdmin() {
     ]);
     const [dataProv, setDataProv] = useState([]);
     const [dataCity, setDataCity] = useState([]);
+    const [dataKecamatan, setDataKecamatan] = useState ([]);
 
     const onChange = ({fileList: newFileList}) => {
         setFileList(newFileList);
@@ -422,7 +423,7 @@ function DataGuruAdmin() {
                             {
                                 "kondisi": "where",
                                 "tbl_coloumn": "state_id",
-                                "tbl_value": 31,
+                                "tbl_value": selectedProvince,
                                 "operator": "="
                             }
                         ],
@@ -432,14 +433,59 @@ function DataGuruAdmin() {
                     }
                 }
             ]
-        }, {
+        }
+        , {
             headers: {
                 'Content-Type': 'application/json',
             },
         }).then(function (response) {
             const kota = JSON.parse(response.data.variables[2].value);
-           console.log(kota);
-           // setDataCity(kota)
+        //    console.log(kota);
+           setDataCity(kota)
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    console.log(dataCity);
+
+    const getKecamatan = (e) => {
+        const selectedKec = e.target.value;
+        axios.post(BASE_URL, {
+            "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_get_where",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "r_district",
+                        "pagination": false,
+                        "order_coloumn": "district",
+                        "order_by": "asc",
+                        "total_result": 2,
+                        "data": [
+                            {
+                                "kondisi": "where",
+                                "tbl_coloumn": "city_id",
+                                "tbl_value": selectedKec,
+                                "operator": "="
+                            }
+                        ],
+                        "tbl_coloumn": [
+                            "*"
+                        ]
+                    }
+                }
+            ]
+        }
+        , {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(function (response) {
+            const kecamatan = JSON.parse(response.data.variables[2].value);
+           console.log(kecamatan);
+           setDataKecamatan(kecamatan)
         }).catch(function (error) {
             console.log(error);
         });
@@ -560,10 +606,10 @@ function DataGuruAdmin() {
                                                             aria-label="Default select example"
                                                             onChange={_getCity}
                                                     >
-                                                        >
+                                                        
                                                         <option value="" selected disabled>Pilih Provinsi</option>
                                                         {dataProv.map(data => (
-                                                            <option value={data.state_code}>{data.state}</option>
+                                                            <option value={data.state_code} /*selected={data != null ? true : false}*/>{data.state}</option>
                                                         ))}
                                                     </select>
                                                 </div>
@@ -576,12 +622,13 @@ function DataGuruAdmin() {
                                                     </label>
                                                     <select className="form-control"
                                                             aria-label="Default select example"
+                                                            // onChange={getKecamatan}
                                                     >
-                                                        >
-                                                        <option value="" selected disabled>Pilih Kota</option>
-                                                        {/*{dataCity.map(data => (*/}
-                                                        {/*    <option value={data.state_id}>{data.city}</option>*/}
-                                                        {/*))}*/}
+                                                        
+                                                        <option value="" disabled>Pilih Kota</option>
+                                                        {dataCity.map(data => (
+                                                            <option value={data.id}>{data.city}</option>
+                                                        ))}
                                                     </select>
                                                 </div>
                                             </div>

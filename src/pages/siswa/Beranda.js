@@ -95,9 +95,8 @@ function BerandaSiswa() {
                                 </div>
                                 <div className="row">
                                     <div className="col-lg-12">
-                                        <div className="card w-100 bg-lightblue p-lg-5 p-4 mb-4 border-0 rounded-lg d-block float-left"
-                                             style={{minHeight: '25vh'}}>
-                                            <h2 className="text-center font-weight-bold">Pengumuman</h2>
+                                        <div className="card w-100 bg-lightblue p-4 mb-4 border-0 rounded-lg d-block float-left">
+                                            <h2 className="text-center pb-5 font-weight-bold">Pengumuman</h2>
                                         </div>
                                     </div>
                                 </div>

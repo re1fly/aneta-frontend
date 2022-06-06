@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import { Button } from 'antd'
 
 class Header extends Component {
   state = {
@@ -16,18 +17,12 @@ class Header extends Component {
       colorClass = 'text-white';
     }
     return (
-      <div className={`header-wrapper pt-3 pb-3 shadow-xss ${divClass}`}>
+      <div className={`header-wrapper pt-2 pb-2 shadow-xss ${divClass}`}>
         <div className="container">
           <div className="row">
-            <div className="col-lg-9 navbar pt-0 pb-0">
-              <Link to="/">
-                <img className='' src="https://aneta.id/assets/img/aneta.png"></img>
-                {/* <h1 className="fredoka-font ls-3 fw-700 text-current font-xxl">
-                  Elomoas
-                  <span className="d-block font-xsssss ls-1 text-grey-500 open-font ">
-                    Online Learning Course
-                  </span>
-                </h1> */}
+            <div className="col-lg-12 navbar pt-0 pb-0">
+              <Link to="/" className=''>
+                <img className='w125' src="https://aneta.id/assets/img/aneta.png"></img>
               </Link>
               <button className="navbar-toggler" onClick={this.toggleOpen}>
                 <span className="navbar-toggler-icon"></span>
@@ -41,8 +36,9 @@ class Header extends Component {
                   className="dropdown-navbar slide-navmenu nav-menu py-0"
                 >
                   <Navbar id="basic-navbar-nav" className="w-100 d-block">
-                    <Nav className={`${colorClass}`}>
-                      <a className="mr-3 navbar-feature" href="">
+                    <Nav className={`mt-2 ${colorClass}`}>
+                      
+                      <a className="mr-5 navbar-feature" href="">
                         Tentang Kami
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -65,7 +61,7 @@ class Header extends Component {
                           Home Five
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-3 navbar-feature" href="">
+                      <a className="mr-5 navbar-feature" href="">
                         Fitur
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -83,7 +79,7 @@ class Header extends Component {
                           404
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-3 navbar-feature" href="">
+                      <a className="mr-5 navbar-feature" href="">
                         Cara Pendaftaran
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -98,7 +94,7 @@ class Header extends Component {
                           Blog Single
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-3 navbar-feature" href="">
+                      <a className="mr-5 pr-5 navbar-feature" href="">
                         Bantuan
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -130,36 +126,32 @@ class Header extends Component {
                       <NavDropdown.Item href="/contact">
                         Contact
                       </NavDropdown.Item> */}
+                      <div className='mr-5 w125'>
+
+                      </div>
+                      
+                      <div className="mr-0 d-flex align-items-center">
+                        <Link
+                          to="/login"
+                          className={`text-center text-grey-800`}
+                        >
+                          <button className=" btn-login btn-login:hover rounded-pill px-4 py-1">
+                            Login
+                          </button>
+                        </Link>
+                        <Link
+                          to="/register"
+                          className={`text-center ml-3 text-grey-800`}
+                        >
+                          <button className="btn-register btn-register:hover rounded-pill px-3 py-1">
+                            Register
+                          </button>
+                        </Link>
+                      </div>
                     </Nav>
                   </Navbar>
                 </Navbar>
               </div>
-            </div>
-            <div className="col-lg-3 text-right navbar d-none d-lg-block">
-              {/* <Link
-                to="#"
-                data-toggle="modal"
-                data-target="#ModalCart"
-                className={`float-right text-center mt-1 ml-4 text-grey-800 position-relative ${colorClass}`}
-              >
-                <i className="ti-shopping-cart font-lg"></i>
-                <span className="font-xssss fw-500 d-block lh-1">Cart</span>
-                <span className="icon-count bg-current">3</span>
-              </Link> */}
-              <Link
-                to="/register"
-                className={`float-right text-center mt-1 ml-4 text-grey-800 position-relative ${colorClass}`}
-              >
-                <i className="ti-user font-lg"></i>
-                <span className="font-xssss fw-500 d-block lh-1">Register</span>
-              </Link>
-              <Link
-                to="/login"
-                className={`float-right d-none d-lg-block text-center mt-1 ml-4 text-grey-800 ${colorClass}`}
-              >
-                <i className="ti-shift-right font-lg"></i>
-                <span className="font-xssss fw-500 d-block lh-1">Login</span>
-              </Link>
             </div>
           </div>
         </div>

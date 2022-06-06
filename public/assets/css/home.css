@@ -124,3 +124,25 @@
   max-width: 100%;
   height: auto;
 }
+.border-none {
+	border: none;
+}
+.btn-login {
+	border: 1px solid #ff9500;
+	color: #ff9500;
+	background-color: white;
+}
+.btn-login:hover {
+	color: white;
+	background-color: #ff6b22;
+}
+.btn-register {
+	color: white;
+	background-color: #ff6b22;
+	border: 1px solid #ff6b22;
+}
+.btn-register:hover {
+	border: 1px solid #ff5900;
+	color: white;
+	background-color: #ff5900;
+}

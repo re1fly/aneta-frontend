@@ -94,12 +94,7 @@ export const searchGlobal = (value, paramsPage) => (dispatch) => {
             )
             .then(function (response) {
                 const siswa = JSON.parse(response.data.variables[3].value);
-                // const pagination = siswa.data.links;
-
                 dispatch({type: "SEARCH_GLOBAL", value: siswa});
-                console.log(siswa)
-                // setGetSiswa(siswa.data.data)
-                // setBtnPagination(pagination)
             });
     }
 };

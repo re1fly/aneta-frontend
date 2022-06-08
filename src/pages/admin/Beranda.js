@@ -83,21 +83,21 @@ function BerandaAdmin() {
             console.log('error: ', err);
         });
 
-       if(institute == 'null'){
-           setVisible(true)
-           setTimeout(() => {
-               notification.info({
-                   message: `Informasi`,
-                   description:
-                       'Sebelum masuk ke dashboard, mohon isi form Institute dan PIC terlebih dahulu.',
-                   placement: 'top',
-                   duration: 5
-               });
-           }, 500)
+        if(institute == 'null'){
+            setVisible(true)
+            setTimeout(() => {
+                notification.info({
+                    message: `Informasi`,
+                    description:
+                        'Sebelum masuk ke dashboard, mohon isi form Institute dan PIC terlebih dahulu.',
+                    placement: 'top',
+                    duration: 4
+                });
+            }, 700)
 
-       }else{
-           setVisible(false)
-       }
+        }else{
+            setVisible(false)
+        }
 
     }, []);
 
@@ -112,7 +112,6 @@ function BerandaAdmin() {
                                 Name
                             </label>
                             <input
-                                defaultValue="Joko"
                                 name="nama_pic"
                                 type="text"
                                 className="form-control"
@@ -127,7 +126,6 @@ function BerandaAdmin() {
                             </label>
                             <input
                                 type="number"
-                                defaultValue="08328382832"
                                 name="phone_pic"
                                 className="form-control"
                             />
@@ -142,7 +140,6 @@ function BerandaAdmin() {
                             </label>
                             <input
                                 type="number"
-                                defaultValue="08328382832"
                                 name="mobile_pic"
                                 className="form-control"
                             />
@@ -154,7 +151,6 @@ function BerandaAdmin() {
                                 Email
                             </label>
                             <input
-                                defaultValue="Joko"
                                 name="email_pic"
                                 type="email"
                                 className="form-control"
@@ -169,7 +165,6 @@ function BerandaAdmin() {
                                 Posisi
                             </label>
                             <input
-                                defaultValue="Kepala Admin"
                                 name="posisi_pic"
                                 type="text"
                                 className="form-control"
@@ -277,7 +272,6 @@ function BerandaAdmin() {
                                                     Name
                                                 </label>
                                                 <input
-                                                    defaultValue="Aneta"
                                                     name="nama_sekolah"
                                                     type="text"
                                                     className="form-control"
@@ -292,7 +286,6 @@ function BerandaAdmin() {
                                                 </label>
                                                 <input
                                                     type="number"
-                                                    defaultValue="08328382832"
                                                     name="phone"
                                                     className="form-control"
                                                 />
@@ -306,7 +299,6 @@ function BerandaAdmin() {
                                                     Email
                                                 </label>
                                                 <input
-                                                    defaultValue="Aneta@gmail.com"
                                                     name="email_sekolah"
                                                     type="email"
                                                     className="form-control"
@@ -320,7 +312,6 @@ function BerandaAdmin() {
                                                 </label>
                                                 <input
                                                     type="number"
-                                                    defaultValue="28302382"
                                                     name="fax"
                                                     className="form-control"
                                                 />
@@ -334,7 +325,6 @@ function BerandaAdmin() {
                                                     Provinsi
                                                 </label>
                                                 <input
-                                                    defaultValue="Jakarta"
                                                     name="provinsi"
                                                     type="text"
                                                     className="form-control"
@@ -349,7 +339,6 @@ function BerandaAdmin() {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    defaultValue="Jakarta Utara"
                                                     name="kota"
                                                     className="form-control"
                                                 />
@@ -364,7 +353,6 @@ function BerandaAdmin() {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    defaultValue="Kelapa Gading Timur"
                                                     name="kecamatan"
                                                     className="form-control"
                                                 />
@@ -377,7 +365,6 @@ function BerandaAdmin() {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    defaultValue="Kelapa Gading"
                                                     name="kelurahan"
                                                     className="form-control"
                                                 />
@@ -405,7 +392,6 @@ function BerandaAdmin() {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    defaultValue="aneta.id"
                                                     name="website"
                                                     className="form-control"
                                                 />
@@ -424,6 +410,31 @@ function BerandaAdmin() {
                                                     name="tahun_berdiri"
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-lg-12 mb-3">
+                                            <label className="mont-font fw-600 font-xsss">
+                                                Type
+                                            </label>
+                                            <select
+                                                className="form-control"
+                                                name="type"
+                                            >
+                                                <option value="" selected disabled>
+                                                    Pilih Kelas
+                                                </option>
+                                                <option value="1">
+                                                    SD
+                                                </option>
+                                                <option value="2">
+                                                    SMP
+                                                </option>
+                                                <option value="3" >
+                                                    SMA
+                                                </option>
+
+                                            </select>
                                         </div>
                                     </div>
 

@@ -40,8 +40,8 @@ function Login() {
             if (dataLogin.status === true) {
                 localStorage.setItem('user_name', (dataLogin.user.name))
                 localStorage.setItem('token', dataLogin.token)
-                // localStorage.setItem('institute', dataLogin.user.institute_id)
-                localStorage.setItem('institute', 'null')
+                localStorage.setItem('institute', dataLogin.user.institute_id)
+                // localStorage.setItem('institute', 'null')
 
 
                 if (dataLogin.user.user_role_id === 1) {

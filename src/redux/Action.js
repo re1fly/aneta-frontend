@@ -98,3 +98,8 @@ export const searchGlobal = (value, paramsPage) => (dispatch) => {
             });
     }
 };
+
+
+export const filterGlobal = (dispatch) => {
+    
+}

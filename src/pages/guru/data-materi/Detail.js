@@ -26,6 +26,7 @@ import {
 import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
+import Filter from '../../../components/Filter';
 
 function GuruDetailPelajaran() {
     const [grid, setGrid] = useState(false);
@@ -204,7 +205,8 @@ function GuruDetailPelajaran() {
                                             Tambah Data
                                         </Button>
                                     </Link>
-                                    <Dropdown overlay={_filterMenu}>
+                                    <Filter title1="Nama Materi" title2="KI/KD"/>
+                                    {/* <Dropdown overlay={_filterMenu}>
                                         <a className="ant-dropdown-link mr-4 font-bold"
                                            onClick={e => e.preventDefault()}>
                                             Filter by <DownOutlined/>
@@ -214,7 +216,7 @@ function GuruDetailPelajaran() {
                                         <a className="ant-dropdown-link font-bold" onClick={e => e.preventDefault()}>
                                             Sort by <DownOutlined/>
                                         </a>
-                                    </Dropdown>
+                                    </Dropdown> */}
                                 </Col>
                                 <Col span={12}>
                                     <div className="float-right">

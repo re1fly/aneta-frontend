@@ -79,7 +79,7 @@ function MateriPelajaranGuru() {
                                             Tambah Data
                                         </Button>
                                     </Link>
-                                    <Dropdown overlay={_filterMenu}>
+                                    {/* <Dropdown overlay={_filterMenu}>
                                         <a className="ant-dropdown-link mr-4 font-bold"
                                            onClick={e => e.preventDefault()}>
                                             Filter by <DownOutlined/>
@@ -90,7 +90,7 @@ function MateriPelajaranGuru() {
                                            onClick={e => e.preventDefault()}>
                                             Sort by <DownOutlined/>
                                         </a>
-                                    </Dropdown>
+                                    </Dropdown> */}
                                 </Col>
                                 <Col span={12}>
                                     <div className="float-right">

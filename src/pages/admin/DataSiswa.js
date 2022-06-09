@@ -32,6 +32,7 @@ import Upload from "antd/es/upload/Upload";
 import axios from "axios";
 import { BASE_URL } from "../../api/Url";
 import pagination from "../../components/Pagination";
+import Filter from '../../components/Filter';
 import {useDispatch, useSelector} from "react-redux";
 import {searchGlobal} from "../../redux/Action";
 
@@ -322,27 +323,40 @@ function DataSiswaAdmin() {
 
     const columns = [
         {
-            title: "NIS",
-            dataIndex: "nis",
-            defaultSortOrder: "ascend",
-            // sorter: (a, b) => a.nis - b.nis,
+            title: 'NIS',
+            dataIndex: 'nis',
+            defaultSortOrder: 'ascend',
+            sorter: (a, b) => a.nis - b.nis,
         },
         {
             title: "Name",
             dataIndex: "namaSiswa",
             filters: [
                 {
-                    text: "John",
-                    value: "John",
+                    text: 'Agung',
+                    value: 'Agung',
                 },
                 {
-                    text: "James",
-                    value: "James",
+                    text: 'Budi',
+                    value: 'Budi',
+                },
+                {
+                    text: 'Ms. Libby Bernhard DDS',
+                    value: 'Ms. Libby Bernhard DDS',
+                },
+                {
+                    text: 'samsul',
+                    value: 'samsul',
+                },
+                {
+                    text: 'Shyann Kirlin Sr',
+                    value: 'Shyann Kirlin Sr',
                 },
             ],
             onFilter: (value, record) => record.namaSiswa.indexOf(value) === 0,
-            sorter: (a, b) => a.namaSiswa.length - b.namaSiswa.length,
-            sortDirections: ["descend"],
+            // sorter: (a, b) => a.namaSiswa.length - b.namaSiswa.length,
+            // defaultSortOrder: 'ascend',
+            sortDirection: ["descend"]
         },
         {
             title: "Tanggal Lahir",
@@ -597,12 +611,11 @@ function DataSiswaAdmin() {
                             >
                                 Tambah Data
                             </Button>
-                            <Dropdown overlay={_filterMenu}>
-                                <a
-                                    className="ant-dropdown-link mr-4 font-bold"
-                                    onClick={(e) => e.preventDefault()}
-                                >
-                                    Filter by <DownOutlined />
+                            <Filter title1="Nama" title2="Tanggal Lahir" allowClear/>
+                            {/* <Dropdown overlay={_filterMenu}>
+                                <a className="ant-dropdown-link mr-4 font-bold"
+                                   onClick={e => e.preventDefault()}>
+                                    Filter by <DownOutlined/>
                                 </a>
                             </Dropdown>
                             <Dropdown overlay={_sortMenu}>
@@ -612,7 +625,7 @@ function DataSiswaAdmin() {
                                 >
                                     Sort by <DownOutlined />
                                 </a>
-                            </Dropdown>
+                            </Dropdown> */}
                         </div>
                         <div className="col-lg-4 col-md-6 my-2">
                             {/*<div className="float-right">*/}

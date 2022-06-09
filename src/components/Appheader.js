@@ -1,11 +1,11 @@
-import React, {Component, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, NavLink, useHistory} from 'react-router-dom';
 import Darkbutton from '../components/Darkbutton';
 
 function Appheader() {
     const [isOpen, setIsOpen] = useState(false);
     const [isActive, setIsActive] = useState(false);
-    const [collapseShow, setCollapseShow] = useState("hidden");
+    // const [collapseShow, setCollapseShow] = useState("hidden");
     const [role, setRole] = useState("");
     let router = useHistory();
 
@@ -313,8 +313,52 @@ function Appheader() {
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
-                                            <i className="feather-file-text mr-3"></i>
+                                            <i className="feather-book mr-3"></i>
                                             <span>Data Materi</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/guru-data-tugas"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-file-text mr-3"></i>
+                                            <span>Data Tugas</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/guru-jadwal-pelajaran"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-calendar mr-3"></i>
+                                            <span>Jadwal Pelajaran</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/guru-penilaian"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-file-text mr-3"></i>
+                                            <span>Penilaian</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/guru-kompetensi"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-clipboard mr-3"></i>
+                                            <span>Kompetensi</span>
                                         </NavLink>
                                     </li>
                                 </ul>
@@ -349,6 +393,61 @@ function Appheader() {
                                             <span>Kelas Saya</span>
                                         </NavLink>
                                     </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/siswa-jadwal-pelajaran"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-calendar mr-3"></i>
+                                            <span>Jadwal Pelajaran</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/siswa-tugas-dan-nilai"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-book mr-3"></i>
+                                            <span>Tugas dan Nilai</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/siswa-erapot"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-file-text mr-3"></i>
+                                            <span>E-Rapot</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/siswa-kehadiran"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-user mr-3"></i>
+                                            <span>Kehadiran</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/siswa-kompetensi"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-clipboard mr-3"></i>
+                                            <span>Kompetensi</span>
+                                        </NavLink>
+                                    </li>
                                 </ul>
                             </> : null
                         }
@@ -377,174 +476,218 @@ function Appheader() {
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
-                                            <i className="feather-book mr-3"></i>
+                                            <i className="feather-user mr-3"></i>
                                             <span>Data Anak</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/orangtua-data-anak"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-file-text mr-3"></i>
+                                            <span>Nilai Anak</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/orangtua-data-anak"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-file-text mr-3"></i>
+                                            <span>E-Rapot Anak</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/orangtua-data-anak"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-clipboard mr-3"></i>
+                                            <span>Evaluasi Anak</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/orangtua-data-anak"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-user mr-3"></i>
+                                            <span>Konsultasi</span>
                                         </NavLink>
                                     </li>
                                 </ul>
                             </> : null
                         }
-                        <div className="nav-caption fw-600 font-xssss text-grey-500">
-                            <span>New </span>Feeds
-                        </div>
-                        <ul className="mb-3">
-                            <li className="logo d-none d-xl-block d-lg-block"></li>
-                            <li>
-                                <NavLink
-                                    activeClassName="active"
-                                    to="/default"
-                                    className="nav-content-bttn open-font"
-                                    data-tab="chats"
-                                >
-                                    <i className="feather-tv mr-3"></i>
-                                    <span>Course Feed</span>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    activeClassName="active"
-                                    to="/default-follower"
-                                    className=" nav-content-bttn open-font"
-                                    data-tab="friends"
-                                >
-                                    <i className="feather-shopping-bag mr-3"></i>
-                                    <span>Followers</span>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    activeClassName="active"
-                                    to="/default-channel"
-                                    className="nav-content-bttn open-font"
-                                    data-tab="favorites"
-                                >
-                                    <i className="feather-globe mr-3"></i>
-                                    <span>Explore Channel</span>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    activeClassName="active"
-                                    to="/default-live-stream"
-                                    className="nav-content-bttn open-font"
-                                    data-tab="favorites"
-                                >
-                                    <i className="feather-play-circle mr-3"></i>
-                                    <span>Live Stream</span>
-                                </NavLink>
-                            </li>
-                            <li className="flex-lg-brackets">
-                                <NavLink
-                                    activeClassName="active"
-                                    to="/default-user-profile"
-                                    data-tab="archived"
-                                    className="nav-content-bttn open-font"
-                                >
-                                    <i className="feather-video mr-3"></i>
-                                    <span>Saved Course</span>
-                                </NavLink>
-                            </li>
-                        </ul>
+                        {/*<div className="nav-caption fw-600 font-xssss text-grey-500">*/}
+                        {/*    <span>New </span>Feeds*/}
+                        {/*</div>*/}
+                        {/*<ul className="mb-3">*/}
+                        {/*    <li className="logo d-none d-xl-block d-lg-block"></li>*/}
+                        {/*    <li>*/}
+                        {/*        <NavLink*/}
+                        {/*            activeClassName="active"*/}
+                        {/*            to="/default"*/}
+                        {/*            className="nav-content-bttn open-font"*/}
+                        {/*            data-tab="chats"*/}
+                        {/*        >*/}
+                        {/*            <i className="feather-tv mr-3"></i>*/}
+                        {/*            <span>Course Feed</span>*/}
+                        {/*        </NavLink>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <NavLink*/}
+                        {/*            activeClassName="active"*/}
+                        {/*            to="/default-follower"*/}
+                        {/*            className=" nav-content-bttn open-font"*/}
+                        {/*            data-tab="friends"*/}
+                        {/*        >*/}
+                        {/*            <i className="feather-shopping-bag mr-3"></i>*/}
+                        {/*            <span>Followers</span>*/}
+                        {/*        </NavLink>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <NavLink*/}
+                        {/*            activeClassName="active"*/}
+                        {/*            to="/default-channel"*/}
+                        {/*            className="nav-content-bttn open-font"*/}
+                        {/*            data-tab="favorites"*/}
+                        {/*        >*/}
+                        {/*            <i className="feather-globe mr-3"></i>*/}
+                        {/*            <span>Explore Channel</span>*/}
+                        {/*        </NavLink>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <NavLink*/}
+                        {/*            activeClassName="active"*/}
+                        {/*            to="/default-live-stream"*/}
+                        {/*            className="nav-content-bttn open-font"*/}
+                        {/*            data-tab="favorites"*/}
+                        {/*        >*/}
+                        {/*            <i className="feather-play-circle mr-3"></i>*/}
+                        {/*            <span>Live Stream</span>*/}
+                        {/*        </NavLink>*/}
+                        {/*    </li>*/}
+                        {/*    <li className="flex-lg-brackets">*/}
+                        {/*        <NavLink*/}
+                        {/*            activeClassName="active"*/}
+                        {/*            to="/default-user-profile"*/}
+                        {/*            data-tab="archived"*/}
+                        {/*            className="nav-content-bttn open-font"*/}
+                        {/*        >*/}
+                        {/*            <i className="feather-video mr-3"></i>*/}
+                        {/*            <span>Saved Course</span>*/}
+                        {/*        </NavLink>*/}
+                        {/*    </li>*/}
+                        {/*</ul>*/}
 
-                        <div className="nav-caption fw-600 font-xssss text-grey-500">
-                            <span>Following </span>Author
-                        </div>
-                        <ul className="mb-3">
-                            <li>
-                                <Link
-                                    to="/default-author-profile"
-                                    className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"
-                                    data-tab="chats"
-                                >
-                                    <img
-                                        src="assets/images/user.png"
-                                        alt="user"
-                                        className="w40 mr-2 rounded-circle"
-                                    />
-                                    <span>Surfiya Zakir </span>
-                                    <span className="circle-icon bg-success mt-3"></span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/default-author-profile"
-                                    className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"
-                                    data-tab="chats"
-                                >
-                                    <img
-                                        src="assets/images/user.png"
-                                        alt="user"
-                                        className="w40 mr-2 rounded-circle"
-                                    />
-                                    <span>Vincent Parks </span>
-                                    <span className="circle-icon bg-warning mt-3"></span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/default-author-profile"
-                                    className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"
-                                    data-tab="chats"
-                                >
-                                    <img
-                                        src="assets/images/user.png"
-                                        alt="user"
-                                        className="w40 mr-2 rounded-circle"
-                                    />
-                                    <span>Richard Bowers </span>
-                                    <span className="circle-icon bg-success mt-3"></span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/default-author-profile"
-                                    className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"
-                                    data-tab="chats"
-                                >
-                                    <img
-                                        src="assets/images/user.png"
-                                        alt="user"
-                                        className="w40 mr-2 rounded-circle"
-                                    />
-                                    <span>John Lambert </span>
-                                    <span className="circle-icon bg-success mt-3"></span>
-                                </Link>
-                            </li>
-                        </ul>
-                        <div className="nav-caption fw-600 font-xssss text-grey-500">
-                            <span></span> Account
-                        </div>
-                        <ul className="mb-3">
-                            <li className="logo d-none d-xl-block d-lg-block"></li>
-                            <li>
-                                <Link
-                                    to="/default-settings"
-                                    className="nav-content-bttn open-font h-auto pt-2 pb-2"
-                                >
-                                    <i className="font-sm feather-settings mr-3 text-grey-500"></i>
-                                    <span>Settings</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/default-analytics"
-                                    className="nav-content-bttn open-font h-auto pt-2 pb-2"
-                                >
-                                    <i className="font-sm feather-pie-chart mr-3 text-grey-500"></i>
-                                    <span>Analytics</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/message"
-                                    className="nav-content-bttn open-font h-auto pt-2 pb-2"
-                                >
-                                    <i className="font-sm feather-message-square mr-3 text-grey-500"></i>
-                                    <span>Chat</span>
-                                    <span className="circle-count bg-warning mt-0">23</span>
-                                </Link>
-                            </li>
-                        </ul>
+                        {/*<div className="nav-caption fw-600 font-xssss text-grey-500">*/}
+                        {/*    <span>Following </span>Author*/}
+                        {/*</div>*/}
+                        {/*<ul className="mb-3">*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/default-author-profile"*/}
+                        {/*            className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"*/}
+                        {/*            data-tab="chats"*/}
+                        {/*        >*/}
+                        {/*            <img*/}
+                        {/*                src="assets/images/user.png"*/}
+                        {/*                alt="user"*/}
+                        {/*                className="w40 mr-2 rounded-circle"*/}
+                        {/*            />*/}
+                        {/*            <span>Surfiya Zakir </span>*/}
+                        {/*            <span className="circle-icon bg-success mt-3"></span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/default-author-profile"*/}
+                        {/*            className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"*/}
+                        {/*            data-tab="chats"*/}
+                        {/*        >*/}
+                        {/*            <img*/}
+                        {/*                src="assets/images/user.png"*/}
+                        {/*                alt="user"*/}
+                        {/*                className="w40 mr-2 rounded-circle"*/}
+                        {/*            />*/}
+                        {/*            <span>Vincent Parks </span>*/}
+                        {/*            <span className="circle-icon bg-warning mt-3"></span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/default-author-profile"*/}
+                        {/*            className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"*/}
+                        {/*            data-tab="chats"*/}
+                        {/*        >*/}
+                        {/*            <img*/}
+                        {/*                src="assets/images/user.png"*/}
+                        {/*                alt="user"*/}
+                        {/*                className="w40 mr-2 rounded-circle"*/}
+                        {/*            />*/}
+                        {/*            <span>Richard Bowers </span>*/}
+                        {/*            <span className="circle-icon bg-success mt-3"></span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/default-author-profile"*/}
+                        {/*            className="nav-content-bttn open-font pl-2 pb-2 pt-1 h-auto"*/}
+                        {/*            data-tab="chats"*/}
+                        {/*        >*/}
+                        {/*            <img*/}
+                        {/*                src="assets/images/user.png"*/}
+                        {/*                alt="user"*/}
+                        {/*                className="w40 mr-2 rounded-circle"*/}
+                        {/*            />*/}
+                        {/*            <span>John Lambert </span>*/}
+                        {/*            <span className="circle-icon bg-success mt-3"></span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*</ul>*/}
+                        {/*<div className="nav-caption fw-600 font-xssss text-grey-500">*/}
+                        {/*    <span></span> Account*/}
+                        {/*</div>*/}
+                        {/*<ul className="mb-3">*/}
+                        {/*    <li className="logo d-none d-xl-block d-lg-block"></li>*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/default-settings"*/}
+                        {/*            className="nav-content-bttn open-font h-auto pt-2 pb-2"*/}
+                        {/*        >*/}
+                        {/*            <i className="font-sm feather-settings mr-3 text-grey-500"></i>*/}
+                        {/*            <span>Settings</span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/default-analytics"*/}
+                        {/*            className="nav-content-bttn open-font h-auto pt-2 pb-2"*/}
+                        {/*        >*/}
+                        {/*            <i className="font-sm feather-pie-chart mr-3 text-grey-500"></i>*/}
+                        {/*            <span>Analytics</span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*    <li>*/}
+                        {/*        <Link*/}
+                        {/*            to="/message"*/}
+                        {/*            className="nav-content-bttn open-font h-auto pt-2 pb-2"*/}
+                        {/*        >*/}
+                        {/*            <i className="font-sm feather-message-square mr-3 text-grey-500"></i>*/}
+                        {/*            <span>Chat</span>*/}
+                        {/*            <span className="circle-count bg-warning mt-0">23</span>*/}
+                        {/*        </Link>*/}
+                        {/*    </li>*/}
+                        {/*</ul>*/}
                     </div>
                 </div>
             </nav>

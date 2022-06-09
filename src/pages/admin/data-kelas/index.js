@@ -30,6 +30,7 @@ import Upload from "antd/es/upload/Upload";
 import Adminfooter from '../../../components/Adminfooter';
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
+import Filter from '../../../components/Filter';
 
 export default function DataKelasAdmin() {
     const [grid, setGrid] = useState(false);
@@ -360,7 +361,8 @@ export default function DataKelasAdmin() {
                                         onClick={() => setIsViewKelas(false)}>
                                     Tambah Data
                                 </Button>
-                                <Dropdown overlay={_filterMenu}>
+                                <Filter title1="Nama Kelas" title2="Sub Kelas"/>
+                                {/* <Dropdown overlay={_filterMenu}>
                                     <a className="ant-dropdown-link mr-4 font-bold"
                                     onClick={e => e.preventDefault()}>
                                         Filter by <DownOutlined/>
@@ -371,7 +373,7 @@ export default function DataKelasAdmin() {
                                     onClick={e => e.preventDefault()}>
                                         Sort by <DownOutlined/>
                                     </a>
-                                </Dropdown>
+                                </Dropdown> */}
                             </div>
                             <div className="col-lg-4 col-md-6 my-2">
                                 <Search className="mr-3" placeholder="Cari kata kunci" allowClear

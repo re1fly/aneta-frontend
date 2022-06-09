@@ -24,6 +24,7 @@ import Upload from "antd/es/upload/Upload";
 import axios from "axios";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
+import Filter from '../../components/Filter';
 
 
 function DataAnakOrangtua() {
@@ -303,7 +304,8 @@ function DataAnakOrangtua() {
                                     onClick={() => setIsViewSiswa(false)}>
                                 Tambah Data
                             </Button>
-                            <Dropdown overlay={_filterMenu}>
+                            <Filter title1="Nama" title2="Tanggal Lahir"/>
+                            {/* <Dropdown overlay={_filterMenu}>
                                 <a className="ant-dropdown-link mr-4 font-bold"
                                    onClick={e => e.preventDefault()}>
                                     Filter by <DownOutlined/>
@@ -314,7 +316,7 @@ function DataAnakOrangtua() {
                                    onClick={e => e.preventDefault()}>
                                     Sort by <DownOutlined/>
                                 </a>
-                            </Dropdown>
+                            </Dropdown> */}
                         </Col>
                         <Col span={12}>
                             <div className="float-right">

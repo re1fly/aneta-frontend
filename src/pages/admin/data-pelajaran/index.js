@@ -32,6 +32,7 @@ import Upload from "antd/es/upload/Upload"
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
+import Filter from "../../../components/Filter";
 
 export default function DataPelajaranAdmin() {
   const [grid, setGrid] = useState(false)
@@ -421,7 +422,8 @@ export default function DataPelajaranAdmin() {
                           onClick={() => setIsViewPelajaran(false)}>
                     Tambah Data
                   </Button>
-                  <Dropdown overlay={_filterMenu}>
+                  <Filter title1="Mata Pelajaran" title2="Kelas"/>
+                  {/* <Dropdown overlay={_filterMenu}>
                     <a className="ant-dropdown-link mr-4 font-bold"
                     onClick={e => e.preventDefault()}>
                       Filter by <DownOutlined/>
@@ -432,7 +434,7 @@ export default function DataPelajaranAdmin() {
                     onClick={e => e.preventDefault()}>
                       Sort by <DownOutlined/>
                     </a>
-                  </Dropdown>
+                  </Dropdown> */}
                 </div>
                 <div className="col-lg-4 col-md-6 my-2">
                   <Search className="mr-3" placeholder="Cari kata kunci" allowClear
@@ -449,7 +451,7 @@ export default function DataPelajaranAdmin() {
                 </div>
               </div>
             </Card>
-            <div className="d-flex">
+            {/* <div className="d-flex">
               <div className="mt-1">
                 <h5 className="fw-600 mb-1">
                   Tahun Akademik
@@ -468,7 +470,7 @@ export default function DataPelajaranAdmin() {
                 className="form-control w-100 mb-3"
                 />
               </div>
-            </div>
+            </div> */}
             {grid ? <TabelDataPelajaran/> : <CardDataPelajaran/>}
           </div>
         </div>

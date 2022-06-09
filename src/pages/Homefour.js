@@ -1,11 +1,9 @@
-import React, { Component, Fragment,  useState, useCallback } from 'react';
+import React, { Fragment,  useState, useCallback } from 'react';
 import Header from '../components/Header';
 import Footertwo from '../components/Footertwo';
-import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
-import ParticlesBg from 'particles-bg';
-
-import ImageViewer from "react-simple-image-viewer";
+// import ParticlesBg from 'particles-bg';
+// import ImageViewer from "react-simple-image-viewer";
 
 const blogList = [
   {

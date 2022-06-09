@@ -2,6 +2,7 @@ import React, {Fragment, useEffect, useState} from 'react';
 import Adminfooter from "../../components/Adminfooter";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
+import Filter from '../../components/Filter';
 import {
     Dropdown,
     Menu,
@@ -69,7 +70,7 @@ function DataGuruAdmin() {
     const channelList = [
         {
             imageUrl: 'user.png',
-            namaGuru: 'Nining Hanjarwati',
+            namaGuru: 'Bambang Setiawan',
             nomorSk: 'SKI-MEI-012212',
             tahunAktif: '2010',
             tag1: 'Kelas 5 A',
@@ -92,7 +93,7 @@ function DataGuruAdmin() {
         },
         {
             imageUrl: 'user.png',
-            namaGuru: 'Bambang Setiawan',
+            namaGuru: 'Nining Hanjarwati',
             nomorSk: 'SKI-MEI-012212',
             tahunAktif: '2011',
             tag1: 'Kelas 5 A',
@@ -103,7 +104,7 @@ function DataGuruAdmin() {
         },
         {
             imageUrl: 'user.png',
-            namaGuru: 'Triyanto',
+            namaGuru: 'Nunung Sutisna',
             nomorSk: 'SKI-MEI-012212',
             tahunAktif: '2009',
             tag1: 'Kelas 5 A',
@@ -114,7 +115,7 @@ function DataGuruAdmin() {
         },
         {
             imageUrl: 'user.png',
-            namaGuru: 'Nunung Sutisna',
+            namaGuru: 'Reza Tanuwijaya',
             nomorSk: 'SKI-MEI-012212',
             tahunAktif: '2010',
             tag1: 'Kelas 5 A',
@@ -125,7 +126,7 @@ function DataGuruAdmin() {
         },
         {
             imageUrl: 'user.png',
-            namaGuru: 'Reza Tanuwijaya',
+            namaGuru: 'Triyanto',
             nomorSk: 'SKI-MEI-012212',
             tahunAktif: '2021',
             tag1: 'Kelas 5 A',
@@ -142,17 +143,33 @@ function DataGuruAdmin() {
             dataIndex: 'namaGuru',
             filters: [
                 {
-                    text: 'John',
-                    value: 'John',
+                    text: 'Bambang Setiawan',
+                    value: 'Bambang Setiawan',
                 },
                 {
-                    text: 'James',
-                    value: 'James',
+                    text: 'Eko Prasetyo',
+                    value: 'Eko Prasetyo',
+                },
+                {
+                    text: 'Nining Hanjarwati',
+                    value: 'Nining Hanjarwati',
+                },
+                {
+                    text: 'Nunung Sutisna',
+                    value: 'Nunung Sutisna',
+                },
+                {
+                    text: 'Reza Tanuwijaya',
+                    value: 'Reza Tanuwijaya',
+                },
+                {
+                    text: 'Triyanto',
+                    value: 'Triyanto',
                 },
             ],
             onFilter: (value, record) => record.namaGuru.indexOf(value) === 0,
             sorter: (a, b) => a.namaGuru.length - b.namaGuru.length,
-            sortDirections: ['descend'],
+            defaultSortOrder: 'ascend'
         },
         {
             title: 'Nomor SK',
@@ -369,7 +386,8 @@ function DataGuruAdmin() {
                                 onClick={() => setIsViewGuru(false)}>
                             Tambah Data
                         </Button>
-                        <Dropdown overlay={_filterMenu}>
+                        <Filter title1="Nama" title2="Tahun Aktif"/>
+                        {/* <Dropdown overlay={_filterMenu}>
                             <a className="ant-dropdown-link mr-4 font-bold"
                                onClick={e => e.preventDefault()}>
                                 Filter by <DownOutlined/>
@@ -380,7 +398,7 @@ function DataGuruAdmin() {
                                onClick={e => e.preventDefault()}>
                                 Sort by <DownOutlined/>
                             </a>
-                        </Dropdown>
+                        </Dropdown> */}
                     </div>
                     <div className="col-lg-4 col-md-6 my-2">
                         {/*<div className="float-right">*/}
@@ -446,7 +464,6 @@ function DataGuruAdmin() {
             console.log(error);
         });
     }
-    console.log(dataCity);
 
     const getKecamatan = (e) => {
         const selectedKec = e.target.value;
@@ -518,6 +535,7 @@ function DataGuruAdmin() {
         }).then(function (response) {
             const data = JSON.parse(response.data.variables[2].value).data;
             setDataProv(data);
+            console.log(response);
         });
 
         return (

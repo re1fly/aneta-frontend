@@ -96,18 +96,6 @@ export default function JadwalPelajaranAdmin() {
                           onClick={() => setIsViewPelajaran(false)}>
                     Tambah Data
                   </Button>
-                  <Dropdown overlay={_filterMenu}>
-                    <a className="ant-dropdown-link mr-4 font-bold"
-                    onClick={e => e.preventDefault()}>
-                      Filter by <DownOutlined/>
-                    </a>
-                  </Dropdown>
-                  <Dropdown overlay={_sortMenu}>
-                    <a className="ant-dropdown-link font-bold"
-                    onClick={e => e.preventDefault()}>
-                      Sort by <DownOutlined/>
-                    </a>
-                  </Dropdown>
                 </div>
                 <div className="col-lg-4 col-md-6 my-2">
                   <Search className="mr-3" placeholder="Cari kata kunci" allowClear

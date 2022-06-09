@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
-import { Button } from 'antd'
+import { Navbar, Nav } from 'react-bootstrap';
 
 class Header extends Component {
   state = {
@@ -22,7 +21,7 @@ class Header extends Component {
           <div className="row">
             <div className="col-lg-12 navbar pt-0 pb-0">
               <Link to="/" className=''>
-                <img className='w125' src="https://aneta.id/assets/img/aneta.png"></img>
+                <img className='w125' src="https://aneta.id/assets/img/aneta.png" alt="aneta logo"></img>
               </Link>
               <button className="navbar-toggler" onClick={this.toggleOpen}>
                 <span className="navbar-toggler-icon"></span>
@@ -37,8 +36,7 @@ class Header extends Component {
                 >
                   <Navbar id="basic-navbar-nav" className="w-100 d-block">
                     <Nav className={`mt-2 ${colorClass}`}>
-                      
-                      <a className="mr-5 navbar-feature" href="">
+                      <a className="mr-5 navbar-feature">
                         Tentang Kami
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -61,7 +59,7 @@ class Header extends Component {
                           Home Five
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-5 navbar-feature" href="">
+                      <a className="mr-5 navbar-feature">
                         Fitur
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -79,7 +77,7 @@ class Header extends Component {
                           404
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-5 navbar-feature" href="">
+                      <a className="mr-5 navbar-feature">
                         Cara Pendaftaran
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
@@ -94,7 +92,7 @@ class Header extends Component {
                           Blog Single
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-5 pr-5 navbar-feature" href="">
+                      <a className="mr-5 pr-5 navbar-feature">
                         Bantuan
                       </a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">

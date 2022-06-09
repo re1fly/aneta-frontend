@@ -33,6 +33,7 @@ import Upload from "antd/es/upload/Upload";
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
+import Filter from "../../../components/Filter";
 
 export default function JadwalPelajaranAdminDetail() {
   const [grid, setGrid] = useState(false);
@@ -355,7 +356,8 @@ export default function JadwalPelajaranAdminDetail() {
                             onClick={() => setIsViewPelajaran(false)}>
                       Tambah Data
                     </Button>
-                    <Dropdown overlay={_filterMenu}>
+                    <Filter title1="Mata Pelajaran" title2="Guru/Tenaga Pengajar"/>
+                    {/* <Dropdown overlay={_filterMenu}>
                       <a className="ant-dropdown-link mr-4 font-bold"
                       onClick={e => e.preventDefault()}>
                         Filter by <DownOutlined/>
@@ -366,7 +368,7 @@ export default function JadwalPelajaranAdminDetail() {
                       onClick={e => e.preventDefault()}>
                         Sort by <DownOutlined/>
                       </a>
-                    </Dropdown>
+                    </Dropdown> */}
                   </div>
                   <div className="col-lg-4 col-md-6 my-2">
                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear

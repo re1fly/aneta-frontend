@@ -210,6 +210,17 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
+                                            to="/admin-tahun-akademik"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-calendar mr-3"></i>
+                                            <span>Tahun Akademik</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
                                             to="/admin-profil-sekolah"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"

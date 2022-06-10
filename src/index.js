@@ -86,6 +86,7 @@ import * as serviceWorker from './serviceWorker';
 
 // Role Admin
 import BerandaAdmin from "./pages/admin/Beranda";
+import TahunAkademikAdmin from './pages/admin/TahunAkademik';
 import ProfilSekolah from "./pages/admin/ProfilSekolah";
 import DataGuruAdmin from "./pages/admin/DataGuru";
 import DataSiswaAdmin from "./pages/admin/DataSiswa";
@@ -124,6 +125,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/admin-beranda`}
               component={BerandaAdmin}
+          />
+          <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/admin-tahun-akademik`}
+              component={TahunAkademikAdmin}
           />
           <Route
               exact

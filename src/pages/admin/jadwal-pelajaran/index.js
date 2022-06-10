@@ -162,7 +162,36 @@ export default function JadwalPelajaranAdmin() {
                           <label className="mont-font fw-600 font-xsss">
                             Hari
                           </label>
-                          <input type="text" className="form-control" />
+                          <select
+                              className="form-control"
+                              aria-label="Default select example"
+                              name="hari_pelajaran"
+                          >
+                            <option value="" selected disabled>
+                              Pilih Hari
+                            </option>
+                            <option value="senin">
+                             Senin
+                            </option>
+                            <option value="selasa">
+                              Selasa
+                            </option>
+                            <option value="rabu">
+                              Rabu
+                            </option>
+                            <option value="kamis">
+                              Kamis
+                            </option>
+                            <option value="jumat">
+                              Jum'at
+                            </option>
+                            <option value="sabtu">
+                              Sabtu
+                            </option>
+                            <option value="minggu">
+                              Minggu
+                            </option>
+                          </select>
                         </div>
                       </div>
                     </div>

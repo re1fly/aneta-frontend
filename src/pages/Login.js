@@ -36,12 +36,12 @@ function Login() {
         }).then(res => {
             const getData = res.data.variables[3].value
             const dataLogin = JSON.parse(getData)
+            console.log(dataLogin)
             if (dataLogin.status === true) {
                 localStorage.setItem('user_name', (dataLogin.user.name))
                 localStorage.setItem('token', dataLogin.token)
                 localStorage.setItem('user_id', dataLogin.user.id)
                 localStorage.setItem('institute', dataLogin.user.institute_id)
-                console.log(dataLogin)
                 // localStorage.setItem('institute', 'null')
 
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import {SearchOutlined} from "@ant-design/icons";
 import {BASE_URL} from "../api/Url";
 
-export const searchGlobal = (value, paramsPage) => (dispatch) => {
+export const searchGlobal = (value, paramsPage, processDef, variablesSearch) => (dispatch) => {
     if (value == "") {
         window.location.reload();
     } else {
@@ -17,68 +17,10 @@ export const searchGlobal = (value, paramsPage) => (dispatch) => {
             .post(
                 BASE_URL,
                 {
-                    processDefinitionId:
-                        "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+                    processDefinitionId: processDef,
                     returnVariables: true,
                     variables: [
-                        {
-                            name: "global_join_where",
-                            type: "json",
-                            value: {
-                                tbl_induk: "x_academic_students",
-                                paginate: 200,
-                                join: [
-                                    {
-                                        tbl_join: "x_academic_year",
-                                        foregenkey: "academic_year_id",
-                                        refkey: "id",
-                                    },
-                                    {
-                                        tbl_join: "users",
-                                        foregenkey: "user_id",
-                                        refkey: "id",
-                                    },
-                                    {
-                                        tbl_join: "x_academic_class",
-                                        foregenkey: "class_id",
-                                        refkey: "id",
-                                    },
-                                    {
-                                        tbl_join: "m_user_profile",
-                                        foregenkey: "user_id",
-                                        refkey: "user_id",
-                                    },
-                                ],
-                                where: [
-                                    {
-                                        tbl_coloumn: "m_user_profile",
-                                        tbl_field: "nisn",
-                                        tbl_value: value,
-                                        operator: "ILIKE",
-                                    },
-                                    {
-                                        tbl_coloumn: "users",
-                                        tbl_field: "name",
-                                        tbl_value: value,
-                                        operator: "ILIKE",
-                                    },
-                                    {
-                                        tbl_coloumn: "m_user_profile",
-                                        tbl_field: "date_of_birth",
-                                        tbl_value: value,
-                                        operator: "ILIKE",
-                                    },
-                                    {
-                                        tbl_coloumn: "users",
-                                        tbl_field: "email",
-                                        tbl_value: value,
-                                        operator: "ILIKE",
-                                    },
-                                ],
-                                order_coloumn: "users.name",
-                                order_by: "asc",
-                            },
-                        },
+                        variablesSearch,
                         {
                             name: "page",
                             type: "string",
@@ -93,8 +35,9 @@ export const searchGlobal = (value, paramsPage) => (dispatch) => {
                 }
             )
             .then(function (response) {
-                const siswa = JSON.parse(response.data.variables[3].value);
-                dispatch({type: "SEARCH_GLOBAL", value: siswa});
+                const data = JSON.parse(response.data.variables[3].value);
+                dispatch({type: "SEARCH_GLOBAL", value: data});
+                console.log(data)
             });
     }
 };

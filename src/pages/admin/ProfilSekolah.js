@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import Adminfooter from "../../components/Adminfooter";
 import {Card, DatePicker, notification, PageHeader} from "antd";
 import Upload from "antd/es/upload/Upload";
@@ -6,6 +6,8 @@ import {CheckOutlined, PlusOutlined} from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
+import axios from "axios";
+import {BASE_URL} from "../../api/Url";
 
 function ProfilSekolah() {
     const [fileList, setFileList] = useState([
@@ -16,6 +18,82 @@ function ProfilSekolah() {
             url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
         },
     ]);
+    const institute = localStorage.getItem('institute');
+    const [dataSekolah, setDataSekolah] = useState({})
+
+    useEffect(() => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "globaljoinsubfirst:1:20ca0e47-eb01-11ec-a658-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where_sub_first",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "m_institutes",
+                            "select" : ["m_institutes.id as id_institute",
+                                "m_institutes.name",
+                                "m_institutes.state_id",
+                                "r_state.state",
+                                "m_institutes.city_id",
+                                "r_city.city",
+                                "m_institutes.district_id",
+                                "r_district.district",
+                                "m_institutes.sub_district_id",
+                                "r_sub_district.sub_district",
+                                "m_institutes.phone",
+                                "m_institutes.fax",
+                                "m_institutes.address",
+                                "m_institutes.website",
+                                "m_institutes.year_of_found"
+                            ],
+                            "join": [
+                                {
+                                    "tbl_join": "r_district",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_institutes",
+                                    "foregenkey": "district_id"
+
+                                },{
+                                    "tbl_join": "r_state",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_institutes",
+                                    "foregenkey": "state_id"
+                                },{
+                                    "tbl_join": "r_sub_district",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_institutes",
+                                    "foregenkey": "sub_district_id"
+                                },{
+                                    "tbl_join": "r_city",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_institutes",
+                                    "foregenkey": "city_id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "m_institutes",
+                                    "tbl_field": "id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response.data.variables[2].value);
+            setDataSekolah(dataRes.data)
+        }).catch(error => {
+            alert(error)
+        })
+    }, [])
     const onChange = ({fileList: newFileList}) => {
         setFileList(newFileList);
     };
@@ -90,7 +168,7 @@ function ProfilSekolah() {
                                                 Name
                                             </label>
                                             <input
-                                                defaultValue="Aneta"
+                                                defaultValue={dataSekolah.name}
                                                 name="nama_sekolah"
                                                 type="text"
                                                 className="form-control"
@@ -104,7 +182,7 @@ function ProfilSekolah() {
                                                 Provinsi
                                             </label>
                                             <input
-                                                defaultValue="Jakarta"
+                                                defaultValue={dataSekolah.state}
                                                 name="provinsi"
                                                 type="text"
                                                 className="form-control"
@@ -120,7 +198,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="number"
-                                                defaultValue="08328382832"
+                                                defaultValue={dataSekolah.phone}
                                                 name="phone"
                                                 className="form-control"
                                             />
@@ -134,7 +212,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="text"
-                                                defaultValue="Jakarta Utara"
+                                                defaultValue={dataSekolah.city}
                                                 name="kota"
                                                 className="form-control"
                                             />
@@ -149,7 +227,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="number"
-                                                defaultValue="28302382"
+                                                defaultValue={dataSekolah.fax}
                                                 name="fax"
                                                 className="form-control"
                                             />
@@ -163,7 +241,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="text"
-                                                defaultValue="Kelapa Gading Timur"
+                                                defaultValue={dataSekolah.district}
                                                 name="kecamatan"
                                                 className="form-control"
                                             />
@@ -178,7 +256,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="text"
-                                                defaultValue="Wisma Permata"
+                                                defaultValue={dataSekolah.address}
                                                 name="address"
                                                 className="form-control"
                                             />
@@ -192,7 +270,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="text"
-                                                defaultValue="Kelapa Gading"
+                                                defaultValue={dataSekolah.sub_district}
                                                 name="kelurahan"
                                                 className="form-control"
                                             />
@@ -207,7 +285,7 @@ function ProfilSekolah() {
                                             </label>
                                             <input
                                                 type="text"
-                                                defaultValue="aneta.id"
+                                                defaultValue={dataSekolah.website}
                                                 name="website"
                                                 className="form-control"
                                             />
@@ -224,6 +302,7 @@ function ProfilSekolah() {
                                                 picker="year"
                                                 placeholder="Pilih Tahun"
                                                 name="tahun_berdiri"
+                                                defaultValue={dataSekolah.year_of_found}
                                             />
                                         </div>
                                     </div>

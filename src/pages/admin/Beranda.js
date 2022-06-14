@@ -59,7 +59,6 @@ function BerandaAdmin() {
     const [formPic, setFormPic] = useState(false);
 
 
-
     useEffect(() => {
         if (institute == 'null') {
             setVisible(true)
@@ -75,6 +74,50 @@ function BerandaAdmin() {
 
         } else {
             setVisible(false)
+            //getacademic
+            axios.post(BASE_URL, {
+                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_get_where",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_year",
+                                "pagination": false,
+                                "total_result": 2,
+                                "order_coloumn": "x_academic_year.id",
+                                "order_by": "desc",
+                                "data": [
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "institute_id",
+                                        "tbl_value": institute,
+                                        "operator": "="
+                                    },
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "is_active",
+                                        "tbl_value": "T",
+                                        "operator": "="
+                                    }
+                                ],
+                                "tbl_coloumn": [
+                                    "*"
+                                ]
+                            }
+                        }
+                    ]
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                }
+            ).then(function (response) {
+                const resData = response.data.variables[2].value;
+                const academic = JSON.parse(resData)
+                localStorage.setItem('academic_year', academic[0].id);
+            });
         }
 
     }, []);

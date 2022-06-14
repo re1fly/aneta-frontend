@@ -1,21 +1,97 @@
 import React, {Fragment, useState} from 'react';
 import {notification} from "antd";
+import axios from "axios";
+import {BASE_URL} from "../api/Url";
+import bcrypt from 'bcryptjs';
 
 function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [namaUser, setNamaUser] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const _handleSubmit = (e) => {
         e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        const dateNow = new Date().toLocaleString()
+        const salt = bcrypt.genSaltSync(10)
+        const hashedPassword = bcrypt.hashSync(password, salt)
 
         if (password !== confirmPassword) {
             notification.error({
                 message: 'Login Failed', description: 'Passwords do not match, Try Again !'
             })
-        }
-        else{
-            alert('Login Successful');
+        } else {
+            axios.post(BASE_URL,
+                {
+                    "processDefinitionId": "authregister:1:13d973de-e956-11ec-9ea6-c6ec5d98c2df",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "validasi",
+                            "type": "json",
+                            "value": {
+                                "data": {
+                                    "user_email": "required",
+                                    "user_password": "required"
+                                },
+                                "user_email": email,
+                                "user_password": hashedPassword
+                            }
+                        },
+                        {
+                            "name": "user_email",
+                            "type": "string",
+                            "value": email
+                        },
+                        {
+                            "name": "users",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "usersModel",
+                                "tbl_coloumn": {
+                                    "name": namaUser,
+                                    "email": email,
+                                    "user_role_id": 1,
+                                    "email_verified_at": dateNow,
+                                    "password": hashedPassword
+
+                                }
+                            }
+                        }
+                    ]
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(res => {
+                    const responseRegister = res.data.variables[6].value;
+                    console.log(res)
+                    if(responseRegister == 200){
+                        notification.error({
+                            message: 'Error',
+                            description: 'Email telah digunakan, Silahkan gunakan email lain.',
+                            placement: 'top'
+                        })
+                    }else{
+                        notification.success({
+                            message: 'Success',
+                            description: 'Registrasi sukses ! silahkan login.',
+                            placement: 'top'
+                        })
+                        setNamaUser('')
+                        setPassword('')
+                        setEmail('')
+                    }
+
+            }).catch(err => {
+                notification.error({
+                    message: 'error', description: err,
+                })
+            });
         }
     }
 
@@ -38,6 +114,16 @@ function Register() {
                                     Aneta Account
                                 </h2>
                                 <form onSubmit={_handleSubmit}>
+                                    <div className="form-group icon-input mb-3">
+                                        <i className="font-sm ti-user text-grey-500 pr-0"></i>
+                                        <input
+                                            type="text"
+                                            className="style2-input pl-5 form-control text-grey-900 font-xsss fw-600"
+                                            placeholder="Your Name"
+                                            value={namaUser}
+                                            onChange={e => setNamaUser(e.target.value)}
+                                        />
+                                    </div>
                                     <div className="form-group icon-input mb-3">
                                         <i className="font-sm ti-email text-grey-500 pr-0"></i>
                                         <input

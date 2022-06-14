@@ -794,7 +794,7 @@ function DataSiswaAdmin() {
                                     </div>
                                     <div className="col-9">
                                         <p className="font-xssss float-left lh-1">
-                                            : {value.email.length > 25 ? value.email.substring(0, 25) + '...' : value.email }
+                                            : {value.email.length > 20 ? value.email.substring(0, 20) + '...' : value.email }
                                         </p>
                                     </div>
                                 </div>

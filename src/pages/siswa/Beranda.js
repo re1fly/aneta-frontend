@@ -28,15 +28,6 @@ function BerandaSiswa() {
             tag3: '',
         },
         {
-            code: 'BREAK',
-            time: '10.00 - 10.30',
-            title: 'ISTIRAHAT',
-            name: '',
-            tag1: '',
-            tag2: '',
-            tag3: ' ',
-        },
-        {
             code: 'TM03',
             time: '10.30 - 12.00',
             title: 'Tematik 3',
@@ -44,15 +35,6 @@ function BerandaSiswa() {
             tag1: 'Matrei',
             tag2: 'Praktek',
             tag3: '',
-        },
-        {
-            code: 'Break',
-            time: '12.00 - 12.30',
-            title: 'ISTIRAHAT',
-            name: '',
-            tag1: '',
-            tag2: '',
-            tag3: ' ',
         },
         {
             code: 'TM04',

@@ -1,10 +1,22 @@
 const searchReduce = {
-  DataSearch: '',
+  DataSearch: "",
 };
 
-const filterReduce = {
-  DataFilter: '',
-}
+const AddresReducer = {
+  DataProvinsi: [],
+  DataCity: [],
+  DataKecamatan: [],
+  DataKelurahan: [],
+};
+
+const ClassReducer = {
+  AllClass: [],
+};
+
+const processReduce = {
+  DataProcess: "",
+  DataClass: [],
+};
 
 export const reducerSearch = (state = searchReduce, action) => {
   if (action.type === "SEARCH_GLOBAL") {
@@ -17,11 +29,53 @@ export const reducerSearch = (state = searchReduce, action) => {
   return state;
 };
 
-export const reducerFilter = (state = filterReduce, action) => {
-  if (action.type === "FILTER_GLOBAL") {
+export const reducerProcessId = (state = processReduce, action) => {
+  if (action.type === "GET_PROCESSID") {
     return {
       ...state,
-      DataPaginate: action.value,
+      DataProcess: action.value,
+    };
+  }
+  return state;
+};
+
+export const ReducerAddres = (state = AddresReducer, action) => {
+  if (action.type === "SET_PROVINSI") {
+    return {
+      ...state,
+      DataProvinsi: action.value,
+    };
+  }
+
+  if (action.type === "SET_CITY") {
+    return {
+      ...state,
+      DataCity: action.value,
+    };
+  }
+
+  if (action.type === "SET_KECAMATAN") {
+    return {
+      ...state,
+      DataKecamatan: action.value,
+    };
+  }
+
+  if (action.type === "SET_KELURAHAN") {
+    return {
+      ...state,
+      DataKelurahan: action.value,
+    };
+  }
+
+  return state;
+};
+
+export const ReducerClass = (state = ClassReducer, action) => {
+  if (action.type === "SET_CLASS") {
+    return {
+      ...state,
+      AllClass: action.value,
     };
   }
 

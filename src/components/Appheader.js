@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {Link, NavLink, useHistory} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink, useHistory } from 'react-router-dom';
 import Darkbutton from '../components/Darkbutton';
+import { Collapse } from 'antd';
 
 function Appheader() {
     const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +27,13 @@ function Appheader() {
         localStorage.clear();
         router.push('/login');
     }
+    const { Panel } = Collapse;
+
+    const text = `
+  A dog is a type of domesticated animal.
+  Known for its loyalty and faithfulness,
+  it can be found as a welcome guest in many households across the world.
+`;
 
     return (
         <div className="middle-sidebar-header bg-white">
@@ -46,8 +54,8 @@ function Appheader() {
                             ></ion-icon>
                         </i>
                         <span className="ms-1 mt-1 d-inline-block close searchbox-close">
-                <i className="ti-close font-xs" onClick={toggleActive}></i>
-              </span>
+                            <i className="ti-close font-xs" onClick={toggleActive}></i>
+                        </span>
                     </div>
                 </form>
             </div>
@@ -93,8 +101,8 @@ function Appheader() {
                                 <h5 className="font-xsss text-grey-900 mb-1 mt-0 fw-700 d-block">
                                     Goria Coast
                                     <span className="text-grey-400 font-xsssss fw-600 float-right mt-1">
-                      2 min
-                    </span>
+                                        2 min
+                                    </span>
                                 </h5>
                                 <h6 className="text-grey-500 fw-500 font-xssss lh-4">
                                     Mobile Apps UI Designer is require..
@@ -110,8 +118,8 @@ function Appheader() {
                                 <h5 className="font-xsss text-grey-900 mb-1 mt-0 fw-700 d-block">
                                     Surfiya Zakir
                                     <span className="text-grey-400 font-xsssss fw-600 float-right mt-1">
-                      1 min
-                    </span>
+                                        1 min
+                                    </span>
                                 </h5>
                                 <h6 className="text-grey-500 fw-500 font-xssss lh-4">
                                     Mobile Apps UI Designer is require..
@@ -126,8 +134,8 @@ function Appheader() {
                                 <h5 className="font-xsss text-grey-900 mb-1 mt-0 fw-700 d-block">
                                     Victor Exrixon
                                     <span className="text-grey-400 font-xsssss fw-600 float-right mt-1">
-                      30 sec
-                    </span>
+                                        30 sec
+                                    </span>
                                 </h5>
                                 <h6 className="text-grey-500 fw-500 font-xssss lh-4">
                                     Mobile Apps UI Designer is require..
@@ -136,7 +144,7 @@ function Appheader() {
                         </div>
                     </Link>
                 </li>
-                <Darkbutton/>
+                <Darkbutton />
 
                 <li>
                     <Link to="/message">
@@ -149,7 +157,8 @@ function Appheader() {
                         <i className="feather-user font-xl text-current"></i>
                         <div className="menu-dropdown">
                             <h4 className="fw-700 font-xs mb-4">Admin</h4>
-                            <div className="card bg-transparent-card w-100 border-0 pl-5 mb-3" onClick={()=> router.push('/default-user-profile')}>
+                            <div className="card bg-transparent-card w-100 border-0 pl-5 mb-3"
+                                onClick={() => router.push('/default-user-profile')}>
                                 <i className="feather-user font-xl text-current w40 position-absolute left-0"></i>
                                 <h5 className="font-xsss text-grey-900 mb-1 mt-2 fw-700 d-block">
                                     My Profile
@@ -165,9 +174,9 @@ function Appheader() {
                     </Link>
                 </li>
                 <li>
-            <span onClick={toggleActive} className="menu-search-icon">
-              <i className="feather-search text-grey-900 font-lg"></i>
-            </span>
+                    <span onClick={toggleActive} className="menu-search-icon">
+                        <i className="feather-search text-grey-900 font-lg"></i>
+                    </span>
                 </li>
             </ul>
 
@@ -179,15 +188,15 @@ function Appheader() {
                                 {/*<i className="feather-slack text-success display1-size mr-3 ml-3"></i>*/}
                                 <span
                                     className="d-inline-block fredoka-font ls-3 fw-600 text-current font-xl ml-3 logo-text mb-0">
-                    Aneta.
-                  </span>
+                                    Aneta.
+                                </span>
                             </Link>
                             <span
                                 onClick={toggleOpen}
                                 className="close-nav d-inline-block d-lg-none"
                             >
-                  <i className="ti-close bg-grey mb-4 btn-round-sm font-xssss fw-700 text-dark ml-auto mr-2 "></i>
-                </span>
+                                <i className="ti-close bg-grey mb-4 btn-round-sm font-xssss fw-700 text-dark ml-auto mr-2 "></i>
+                            </span>
                         </div>
                         {role === "admin" ?
                             <>
@@ -273,16 +282,33 @@ function Appheader() {
                                             <span>Jadwal Pelajaran</span>
                                         </NavLink>
                                     </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
-                                            to="/admin-data-pelajaran"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-book mr-3"></i>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
                                             <span>Data Pelajaran</span>
-                                        </NavLink>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-data-matapelajaran">
+                                                    <span>Data Mata Pelajaran</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-data-kkm-pelajaran">
+                                                    <span>Data KKM Pelajaran</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-data-pelajaran-kelas">
+                                                    <span>Data Pelajaran Kelas</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-data-interval-predikat">
+                                                    <span>Data Interval Predikat</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
                                     <li>
                                         <NavLink
@@ -294,6 +320,79 @@ function Appheader() {
                                             <i className="feather-clipboard mr-3"></i>
                                             <span>Kompetensi</span>
                                         </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-capaian-penilaian"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-trending-up mr-3"></i>
+                                            <span>Capaian Penilaian</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-perencanaan-nilai"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-layout mr-3"></i>
+                                            <span>Perencanaan Penilaian</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-input-nilai"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-database mr-3"></i>
+                                            <span>Input Data Nilai</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-input-deskripsi"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-hard-drive mr-3"></i>
+                                            <span>Input Data Deskripsi</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-kirim-penilaian"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-send mr-3"></i>
+                                            <span>Kirim Penilaian</span>
+                                        </NavLink>
+                                    </li>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
+                                            <span>E-Rapor</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-status-penilaian">
+                                                    <span>Status Penilaian</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-cetak-rapor">
+                                                    <span>Cetak Rapor</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
                                 </ul>
                             </> : null
@@ -396,7 +495,7 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/siswa-kelas-materi"
+                                            to="/siswa-kelas"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
@@ -535,6 +634,7 @@ function Appheader() {
                                             <span>Konsultasi</span>
                                         </NavLink>
                                     </li>
+
                                 </ul>
                             </> : null
                         }

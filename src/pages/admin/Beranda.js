@@ -5,19 +5,11 @@ import axios from "axios";
 import * as https from "https";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
-import {Button, Card, DatePicker, Divider, Modal, notification, PageHeader, Tooltip} from "antd";
+import {Button, Card, DatePicker, Divider, Modal, notification, PageHeader, Spin, Tooltip} from "antd";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
-import {PlusOutlined, SearchOutlined, UserAddOutlined} from "@ant-design/icons";
+import {LoadingOutlined, PlusOutlined, SearchOutlined, UserAddOutlined} from "@ant-design/icons";
 import {BASE_URL} from "../../api/Url";
-
-const iconlList = [{
-    name: '350.429', count: 'Siswa', status: 'warning', icon: 'feather-hard-drive',
-}, {
-    name: '2.356', count: 'Guru', status: 'success', icon: 'feather-box',
-}, {
-    name: '14', count: 'Kelas Aktif', status: 'info', icon: 'feather-award',
-}];
 
 const lineChart = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',],
@@ -55,9 +47,11 @@ const lineChart = {
 function BerandaAdmin() {
     const user = localStorage.getItem('user_name');
     const institute = localStorage.getItem('institute');
+    const academicYear = localStorage.getItem("academic_year");;
     const [visible, setVisible] = useState(false);
     const [formPic, setFormPic] = useState(false);
-
+    const [dataDashboard, setDataDashboard] = useState({})
+    const [render, setRender]= useState(false)
 
     useEffect(() => {
         if (institute == 'null') {
@@ -73,7 +67,7 @@ function BerandaAdmin() {
             }, 700)
 
         } else {
-            setVisible(false)
+            setVisible(false);
             //getacademic
             axios.post(BASE_URL, {
                     "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
@@ -118,9 +112,91 @@ function BerandaAdmin() {
                 const academic = JSON.parse(resData)
                 localStorage.setItem('academic_year', academic[0].id);
             });
-        }
 
+        }
     }, []);
+
+    useEffect(() => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "dashboardadmin:4:928e027e-f076-11ec-a658-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "count_siswa",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "users",
+                            "kondisi": [
+                                {
+                                    "keterangan": "where",
+                                    "kolom": "users.institute_id",
+                                    "value": institute
+                                }, {
+                                    "keterangan": "where",
+                                    "kolom": "users.user_role_id",
+                                    "value": "3"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "count_guru",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "users",
+                            "kondisi": [
+                                {
+                                    "keterangan": "where",
+                                    "kolom": "users.institute_id",
+                                    "value": institute
+                                }, {
+                                    "keterangan": "where",
+                                    "kolom": "users.user_role_id",
+                                    "value": "2"
+                                }
+                            ]
+                        }
+                    }, {
+                        "name": "count_class",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "x_academic_class",
+                            "kondisi": [
+                                {
+                                    "keterangan": "where",
+                                    "kolom": "x_academic_class.academic_year_id",
+                                    "value": academicYear
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+
+            const resData = response.data.variables;
+            let jumlahSiswa = resData.find(item => item.name === "count_siswa");
+            jumlahSiswa = jumlahSiswa.value
+
+            let jumlahGuru = resData.find(item => item.name === "count_guru");
+            jumlahGuru = jumlahGuru.value
+
+            let jumlahKelas = resData.find(item => item.name === "count_kelas");
+            jumlahKelas = jumlahKelas.value
+
+
+            setDataDashboard({
+                siswa: jumlahSiswa,
+                guru: jumlahGuru,
+                kelas: jumlahKelas
+            })
+            setRender(true);
+        });
+    }, [academicYear])
 
     const PicForm = () => {
         return (
@@ -234,7 +310,6 @@ function BerandaAdmin() {
             </>
         )
     }
-
 
     const CreateInstitute = (e) => {
         e.preventDefault();
@@ -356,13 +431,13 @@ function BerandaAdmin() {
         )
             .then(function (response) {
                 const message = response.data.variables[8].value;
-                if (response.data.variables[7].value == 422){
+                if (response.data.variables[7].value == 422) {
                     notification.error({
                         message: "Error Create Institute",
                         description: message,
                         placement: 'top'
                     })
-                }else if(response.data.variables[7].value == 200){
+                } else if (response.data.variables[7].value == 200) {
                     localStorage.setItem('institute', response.data.variables[10].value)
                     console.log(response)
                     setVisible(false)
@@ -374,6 +449,27 @@ function BerandaAdmin() {
 
     }
 
+    const iconlList = [
+        {
+            name: dataDashboard.siswa,
+            count: 'Siswa',
+            status: 'warning',
+            icon: 'feather-hard-drive'
+        },
+        {
+            name: dataDashboard.guru,
+            count: 'Guru',
+            status: 'success',
+            icon: 'feather-box'
+        },
+        {
+            name: dataDashboard.kelas,
+            count: 'Kelas Aktif',
+            status: 'info',
+            icon: 'feather-award'
+        }
+
+    ];
     return (
         <Fragment>
             <div className="main-wrapper">
@@ -656,8 +752,9 @@ function BerandaAdmin() {
                             </div>
                         </div>
 
+
                         <div className="row">
-                            {iconlList.map((value, index) => (<div key={index} className="col-lg-4">
+                            { render ? iconlList.map((value, index) => (<div key={index} className="col-lg-4">
                                 <div
                                     className={`card mb-4 border-0 pt-4 pb-4 text-center alert-${value.status} align-items-center rounded-10`}
                                 >
@@ -671,7 +768,7 @@ function BerandaAdmin() {
                           {value.count}
                         </span>
                                 </div>
-                            </div>))}
+                            </div>)) : <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />}
                         </div>
 
                         <div className="row">

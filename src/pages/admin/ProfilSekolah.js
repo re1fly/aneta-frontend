@@ -91,7 +91,6 @@ function ProfilSekolah() {
         ).then(function (response) {
             const dataRes = JSON.parse(response.data.variables[2].value);
             setDataSekolah(dataRes.data)
-            console.log(response)
         }).catch(error => {
             alert(error)
         })
@@ -246,12 +245,16 @@ function ProfilSekolah() {
                                         <label className="mont-font fw-600 font-xsss">
                                             Provinsi
                                         </label>
-                                        <input
-                                            defaultValue={dataSekolah.state_id}
-                                            name="provinsi_sekolah"
-                                            type="text"
+                                        <select
                                             className="form-control"
-                                        />
+                                            aria-label="Default select example"
+                                            name="provinsi_sekolah"
+                                            required
+                                        >
+                                            <option value={dataSekolah.state_id} selected disabled hidden>
+                                                {dataSekolah.state}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -275,12 +278,16 @@ function ProfilSekolah() {
                                         <label className="mont-font fw-600 font-xsss">
                                             Kota / Kabupaten
                                         </label>
-                                        <input
-                                            type="text"
-                                            defaultValue={dataSekolah.city_id}
-                                            name="kota_sekolah"
+                                        <select
                                             className="form-control"
-                                        />
+                                            aria-label="Default select example"
+                                            name="kota_sekolah"
+                                            required
+                                        >
+                                            <option value={dataSekolah.city_id} selected disabled hidden>
+                                                {dataSekolah.city}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -304,12 +311,16 @@ function ProfilSekolah() {
                                         <label className="mont-font fw-600 font-xsss">
                                             Kecamatan
                                         </label>
-                                        <input
-                                            type="text"
-                                            defaultValue={dataSekolah.district_id}
-                                            name="kecamatan_sekolah"
+                                        <select
                                             className="form-control"
-                                        />
+                                            aria-label="Default select example"
+                                            name="kecamatan_sekolah"
+                                            required
+                                        >
+                                            <option value={dataSekolah.district_id} selected disabled hidden>
+                                                {dataSekolah.district}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -333,12 +344,16 @@ function ProfilSekolah() {
                                         <label className="mont-font fw-600 font-xsss">
                                             Kelurahan
                                         </label>
-                                        <input
-                                            type="text"
-                                            defaultValue={dataSekolah.sub_district_id}
-                                            name="kelurahan_sekolah"
+                                        <select
                                             className="form-control"
-                                        />
+                                            aria-label="Default select example"
+                                            name="kelurahan_sekolah"
+                                            required
+                                        >
+                                            <option value={dataSekolah.sub_district_id} selected disabled hidden>
+                                                {dataSekolah.sub_district}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

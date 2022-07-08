@@ -967,7 +967,8 @@ function DataPelajaranKelas() {
                                 "academic_year_id": data.thn_akademik,
                                 "course_grade_id": data.kelas_sub,
                                 "academic_subjects_master_id": data.mata_pelajaran,
-                                "aktiv": data.status_guru
+                                "aktiv": data.status_guru,
+                                "is_edit": true
                             }
                         }
                     }

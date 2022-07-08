@@ -8,30 +8,42 @@ import { GetCity, GetKecamatan, GetKelurahan, GetProvinsi } from "../../redux/Ac
 
 export const FormAdminGuru = (props) => {
 
-    // const dispatch = useDispatch();
-    // const dataAddres = useSelector(state => state.addres);
+    const dispatch = useDispatch();
+    const dataAddres = useSelector(state => state.addres);
 
-    // const provinsi = dataAddres?.DataProvinsi
-    // const city = dataAddres?.DataCity
-    // const kecamatan = dataAddres?.DataKecamatan
-    // const kelurahan = dataAddres?.DataKelurahan
+    const provinsi = dataAddres?.DataProvinsi
+    const city = dataAddres?.DataCity
+    const kecamatan = dataAddres?.DataKecamatan
+    const kelurahan = dataAddres?.DataKelurahan
 
-    // const [idProv, setIdProv] = useState('');
-    // const [idCity, setIdCity] = useState('');
-    // const [idKecamatan, setIdKecamatan] = useState('');
+    const [idProv, setIdProv] = useState('');
+    const [idCity, setIdCity] = useState('');
+    const [idKecamatan, setIdKecamatan] = useState('');
+    const [idKelurahan, setIdKelurahan] = useState('');
 
-    // useEffect(() => {
-    //     dispatch(GetProvinsi());
-    //     if (idProv != '') {
-    //         dispatch(GetCity(idProv));
-    //     }
-    //     if (idCity != '') {
-    //         dispatch(GetKecamatan(idCity));
-    //     }
-    //     if (idKecamatan != '') {
-    //         dispatch(GetKelurahan(idKecamatan));
-    //     }
-    // }, [idProv, idCity, idKecamatan])
+    useEffect(() => {
+        dispatch(GetProvinsi());
+        if (idProv != '') {
+            dispatch(GetCity(idProv));
+        }
+        if (idCity != '') {
+            dispatch(GetKecamatan(idCity));
+        }
+        if (idKecamatan != '') {
+            dispatch(GetKelurahan(idKecamatan));
+        }
+    }, [idProv, idCity, idKecamatan])
+
+    useEffect(() => {
+        if (props.location=='edit'|| props.location=='detail') {
+            setIdProv(props.idProvinsi);
+            setIdCity(props.idKota);
+            setIdKecamatan(props.idKec);
+            setIdKelurahan(props.idKel);
+        }
+     
+    }, [])
+    
 
     let disabledButton = props.isDisabled;
     return (
@@ -185,12 +197,38 @@ export const FormAdminGuru = (props) => {
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="provinsi_guru"
-                                                    required
+                                                    // disabled={props.isDisabled}
                                                     disabled={props.isDisabled}
+                                                    required
+                                                    onChange={(event) => {
+                                                        if (idProv != '') {
+                                                            //  isResetData("provinsi");
+                                                            if (event.currentTarget.value != idProv) {
+                                                                // ResetDataFun()
+                                                                dispatch({ type: "SET_CITY", value: [] });
+                                                                dispatch({ type: "SET_KECAMATAN", value: [] });
+                                                                dispatch({ type: "SET_KELURAHAN", value: [] });
+                                                                setIdCity('');
+                                                                setIdKecamatan('');
+                                                                setIdKelurahan('');
+
+                                                            }
+                                                        }
+                                                        setIdProv(event.currentTarget.value);
+                                                    }}
                                                 >
-                                                    <option value={props.idProvinsi} selected disabled hidden>
-                                                        {props.provinsi}
+                                                    <option selected={idProv == '' ? false : true}>
+                                                        {props.provinsi == undefined ? "Pilih Provinsi" : idProv != props.idProvinsi ? "Pilih Provinsi" : props.provinsi}
                                                     </option>
+                                                   
+
+                                                    {provinsi.map((data, i) => {
+                                                        return (
+                                                            <option value={data.id} selected={data.id != idProv ? false : true} >
+                                                                {data.state}
+                                                            </option>
+                                                        )
+                                                    })}
                                                 </select>
                                             </div>
                                         </div>
@@ -204,12 +242,35 @@ export const FormAdminGuru = (props) => {
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="kota_guru"
-                                                    required
+                                                    // disabled={props.isDisabled}
                                                     disabled={props.isDisabled}
+                                                    required
+                                                    onChange={(event) => {
+                                                        if (idCity != '') {
+                                                            // isResetData("city");
+                                                            if (event.currentTarget.value != idCity) {
+                                                                // ResetDataFun()
+                                                                dispatch({ type: "SET_KECAMATAN", value: [] });
+                                                                dispatch({ type: "SET_KELURAHAN", value: [] });
+                                                                setIdKecamatan('');
+                                                                setIdKelurahan('');
+                                                            }
+                                                        }
+                                                        setIdCity(event.currentTarget.value)
+                                                    }
+                                                    }
                                                 >
-                                                    <option value={props.idKota} selected disabled hidden>
-                                                        {props.kota}
+                                                    
+                                                    <option selected={idCity == '' ? false : true}>
+                                                        {props.kota == undefined ? "Pilih Kota" : idCity != props.idKota ? "Pilih Kota" : props.kota}
                                                     </option>
+                                                    {city.map((data, i) => {
+                                                        return (
+                                                            <option value={data.id} selected={data.id != idCity ? false : true} key={i}>
+                                                                {data.city}
+                                                            </option>
+                                                        )
+                                                    })}
                                                 </select>
                                             </div>
                                         </div>
@@ -225,12 +286,29 @@ export const FormAdminGuru = (props) => {
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="kecamatan_guru"
-                                                    required
+                                                    // disabled={props.isDisabled}
                                                     disabled={props.isDisabled}
+                                                    required
+                                                    onChange={(event) => {
+                                                        if (idKecamatan != '') {
+                                                            if (event.currentTarget.value != idKecamatan) {
+                                                                dispatch({ type: "SET_KELURAHAN", value: [] });
+                                                                setIdKelurahan('');
+                                                            }
+                                                        }
+                                                        setIdKecamatan(event.currentTarget.value)
+                                                    }}
                                                 >
-                                                    <option value={props.idKec} selected disabled hidden>
-                                                        {props.kecamatan}
+                                                    <option selected={idKecamatan == '' ? false : true}>
+                                                        {props.kecamatan == undefined ? "Pilih Kecamatan" : idKecamatan != props.idKec ? "Pilih Kecamatan" : props.kecamatan}
                                                     </option>
+                                                    {kecamatan.map((data, i) => {
+                                                        return (
+                                                            <option value={data.id} selected={data.id != idKecamatan ? false : true} key={i}>
+                                                                {data.district}
+                                                            </option>
+                                                        )
+                                                    })}
                                                 </select>
                                             </div>
                                         </div>
@@ -243,12 +321,22 @@ export const FormAdminGuru = (props) => {
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="kelurahan_guru"
-                                                    required
                                                     disabled={props.isDisabled}
+                                                    required
+                                                    onChange={(event) => {
+                                                        setIdKelurahan(event.currentTarget.value);
+                                                    }}
                                                 >
-                                                    <option value={props.idKel} selected disabled hidden>
-                                                        {props.kelurahan}
+                                                    <option selected={idKelurahan == '' ? false : true}>
+                                                        {props.kelurahan == undefined ? "Pilih Kelurahan" : idKelurahan != props.idKel ? "Pilih Kelurahan" : props.kelurahan}
                                                     </option>
+                                                    {kelurahan.map((data, i) => {
+                                                        return (
+                                                            <option value={data.id} selected={data.id != idKelurahan ? false : true} key={i}>
+                                                                {data.sub_district}
+                                                            </option>
+                                                        )
+                                                    })}
                                                 </select>
                                             </div>
                                         </div>

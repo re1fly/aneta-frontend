@@ -31,21 +31,24 @@ import Filter from "../../../components/Filter";
 import { FormAdminTahunAkademik } from "../../../components/form/AdminTahunAkademik";
 import Swal from "sweetalert2";
 import { pageLoad } from "../../../components/misc/loadPage";
+import { dateNow } from "../../../components/misc/date";
 
 export default function ListTahunAkademik() {
     const [grid, setGrid] = useState(false)
     const [isViewTahunAkademik, setIsViewTahunAkademik] = useState(true);
+    const [isViewEdit, setIsViewEdit] = useState(false);
+    const [isViewCreate, setIsViewCreate] = useState(false);
+    const [isViewDetail, setIsViewDetail] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+
     const [getTahunAkademik, setGetTahunAkademik] = useState([])
-    const [academic, setGetAcademic] = useState([])
+    // console.log(getTahunAkademik);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
-    const academicYear = localStorage.getItem('academic_year')
+    const academicYear = localStorage.getItem('academic_year');
     const institute = localStorage.getItem('institute');
-    const user = localStorage.getItem('user_id')
-
-
-
+    const user = localStorage.getItem('user_id');
     const dateFormat = 'YYYY-MM-DD';
 
     const handleChange = (value) => {
@@ -109,7 +112,6 @@ export default function ListTahunAkademik() {
         ).then(function (response) {
             // console.log(response);
             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
-            console.log(tahunAkademik);
             setGetTahunAkademik(tahunAkademik?.data)
             // setBtnPagination(tahunAkademik?.links)
         })
@@ -125,18 +127,18 @@ export default function ListTahunAkademik() {
                 tag3: '',
                 periodeAwal: data.periode_start,
                 periodeAkhir: data.periode_end,
-                tahunAkademikAktif: [data.is_active],
+                tahunAkademikAktif: [data.is_active],                                                                                                                                           
             }
         })
 
         return (
             <>
-                <div className="row">
+                <div className="row">                                                                                                                                                                                                                                                                                                                                                                                                                                               
                     {data_sampel.map((value, index) => (
                         <div className="col-xl-4 col-lg-6 col-md-6" /*key={index}*/>
                             <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
                                 <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                                    {value.tahunAkademikAktif == "T" ? 'Aktif' : 'Nonaktif'}
+                                    {value.tahunAkademikAktif == "T" ? 'Aktif' : 'Tidak Aktif'}                                                                                                                                                                                                                                                 
                                 </span>
                                 <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
                                     overlay={_Account}>
@@ -249,8 +251,8 @@ export default function ListTahunAkademik() {
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined style={{ color: "black" }} />
-                        <EditOutlined style={{ color: "blue" }} />
+                        <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailTahunAkademik(record)} />
+                        <EditOutlined style={{ color: "blue" }} onClick={() => viewEditTahunAkademik(record)} />
                         <DeleteOutlined style={{ color: 'red' }} onClick={() => deleteTahunAkademik(record)} />
                     </Space>
                 ),
@@ -265,6 +267,9 @@ export default function ListTahunAkademik() {
                 periodeAwal: data.periode_start,
                 periodeAkhir: data.periode_end,
                 tahunAkademikAktif: [data.is_active],
+                jumlahMurid: data.number_of_student,
+                jumlahGuru: data.number_of_teachers,
+                jumlahStaff: data.number_of_staff,
             }
         })
 
@@ -322,7 +327,7 @@ export default function ListTahunAkademik() {
                             <div className="row">
                                 <div className="col-lg-8 col-md-6 my-2">
                                     <Button className="mr-4" type="primary" shape="round" size='middle'
-                                        onClick={() => setIsViewTahunAkademik(false)}>
+                                        onClick={viewCreateAkademik}>
                                         Tambah Data
                                     </Button>
                                     <Filter title1="Mata Pelajaran" title2="Kelas" />
@@ -540,9 +545,8 @@ export default function ListTahunAkademik() {
             if (el.name !== "") data[el.name] = el.value;
         }
         const dateNow = new Date().toLocaleString()
-        console.log(data, dateNow)
-        console.log('institute', institute)
-        console.log('academic_year', academicYear)
+        console.log(data)
+        const akademikInsert = `${data.tahun_akademik} / ${parseInt(data.tahun_akademik) + 1} `
 
         axios.post(BASE_URL, {
             "processDefinitionId": "GlobalInsertRecord:7:7777c884-d588-11ec-a2ad-3a00788faff5",
@@ -556,10 +560,10 @@ export default function ListTahunAkademik() {
                         "tbl_coloumn": {
                             "uuid": "",
                             "institute_id": institute,
-                            "academic_year": data.tahun_akademik,
+                            "academic_year": akademikInsert,
                             "periode_start": data.periode_awal,
                             "periode_end": data.periode_akhir,
-                            "is_active": data.status_akhir,
+                            "is_active": data.tahunAkademik_aktif,
                             "number_of_student": data.jumlah_murid,
                             "number_of_teachers": data.jumlah_guru,
                             "number_of_staff": data.jumlah_staff,
@@ -574,10 +578,91 @@ export default function ListTahunAkademik() {
         }).then(function (response) {
             const dataRes = JSON.parse(response.data.variables[2].value)
             console.log(dataRes);
-            localStorage.setItem('academic_year', dataRes.id);
-            localStorage.setItem('year', data.tahun_akademik);
-            localStorage.setItem('semester', data.semester);
+            if (dataRes.status == 'success') {
+                // setIsViewPelajaran(true)
+                notification.success({
+                  message: 'Sukses',
+                  description: 'Tahun Akademik berhasil ditambahkan.',
+                  placement: 'top'
+                })
+              } else {
+                notification.error({
+                  message: 'Error',
+                  description: 'Harap isi semua field',
+                  placement: 'top'
+                })
+              }
+            if (data.tahunAkademik_aktif == "T") {
+                localStorage.setItem('academic_year', dataRes.id);
+                localStorage.setItem('year', data.tahun_akademik);
+                localStorage.setItem('semester', data.semester);
+            }
             pageLoad()
+        })
+    }
+
+    const editTahunAkademik = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        // const dateNow = new Date().toLocaleString()
+        console.log(data)
+        const akademikInsert = `${data.tahun_akademik} / ${parseInt(data.tahun_akademik) + 1} `
+
+        axios.post(BASE_URL, {
+            "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_updatedata",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "x_academic_yearModel",
+                        "id": selectedUser.id,
+                        "tbl_coloumn": {
+                            "uuid": '',
+                            "institute_id": institute,
+                            "academic_year": akademikInsert,
+                            "periode_start": data.periode_awal,
+                            "periode_end": data.periode_akhir,
+                            "is_active": data.status_akhir,
+                            "number_of_student": data.jumlah_murid,
+                            "number_of_teachers": data.jumlah_guru,
+                            "number_of_staff": data.jumlah_staff,
+                            "semester": data.semester,
+                            "created_at": dateNow,
+                            "updated_at": dateNow,
+                            "created_by": user
+                        }
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }).then(function (response) {
+            const valueRes = response.data.variables[2].value
+            const valueResObj = JSON.parse(valueRes)
+            if (valueResObj.status == "success") {
+                setIsViewEdit(false)
+                setIsViewTahunAkademik(true)
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Data Tahun Akademik berhasil di update.',
+                    placement: 'top'
+                })
+                pageLoad()
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                })
+            }
+            console.log(response)
         })
     }
 
@@ -624,14 +709,108 @@ export default function ListTahunAkademik() {
         })
     }
 
+    const viewCreateAkademik = () => {
+        setIsViewCreate(true)
+        setIsViewTahunAkademik(false)
+        setIsViewEdit(false)
+        setIsViewDetail(false)
+    }
+
+    const viewEditTahunAkademik = (record) => {
+        setSelectedUser(record)
+        setIsViewEdit(true)
+        setIsViewCreate(false)
+        setIsViewTahunAkademik(false)
+        setIsViewDetail(false)
+    }
+
+    const viewDetailTahunAkademik = (record) => {
+        setSelectedUser(record)
+        setIsViewCreate(false)
+        setIsViewTahunAkademik(false)
+        setIsViewEdit(false)
+        setIsViewDetail(true)
+    }
+
+    const FormCreate = () => {
+        return (
+            <FormAdminTahunAkademik
+                setView={() => setIsViewTahunAkademik(true)}
+                title="Tambah Tahun Akademik"
+                submit={creatTahunAkademik}
+                isDisabled={false}
+                isViewForm={isViewTahunAkademik}
+                getTahunAkademik={getTahunAkademik}
+                location={"create"}
+                isDisabledStatus={true}
+            />
+        )
+    }
+
+    const FormEdit = () => {
+        return (
+            <FormAdminTahunAkademik
+                setView={() => setIsViewTahunAkademik(true)}
+                title="Edit Tahun Akademik"
+                submit={editTahunAkademik}
+                id = {selectedUser.id}
+                tahunAkademik={selectedUser.tahunAkademik}
+                semester = {selectedUser.semester}
+                periodeAwal = {selectedUser.periodeAwal}
+                periodeAkhir = {selectedUser.periodeAkhir}
+                tahunAkademikAktif = {selectedUser.tahunAkademikAktif[0]}
+                jumlahMurid = {selectedUser.jumlahMurid}
+                jumlahGuru = {selectedUser.jumlahGuru}
+                jumlahStaff = {selectedUser.jumlahStaff}
+                isDisabled={false}
+                getTahunAkademik={getTahunAkademik}
+                isDisabledStatus={true}
+                location={"edit"}
+            />
+        )
+    }
+
+    const FormDetail = () => {
+        return (
+            <FormAdminTahunAkademik
+                setView={() => setIsViewTahunAkademik(true)}
+                title="Detail Tahun Akademik"
+                submit={creatTahunAkademik}
+                id = {selectedUser.id}
+                tahunAkademik = {selectedUser.tahunAkademik}
+                semester = {selectedUser.semester}
+                periodeAwal = {selectedUser.periodeAwal}
+                periodeAkhir = {selectedUser.periodeAkhir}
+                tahunAkademikAktif = {selectedUser.tahunAkademikAktif[0]}
+                jumlahMurid = {selectedUser.jumlahMurid}
+                jumlahGuru = {selectedUser.jumlahGuru}
+                jumlahStaff = {selectedUser.jumlahStaff}
+                getTahunAkademik={getTahunAkademik}
+                isDisabled={true}
+                isDisabledStatus={true}
+                location={"detail"}
+            />
+        )
+    }
+
     return (
         <Fragment>
             <div className="main-wrapper">
                 <Navheader />
                 <div className="main-content">
                     <Appheader />
-                    {isViewTahunAkademik ? <ViewTahunAkademik /> : <TambahTahunAkademik />}
-
+                    {/* {isViewTahunAkademik ? <ViewTahunAkademik /> : <TambahTahunAkademik />} */}
+                    {
+                        isViewTahunAkademik ?
+                            <ViewTahunAkademik /> :
+                            isViewCreate ?
+                                <FormCreate /> :
+                                isViewEdit ?
+                                    <FormEdit /> :
+                                    isViewDetail ?
+                                        <FormDetail /> :
+                                        <ViewTahunAkademik />
+                    }
                     <Adminfooter />
                 </div>
             </div>

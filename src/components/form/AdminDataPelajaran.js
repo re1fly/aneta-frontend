@@ -81,39 +81,26 @@ export const FormAdminPelajaran = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kurikulum
+                                                    Kelompok
                                                 </label>
-                                                {/* <input
-                                                    type="text"
-                                                    name='kelas'
-                                                    className="form-control"
-                                                    defaultValue={props.kode}
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                /> */}
                                                 <select
                                                     className="form-control"
                                                     aria-label="Default select example"
-                                                    name="kurikulum"
+                                                    name="kelompok"
                                                     required
                                                     disabled={props.isDisabled}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Kurikulum
+                                                    <option value={props.idKelompok} selected disabled>
+                                                        {props.kelompok == null ? "Pilih Kelompok Belajar" : props.kelompok}
                                                     </option>
-                                                    <option value="kurukulum 2013">
-                                                        Kurikulum 2013
-                                                    </option>
-                                                    <option value="kurikulum merdeka belajar">
-                                                        Kurikulum Merdeka Belajar
-                                                    </option>
+                                                    {props.selectKelompokBelajar}
                                                 </select>
                                             </div>
                                         </div>
 
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
-                                            <label className="mont-font fw-600 font-xsss">
+                                                <label className="mont-font fw-600 font-xsss">
                                                     No urut Rapor
                                                 </label>
                                                 <input
@@ -129,29 +116,9 @@ export const FormAdminPelajaran = (props) => {
                                     </div>
 
                                     <div className="row">
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kelompok
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kelompok"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value="" selected disabled>
-                                                        Pilih Kelompok
-                                                    </option>
-                                                    <option value="muatan wajib">
-                                                        Muatan Wajib
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
 
-                                        <div className="col-lg-6 mb-3">
+
+                                        <div className="col-lg-12 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Status
@@ -163,13 +130,13 @@ export const FormAdminPelajaran = (props) => {
                                                     required
                                                     disabled={props.isDisabled}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Status
+                                                    <option value={props.status} selected disabled>
+                                                        {props.status == null ? "Pilih Status" : props.status}
                                                     </option>
-                                                    <option value="aktif">
+                                                    <option value="true">
                                                         Aktif
                                                     </option>
-                                                    <option value="aktif">
+                                                    <option value="false">
                                                         Tidak Aktif
                                                     </option>
                                                 </select>

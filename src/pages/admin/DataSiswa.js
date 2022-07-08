@@ -169,6 +169,12 @@ function DataSiswaAdmin() {
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
                                         "operator": "="
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_class", // => update dari syamsul
+                                        "tbl_field": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "="
                                     }
                                 ],
                                 "order_coloumn": "x_academic_students.updated_at",
@@ -293,6 +299,7 @@ function DataSiswaAdmin() {
             .then(function (response) {
                 const dataClass = JSON.parse(response.data.variables[2].value);
                 setDataClass(dataClass);
+                console.log(dataClass)
             })
     }, [academic, paramsPage, refreshState, isViewSiswa]);
 
@@ -1093,6 +1100,7 @@ function DataSiswaAdmin() {
                                     email: data.email_ortu,
                                     user_role_id: 4,
                                     email_verified_at: dateNow,
+                                    institute_id: institute,
                                     password:
                                         "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
                                 },

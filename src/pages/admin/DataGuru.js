@@ -34,9 +34,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProcessId, searchGlobal } from "../../redux/Action";
 import { FormAdminGuru } from '../../components/form/AdminGuru';
 import Swal from "sweetalert2";
-import { dateNow } from "../../components/misc/date";
-import { pageLoad } from "../../components/misc/loadPage";
-import { FilterAcademic } from "../../components/FilterAcademic";
+
+import { dateNow } from "../../components/misc/date"; // 
+import { pageLoad } from "../../components/misc/loadPage"; // 
+import { FilterAcademic } from "../../components/FilterAcademic"; // 
 
 function DataGuruAdmin() {
     const [grid, setGrid] = useState(false);
@@ -50,8 +51,8 @@ function DataGuruAdmin() {
     const institute = localStorage.getItem('institute');
     const academicYear = localStorage.getItem('academic_year')
 
-    const [academic, setAcademic] = useState(academicYear);
-    const [academicYears, setAcademicYears] = useState([]);
+    const [academic, setAcademic] = useState(academicYear); // 
+    const [academicYears, setAcademicYears] = useState([]); // 
 
     const [getGuru, setGetGuru] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
@@ -64,34 +65,9 @@ function DataGuruAdmin() {
     const dispatch = useDispatch();
     const searchRedux = useSelector(state => state.search);
     const DataSearch = searchRedux.DataSearch;
-    const dataAddres = useSelector(state => state.addres);
-
-    const provinsi = dataAddres?.DataProvinsi
-    const city = dataAddres?.DataCity
-    const kecamatan = dataAddres?.DataKecamatan
-    const kelurahan = dataAddres?.DataKelurahan
-
-    const [idProv, setIdProv] = useState('');
-    const [idCity, setIdCity] = useState('');
-    const [idKecamatan, setIdKecamatan] = useState('');
-
-    // useEffect(() => {
-    //     dispatch(GetProvinsi());
-    //     if (idProv != '') {
-    //         dispatch(GetCity(idProv));
-    //     }
-    //     if (idCity != '') {
-    //         dispatch(GetKecamatan(idCity));
-    //     }
-    //     if (idKecamatan != '') {
-    //         dispatch(GetKelurahan(idKecamatan));
-    //     }
-    // }, [idProv, idCity, idKecamatan])
 
     const getProcess = useSelector(state => state.processId);
     let ProcessId = getProcess.DataProcess;
-
-    let getKeyGlobalJoin;
 
     const getBase64 = (img, callback) => {
         const reader = new FileReader();
@@ -231,7 +207,7 @@ function DataGuruAdmin() {
         dispatch(getProcessId(["globaljoinsubwhereget", "getdatajoinwhere"]))
     }, [])
 
-    useEffect(() => {
+    const getListGuru = () => {
 
         axios.post(BASE_URL,
             {
@@ -314,7 +290,7 @@ function DataGuruAdmin() {
                                 }
                             ],
                             "order_coloumn": "x_academic_teachers.updated_at", // =>
-                            "order_by": "desc" // => done
+                            "order_by": "desc" // => 
                         }
                     },
                     {
@@ -325,13 +301,16 @@ function DataGuruAdmin() {
                 ]
             }
         ).then(function (response) {
-            console.log(response);
             const guru = JSON.parse(response?.data?.variables[3]?.value)
             setGetGuru(guru?.data?.data)
             const pagination = guru?.data?.links;
             setBtnPagination(pagination)
         })
+    }
 
+    useEffect(() => {
+
+        getListGuru()
 
         axios.post(BASE_URL, {
             "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
@@ -379,7 +358,6 @@ function DataGuruAdmin() {
             }
         }
         ).then(function (response) {
-            // console.log(response);
             const academics = JSON.parse(response?.data?.variables[3]?.value);
             setAcademicYears(academics?.data?.data);
         })
@@ -496,6 +474,10 @@ function DataGuruAdmin() {
     const TableDataGuru = () => {
         const columns = [
             {
+                title: 'No',
+                dataIndex: "no"
+            },
+            {
                 title: 'Name',
                 dataIndex: 'namaGuru',
                 filters: [
@@ -572,6 +554,7 @@ function DataGuruAdmin() {
             const tahunAktifGuru = dataSk?.substring(0, 4)
 
             return {
+                no: index + 1,
                 imageUrl: 'user.png',
                 id: guru.id_guru,
                 user_id: guru.user_id,
@@ -592,7 +575,7 @@ function DataGuruAdmin() {
                 kota: guru.city,
                 idKec: guru.district_id,
                 kecamatan: guru.district,
-                idKel: guru.sub_district_id,
+                idKel: guru.sub_discrict_id,
                 kelurahan: guru.sub_district,
                 alamat: guru.address,
             }
@@ -981,15 +964,14 @@ function DataGuruAdmin() {
                             "user_register_date": "required",
                             "status": "required",
                             "sk_number": "required",
-                            // "created_at": "required",
-                            // "updated_at": "required",
-                            "institute_id" : "required"
-                            
+                            "created_at": "required",
+                            "updated_at": "required",
+                            "institute_id": "required"
+
                         },
                         "user_email": data.email_guru,
                         "user_name": data.nama_guru,
                         "user_role_id": 2,
-                        "institute_id" : institute,
                         "user_email_verified_at": dateNow,
                         "user_password": "password",
                         "user_place_of_birth": data.tempatlahir_guru,
@@ -1006,8 +988,9 @@ function DataGuruAdmin() {
                         "user_register_date": dateNow,
                         "status": data.status_guru,
                         "sk_number": data.sk_guru,
-                        // "created_at": dateNow, 
-                        // "updated_at": dateNow
+                        "created_at": dateNow,
+                        "updated_at": dateNow,
+                        "institute_id": institute,
                     }
                 },
                 {
@@ -1024,7 +1007,7 @@ function DataGuruAdmin() {
                             "name": data.nama_guru,
                             "email": data.email_guru,
                             "user_role_id": 2,
-                            "institute_id" : institute,
+                            "institute_id": institute,
                             "email_verified_at": dateNow,
                             "password": "password",
                         }
@@ -1039,10 +1022,10 @@ function DataGuruAdmin() {
                             "place_of_birth": data.tempatlahir_guru,
                             "date_of_birth": data.tanggallahir_guru,
                             "mobile_phone": data.nomortelefon_guru,
-                            "state_id": "11",
-                            "city_id": "1101",
-                            "district_id": "1101010",
-                            "sub_discrict_id": "1101010001",
+                            "state_id": data.provinsi_guru,
+                            "city_id": data.kota_guru,
+                            "district_id": data.kecamatan_guru,
+                            "sub_discrict_id": data.kelurahan_guru,
                             "address": data.alamat_guru
                         }
                     }
@@ -1101,7 +1084,7 @@ function DataGuruAdmin() {
                         placement: "top"
                     });
                 }
-                pageLoad()
+                // pageLoad()
             } else {
                 notification.error({
                     message: 'Error',
@@ -1153,10 +1136,10 @@ function DataGuruAdmin() {
                         "user_place_of_birth": data.tempatlahir_guru,
                         "user_date_of_birth": data.tanggallahir_guru,
                         "user_mobile_phone": data.nomortelefon_guru,
-                        "user_state_id": "11",
-                        "user_city_id": "1101",
-                        "user_district_id": "1101010",
-                        "user_sub_discrict_id": "1101010001",
+                        "user_state_id": data.provinsi_guru,
+                        "user_city_id": data.kota_guru,
+                        "user_district_id": data.kecamatan_guru,
+                        "user_sub_discrict_id": data.kecamatan_guru,
                         "user_address": data.alamat_guru,
                         "user_image": "jpg",
                         "user_image_type": "string",
@@ -1185,10 +1168,10 @@ function DataGuruAdmin() {
                             "place_of_birth": data.tempatlahir_guru,
                             "date_of_birth": data.tanggallahir_guru,
                             "mobile_phone": data.nomortelefon_guru,
-                            "state_id": "11",
-                            "city_id": "1101",
-                            "district_id": "1101010",
-                            "sub_discrict_id": "1101010001",
+                            "state_id": data.provinsi_guru,
+                            "city_id": data.kota_guru,
+                            "district_id": data.kecamatan_guru,
+                            "sub_discrict_id": data.kelurahan_guru,
                             "address": data.alamat_guru
                         }
                     }
@@ -1221,7 +1204,7 @@ function DataGuruAdmin() {
                     description: 'Data guru berhasil di update.',
                     placement: 'top'
                 })
-                pageLoad()
+                // pageLoad()
             } else {
                 notification.error({
                     message: 'Error',
@@ -1265,13 +1248,13 @@ function DataGuruAdmin() {
                 }
                 ).then(function (response) {
                     console.log(response);
-                    setRefreshState(true);
+                    getListGuru()
                     Swal.fire(
                         'Data telah terhapus!',
                         'Menghapus data siswa bernama ' + record.namaGuru,
                         'success'
                     )
-                    pageLoad()
+                    // pageLoad()
                 })
             }
         })
@@ -1308,14 +1291,8 @@ function DataGuruAdmin() {
                 submit={createGuru}
                 isDisabled={false}
                 disabledEmail={false}
-                provinsi="ACEH"
-                idProvinsi="11"
-                kota="KABUPATEN SIMEULUE"
-                idKota="1101"
-                kecamatan="TEUPAH SELATAN"
-                idKec="1101010"
-                kelurahan="LATIUNG"
-                idKel="1101010001"
+                isViewForm={isViewGuru}
+                location={"create"}
             />
         )
     }
@@ -1344,6 +1321,7 @@ function DataGuruAdmin() {
                 alamat={selectedUser.alamat}
                 isDisabled={false}
                 disabledEmail={true}
+                location={"edit"}
             />
         )
     }
@@ -1372,6 +1350,8 @@ function DataGuruAdmin() {
                 alamat={selectedUser.alamat}
                 isDisabled={true}
                 disabledEmail={true}
+                location={"detail"}
+
             />
         )
     }

@@ -31,6 +31,8 @@ import {FilterAcademic} from "../../../components/FilterAcademic";
 import {FilterKelas} from "../../../components/FilterKelas";
 import {searchGlobal} from "../../../redux/Action";
 import {useDispatch, useSelector} from "react-redux";
+import {dateNow} from "../../../components/misc/date";
+import Swal from "sweetalert2";
 
 function DataPelajaranKelas() {
     const [grid, setGrid] = useState(false);
@@ -506,6 +508,7 @@ function DataPelajaranKelas() {
     const data =
         dataPelajaran.map((data, index) => {
             return {
+                no: index +1,
                 id: data.id_subjects,
                 idMataPelajaran: data.id_subjects_master,
                 mataPelajaran: data.nama_mata,
@@ -522,8 +525,13 @@ function DataPelajaranKelas() {
     const TabelDataPelajaranKelas = () => {
         const columns = [
             {
-                title: "Mata Pelajaran",
-                dataIndex: "mataPelajaran",
+                title: "No",
+                dataIndex: "no",
+            },
+            {
+                title: "Kelas",
+                dataIndex: "kelas",
+                align: "center",
             },
             {
                 title: "Kode",
@@ -531,9 +539,8 @@ function DataPelajaranKelas() {
                 align: "center",
             },
             {
-                title: "Kelas",
-                dataIndex: "kelas",
-                align: "center",
+                title: "Mata Pelajaran",
+                dataIndex: "mataPelajaran",
             },
             {
                 title: "Tahun Akademik",
@@ -554,7 +561,7 @@ function DataPelajaranKelas() {
                     <Space size="middle">
                         <EyeOutlined style={{color: "black"}} onClick={() => viewDetailPelKelas(record)}/>
                         <EditOutlined style={{color: "blue"}} onClick={() => viewEditPelKelas(record)}/>
-                        <DeleteOutlined style={{color: 'red'}} onClick={() => alert(record.mataPelajaran)}/>
+                        <DeleteOutlined style={{color: 'red'}} onClick={() => deleteData(record)}/>
                     </Space>
                 ),
             },
@@ -787,7 +794,7 @@ function DataPelajaranKelas() {
                     </div>
                 </Card>
                 <div className="px-3 row d-flex align-items-center">
-                    <div className="w-25 mr-3">
+                    <div style={{width: '20%'}}>
                         <label className="mont-font fw-600 font-xssss">
                             Tahun Akademik / Semester
                         </label>
@@ -982,6 +989,49 @@ function DataPelajaranKelas() {
         }).catch(error => {
             alert(error)
         });
+    }
+
+    const deleteData = (record) => {
+        Swal.fire({
+            title: 'Apakah anda yakin menghapus data?',
+            text: "Anda tidak dapat mengembalikan data yang sudah terhapus",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Batalkan',
+            confirmButtonText: 'Hapus'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post(BASE_URL, {
+                        "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                        "returnVariables": true,
+                        "variables": [
+                            {
+                                "name": "global_updatedata",
+                                "type": "json",
+                                "value": {
+                                    "tbl_name": "x_academic_subjectsModel",
+                                    "id": record.id,
+                                    "tbl_coloumn": {
+                                        "deleted_at": dateNow
+                                    }
+
+                                }
+                            }
+                        ]
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json",
+                        }
+                    }
+                ).then(function (response) {
+                    _getDataPelajaran()
+                }).catch(error => {
+                    alert(error)
+                });
+            }
+        })
     }
 
     const FormEdit = () => {

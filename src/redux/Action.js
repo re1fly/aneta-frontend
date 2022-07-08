@@ -73,36 +73,36 @@ export const getProcessId = (keyProcess) => (dispatch) => {
     });
 };
 
-// export const GetProvinsi = () => (dispatch) => {
-//   axios
-//     .post(BASE_URL, {
-//       processDefinitionId:
-//         "getdataglobal:5:7248a1b1-d5a7-11ec-a658-66fc627bf211",
-//       returnVariables: true,
-//       variables: [
-//         {
-//           name: "global_getdata",
-//           type: "json",
-//           value: {
-//             tbl_name: "r_state",
-//             tbl_coloumn: ["*"],
-//             order_coloumn: "state",
-//             order_by: "asc",
-//             pagination: false,
-//             total_result: 2,
-//           },
-//         },
-//       ],
-//     })
-//     .then(function (response) {
-//       const dataProvinsi = JSON.parse(response?.data?.variables[2]?.value);
-//       dispatch({ type: "SET_PROVINSI", value: dataProvinsi?.data });
-//       // console.log(dataProvinsi);
-//     })
-//     .catch(function (error) {
-//       console.log(error);
-//     });
-// };
+export const GetProvinsi = () => (dispatch) => {
+  axios
+    .post(BASE_URL, {
+      processDefinitionId:
+        "getdataglobal:5:7248a1b1-d5a7-11ec-a658-66fc627bf211",
+      returnVariables: true,
+      variables: [
+        {
+          name: "global_getdata",
+          type: "json",
+          value: {
+            tbl_name: "r_state",
+            tbl_coloumn: ["*"],
+            order_coloumn: "state",
+            order_by: "asc",
+            pagination: false,
+            total_result: 2,
+          },
+        },
+      ],
+    })
+    .then(function (response) {
+      const dataProvinsi = JSON.parse(response?.data?.variables[2]?.value);
+      dispatch({ type: "SET_PROVINSI", value: dataProvinsi?.data });
+      // console.log(dataProvinsi);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
 
 export const GetCity = (id_provinsi) => (dispatch) => {
   axios

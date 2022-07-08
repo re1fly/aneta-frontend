@@ -1,5 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 import { DatePicker, Input, PageHeader, Select, Button } from "antd";
+import moment from 'moment';
 
 export const FormAdminTahunAkademik = (props) => {
     let disabledButton = props.isDisabled;
@@ -31,9 +32,9 @@ export const FormAdminTahunAkademik = (props) => {
                                                 <DatePicker
                                                     className="form-control"
                                                     picker="year"
-                                                    // placeholder="Pilih Tahun Akademik"
+                                                    placeholder="Pilih Tahun Akademik"
+                                                    defaultValue={ props.location == "edit" || props.location == "detail" ? moment(props.tahunAkademik,'YYYY') : '' }
                                                     name="tahun_akademik"
-                                                    defaultValue={props.tahunAkademik}
                                                     disabled={props.isDisabled}
                                                 />
                                             </div>
@@ -47,7 +48,7 @@ export const FormAdminTahunAkademik = (props) => {
                                                 <select
                                                     className="form-control"
                                                     aria-label="Default select example"
-                                                    name="semster"
+                                                    name="semester"
                                                     required
                                                     disabled={props.isDisabled}
                                                 >
@@ -76,8 +77,8 @@ export const FormAdminTahunAkademik = (props) => {
                                                         format={dateFormat}
                                                         placeholder="Pilih Periode Awal"
                                                         name="periode_awal"
-                                                    // defaultValue={props.periode_awal}
-                                                    // disabled={props.isDisabled}
+                                                        defaultValue={ props.location == "edit" || props.location == "detail" ? moment(props.periodeAwal,'YYYY-MM-DD') : '' }
+                                                        disabled={props.isDisabled}
                                                     />
                                             </div>
                                         </div>
@@ -92,8 +93,8 @@ export const FormAdminTahunAkademik = (props) => {
                                                     format={dateFormat}
                                                     placeholder="Pilih Periode Akhir"
                                                     name="periode_akhir"
-                                                // defaultValue={props.periode_akhir}
-                                                // disabled={props.isDisabled}
+                                                    defaultValue={ props.location == "edit" || props.location == "detail" ? moment(props.periodeAkhir,'YYYY-MM-DD') : '' }
+                                                    disabled={props.isDisabled}
                                                 />
                                             </div>
                                         </div>
@@ -110,17 +111,19 @@ export const FormAdminTahunAkademik = (props) => {
                                                     aria-label="Default select example"
                                                     name="tahunAkademik_aktif"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.isDisabledStatus}
                                                 >
-                                                    <option value={props.tahunAkademikAktif} selected disabled>
-                                                        {props.tahunAkademikAktif}
+                                                    <option value={props.tahunAkademikAktif == "T" || props.getTahunAkademik == null ? "T" : "F"} selected disabled>
+                                                        {props.tahunAkademikAktif == "T" || props.getTahunAkademik == null ? "Aktif" : "Tidak Aktif"}
                                                     </option>
-                                                    <option value="T">
+                                                    {/* {props.getTahunAkademik != null ? <option className="form-control" value="F">Tidak Aktif</option>
+                                                    : <option className="form-control" value="T">Aktif</option>} */}
+                                                    {/* <option value="T">
                                                         Aktif
                                                     </option>
                                                     <option value="F">
                                                         Tidak Aktif
-                                                    </option>
+                                                    </option> */}
                                                 </select>
                                             </div>
                                         </div>
@@ -132,7 +135,7 @@ export const FormAdminTahunAkademik = (props) => {
                                                 </label>
                                                 <input
                                                     type="number"
-                                                    name='jumlah_guru'
+                                                    name='jumlah_murid'
                                                     className="form-control"
                                                     defaultValue={props.jumlahMurid}
                                                     required
@@ -159,7 +162,7 @@ export const FormAdminTahunAkademik = (props) => {
                                             </div>
                                         </div>
 
-                                        <div className="col-lg-12 mb-3">
+                                        <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Jumlah Staff

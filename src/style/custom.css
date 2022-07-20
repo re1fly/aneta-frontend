@@ -1,0 +1,118 @@
+.custom-table .table-custom {
+    overflow: auto;
+    width: 100%;
+}
+
+.custom-table td, .custom-table th {
+    border: 1px solid lightgrey;
+    width: 200px;
+}
+
+.custom-table table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.custom-table td:first-child, .custom-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: 200px;
+    background-color: #FF6B22;
+    color: white;
+}
+
+.custom-table thead tr th {
+    position: sticky;
+    top: 0;
+}
+
+.custom-table th:first-child {
+    z-index: 2;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: grey;
+}
+
+.box {
+    width: 200px;
+    height: 300px;
+    position: relative;
+    border: 1px solid #bbb;
+    background: #eee;
+    float: left;
+    margin: 20px;
+}
+
+.ribbon {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    z-index: 1;
+    overflow: hidden;
+    width: 93px;
+    height: 93px;
+    text-align: right;
+}
+
+.ribbon span {
+    font-size: 0.5rem;
+    color: #fff;
+    text-transform: Capitalize;
+    text-align: center;
+    font-weight: bold;
+    line-height: 25px;
+    transform: rotate(45deg);
+    width: 120px;
+    display: block;
+    background: #79a70a;
+    background: linear-gradient(#FB5B0C 0%, #FB5B0C 100%);
+    box-shadow: 0 3px 8px -4px rgba(0, 0, 0, 1);
+    position: absolute;
+    top: 17px;
+    right: -29px;
+}
+
+.ribbon span::before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: 100%;
+    z-index: -1;
+    border-left: 3px solid #FB5B0C;
+    border-right: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-top: 3px solid #FB5B0C;
+}
+
+.ribbon span::after {
+    content: '';
+    position: absolute;
+    right: 0%;
+    top: 50%;
+    z-index: -1;
+    border-right: 3px solid #FB5B0C;
+    border-left: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-top: 3px solid #FB5B0C;
+}
+
+.ant-form-inline .ant-form-item {
+    margin-bottom: 15px;
+}
+

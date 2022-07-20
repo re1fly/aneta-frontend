@@ -79,7 +79,7 @@ function Register() {
                     }else{
                         notification.success({
                             message: 'Success',
-                            description: 'Registrasi sukses ! silahkan login.',
+                            description: 'Registrasi sukses ! silahkan Cek email anda untuk verifikasi login.',
                             placement: 'top'
                         })
                         setNamaUser('')

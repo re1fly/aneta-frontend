@@ -35,6 +35,9 @@ import Adminfooter from '../../../components/Adminfooter';
 import Filter from "../../../components/Filter";
 import { FormAdminPelajaran } from "../../../components/form/AdminDataPelajaran";
 import Swal from "sweetalert2";
+import { dateNow } from "../../../components/misc/date";
+import { pageLoad } from "../../../components/misc/loadPage";
+import { FilterAcademic } from "../../../components/FilterAcademic";
 
 export default function DataMataPelajaranAdmin() {
   const [grid, setGrid] = useState(false)
@@ -45,18 +48,21 @@ export default function DataMataPelajaranAdmin() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [refreshState, setRefreshState] = useState(false);
 
+  const institute = localStorage.getItem('institute');
+  const academicYear = localStorage.getItem('academic_year')
+
+  const [year, setYear] = useState(localStorage.getItem('year'));
+  const [academic, setAcademic] = useState(academicYear);
+  const [academicYears, setAcademicYears] = useState([]);
+
   const [getPelajaran, setGetPelajaran] = useState([]);
+  const [getKelompokBelajar, setGetKelompokBelajar] = useState([])
   const [btnPagination, setBtnPagination] = useState([]);
   const [paramsPage, setParamsPage] = useState("1");
-  const [dataClass, setDataClass] = useState();
-  const [academicYears, setAcademicYears] = useState([]);
 
   const [handleImage, setHandleImage] = useState('')
   const [_Img, setIMG] = useState('');
   const [_ImgBase64, setIMGBase64] = useState('');
-
-  const academicYear = localStorage.getItem('academic_year')
-  const institute = localStorage.getItem('institute');
 
   const dispatch = useDispatch();
   const searchRedux = useSelector(state => state.search);
@@ -205,12 +211,14 @@ export default function DataMataPelajaranAdmin() {
             "name": "global_join_where",
             "type": "json",
             "value": {
-              "tbl_induk": "x_academic_subjects",
+              "tbl_induk": "x_academic_subject_master",
               "select": [
-                "x_academic_subjects.*",
-                "x_academic_year.*",
-                "x_academic_class.*",
-                "x_academic_subjects.id as id_pelajaran"
+                "x_academic_subject_master.*",
+                "r_kelompok_mapel.id as id_mapel",
+                "r_kelompok_mapel.kelompok as kel_id",
+                "r_class_type.*",
+                "x_academic_year.id as id_academic",
+                "x_academic_subject_master.id as id_master"
               ],
               "paginate": 10,
               "join": [
@@ -220,77 +228,73 @@ export default function DataMataPelajaranAdmin() {
                   "refkey": "id"
                 },
                 {
-                  "tbl_join": "x_academic_class",
-                  "foregenkey": "course_grade_id",
+                  "tbl_join": "r_kelompok_mapel",
+                  "foregenkey": "kel_id",
+                  "refkey": "id"
+                },
+                {
+                  "tbl_join": "r_class_type",
+                  "foregenkey": "class_type",
                   "refkey": "id"
                 }
               ],
               "where": [
                 {
-                  "tbl_coloumn": "x_academic_subjects",
+                  "tbl_coloumn": "x_academic_subject_master",
                   "tbl_field": "academic_year_id",
                   "tbl_value": academicYear,
                   "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subject_master",
+                  "tbl_field": "deleted_at",
+                  "tbl_value": "",
+                  "operator": "="
                 }
               ],
-              "order_coloumn": "x_academic_subjects.id",
-              "order_by": "asc"
+              "order_coloumn": "x_academic_subject_master.updated_at",
+              "order_by": "desc"
             }
           },
           {
             "name": "page",
             "type": "string",
-            "value": paramsPage
+            "value": "1"
           }
         ]
       }
     ).then(function (response) {
-      const pelajaran = JSON.parse(response.data.variables[3].value)
-      setGetPelajaran(pelajaran.data.data)
-      const pagination = pelajaran.data.links
-      setBtnPagination(pagination)
+      const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
+      setGetPelajaran(pelajaran?.data?.data)
+      // const pagination = pelajaran?.data?.links
+      // setBtnPagination(pagination)
     })
 
     axios.post(BASE_URL,
       {
-        processDefinitionId:
-          "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
-        returnVariables: true,
-        variables: [
+        "processDefinitionId": "getdataglobal:5:7248a1b1-d5a7-11ec-a658-66fc627bf211",
+        "returnVariables": true,
+        "variables": [
           {
-            name: "global_get_where",
-            type: "json",
-            value: {
-              tbl_name: "x_academic_class",
-              pagination: false,
-              total_result: 2,
-              order_coloumn: "x_academic_class.class",
-              order_by: "asc",
-              data: [
-                {
-                  kondisi: "where",
-                  tbl_coloumn: "academic_year_id",
-                  tbl_value: academicYear,
-                  operator: "=",
-                },
+            "name": "global_getdata",
+            "type": "json",
+            "value": {
+              "tbl_name": "r_kelompok_mapel",
+              "tbl_coloumn": [
+                "*"
               ],
-              tbl_coloumn: ["*"],
-            },
-          },
-        ],
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+              "order_coloumn": "r_kelompok_mapel.id",
+              "order_by": "desc",
+              "pagination": true,
+              "total_result": 2
+            }
+          }
+        ]
       }
     ).then(function (response) {
-      const dataClass = JSON.parse(response.data.variables[2].value);
-      // console.log(dataClass);
-      setDataClass(dataClass);
-    }).catch(function (error) {
-      alert(error);
-    });
+      const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+      setGetKelompokBelajar(dataRes?.data?.data)
+    })
 
     axios.post(BASE_URL, {
       "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
@@ -338,23 +342,22 @@ export default function DataMataPelajaranAdmin() {
       }
     }
     ).then(function (response) {
-      const academics = JSON.parse(response.data.variables[3].value);
-      setAcademicYears(academics.data.data);
+      const academics = JSON.parse(response?.data?.variables[3]?.value);
+      setAcademicYears(academics?.data?.data);
     })
-  }, [paramsPage, isViewPelajaran, refreshState])
+  }, [academic, paramsPage, isViewPelajaran, refreshState])
 
   const CardDataPelajaran = () => {
     const channelList = getPelajaran.map((pelajaran, index) => {
       return {
         imageUrl: 'user.png',
-        namaPelajaran: pelajaran.course_name,
-        kode: pelajaran.course_code,
+        namaPelajaran: pelajaran.nama_mata,
+        kode: pelajaran.code,
         tag2: '',
         tag3: '',
-        kelas: pelajaran.class,
-        tahunAkademik: pelajaran.academic_year,
-        maxSiswa: pelajaran.max_student,
-        status: [pelajaran.is_active],
+        kelompok: pelajaran.kelompok,
+        noUrutRapor: pelajaran.urut_lapor,
+        status: [pelajaran.status],
       }
     })
 
@@ -417,28 +420,28 @@ export default function DataMataPelajaranAdmin() {
                 <div className="mt-4 mx-auto">
                   <div className="row ml-3">
                     <div className="col-6">
-                      <p className="font-xssss float-left lh-1">Kelas</p>
+                      <p className="font-xssss float-left lh-1">Kelompok</p>
                     </div>
                     <div className="">
-                      <p className="font-xssss float-left lh-1">: {value.kelas}</p>
+                      <p className="font-xssss float-left lh-1">: {value.kelompok}</p>
                     </div>
                   </div>
 
                   <div className="row ml-3">
                     <div className="col-6">
-                      <p className="font-xssss float-left lh-1">Tahun Akademik</p>
+                      <p className="font-xssss float-left lh-1">No Urut Rapor</p>
                     </div>
                     <div className="">
-                      <p className="font-xssss float-left lh-1">: {value.tahunAkademik}</p>
+                      <p className="font-xssss float-left lh-1">: {value.noUrutRapor}</p>
                     </div>
                   </div>
 
                   <div className="row ml-3">
                     <div className="col-6">
-                      <p className="font-xssss float-left lh-1">Max siswa</p>
+                      <p className="font-xssss float-left lh-1"></p>
                     </div>
                     <div className="">
-                      <p className="font-xssss float-left lh-1">: {value.maxSiswa}</p>
+                      <p className="font-xssss float-left lh-1"></p>
                     </div>
                   </div>
                 </div>
@@ -476,100 +479,72 @@ export default function DataMataPelajaranAdmin() {
   };
 
   const TabelDataPelajaran = () => {
+    const color = 'green'
+
+    const channelList = getPelajaran.map((pelajaran, index) => {
+      return {
+        no: index + 1,
+        namaPelajaran: pelajaran.nama_mata,
+        kode: pelajaran.code,
+        idKelompok: pelajaran.id_mapel,
+        kelompok: pelajaran.kel_id,
+        noUrutRapor: pelajaran.urut_lapor,
+        kurikulum: pelajaran.max_student,
+        status: [JSON.stringify(pelajaran.status)],
+      }
+    })
+
     const columns = [
       {
         title: 'No',
         dataIndex: 'no',
-        defaultSortOrder: 'ascend',
         responsive: ['sm'],
-        // sorter: (a, b) => a.nis - b.nis,
       },
       {
         title: 'Pelajaran',
         dataIndex: 'namaPelajaran',
-        filters: [
-          {
-            text: 'Matematika',
-            value: 'Matematika',
-          },
-          {
-            text: 'Bahasa Indonesia',
-            value: 'Bahasa Indonesia',
-          },
-          {
-            text: 'Submenu',
-            value: 'Submenu',
-            children: [
-              {
-                text: 'Green',
-                value: 'Green',
-              },
-              {
-                text: 'Red',
-                value: 'Red',
-              },
-            ],
-          },
-        ],
-        // specify the condition of filtering result
-        // here is that finding the name started with `value`
         onFilter: (value, record) => record.namaKompetensi.indexOf(value) === 0,
-        // sorter: (a, b) => a.namaKompetensi.length - b.namaKompetensi.length,
         sortDirections: ['descend'],
       },
       {
         title: 'Kode',
         dataIndex: 'kode',
-        defaultSortOrder: 'descend',
-        align: "center"
-        // sorter: (a, b) => a.semester - b.semester,
-      },
-      {
-        title: 'Kelas',
-        dataIndex: 'kelas',
-        defaultSortOrder: 'descend',
-        align: "center"
-        // sorter: (a, b) => a.semester - b.semester,
-      },
-      {
-        title: 'Tahun Akademik',
-        dataIndex: 'tahunAkademik',
-        defaultSortOrder: 'descend',
         align: "center"
       },
       {
-        title: 'Max Siswa',
-        dataIndex: 'maxSiswa',
-        defaultSortOrder: 'descend',
+        title: 'Kelompok',
+        dataIndex: 'kelompok',
         align: "center"
       },
       {
-        title: 'Status',
-        dataIndex: 'status',
-        responsive: ['sm'],
-        render: status => (
+        title: 'No Urut Rapor',
+        dataIndex: 'noUrutRapor',
+        align: "center"
+      },
+      // {
+      //   title: 'Status',
+      //   dataIndex: 'status',
+      //   render: channelList => (
+      //     <Tag style={{ borderRadius: '15px' }} color={color}>
+      //       Aktif
+      //     </Tag>
+      //   ),
+      // },
+      {
+        title: "Status",
+        dataIndex: "status",
+        render: (status) => (
           <>
-            {status.map(status => {
-              let color = status != "T" ? 'red' : 'green';
+            {status.map((status) => {
+              let color = status == 'true' ? "green" : "red";
               return (
-                <Tag style={{ borderRadius: '15px' }} color={color} key={status}>
-                  {status ? "Aktif" : "Nonaktif"}
+                <Tag style={{ borderRadius: "15px" }} color={color} key={status}>
+                  {status == 'true' ? "Aktif" : "Nonaktif"}
                 </Tag>
               );
             })}
           </>
         ),
-        filters: [
-          {
-            text: 'Aktif',
-            value: 'aktif',
-          },
-          {
-            text: 'Nonaktif',
-            value: 'nonAktif',
-          },
-        ],
-        onFilter: (value, record) => record.status.indexOf(value) === 0,
       },
       {
         title: 'Aksi',
@@ -585,27 +560,11 @@ export default function DataMataPelajaranAdmin() {
       },
     ];
 
-    const data_sampel = getPelajaran.map((pelajaran, index) => {
-      return {
-        no: index + 1,
-        imageUrl: 'user.png',
-        id: pelajaran.id_pelajaran,
-        namaPelajaran: pelajaran.course_name,
-        kode: pelajaran.course_code,
-        idKelas: pelajaran.course_grade_id,
-        kelas: pelajaran.class,
-        idTahunAKademik: pelajaran.academic_year_id,
-        tahunAkademik: pelajaran.academic_year,
-        maxSiswa: pelajaran.max_student,
-        status: [pelajaran.is_active],
-      }
-    })
-
     return (
       <>
         <Table className=""
           columns={columns}
-          dataSource={data_sampel}
+          dataSource={channelList}
           onChange={onChangeTable}
           pagination={false}
           rowClassName="bg-greylight text-grey-900"
@@ -657,6 +616,17 @@ export default function DataMataPelajaranAdmin() {
                     Tambah Data
                   </Button>
                   <Filter title1="Mata Pelajaran" title2="Kelas" />
+                  <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
+                    selectYear={academicYears.map((data) => {
+                      return (
+                        <>
+                          <option value={data.id_academic}>
+                            {data.academic_year} Semester {data.semester}
+                          </option>
+                        </>
+                      )
+                    }
+                    )} />
                   {/* <Dropdown overlay={_filterMenu}>
                     <a className="ant-dropdown-link mr-4 font-bold"
                     onClick={e => e.preventDefault()}>
@@ -795,9 +765,6 @@ export default function DataMataPelajaranAdmin() {
                             <option value="" selected disabled>
                               Pilih Kelas
                             </option>
-                            {dataClass.map((data) => (
-                              <option value={data.id}>{data.class}</option>
-                            ))}
                           </select>
                         </div>
                       </div>
@@ -871,11 +838,11 @@ export default function DataMataPelajaranAdmin() {
     for (const el of e.target.elements) {
       if (el.name !== "") data[el.name] = el.value;
     }
-    const dateNow = new Date().toLocaleString()
+    // const dateNow = new Date().toLocaleString()
     console.log(data)
 
     axios.post(BASE_URL, {
-      "processDefinitionId": "insertpelajaran:12:d495502b-f069-11ec-a658-66fc627bf211",
+      "processDefinitionId": "datamatapelajaraninsert1:13:a8f250c5-fc3d-11ec-ac5e-66fc627bf211",
       "returnVariables": true,
       "variables": [
         {
@@ -883,41 +850,56 @@ export default function DataMataPelajaranAdmin() {
           "type": "json",
           "value": {
             "data": {
-              "course_name": "required",
-              "course_code": "required",
-              "max_student": "required",
-              "course_grade": "required",
-              "academic_year_id": "required"
+              "code": "required",
+              "nama_mata": "required",
+              "urut_lapor": "required",
+              "kelompok": "required",
+              "status": "required",
+              "deleted_at": "required",
+              "updated_at": "required"
             },
-            "course_name": data.nama_pelajaran,
-            "course_code": data.kode,
-            "max_student": data.max_siswa,
-            "course_grade": data.kelas,
-            "academic_year_id": data.tahun_akademik
-
+            "code": data.kode_pelajaran,
+            "nama_mata": data.nama_pelajaran,
+            "urut_lapor": data.noUrut_rapor,
+            "kelompok": 1,
+            "status": data.status,
+            "deleted_at": dateNow,
+            "updated_at": dateNow
           }
         },
         {
-          "name": "x_academic_subjects",
+          "name": "x_academic_subject_master",
           "type": "json",
           "value": {
-            "tbl_name": "x_academic_subjects",
+            "tbl_name": "x_academic_subject_master",
             "tbl_coloumn": {
-              "academic_year_id": data.tahun_akademik,
-              "course_grade_id": data.kelas,
-              "course_name": data.nama_pelajaran,
-              "course_code": data.kode,
-              "max_student": data.max_siswa
+              "academic_year_id": academicYear,
+              "code": data.kode_pelajaran,
+              "nama_mata": data.nama_pelajaran,
+              "urut_lapor": data.noUrut_rapor,
+              "status": data.status,
+              "deleted_at": dateNow,
+              "updated_at": dateNow
             }
           }
         },
         {
-          "name": "upload_image",
+          "name": "r_kelompok_mapel",
+          "type": "json",
+          "value": {
+            "tbl_name": "r_kelompok_mapel",
+            "tbl_coloumn": {
+              "kel_id": 1
+            }
+          }
+        },
+        {
+          "name": "image_data",
           "type": "json",
           "value": {
             "image": "bb",
             "image_type": "png",
-            "nama_folder": "image_pelajaran"
+            "nama_folder": "image_data"
           }
         }
       ]
@@ -926,22 +908,23 @@ export default function DataMataPelajaranAdmin() {
         "Content-Type": "application/json",
       }
     }).then(function (response) {
-      console.log("test :", response);
-      if (response.data.variables[5].value == 200) {
-        setIsViewCreate(false)
-        setIsViewPelajaran(true)
-        notification.success({
-          message: 'Sukses',
-          description: 'Pelajaran berhasil ditambahkan.',
-          placement: 'top'
-        })
-      } else {
-        notification.error({
-          message: 'Error',
-          description: 'Harap isi semua field',
-          placement: 'top'
-        })
-      }
+      console.log("insert :", response);
+      // if (response.data.variables[5].value == 200) {
+      //   setIsViewCreate(false)
+      //   setIsViewPelajaran(true)
+      //   notification.success({
+      //     message: 'Sukses',
+      //     description: 'Pelajaran berhasil ditambahkan.',
+      //     placement: 'top'
+      //   })
+      // pageLoad()
+      // } else {
+      //   notification.error({
+      //     message: 'Error',
+      //     description: 'Harap isi semua field',
+      //     placement: 'top'
+      //   })
+      // }
     })
   }
 
@@ -987,6 +970,7 @@ export default function DataMataPelajaranAdmin() {
               "max_student": data.max_siswa,
               "course_grade_id": data.kelas,
               "academic_year_id": data.tahun_akademik,
+              "updated_at": dateNow, // => done
             }
           }
         }
@@ -1004,6 +988,7 @@ export default function DataMataPelajaranAdmin() {
           description: 'Pelajaran berhasil di update.',
           placement: 'top'
         })
+        pageLoad()
       } else {
         notification.error({
           message: 'Error',
@@ -1053,6 +1038,7 @@ export default function DataMataPelajaranAdmin() {
             'Menghapus data siswa bernama ' + record.namaPelajaran,
             'success'
           )
+          pageLoad()
         })
       }
     })
@@ -1087,13 +1073,8 @@ export default function DataMataPelajaranAdmin() {
         setView={() => setIsViewPelajaran(true)}
         title="Tambah Data Mata Pelajaran"
         submit={createPelajaran}
-        selectKelas={dataClass.map((data) => (
-          <option value={data.id}>
-            {data.class}
-          </option>
-        ))}
-        selectYears={academicYears.map((data) => (
-          <option value={data.id_academic}>{data.academic_year}</option>
+        selectKelompokBelajar={getKelompokBelajar.map((data) => (
+          <option value={data.id}>{data.kelompok}</option>
         ))}
         isDisabled={false}
       />
@@ -1101,44 +1082,36 @@ export default function DataMataPelajaranAdmin() {
   }
 
   const FormEdit = () => {
+    const status = selectedUser.status == "true" ? "Aktif" : "Tidak Aktif"
     return (
       <FormAdminPelajaran
         setView={() => setIsViewPelajaran(true)}
         title="Edit Pelajaran"
         submit={editPelajaran}
-        selectKelas={dataClass.map((data) => (
-          <option value={data.id}>{data.class}</option>
-        ))}
-        selectYears={academicYears.map((data) => (
-          <option value={data.id_academic}>{data.academic_year}</option>
-        ))}
         namaPelajaran={selectedUser.namaPelajaran}
         kode={selectedUser.kode}
-        kelas={selectedUser.kelas}
-        tahunAkademik={selectedUser.tahunAkademik}
-        maxSiswa={selectedUser.maxSiswa}
+        kelompok={selectedUser.kelompok}
+        noUrutRapor={selectedUser.noUrutRapor}
+        kurikulum={selectedUser.kurikulum}
+        status={status}
         isDisabled={false}
       />
     )
   }
 
   const FormDetail = () => {
+    const status = selectedUser.status == "true" ? "Aktif" : "Tidak Aktif"
     return (
       <FormAdminPelajaran
         setView={() => setIsViewPelajaran(true)}
         title="View pelajaran"
         submit={createPelajaran}
-        selectKelas={dataClass.map((data) => (
-          <option value={data.id}>{data.class}</option>
-        ))}
-        selectYears={academicYears.map((data) => (
-          <option value={data.id_academic}>{data.academic_year}</option>
-        ))}
         namaPelajaran={selectedUser.namaPelajaran}
         kode={selectedUser.kode}
-        kelas={selectedUser.kelas}
-        tahunAkademik={selectedUser.tahunAkademik}
-        maxSiswa={selectedUser.maxSiswa}
+        kelompok={selectedUser.kelompok}
+        noUrutRapor={selectedUser.noUrutRapor}
+        kurikulum={selectedUser.kurikulum}
+        status={status}
         isDisabled={true}
       />
     )

@@ -10,7 +10,7 @@ function Login() {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     let router = useHistory();
-    const loadingIcon = <LoadingOutlined style={{ fontSize: 25, color: 'white' }} spin />;
+    const loadingIcon = <LoadingOutlined style={{fontSize: 25, color: 'white'}} spin/>;
 
     const _handleLogin = (e) => {
         e.preventDefault()
@@ -36,14 +36,13 @@ function Login() {
         }).then(res => {
             const getData = res.data.variables[3].value
             const dataLogin = JSON.parse(getData)
-            console.log(dataLogin)
             if (dataLogin.status === true) {
+                console.log(dataLogin)
                 localStorage.setItem('user_name', (dataLogin.user.name))
                 localStorage.setItem('token', dataLogin.token)
                 localStorage.setItem('user_id', dataLogin.user.id)
                 localStorage.setItem('institute', dataLogin.user.institute_id)
                 // localStorage.setItem('institute', 'null')
-
 
                 if (dataLogin.user.user_role_id === 1) {
                     localStorage.setItem('role', 'admin')
@@ -66,9 +65,7 @@ function Login() {
                 })
             }
         }).catch(err => {
-            notification.error({
-                message: 'error', description: err,
-            })
+            alert(err)
         });
 
     };
@@ -140,7 +137,7 @@ function Login() {
                                                 onClick={() => setIsLoading(true)}
                                                 disabled={email && password ? false : true}
                                             >
-                                                { !isLoading ? 'Login' : <Spin indicator={loadingIcon} /> }
+                                                {!isLoading ? 'Login' : <Spin indicator={loadingIcon}/>}
                                             </button>
                                         </div>
                                         <h6 className="text-grey-500 font-xssss fw-500 mt-0 mb-0 lh-32">

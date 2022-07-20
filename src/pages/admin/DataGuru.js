@@ -35,6 +35,10 @@ import { getProcessId, searchGlobal } from "../../redux/Action";
 import { FormAdminGuru } from '../../components/form/AdminGuru';
 import Swal from "sweetalert2";
 
+import { dateNow } from "../../components/misc/date"; // 
+import { pageLoad } from "../../components/misc/loadPage"; // 
+import { FilterAcademic } from "../../components/FilterAcademic"; // 
+
 function DataGuruAdmin() {
     const [grid, setGrid] = useState(false);
     const [isViewGuru, setIsViewGuru] = useState(true);
@@ -44,6 +48,12 @@ function DataGuruAdmin() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [refreshState, setRefreshState] = useState(false);
 
+    const institute = localStorage.getItem('institute');
+    const academicYear = localStorage.getItem('academic_year')
+
+    const [academic, setAcademic] = useState(academicYear); // 
+    const [academicYears, setAcademicYears] = useState([]); // 
+
     const [getGuru, setGetGuru] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
@@ -52,17 +62,12 @@ function DataGuruAdmin() {
     const [_Img, setIMG] = useState('');
     const [_ImgBase64, setIMGBase64] = useState('');
 
-    const academicYear = localStorage.getItem('academic_year')
-    const institute = localStorage.getItem('institute');
-
     const dispatch = useDispatch();
     const searchRedux = useSelector(state => state.search);
     const DataSearch = searchRedux.DataSearch;
 
     const getProcess = useSelector(state => state.processId);
     let ProcessId = getProcess.DataProcess;
-
-    let getKeyGlobalJoin;
 
     const getBase64 = (img, callback) => {
         const reader = new FileReader();
@@ -202,107 +207,162 @@ function DataGuruAdmin() {
         dispatch(getProcessId(["globaljoinsubwhereget", "getdatajoinwhere"]))
     }, [])
 
-    useEffect(() => {
-        if (ProcessId.length != 0) {
-            getKeyGlobalJoin = ProcessId.filter(function (el) {
-                return el.key == "globaljoinsubwhereget"
-            });
+    const getListGuru = () => {
 
-            getKeyGlobalJoin = getKeyGlobalJoin[0].proses_def_id
-
-            axios.post(BASE_URL,
-                {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_join_where_sub",
-                            "type": "json",
-                            "value": {
-                                "tbl_induk": "x_academic_teachers",
-                                "select": [
-                                    "x_academic_teachers.*",
-                                    "x_academic_year.*",
-                                    "users.*",
-                                    "m_user_profile.*",
-                                    "r_city.city",
-                                    "r_state.state",
-                                    "r_district.district",
-                                    "r_sub_district.sub_district",
-                                    "x_academic_teachers.id as id_guru"
-                                ],
-                                "paginate": 10,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_academic_year",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_teachers",
-                                        "foregenkey": "academic_year_id"
-                                    },
-                                    {
-                                        "tbl_join": "users",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_teachers",
-                                        "foregenkey": "user_id"
-                                    },
-                                    {
-                                        "tbl_join": "m_user_profile",
-                                        "refkey": "user_id",
-                                        "tbl_join2": "x_academic_teachers",
-                                        "foregenkey": "user_id"
-                                    },
-                                    {
-                                        "tbl_join": "r_district",
-                                        "refkey": "id",
-                                        "tbl_join2": "m_user_profile",
-                                        "foregenkey": "district_id"
-                                    },
-                                    {
-                                        "tbl_join": "r_state",
-                                        "refkey": "id",
-                                        "tbl_join2": "m_user_profile",
-                                        "foregenkey": "state_id"
-                                    },
-                                    {
-                                        "tbl_join": "r_sub_district",
-                                        "refkey": "id",
-                                        "tbl_join2": "m_user_profile",
-                                        "foregenkey": "sub_discrict_id"
-                                    },
-                                    {
-                                        "tbl_join": "r_city",
-                                        "refkey": "id",
-                                        "tbl_join2": "m_user_profile",
-                                        "foregenkey": "city_id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_academic_teachers",
-                                        "tbl_field": "academic_year_id",
-                                        "tbl_value": academicYear,
-                                        "operator": "="
-                                    }
-                                ],
-                                "order_coloumn": "users.name",
-                                "order_by": "asc"
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": paramsPage
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where_sub",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_teachers",
+                            "select": [
+                                "x_academic_teachers.*",
+                                "x_academic_year.*",
+                                "users.*",
+                                "m_user_profile.*",
+                                "r_city.city",
+                                "r_state.state",
+                                "r_district.district",
+                                "r_sub_district.sub_district",
+                                "x_academic_teachers.id as id_guru"
+                            ],
+                            "paginate": 10,
+                            "join": [
+                                {
+                                    "tbl_join": "x_academic_year",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_teachers",
+                                    "foregenkey": "academic_year_id"
+                                },
+                                {
+                                    "tbl_join": "users",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_teachers",
+                                    "foregenkey": "user_id"
+                                },
+                                {
+                                    "tbl_join": "m_user_profile",
+                                    "refkey": "user_id",
+                                    "tbl_join2": "x_academic_teachers",
+                                    "foregenkey": "user_id"
+                                },
+                                {
+                                    "tbl_join": "r_district",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_user_profile",
+                                    "foregenkey": "district_id"
+                                },
+                                {
+                                    "tbl_join": "r_state",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_user_profile",
+                                    "foregenkey": "state_id"
+                                },
+                                {
+                                    "tbl_join": "r_sub_district",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_user_profile",
+                                    "foregenkey": "sub_discrict_id"
+                                },
+                                {
+                                    "tbl_join": "r_city",
+                                    "refkey": "id",
+                                    "tbl_join2": "m_user_profile",
+                                    "foregenkey": "city_id"
+                                },
+                                {
+                                    "tbl_join": "m_institutes",
+                                    "refkey": "id",
+                                    "tbl_join2": "users",
+                                    "foregenkey": "institute_id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "x_academic_teachers",
+                                    "tbl_field": "academic_year_id",
+                                    "tbl_value": academic,
+                                    "operator": "="
+                                }
+                            ],
+                            "order_coloumn": "x_academic_teachers.updated_at", // =>
+                            "order_by": "desc" // => 
                         }
-                    ]
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": paramsPage
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const guru = JSON.parse(response?.data?.variables[3]?.value)
+            setGetGuru(guru?.data?.data)
+            const pagination = guru?.data?.links;
+            setBtnPagination(pagination)
+        })
+    }
+
+    useEffect(() => {
+
+        getListGuru()
+
+        axios.post(BASE_URL, {
+            "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_academic_year",
+                        "select": [
+                            "x_academic_year.id as id_academic",
+                            "x_academic_year.academic_year",
+                            "m_institutes.id", "x_academic_year.semester"
+                        ],
+                        "paginate": 1000,
+                        "join": [
+                            {
+                                "tbl_join": "m_institutes",
+                                "foregenkey": "institute_id",
+                                "refkey": "id"
+                            }
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_academic_year",
+                                "tbl_field": "institute_id",
+                                "tbl_value": institute,
+                                "operator": "="
+                            }
+                        ],
+                        "order_coloumn": "x_academic_year.academic_year",
+                        "order_by": "asc"
+                    }
+                },
+                {
+                    "name": "page",
+                    "type": "string",
+                    "value": "1"
                 }
-            ).then(function (response) {
-                const guru = JSON.parse(response.data.variables[3].value)
-                setGetGuru(guru.data.data)
-                const pagination = guru.data.links;
-                setBtnPagination(pagination)
-            })
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            }
         }
-    }, [paramsPage, ProcessId, isViewGuru, refreshState])
+        ).then(function (response) {
+            const academics = JSON.parse(response?.data?.variables[3]?.value);
+            setAcademicYears(academics?.data?.data);
+        })
+
+    }, [academic, paramsPage, isViewGuru, refreshState])
 
     const CardDataGuru = () => {
         const channelList = getGuru.map((guru, index) => {
@@ -414,6 +474,10 @@ function DataGuruAdmin() {
     const TableDataGuru = () => {
         const columns = [
             {
+                title: 'No',
+                dataIndex: "no"
+            },
+            {
                 title: 'Name',
                 dataIndex: 'namaGuru',
                 filters: [
@@ -428,12 +492,12 @@ function DataGuruAdmin() {
                 ],
                 onFilter: (value, record) => record.namaGuru.indexOf(value) === 0,
                 sorter: (a, b) => a.namaGuru.length - b.namaGuru.length,
-                defaultSortOrder: 'ascend'
+                // defaultSortOrder: 'ascend'
             },
             {
                 title: 'Nomor SK',
                 dataIndex: 'nomorSk',
-                defaultSortOrder: 'descend',
+                // defaultSortOrder: 'descend',
                 // sorter: (a, b) => a.nomorSk - b.nomorSk,
             },
             {
@@ -467,7 +531,7 @@ function DataGuruAdmin() {
             {
                 title: 'Tahun Aktif',
                 dataIndex: 'tahunAktif',
-                defaultSortOrder: 'descend',
+                // defaultSortOrder: 'descend',
                 responsive: ['sm'],
                 // sorter: (a, b) => a.nomorSk - b.nomorSk,
             },
@@ -485,11 +549,12 @@ function DataGuruAdmin() {
             },
         ];
 
-        const data_sampel = getGuru.map((guru, index) => {
-            const dataSk = guru.sk_date
-            const tahunAktifGuru = dataSk.substring(0, 4)
+        const data_sampel = getGuru?.map((guru, index) => {
+            const dataSk = guru?.sk_date
+            const tahunAktifGuru = dataSk?.substring(0, 4)
 
             return {
+                no: index + 1,
                 imageUrl: 'user.png',
                 id: guru.id_guru,
                 user_id: guru.user_id,
@@ -503,9 +568,14 @@ function DataGuruAdmin() {
                 email: guru.email,
                 tempatLahir: guru.place_of_birth,
                 tanggalLahir: guru.date_of_birth,
+
+                idProvinsi: guru.state_id,
                 provinsi: guru.state,
+                idKota: guru.city_id,
                 kota: guru.city,
+                idKec: guru.district_id,
                 kecamatan: guru.district,
+                idKel: guru.sub_discrict_id,
                 kelurahan: guru.sub_district,
                 alamat: guru.address,
             }
@@ -523,7 +593,7 @@ function DataGuruAdmin() {
                     scroll={{ X: 400 }}
                 />
                 <div className='text-center mt-4'>
-                    {btnPagination.map((dataBtn) => {
+                    {btnPagination?.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
                         const label = labelBtn
                             .replace(/(&laquo\;)/g, "")
@@ -571,6 +641,17 @@ function DataGuruAdmin() {
                                 Tambah Data
                             </Button>
                             <Filter title1="Nama" title2="Tahun Aktif" />
+                            <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
+                                selectYear={academicYears.map((data) => {
+                                    return (
+                                        <>
+                                            <option value={data.id_academic}>
+                                                {data.academic_year} Semester {data.semester}
+                                            </option>
+                                        </>
+                                    )
+                                }
+                                )} />
                             {/* <Dropdown overlay={_filterMenu}>
                             <a className="ant-dropdown-link mr-4 font-bold"
                                onClick={e => e.preventDefault()}>
@@ -852,7 +933,7 @@ function DataGuruAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        const dateNow = new Date().toLocaleString()
+        // const dateNow = new Date().toLocaleString()
         console.log(data);
 
         axios.post(BASE_URL, {
@@ -882,7 +963,11 @@ function DataGuruAdmin() {
                             "user_academic_year_id": "required",
                             "user_register_date": "required",
                             "status": "required",
-                            "sk_number": "required"
+                            "sk_number": "required",
+                            "created_at": "required",
+                            "updated_at": "required",
+                            "institute_id": "required"
+
                         },
                         "user_email": data.email_guru,
                         "user_name": data.nama_guru,
@@ -903,6 +988,9 @@ function DataGuruAdmin() {
                         "user_register_date": dateNow,
                         "status": data.status_guru,
                         "sk_number": data.sk_guru,
+                        "created_at": dateNow,
+                        "updated_at": dateNow,
+                        "institute_id": institute,
                     }
                 },
                 {
@@ -919,8 +1007,9 @@ function DataGuruAdmin() {
                             "name": data.nama_guru,
                             "email": data.email_guru,
                             "user_role_id": 2,
+                            "institute_id": institute,
                             "email_verified_at": dateNow,
-                            "password": "password"
+                            "password": "password",
                         }
                     }
                 },
@@ -933,10 +1022,10 @@ function DataGuruAdmin() {
                             "place_of_birth": data.tempatlahir_guru,
                             "date_of_birth": data.tanggallahir_guru,
                             "mobile_phone": data.nomortelefon_guru,
-                            "state_id": "11",
-                            "city_id": "1101",
-                            "district_id": "1101010",
-                            "sub_discrict_id": "1101010001",
+                            "state_id": data.provinsi_guru,
+                            "city_id": data.kota_guru,
+                            "district_id": data.kecamatan_guru,
+                            "sub_discrict_id": data.kelurahan_guru,
                             "address": data.alamat_guru
                         }
                     }
@@ -956,11 +1045,13 @@ function DataGuruAdmin() {
                     "value": {
                         "tbl_name": "x_academic_teachers",
                         "tbl_coloumn": {
-                            "academic_year_id": 1,
+                            "academic_year_id": academicYear,
                             "register_date": dateNow,
                             "sk_number": data.sk_guru,
                             "sk_date": dateNow,
-                            "status": data.status_guru
+                            "status": data.status_guru,
+                            // "created_at": dateNow, // => done
+                            // "updated_at": dateNow // => done
                         }
                     }
                 }
@@ -993,6 +1084,7 @@ function DataGuruAdmin() {
                         placement: "top"
                     });
                 }
+                // pageLoad()
             } else {
                 notification.error({
                     message: 'Error',
@@ -1003,7 +1095,6 @@ function DataGuruAdmin() {
             console.log(response)
         }).catch(error => {
             alert('Email Telah di gunakan, silahkan gunakan email lain.')
-
         });
     };
 
@@ -1045,10 +1136,10 @@ function DataGuruAdmin() {
                         "user_place_of_birth": data.tempatlahir_guru,
                         "user_date_of_birth": data.tanggallahir_guru,
                         "user_mobile_phone": data.nomortelefon_guru,
-                        "user_state_id": "11",
-                        "user_city_id": "1101",
-                        "user_district_id": "1101010",
-                        "user_sub_discrict_id": "1101010001",
+                        "user_state_id": data.provinsi_guru,
+                        "user_city_id": data.kota_guru,
+                        "user_district_id": data.kecamatan_guru,
+                        "user_sub_discrict_id": data.kecamatan_guru,
                         "user_address": data.alamat_guru,
                         "user_image": "jpg",
                         "user_image_type": "string",
@@ -1077,10 +1168,10 @@ function DataGuruAdmin() {
                             "place_of_birth": data.tempatlahir_guru,
                             "date_of_birth": data.tanggallahir_guru,
                             "mobile_phone": data.nomortelefon_guru,
-                            "state_id": "11",
-                            "city_id": "1101",
-                            "district_id": "1101010",
-                            "sub_discrict_id": "1101010001",
+                            "state_id": data.provinsi_guru,
+                            "city_id": data.kota_guru,
+                            "district_id": data.kecamatan_guru,
+                            "sub_discrict_id": data.kelurahan_guru,
                             "address": data.alamat_guru
                         }
                     }
@@ -1094,7 +1185,8 @@ function DataGuruAdmin() {
                         "tbl_coloumn": {
                             "user_id": selectedUser.user_id,
                             "status": data.status_guru,
-                            "sk_number": data.sk_guru
+                            "sk_number": data.sk_guru,
+                            // "updated_at": dateNow, // => done
                         }
                     }
                 }
@@ -1112,6 +1204,7 @@ function DataGuruAdmin() {
                     description: 'Data guru berhasil di update.',
                     placement: 'top'
                 })
+                // pageLoad()
             } else {
                 notification.error({
                     message: 'Error',
@@ -1155,12 +1248,13 @@ function DataGuruAdmin() {
                 }
                 ).then(function (response) {
                     console.log(response);
-                    setRefreshState(true);
+                    getListGuru()
                     Swal.fire(
                         'Data telah terhapus!',
                         'Menghapus data siswa bernama ' + record.namaGuru,
                         'success'
                     )
+                    // pageLoad()
                 })
             }
         })
@@ -1195,6 +1289,10 @@ function DataGuruAdmin() {
                 setView={() => setIsViewGuru(true)}
                 title="Tambah Guru"
                 submit={createGuru}
+                isDisabled={false}
+                disabledEmail={false}
+                isViewForm={isViewGuru}
+                location={"create"}
             />
         )
     }
@@ -1211,13 +1309,19 @@ function DataGuruAdmin() {
                 tempatLahir={selectedUser.tempatLahir}
                 tanggalLahir={selectedUser.tanggalLahir}
                 nomorSk={selectedUser.nomorSk}
+                idProvinsi={selectedUser.idProvinsi}
                 provinsi={selectedUser.provinsi}
+                idKota={selectedUser.idKota}
                 kota={selectedUser.kota}
+                idKec={selectedUser.idKec}
                 kecamatan={selectedUser.kecamatan}
+                idKel={selectedUser.idKel}
                 kelurahan={selectedUser.kelurahan}
                 statusGuru={selectedUser.statusGuru[0]}
                 alamat={selectedUser.alamat}
                 isDisabled={false}
+                disabledEmail={true}
+                location={"edit"}
             />
         )
     }
@@ -1234,13 +1338,20 @@ function DataGuruAdmin() {
                 tempatLahir={selectedUser.tempatLahir}
                 tanggalLahir={selectedUser.tanggalLahir}
                 nomorSk={selectedUser.nomorSk}
+                idProvinsi={selectedUser.idProvinsi}
                 provinsi={selectedUser.provinsi}
+                idKota={selectedUser.idKota}
                 kota={selectedUser.kota}
+                idKec={selectedUser.idKec}
                 kecamatan={selectedUser.kecamatan}
+                idKel={selectedUser.idKel}
                 kelurahan={selectedUser.kelurahan}
                 statusGuru={selectedUser.statusGuru[0]}
                 alamat={selectedUser.alamat}
                 isDisabled={true}
+                disabledEmail={true}
+                location={"detail"}
+
             />
         )
     }

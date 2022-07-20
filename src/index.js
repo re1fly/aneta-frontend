@@ -135,6 +135,8 @@ import DataNilaiKeterampilan from "./pages/admin/penilaian/data-nilai/DataNilaiK
 import DataNilaiSpiritual from "./pages/admin/penilaian/data-nilai/DataNilaiSpiritual";
 import DataNilaiSosial from "./pages/admin/penilaian/data-nilai/DataNilaiSosial";
 import DataNilaiUjian from "./pages/admin/penilaian/data-nilai/DataNilaiUjian";
+import ListTahunAkademik from './pages/admin/tahun-akademik/ListTahunAkademik';
+import JadwalPelajaranAdminSubKelas from './pages/admin/jadwal-pelajaran/SubKelas';
 
 class Root extends Component {
   render() {
@@ -152,6 +154,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/admin-tahun-akademik`}
               component={TahunAkademikAdmin}
+            />
+             <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/admin-list-tahun-akademik`}
+              component={ListTahunAkademik}
             />
             <Route
               exact
@@ -177,6 +184,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran`}
               component={JadwalPelajaranAdmin}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-sub-kelas`}
+              component={JadwalPelajaranAdminSubKelas}
             />
             <Route
               exact

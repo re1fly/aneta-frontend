@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react"
+import axios from "axios";
 import {
     Menu,
     Card,
@@ -31,10 +32,14 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
 import Filter from "../../../components/Filter";
+import { BASE_URL } from "../../../api/Url";
 
 export default function KompetensiAdmin() {
     const [grid, setGrid] = useState(false)
     const [isViewKompetensi, setIsViewKompetensi] = useState(true);
+
+    const [getKompetensi, setGetKompetensi] = useState();
+
     let [count, setCount] = useState(1);
 
     const increment = () => {
@@ -45,7 +50,6 @@ export default function KompetensiAdmin() {
         setCount((prevCount) => prevCount - 1);
     };
 
-
     const { TextArea } = Input;
 
     function onChange(value) {
@@ -55,27 +59,6 @@ export default function KompetensiAdmin() {
     const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
     };
-
-    // const data = [
-    //     {
-
-    //         "nama": "samsul",
-    //         "hari": "senin",
-    //     }, {
-
-    //         "nama": "samsul rabu",
-    //         "hari": "rabu",
-    //     }, {
-
-    //         "nama": "samsul senin",
-    //         "hari": "senin",
-    //     }, {
-
-    //         "nama": "samsul senin",
-    //         "hari": "senin",
-    //     },
-    // ]
-
 
     const _filterMenu = (
         <Menu onClick={_onSelectMenu}>
@@ -104,6 +87,35 @@ export default function KompetensiAdmin() {
 
     const { Option } = Select;
 
+    useEffect(() => {
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "getdataglobal:5:7248a1b1-d5a7-11ec-a658-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_getdata",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "x_competence",
+                            "tbl_coloumn": [
+                                "*"
+                            ],
+                            "order_coloumn": "x_competence.id",
+                            "order_by": "desc",
+                            "pagination": true,
+                            "total_result": 10
+                        }
+                    }
+                ]
+
+            }
+        ).then(function(response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            setGetKompetensi(dataRes?.data?.data)
+        })
+    })
+
     function onSearch(val) {
         console.log('search:', val);
     }
@@ -119,67 +131,42 @@ export default function KompetensiAdmin() {
                 dataIndex: 'no',
                 defaultSortOrder: 'ascend',
                 responsive: ['sm'],
-                // sorter: (a, b) => a.nis - b.nis,
+                align: "center"
             },
             {
                 title: 'Kompetensi',
                 dataIndex: 'namaKompetensi',
-                filters: [
-                    {
-                        text: 'Pengetahuan 1',
-                        value: 'Pengetahuan 1',
-                    },
-                    {
-                        text: 'Pengetahuan 2',
-                        value: 'Pengetahuan 2',
-                    },
-                    {
-                        text: 'Submenu',
-                        value: 'Submenu',
-                        children: [
-                            {
-                                text: 'Green',
-                                value: 'Green',
-                            },
-                            {
-                                text: 'Red',
-                                value: 'Red',
-                            },
-                        ],
-                    },
-                ],
-                // specify the condition of filtering result
-                // here is that finding the name started with `value`
-                onFilter: (value, record) => record.namaKompetensi.indexOf(value) === 0,
-                // sorter: (a, b) => a.namaKompetensi.length - b.namaKompetensi.length,
-                sortDirections: ['descend'],
+                // align: "center"
             },
             {
                 title: 'Kelas',
                 dataIndex: 'kelas',
                 defaultSortOrder: 'descend',
-                // sorter: (a, b) => a.semester - b.semester,
+                align: "center"
             },
             {
                 title: 'Semester',
                 dataIndex: 'semester',
                 defaultSortOrder: 'descend',
-                // sorter: (a, b) => a.semester - b.semester,
+                align: "center"
             },
             {
                 title: 'Kode',
                 dataIndex: 'kode',
                 defaultSortOrder: 'descend',
+                align: "center"
             },
             {
                 title: 'Kompetensi Dasar',
                 dataIndex: 'kompetensiDasar',
                 defaultSortOrder: 'descend',
+                align: "center"
             },
             {
                 title: 'Keterangan',
                 dataIndex: 'keterangan',
                 defaultSortOrder: 'descend',
+                align: "center"
             },
             {
                 title: 'Status',
@@ -277,10 +264,23 @@ export default function KompetensiAdmin() {
             },
         ];
 
+        const channelList = getKompetensi?.map((data, index) => {
+            return{
+                no: index + 1,
+                namaKompetensi: data.basic_competence,
+                kelas: data.class_id,
+                semester: data.semester,
+                kode: data.kode,
+                kompetensiDasar: "",
+                keterangan: "",
+                status: []
+            }
+        })
+
         return (
             <Table className=""
                 columns={columns}
-                dataSource={data}
+                dataSource={channelList}
                 onChange={onChangeTable}
                 pagination={{ position: ['bottomCenter'] }}
                 rowClassName="bg-greylight text-grey-900"
@@ -627,6 +627,19 @@ export default function KompetensiAdmin() {
                             pagination={false}
                             rowClassName="bg-greylight text-grey-900"
                             scroll={{ x: 400 }} />
+                        {/* <div className="col-lg-12">
+                            <div className="table ">
+                                <thead>
+                                    <td className="bg-current text-light text-center">
+                                        <th className="col">No</th>
+                                    </td>
+                                    <td className="bg-current text-light text-center">
+                                        <th className="">Nama Pelajaran</th>
+                                    </td>
+                                </thead>
+                            </div>
+                        </div> */}
+
                     </div>
                 </div>
             </div>

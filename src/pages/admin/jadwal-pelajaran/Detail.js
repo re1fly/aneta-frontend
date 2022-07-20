@@ -12,7 +12,8 @@ import {
   Table,
   Space,
   notification,
-  PageHeader
+  PageHeader,
+  TimePicker,
 } from "antd";
 import {
   DownOutlined,
@@ -23,13 +24,10 @@ import {
   CalendarOutlined,
   TableOutlined,
   EllipsisOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
-import { Link, useParams, useLocation } from 'react-router-dom';
-
+import moment from "moment";
 import Search from "antd/es/input/Search";
-import ImgCrop from "antd-img-crop";
-import Upload from "antd/es/upload/Upload";
-
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
@@ -37,66 +35,79 @@ import Filter from "../../../components/Filter";
 import axios from "axios";
 import { BASE_URL } from "../../../api/Url";
 import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
+import { pageLoad } from "../../../components/misc/loadPage";
 
 export default function JadwalPelajaranAdminDetail() {
   const [grid, setGrid] = useState(false);
   const [calendar, setCalendar] = useState(true);
   const [isViewPelajaran, setIsViewPelajaran] = useState(true);
-  const [getPelajaran, setGetPelajaran] = useState()
+  const [getJadwalPelajaran, setGetJadwalPelajaran] = useState()
+  const [mataPelajaran, setGetMataPelajaran] = useState()
+  const [getGuru, setGetGuru] = useState([]);
+  const [refreshState, setRefreshState] = useState(false)
 
-  const _onSelectMenu = ({ key }) => {
-    message.info(`Click on item ${key}`);
+  const academicYear = localStorage.getItem('academic_year')
+
+  const senin = getJadwalPelajaran?.filter((data) => {
+    return data.hari === "senin"
+  })
+
+  const selasa = getJadwalPelajaran?.filter((data) => {
+    return data.hari === "selasa"
+  })
+
+  const rabu = getJadwalPelajaran?.filter((data) => {
+    return data.hari === "rabu"
+  })
+
+  const kamis = getJadwalPelajaran?.filter((data) => {
+    return data.hari === "kamis"
+  })
+
+  const jumat = getJadwalPelajaran?.filter((data) => {
+    return data.hari === "jumat"
+  })
+
+  const sabtu = getJadwalPelajaran?.filter((data) => {
+    return data.hari === "sabtu"
+  })
+
+  const onChange = (time, timeString) => {
+    console.log(time, timeString);
   };
-
-  const _filterMenu = (
-    <Menu onClick={_onSelectMenu}>
-      <Menu.Item key="1">1st filter</Menu.Item>
-      <Menu.Item key="2">2nd filter</Menu.Item>
-      <Menu.Item key="3">3rd filter</Menu.Item>
-    </Menu>
-  );
-
-  const _sortMenu = (
-    <Menu onClick={_onSelectMenu}>
-      <Menu.Item key="1">1st sort</Menu.Item>
-      <Menu.Item key="2">2nd sort</Menu.Item>
-      <Menu.Item key="3">3rd sort</Menu.Item>
-    </Menu>
-  );
-
-  const ClassReducer = useSelector(state => state.dataKelas)
-  const idClass = ClassReducer.AllClass.idClass
-  console.log(idClass);
-  console.log("INNI TEST", ClassReducer.AllClass);
 
   const _onSearch = value => console.log(value);
 
-  const { query } = useLocation();
+  const ClassReducer = useSelector(state => state.dataKelas)
+  const idSubClass = ClassReducer.SubClass.id_class
 
   useEffect(() => {
-    if (ClassReducer.AllClass.length === 0) {
-      window.history.back()
-    }
+    // if (ClassReducer.AllClass.length === 0) {
+    //   window.history.back()
+    // }
     axios.post(BASE_URL,
       {
-        "processDefinitionId": "globaljoinsubfirst:1:20ca0e47-eb01-11ec-a658-66fc627bf211",
+        "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
         "returnVariables": true,
         "variables": [
           {
-            "name": "global_join_where_sub_first",
+            "name": "global_join_where_sub",
             "type": "json",
             "value": {
               "tbl_induk": "x_academic_subjects_schedule",
               "select": [
-                "x_academic_subjects.id as id_matkul",
-                "x_academic_subjects.course_name",
-                "users.id as id_guru",
-                "users.name as name",
+                "x_academic_subjects_schedule.hari",
                 "x_academic_subjects_schedule.time_start",
                 "x_academic_subjects_schedule.time_end",
-                "x_academic_subjects_schedule.max_student",
-                "x_academic_subjects_schedule.hari"
+                "x_academic_subject_master.nama_mata",
+                "users.name",
+                "x_academic_subjects_schedule.id as id_shedule",
+                "x_academic_subjects.id as id_subjects",
+                "x_academic_teachers.id as id_teacher",
+                "x_academic_class.class"
               ],
+              "paginate": 10,
               "join": [
                 {
                   "tbl_join": "x_academic_subjects",
@@ -105,26 +116,57 @@ export default function JadwalPelajaranAdminDetail() {
                   "foregenkey": "academic_subjects_id"
                 },
                 {
-                  "tbl_join": "users",
+                  "tbl_join": "x_academic_subject_master",
                   "refkey": "id",
-                  "tbl_join2": "x_academic_subjects_schedule",
-                  "foregenkey": "teachers_id"
-                }, {
+                  "tbl_join2": "x_academic_subjects",
+                  "foregenkey": "academic_subjects_master_id"
+                },
+                {
                   "tbl_join": "x_academic_class",
                   "refkey": "id",
                   "tbl_join2": "x_academic_subjects",
                   "foregenkey": "course_grade_id"
+                },
+                {
+                  "tbl_join": "x_academic_teachers",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_subjects_schedule",
+                  "foregenkey": "teachers_id"
+                },
+                {
+                  "tbl_join": "users",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_teachers",
+                  "foregenkey": "user_id"
                 }
               ],
               "where": [
                 {
                   "tbl_coloumn": "x_academic_subjects",
+                  "tbl_field": "academic_year_id",
+                  "tbl_value": academicYear,
+                  "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subjects",
                   "tbl_field": "course_grade_id",
-                  "tbl_value": idClass,
+                  "tbl_value": idSubClass,
+                  "operator": "="
+                }, {
+                  "tbl_coloumn": "x_academic_subjects_schedule",
+                  "tbl_field": "deleted_at",
+                  "tbl_value": "",
                   "operator": "="
                 }
-              ]
+              ],
+              "order_coloumn": "x_academic_subjects_schedule.id",
+              "order_by": "asc"
             }
+          },
+          {
+            "name": "page",
+            "type": "string",
+            "value": "1"
           }
         ]
       }, {
@@ -133,13 +175,125 @@ export default function JadwalPelajaranAdminDetail() {
       }
     }
     ).then(function (response) {
-      console.log(response);
-      // const data = JSON.parse(response.data.variables[2].value);
-      // const pelajaran = data.data
-      // console.log(pelajaran);
-      // setGetPelajaran(pelajaran)
+      // console.log(response);
+      const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+      // console.log(JSON.stringify(dataRes, null, 2));
+      const pelajaran = dataRes?.data?.data
+      setGetJadwalPelajaran(pelajaran);
     })
-  })
+
+    axios.post(BASE_URL,
+      {
+        "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+        "returnVariables": true,
+        "variables": [
+          {
+            "name": "global_join_where_sub",
+            "type": "json",
+            "value": {
+              "tbl_induk": "x_academic_teachers",
+              "select": [
+                "users.name",
+                "x_academic_teachers.id as id_guru"
+
+              ],
+              "paginate": 1000,
+              "join": [
+                {
+                  "tbl_join": "users",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_teachers",
+                  "foregenkey": "user_id"
+                }
+              ],
+              "where": [
+                {
+                  "tbl_coloumn": "x_academic_teachers",
+                  "tbl_field": "academic_year_id",
+                  "tbl_value": academicYear,
+                  "operator": "="
+                }
+              ],
+              "order_coloumn": "users.name",
+              "order_by": "asc"
+            }
+          },
+          {
+            "name": "page",
+            "type": "string",
+            "value": "1"
+          }
+        ]
+      }
+    ).then(function (response) {
+      const guru = JSON.parse(response?.data?.variables[3]?.value)
+      setGetGuru(guru?.data?.data)
+    })
+  }, [academicYear, refreshState, , academicYear])
+
+  useEffect(() => {
+    axios.post(BASE_URL,
+      {
+        "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+        "returnVariables": true,
+        "variables": [
+          {
+            "name": "global_join_where_sub",
+            "type": "json",
+            "value": {
+              "tbl_induk": "x_academic_subjects",
+              "select": [
+                "x_academic_subjects.id as id_subjects",
+                "x_academic_subject_master.nama_mata"
+              ],
+              "paginate": 1000,
+              "join": [
+                {
+                  "tbl_join": "x_academic_subject_master",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_subjects",
+                  "foregenkey": "academic_subjects_master_id"
+                }
+              ],
+              "where": [
+                {
+                  "tbl_coloumn": "x_academic_subjects",
+                  "tbl_field": "academic_year_id",
+                  "tbl_value": academicYear,
+                  "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subjects",
+                  "tbl_field": "course_grade_id",
+                  "tbl_value": idSubClass,
+                  "operator": "="
+                }
+
+              ],
+              "order_coloumn": "x_academic_subject_master.nama_mata",
+              "order_by": "asc"
+            }
+          },
+          {
+            "name": "page",
+            "type": "string",
+            "value": "1"
+          }
+        ]
+      }, {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }
+    ).then(function (response) {
+      // console.log(response);
+      const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+      const mataPelajaran = dataRes.data.data
+      console.log(mataPelajaran);
+      setGetMataPelajaran(mataPelajaran)
+    })
+  }, [academicYear,])
+
 
   const CalendarData = () => {
     return (
@@ -158,16 +312,16 @@ export default function JadwalPelajaranAdminDetail() {
         title: 'Mata Pelajaran',
         dataIndex: 'namaPelajaran',
         align: 'center',
-        filters: [
-          {
-            text: 'Tematik 1',
-            value: 'Tematik 1',
-          },
-          {
-            text: 'Tematik 2',
-            value: 'Tematik 2',
-          },
-        ],
+        // filters: [
+        //   {
+        //     text: 'Tematik 1',
+        //     value: 'Tematik 1',
+        //   },
+        //   {
+        //     text: 'Tematik 2',
+        //     value: 'Tematik 2',
+        //   },
+        // ],
         // onFilter: (value, record) => record.namaPelajaran.indexOf(value) === 0,
         // sorter: (a, b) => a.namaPelajaran.length - b.namaPelajaran.length,
       },
@@ -175,16 +329,16 @@ export default function JadwalPelajaranAdminDetail() {
         title: 'Guru/Tenaga Pengajar',
         dataIndex: 'namaPengajar',
         align: 'center',
-        filters: [
-          {
-            text: 'Sri Wahyuni S.pd',
-            value: 'Sri Wahyuni S.pd',
-          },
-          {
-            text: 'Siti Mulyani S.pd',
-            value: 'Siti Mulyani S.pd',
-          },
-        ],
+        // filters: [
+        //   {
+        //     text: 'Sri Wahyuni S.pd',
+        //     value: 'Sri Wahyuni S.pd',
+        //   },
+        //   {
+        //     text: 'Siti Mulyani S.pd',
+        //     value: 'Siti Mulyani S.pd',
+        //   },
+        // ],
         // onFilter: (value, record) => record.namaPengajar.indexOf(value) === 0,
         // sorter: (a, b) => a.namaPengajar.length - b.namaPengajar.length,
       },
@@ -200,6 +354,7 @@ export default function JadwalPelajaranAdminDetail() {
         responsive: ['sm'],
         render: (text, record) => (
           <Space size="middle">
+            <EyeOutlined style={{ color: "black" }} />
             <EditOutlined style={{ color: "blue" }} onClick={() => notification.open({
               message: 'Edit',
               description:
@@ -207,41 +362,77 @@ export default function JadwalPelajaranAdminDetail() {
               duration: 2
 
             })} />
-            <DeleteOutlined style={{ color: 'red' }} onClick={() => notification.open({
-              message: 'Delete',
-              description:
-                'Hapus user bernama ' + record.namaPelajaran,
-              duration: 2
-            })} />
+            <DeleteOutlined style={{ color: 'red' }} onClick={() => deleteJadwalPelajaran(record)} />
           </Space>
         ),
       },
     ];
 
-    // const channelList = getPelajaran.map((pelajaran, index) => {
-    //   return {
-    //     hari: 'pelajaran.hari',
-    //     namaPelajaran: pelajaran.course_name,
-    //     namaPengajar: pelajaran.name,
-    //     waktuMulai: pelajaran.time_start,
-    //     waktuSelesai: pelajaran.time_end
-    //   }
-    // })
+    const dataSenin = senin?.map((data, index) => {
+      return {
+        id: data.id_shedule,
+        hari: data.hari,
+        kelas: data.class,
+        namaPelajaran: data.nama_mata,
+        namaPengajar: data.name,
+        waktu: `${data.time_start} - ${data.time_end}`,
+      }
+    })
 
-    const data = [
-      {
-        kelas: '2/B',
-        namaPelajaran: 'Tematik 1',
-        namaPengajar: 'Sri Wahyuni S.pd',
-        waktu: '07.30 - 08.30',
-      },
-      {
-        kelas: '2/B',
-        namaPelajaran: 'Tematik 2',
-        namaPengajar: 'Siti Mulyani S.pd',
-        waktu: '08.30 - 09.30',
-      },
-    ];
+    const dataSelasa = selasa?.map((data, index) => {
+      return {
+        id: data.id_shedule,
+        hari: data.hari,
+        kelas: data.class,
+        namaPelajaran: data.nama_mata,
+        namaPengajar: data.name,
+        waktu: `${data.time_start} - ${data.time_end}`,
+      }
+    })
+
+    const dataRabu = rabu?.map((data, index) => {
+      return {
+        id: data.id_shedule,
+        hari: data.hari,
+        kelas: data.class,
+        namaPelajaran: data.nama_mata,
+        namaPengajar: data.name,
+        waktu: `${data.time_start} - ${data.time_end}`,
+      }
+    })
+
+    const dataKamis = kamis?.map((data, index) => {
+      return {
+        id: data.id_shedule,
+        hari: data.hari,
+        kelas: data.class,
+        namaPelajaran: data.nama_mata,
+        namaPengajar: data.name,
+        waktu: `${data.time_start} - ${data.time_end}`,
+      }
+    })
+
+    const dataJumat = jumat?.map((data, index) => {
+      return {
+        id: data.id_shedule,
+        hari: data.hari,
+        kelas: data.class,
+        namaPelajaran: data.nama_mata,
+        namaPengajar: data.name,
+        waktu: `${data.time_start} - ${data.time_end}`,
+      }
+    })
+
+    const dataSabtu = sabtu?.map((data, index) => {
+      return {
+        id: data.id_shedule,
+        hari: data.hari,
+        kelas: data.class,
+        namaPelajaran: data.nama_mata,
+        namaPengajar: data.name,
+        waktu: `${data.time_start} - ${data.time_end}`,
+      }
+    })
 
     function onChangeTable(pagination, filters, sorter, extra) {
       console.log('params', pagination, filters, sorter, extra);
@@ -256,7 +447,72 @@ export default function JadwalPelajaranAdminDetail() {
         </div>
         <Table className=""
           columns={columns}
-          dataSource={data}
+          dataSource={dataSenin}
+          onChange={onChangeTable}
+          pagination={{ position: ['none'] }}
+          rowClassName="bg-greylight text-grey-900"
+          scroll={{ x: 400 }} />
+
+        <div className="mt-4">
+          <div className="bg-grey">
+            <p className="strong text-black pl-4 mb-0">SELASA</p>
+          </div>
+        </div>
+        <Table className=""
+          columns={columns}
+          dataSource={dataSelasa}
+          onChange={onChangeTable}
+          pagination={{ position: ['none'] }}
+          rowClassName="bg-greylight text-grey-900"
+          scroll={{ x: 400 }} />
+
+        <div className="mt-4">
+          <div className="bg-grey">
+            <p className="strong text-black pl-4 mb-0">RABU</p>
+          </div>
+        </div>
+        <Table className=""
+          columns={columns}
+          dataSource={dataRabu}
+          onChange={onChangeTable}
+          pagination={{ position: ['none'] }}
+          rowClassName="bg-greylight text-grey-900"
+          scroll={{ x: 400 }} />
+
+        <div className="mt-4">
+          <div className="bg-grey">
+            <p className="strong text-black pl-4 mb-0">KAMIS</p>
+          </div>
+        </div>
+        <Table className=""
+          columns={columns}
+          dataSource={dataKamis}
+          onChange={onChangeTable}
+          pagination={{ position: ['none'] }}
+          rowClassName="bg-greylight text-grey-900"
+          scroll={{ x: 400 }} />
+
+        <div className="mt-4">
+          <div className="bg-grey">
+            <p className="strong text-black pl-4 mb-0">JUMAT</p>
+          </div>
+        </div>
+        <Table className=""
+          columns={columns}
+          dataSource={dataJumat}
+          onChange={onChangeTable}
+          pagination={{ position: ['none'] }}
+          rowClassName="bg-greylight text-grey-900"
+          scroll={{ x: 400 }} />
+
+        <div className="mt-4">
+          <div className="bg-grey">
+            <p className="strong text-black pl-4 mb-0">SABTU</p>
+          </div>
+        </div>
+        <Table className=""
+          columns={columns}
+          dataSource={dataSabtu}
           onChange={onChangeTable}
           pagination={{ position: ['none'] }}
           rowClassName="bg-greylight text-grey-900"
@@ -455,25 +711,25 @@ export default function JadwalPelajaranAdminDetail() {
                   <select
                     className="form-control"
                     aria-label="Default select example"
-                    name="status_guru"
+                    name="hari"
                     required
                   >
                     <option value="" selected disabled>
-
+                      Pilih Hari
                     </option>
-                    <option value="Senin">
+                    <option value="senin">
                       Senin
                     </option>
-                    <option value="Selasa">
+                    <option value="selasa">
                       Selasa
                     </option>
-                    <option value="Rabu">
+                    <option value="rabu">
                       Rabu
                     </option>
-                    <option value="Kamis">
+                    <option value="kamis">
                       Kamis
                     </option>
-                    <option value="Jumat">
+                    <option value="jumat">
                       Jumat
                     </option>
                   </select>
@@ -500,6 +756,64 @@ export default function JadwalPelajaranAdminDetail() {
     );
   };
 
+  const createJadwalPelajaran = (e) => {
+    e.preventDefault();
+    const data = {};
+    for (const el of e.target.elements) {
+      if (el.name !== "") data[el.name] = el.value;
+    }
+    const dateNow = new Date().toLocaleString()
+    console.log(data);
+
+    axios.post(BASE_URL,
+      {
+        "processDefinitionId": "GlobalInsertRecord:7:7777c884-d588-11ec-a2ad-3a00788faff5",
+        "returnVariables": true,
+        "variables": [
+          {
+            "name": "global_Insert",
+            "type": "json",
+            "value": {
+              "tbl_name": "x_academic_subjects_scheduleModel",
+              "tbl_coloumn": {
+                "academic_subjects_id": data.mata_pelajaran,
+                "time_start": data.waktu_mulai,
+                "time_end": data.waktu_selesai,
+                "max_student": "",
+                "teachers_id": data.guru,
+                "hari": data.hari,
+              }
+            }
+          }
+        ]
+      }, {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }
+    ).then(function (response) {
+      setRefreshState(true);
+      // console.log(JSON.stringify(response.data.variables[2].value, null, 2));
+      const valueRes = response.data.variables[2].value;
+      const valueResObj = JSON.parse(valueRes);
+      // console.log(valueResObj.status)
+      if (valueResObj.status == 'success') {
+        setIsViewPelajaran(true)
+        notification.success({
+          message: 'Sukses',
+          description: 'Pelajaran berhasil ditambahkan.',
+          placement: 'top'
+        })
+      } else {
+        notification.error({
+          message: 'Error',
+          description: 'Harap isi semua field',
+          placement: 'top'
+        })
+      }
+    })
+  }
+
   const TambahPelajaran = () => {
     return (
       <div className="container px-3 py-4">
@@ -514,43 +828,88 @@ export default function JadwalPelajaranAdminDetail() {
                   </h4>
                 </div>
                 <div className="card-body p-lg-5 p-4 w-100 border-0 ">
-                  <form action="#">
+                  <form id="mataPelajaran_form"
+                    onSubmit={createJadwalPelajaran}
+                    method="POST">
                     <div className="row">
-                      <div className="col-lg-6 mb-3">
-                        <div className="form-group">
-                          <label className="mont-font fw-600 font-xsss">
-                            Kelas
-                          </label>
-                          <input type="text" className="form-control" />
-                        </div>
-                      </div>
-
                       <div className="col-lg-6 mb-3">
                         <div className="form-group">
                           <label className="mont-font fw-600 font-xsss">
                             Hari
                           </label>
-                          <input type="text" className="form-control" />
+                          <select
+                            className="form-control"
+                            aria-label="Default select example"
+                            name="hari"
+                            required
+                          >
+                            <option value="" selected disabled>
+                              Pilih Hari
+                            </option>
+                            <option value="senin">
+                              Senin
+                            </option>
+                            <option value="selasa">
+                              Selasa
+                            </option>
+                            <option value="rabu">
+                              Rabu
+                            </option>
+                            <option value="kamis">
+                              Kamis
+                            </option>
+                            <option value="jumat">
+                              Jumat
+                            </option>
+                            <option value="sabtu">
+                              Sabtu
+                            </option>
+                          </select>
                         </div>
                       </div>
-                    </div>
-
-                    <div className="row">
                       <div className="col-lg-6 mb-3">
                         <div className="form-group">
                           <label className="mont-font fw-600 font-xsss">
                             Mata Pelajaran
                           </label>
-                          <input type="text" className="form-control" />
+                          <select
+                            className="form-control"
+                            aria-label="Default select example"
+                            name="mata_pelajaran"
+                            required
+                          >
+                            {mataPelajaran.map((data, i) => {
+                              return (
+                                <option value={data.id_subjects} selected key={i}>
+                                  {data.nama_mata}
+                                </option>
+                              )
+                            })}
+                          </select>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="col-lg-6 mb-3">
+                    <div className="row">
+                      <div className="col-lg-12 mb-3">
                         <div className="form-group">
                           <label className="mont-font fw-600 font-xsss">
                             Guru/Tenaga Pengajar
                           </label>
-                          <input type="text" className="form-control" />
+                          <select
+                            className="form-control"
+                            aria-label="Default select example"
+                            name="guru"
+                            required
+                          >
+                            {getGuru.map((data, i) => {
+                              return (
+                                <option value={data.id_guru} selected key={i}>
+                                  {data.name}
+                                </option>
+                              )
+                            })}
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -561,7 +920,17 @@ export default function JadwalPelajaranAdminDetail() {
                           <label className="mont-font fw-600 font-xsss">
                             Waktu Mulai
                           </label>
-                          <input type="text" className="form-control" />
+                          <TimePicker onChange={onChange}
+                            defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                            name='waktu_mulai'
+                            className="form-control"
+                            required />
+                          {/* <input
+                            type="text"
+                            name='waktu_mulai'
+                            className="form-control"
+                            required
+                          /> */}
                         </div>
                       </div>
 
@@ -570,23 +939,34 @@ export default function JadwalPelajaranAdminDetail() {
                           <label className="mont-font fw-600 font-xsss">
                             Waktu Selesai
                           </label>
-                          <input type="text" className="form-control" />
+                          <TimePicker onChange={onChange}
+                            defaultOpenValue={moment('00:00', 'HH:mm')}
+                            name='waktu_selesai'
+                            className="form-control"
+                            required />
+                          {/* <input
+                            type="text"
+                            name='waktu_selesai'
+                            className="form-control"
+                            required
+                          /> */}
                         </div>
                       </div>
 
                       <div className="col-lg-12">
-                        <Link
-                          to="/account-information"
-                          className="bg-current text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                        <button
+                          className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                          type="submit"
                         >
-                          Save
-                        </Link>
-                        <Link
-                          to="/account-information"
-                          className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                          Simpan
+                        </button>
+                        <button
+                          onClick={() => setIsViewPelajaran(true)}
+
+                          className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block border-none"
                         >
                           Batal
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   </form>
@@ -598,6 +978,50 @@ export default function JadwalPelajaranAdminDetail() {
       </div>
     );
   };
+
+  const deleteJadwalPelajaran = (record) => {
+    Swal.fire({
+      title: 'Apakah anda yakin menghapus data?',
+      text: "Anda tidak dapat mengembalikan data yang sudah terhapus",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      cancelButtonText: 'Batalkan',
+      confirmButtonText: 'Hapus',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post(BASE_URL, {
+          "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
+          "returnVariables": true,
+          "variables": [
+            {
+              "name": "global_delete",
+              "type": "json",
+              "value": {
+                "tbl_name": "x_academic_subjects_scheduleModel",
+                "id": record.id
+              }
+            }
+          ]
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }
+        ).then(function (response) {
+          console.log(response);
+          setRefreshState(true);
+          Swal.fire(
+            'Data telah terhapus!',
+            'Menghapus data pelajaran ' + record.namaPelajaran,
+            'success'
+          )
+          // pageLoad()
+        })
+      }
+    })
+  }
 
   return (
     <Fragment>

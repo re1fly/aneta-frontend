@@ -22,14 +22,37 @@ export const FormAdminKelas = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Nama Kelas
+                                                    Tingkat Kelas
                                                 </label>
-                                                <input type="text"
-                                                       name="nama_kelas"
-                                                       className="form-control"
-                                                       defaultValue={props.namaKelas}
-                                                       required
-                                                       disabled={props.isDisabled}/>
+                                                <select
+                                                    className="form-control"
+                                                    aria-label="Default select example"
+                                                    name="nama_kelas"
+                                                    required
+                                                    disabled={props.isDisabled}
+                                                >
+                                                    <option value={props.namaKelas} selected disabled hidden>
+                                                        {props.namaKelas}
+                                                    </option>
+                                                    <option value="Kelas 1">
+                                                        Kelas 1
+                                                    </option>
+                                                    <option value="Kelas 2">
+                                                        Kelas 2
+                                                    </option>
+                                                    <option value="Kelas 3">
+                                                        Kelas 3
+                                                    </option>
+                                                    <option value="Kelas 4">
+                                                        Kelas 4
+                                                    </option>
+                                                    <option value="Kelas 5">
+                                                        Kelas 5
+                                                    </option>
+                                                    <option value="Kelas 6">
+                                                        Kelas 6
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -71,18 +94,17 @@ export const FormAdminKelas = (props) => {
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Tahun Akademik
                                                 </label>
+
                                                 <select
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="tahun_akademik"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    disabled
                                                 >
                                                     <option value={props.idTahunAkademik} selected disabled hidden>
                                                         {props.tahunAkademik}
                                                     </option>
-                                                    {props.selectYears}
-
                                                 </select>
                                             </div>
                                         </div>
@@ -130,7 +152,7 @@ export const FormAdminKelas = (props) => {
                                             >
                                                 Batal
                                             </button>
-                                        </div> : null }
+                                        </div> : null}
 
                                     </div>
                                 </form>

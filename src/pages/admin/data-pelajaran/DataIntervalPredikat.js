@@ -1,26 +1,220 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
-import React, { Fragment } from "react";
-import { PageHeader, Select, Card, Table, Row, Button, Space, Menu, Dropdown, message } from "antd"
+import React, {Fragment} from "react";
+import {PageHeader, Card, Table, Button, Space, Menu, Dropdown, message, Modal, Form, Input, notification} from "antd"
 import {
     AppstoreOutlined,
     MenuOutlined,
     EyeOutlined,
     DeleteOutlined,
     EditOutlined,
-    EllipsisOutlined,
+    EllipsisOutlined, UserOutlined, LockOutlined,
 } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
 
 import Filter from "../../../components/Filter";
+import axios from "axios";
+import {BASE_URL} from "../../../api/Url";
+import Swal from "sweetalert2";
+import {FormAdminKelas} from "../../../components/form/AdminKelas";
+import {FormAdminDataInterval} from "../../../components/form/AdminDataInterval";
 
 function DataIntervalPredikat() {
     const [grid, setGrid] = useState(false);
-    const [isViewDataPredikat, setIsViewDataPredikat] = useState(true);
+    const [dataInterval, setDataInterval] = useState([])
+    const [paramsPage, setParamsPage] = useState("1");
+    const [btnPagination, setBtnPagination] = useState([]);
+    const institute = localStorage.getItem("institute");
+    const [isViewEdit, setIsViewEdit] = useState(false);
+    const [selectedData, setSelectedData] = useState(null);
 
-    const _onSelectMenu = ({ key }) => {
+
+    const getDataInterval = () => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "c6097444-fb4b-11ec-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "institute_id": institute,
+                            "result": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": paramsPage
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[3].value)
+            const dataItv = resData.data
+            const pagination = resData.links;
+
+            setDataInterval(dataItv)
+            setBtnPagination(pagination);
+
+        }).catch(error => {
+            alert(error)
+        });
+    }
+    const sinkronisasiData = () => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "8f1df157-fce4-11ec-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "institude_id": institute
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+            const res = JSON.parse(response.data.variables[2].value)
+            const resCode = res.code
+
+            if (resCode === true) {
+                getDataInterval();
+                notification.success({
+                    message: "Sukses",
+                    description: res.message,
+                    placement: 'top',
+                    className: 'text-capitalize'
+                })
+            } else {
+                notification.error({
+                    message: "Gagal",
+                    description: res.message,
+                    placement: 'top',
+                    className: 'text-capitalize'
+                })
+            }
+
+        }).catch(error => {
+            alert(error)
+        });
+    }
+    const deleteData = (record) => {
+        Swal.fire({
+            title: 'Apakah anda yakin menghapus data?',
+            text: "Data yang telah terhapus dapat dikembalikan jika anda sinkronisasi data.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Batalkan',
+            confirmButtonText: 'Hapus'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post(BASE_URL, {
+                        "processDefinitionId": "380b3aa5-fc3c-11ec-9ea6-c6ec5d98c2df",
+                        "returnVariables": true,
+                        "variables": [
+                            {
+                                "name": "get_data",
+                                "type": "json",
+                                "value": {
+                                    "id_subject_master" : record.id
+                                }
+                            }
+                        ]
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json",
+                        }
+                    }
+                ).then(function (response) {
+                    const res = JSON.parse(response.data.variables[2].value)
+                    const resCode = res.status
+
+                    if (resCode === true) {
+                        getDataInterval()
+                        Swal.fire(
+                            'Data telah terhapus!',
+                            'Menghapus data interval mata pelajaran ' + record.mataPelajaran,
+                            'success'
+                        )
+                    } else {
+                        notification.error({
+                            message: "Gagal",
+                            description: 'Data gagal dihapus',
+                            placement: 'top',
+                            className: 'text-capitalize'
+                        })
+                    }
+
+                }).catch(error => {
+                    alert(error)
+                });
+            }
+        })
+
+    }
+
+    useEffect(() => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "getwherenojoinfirst:1:e973019e-00cc-11ed-9ea6-c6ec5d98c2df",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_get_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "test",
+                            "pagination": false,
+                            "total_result": 2,
+                            "order_coloumn": "test.id",
+                            "order_by": "asc",
+                            "data": [
+                                {
+                                    "kondisi": "where",
+                                    "tbl_coloumn": "id",
+                                    "tbl_value": "1",
+                                    "operator": "="
+                                }
+                            ],
+                            "tbl_coloumn": [
+                                "*"
+                            ]
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData.data.json)
+
+        }).catch(error => {
+            alert(error)
+        });
+    }, [])
+
+    useEffect(() => {
+        getDataInterval()
+    }, [paramsPage]);
+
+
+    const _onSelectMenu = ({key}) => {
         message.info(`Click on item ${key}`);
     };
 
@@ -45,13 +239,73 @@ function DataIntervalPredikat() {
         console.log('params', pagination, filters, sorter, extra);
     }
 
+    const showModalEdit = (record) => {
+        setSelectedData(record)
+        console.log(record)
+        setIsViewEdit(true);
+    };
+
+    const FormEdit = () => {
+        return (
+            <FormAdminDataInterval
+                setView={() => setIsViewEdit(false)}
+                title={`Edit Data Interval ${selectedData.mataPelajaran}`}
+                submit={editInterval}
+                nilai_a_min={selectedData.nilai_a_min}
+                nilai_a_max={selectedData.nilai_a_max}
+                nilai_b_min={selectedData.nilai_b_min}
+                nilai_b_max={selectedData.nilai_b_max}
+                nilai_c_min={selectedData.nilai_c_min}
+                nilai_c_max={selectedData.nilai_c_max}
+                nilai_d_min={selectedData.nilai_d_min}
+                nilai_d_max={selectedData.nilai_d_max}
+            />
+        )
+    }
+
+    const dataTableInterval = dataInterval.map((data, index) => {
+        const nilaiInterval = data.konten;
+
+        const nilaiA = nilaiInterval.find(nilai => nilai.predikat == 'A');
+        const getIntervalA = `${nilaiA.min} - ${nilaiA.max}`
+
+        const nilaiB = nilaiInterval.find(nilai => nilai.predikat == 'B');
+        const getIntervalB = `${nilaiB.min} - ${nilaiB.max}`
+
+        const nilaiC = nilaiInterval.find(nilai => nilai.predikat == 'C');
+        const getIntervalC = `${nilaiC.min} - ${nilaiC.max}`
+
+        const nilaiD = nilaiInterval.find(nilai => nilai.predikat == 'D');
+        const getIntervalD = `${nilaiD.min} - ${nilaiD.max}`
+
+
+        return {
+            no: index + 1,
+            id: data.id_matpel,
+            mataPelajaran: data.matpel,
+            ta_smt: `${data.academic_year} / ${data.semester}`,
+            tingkatKelas: data.tingkat,
+            nilai_a: getIntervalA,
+            nilai_a_min: nilaiA.min,
+            nilai_a_max: nilaiA.max,
+            nilai_b: getIntervalB,
+            nilai_b_min: nilaiB.min,
+            nilai_b_max: nilaiB.max,
+            nilai_c: getIntervalC,
+            nilai_c_min: nilaiC.min,
+            nilai_c_max: nilaiC.max,
+            nilai_d: getIntervalD,
+            nilai_d_min: nilaiD.min,
+            nilai_d_max: nilaiD.max,
+        }
+
+    })
+
     const TabelDataPredikat = () => {
         const columns = [
             {
                 title: 'No',
                 dataIndex: 'no',
-                responsive: ['sm'],
-                align: 'center'
             },
             {
                 title: 'Mata Pelajaran',
@@ -83,113 +337,108 @@ function DataIntervalPredikat() {
                 align: 'center'
             },
             {
+                title: 'Nilai D',
+                dataIndex: 'nilai_d',
+                align: 'center'
+            },
+            {
                 title: 'Aksi',
                 dataIndex: 'aksi',
-                defaultSortOrder: 'descend',
-                render: () => (
+                align: "center",
+                render: (text, record) => (
                     <Space size="middle">
-                        <EditOutlined style={{ color: "blue" }} />
-                        <DeleteOutlined style={{ color: "red" }} />
+                        <EditOutlined style={{color: "blue"}} onClick={() => showModalEdit(record)}/>
+                        <DeleteOutlined style={{color: "red"}} onClick={() => deleteData(record)}/>
+
                     </Space>
                 ),
             },
         ];
 
-        const data = [
-            {
-                no: '1',
-                mataPelajaran: "Bahasa Indonesia",
-                ta_smt: "2022/Ganjil",
-                tingkatKelas: "1",
-                nilai_c: "75 - 83",
-                nilai_b: "84 - 92",
-                nilai_a: "93 - 100",
-            },
-            {
-                no: '2',
-                mataPelajaran: "Penjaskes",
-                ta_smt: "2022/Ganjil",
-                tingkatKelas: "1",
-                nilai_c: "70 - 80",
-                nilai_b: "81 - 91",
-                nilai_a: "92 - 100",
-            },
-            {
-                no: '3',
-                mataPelajaran: "Matematika",
-                ta_smt: "2022/Genap",
-                tingkatKelas: "2",
-                nilai_c: "60 - 73",
-                nilai_b: "74 - 87",
-                nilai_a: "88 - 100",
-            },
-        ];
 
         return (
-            <Table className=""
-                columns={columns}
-                dataSource={data}
-                onChange={onChangeTable}
-                pagination={{ position: ['bottomCenter'] }}
-                rowClassName="bg-greylight text-grey-900"
-                scroll={{ x: 400 }} />
+            <>
+                <Table className=""
+                       columns={columns}
+                       dataSource={dataTableInterval}
+                       onChange={onChangeTable}
+                       pagination={false}
+                       rowClassName="bg-greylight text-grey-900 text-capitalize"
+                       scroll={{x: 400}}/>
+                <div className="text-center mt-4">
+                    {btnPagination.map((dataBtn, index) => {
+                        const labelBtn = dataBtn.label;
+                        const label = labelBtn
+                            .replace(/(&laquo\;)/g, "")
+                            .replace(/(&raquo\;)/g, "");
+                        let linkUrl = dataBtn.url;
+
+                        if (linkUrl != null) {
+                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                        }
+
+                        return (
+                            <Button
+                                key={`interval_${index}`}
+                                className="btn btn-primary mr-2 font-xssss fw-600"
+                                disabled={linkUrl == null ? true : false}
+                                onClick={() => {
+                                    setParamsPage(linkUrl);
+                                }}
+                            >
+                                {label}
+                            </Button>
+                        );
+                    })}
+                </div>
+            </>
+
         )
     }
 
     const CardDataPredikat = () => {
-        const channelList = [
-            {
-                // imageUrl: 'user.png',
-                title: 'Bahasa Indonesia',
-                tag1: '2022 / Ganjil',
-                tingkatKelas: '1',
-                nilai_c: "75 - 83",
-                nilai_b: "84 - 92",
-                nilai_a: "93 - 100",
-            },
-            {
-                // imageUrl: 'user.png',
-                title: 'Pendidikan Kewarganegaraan',
-                tag1: '2022 / Ganjil',
-                tingkatKelas: '1',
-                nilai_c: "70 - 80",
-                nilai_b: "81 - 91",
-                nilai_a: "92 - 100",
-            },
-            {
-                // imageUrl: 'user.png',
-                title: 'Matematika',
-                tag1: '2022 / Genap',
-                tingkatKelas: '2',
-                nilai_c: "60 - 73",
-                nilai_b: "74 - 87",
-                nilai_a: "88 - 100",
-            },
-        ];
+        const channelList =
+            dataInterval.map((data, index) => {
+                const nilaiInterval = data.konten;
+
+                const nilaiA = nilaiInterval.find(nilai => nilai.predikat == 'A');
+                const getIntervalA = `${nilaiA.min} - ${nilaiA.max}`
+
+                const nilaiB = nilaiInterval.find(nilai => nilai.predikat == 'B');
+                const getIntervalB = `${nilaiB.min} - ${nilaiB.max}`
+
+                const nilaiC = nilaiInterval.find(nilai => nilai.predikat == 'C');
+                const getIntervalC = `${nilaiC.min} - ${nilaiC.max}`
+
+                const nilaiD = nilaiInterval.find(nilai => nilai.predikat == 'D');
+                const getIntervalD = `${nilaiD.min} - ${nilaiD.max}`
+                return {
+                    title: data.matpel,
+                    tag3: data.semester == 1 ? data.academic_year + ' / Ganjil' : '',
+                    tag1: data.semester == 2 ? data.academic_year + ' / Genap' : '',
+                    tingkatKelas: data.tingkat,
+                    nilai_a: getIntervalA,
+                    nilai_b: getIntervalB,
+                    nilai_c: getIntervalC,
+                    nilai_d: getIntervalD,
+                }
+            })
 
         return (
             <div className="row">
                 {channelList.map((value, index) => (
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
-                        <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
-                            <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                        <div
+                            className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
+                            <span
+                                className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
                                 Aktif
                             </span>
                             <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
-                                overlay={_Account}>
-                                <EllipsisOutlined />
+                                      overlay={_Account}>
+                                <EllipsisOutlined/>
                             </Dropdown>
-                            {/* <a
-                                href=""
-                                className="btn-round-xxxl rounded-lg bg-lightblue ml-auto mr-auto mt-4"
-                            >
-                                <img
-                                    src={`assets/images/${value.imageUrl}`}
-                                    alt="icon"
-                                    className="p-1 w-100"
-                                />
-                            </a> */}
-                            <h4 className="fw-700 font-xs mt-5">{value.title}</h4>
+                            <h4 className="fw-700 font-xs mt-5 mb-4 text-capitalize">{value.title}</h4>
                             <div className="clearfix"></div>
                             {value.tag1 ? (
                                 <span
@@ -216,7 +465,7 @@ function DataIntervalPredikat() {
                                 ''
                             )}
                             <div className="clearfix"></div>
-                            <div className="mt-4 mx-auto">
+                            <div className="mt-5 mx-auto">
                                 <div className="row ml-3">
                                     <div className="col-6">
                                         <p className="font-xssss float-left lh-1">Tingkat Kelas</p>
@@ -252,24 +501,14 @@ function DataIntervalPredikat() {
                                         <p className="font-xssss float-left lh-1">: {value.nilai_c}</p>
                                     </div>
                                 </div>
-
                                 <div className="row ml-3">
                                     <div className="col-6">
-                                        <p className="font-xssss float-left lh-1">Nilai A</p>
+                                        <p className="font-xssss float-left lh-1">Nilai D</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {value.nilai_a}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.nilai_d}</p>
                                     </div>
                                 </div>
-
-                                {/* <div className="row ml-3">
-                                    <div className="col-6">
-                                        <p className="font-xssss float-left lh-1">Tanggal Proses</p>
-                                    </div>
-                                    <div className="">
-                                        <p className="font-xssss float-left lh-1">: 12 Juni 2022, 16.00</p>
-                                    </div>
-                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -289,8 +528,8 @@ function DataIntervalPredikat() {
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <div className="row">
                         <div className="col-lg-8 col-md-6 my-2">
-                            <Button className="mr-4" type="primary" shape="round" size='middle'>
-                                {/* onClick={() => setIsViewDataPredikat(false)} */}
+                            <Button className="mr-4" type="primary" shape="round" size='middle'
+                                    onClick={() => sinkronisasiData()}>
                                 Sinkronisasi
                             </Button>
                             {/* <Filter title1="Kompetensi" title2="Kelas" /> */}
@@ -309,15 +548,15 @@ function DataIntervalPredikat() {
                         </div>
                         <div className="col-lg-4 col-md-6 my-2">
                             <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                onSearch={_onSearch} style={{ width: '80%' }} />
+                                    onSearch={_onSearch} style={{width: '80%'}}/>
                             {grid == false ?
                                 <a>
-                                    <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
-                                        onClick={() => setGrid(true)} />
+                                    <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                      onClick={() => setGrid(true)}/>
                                 </a> :
                                 <a>
-                                    <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
-                                        onClick={() => setGrid(false)} />
+                                    <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
+                                                  onClick={() => setGrid(false)}/>
                                 </a>
                             }
                         </div>
@@ -327,160 +566,98 @@ function DataIntervalPredikat() {
 
                 </div>
                 <div className="mt-4">
-                    {grid ? <CardDataPredikat /> : <TabelDataPredikat />}
+                    {grid ? <CardDataPredikat/> : <TabelDataPredikat/>}
                 </div>
             </div>
         )
     }
 
-    const TambahDataPredikat = () => {
-        return (
-            <div className="container px-3 py-4">
-                <div className="row">
-                    <div className="col-lg-12">
-                        <div className="middle-wrap">
-                            <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
-                                <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewDataPredikat(true)}
-                                        className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
-                                    <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                        Tambah Data KKM Mata Pelajaran
-                                    </h4>
-                                </div>
-                                <div className="card-body p-lg-5 p-4 w-100 border-0">
-                                    <form id="teacher_form"
-                                        // onSubmit={createGuru}
-                                        method="POST">
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Mata Pelajaran
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name='mata_pelajaran'
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
+    const editInterval = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
 
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        TA / Semester
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name='ta_semester'
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
+        axios.post(BASE_URL, {
+                "processDefinitionId": "4381de04-fce4-11ec-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "id_matpel": selectedData.id,
+                            "konten": [
+                                {
+                                    "min": data.nilai_a_min,
+                                    "max": data.nilai_a_max,
+                                    "predikat": "A",
+                                    "id_predikat": 1
+                                },
+                                {
+                                    "min": data.nilai_b_min,
+                                    "max": data.nilai_b_max,
+                                    "predikat": "B",
+                                    "id_predikat": 2
+                                },
+                                {
+                                    "min": data.nilai_c_min,
+                                    "max": data.nilai_c_max,
+                                    "predikat": "C",
+                                    "id_predikat": 3
+                                },
+                                {
+                                    "min": data.nilai_d_min,
+                                    "max": data.nilai_d_max,
+                                    "predikat": "D",
+                                    "id_predikat": 4
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+            const res = JSON.parse(response.data.variables[2].value)
+            const resCode = res.code
 
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kurikulum
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="kurikulum"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Kurikulum
-                                                        </option>
-                                                        <option value="Kurikulum 1">
-                                                            Kurikulum 1
-                                                        </option>
-                                                        <option value="Kurikulum 2">
-                                                            Kurikulum 2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
+            if (resCode === true) {
+                setIsViewEdit(false);
+                getDataInterval()
+                notification.success({
+                    message: "Sukses",
+                    description: res.message,
+                    placement: 'top',
+                    className: 'text-capitalize'
+                })
+            } else {
+                notification.error({
+                    message: "Gagal",
+                    description: res.message,
+                    placement: 'top',
+                    className: 'text-capitalize'
+                })
+            }
+        }).catch(error => {
+            alert(error)
+        });
 
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Tingkat Kelas
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="status_guru"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Tingkat Kelas
-                                                        </option>
-                                                        <option value="1">
-                                                            1
-                                                        </option>
-                                                        <option value="2">
-                                                            2
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Nilai KKM
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name="state_guru"
-                                                        defaultValue="11"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-lg-12">
-                                                <button
-                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    type="submit"
-                                                >
-                                                    Simpan
-                                                </button>
-                                                <a
-                                                    onClick={() => setIsViewDataPredikat(true)}
-                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                >
-                                                    Batal
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
     };
 
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
-                    {isViewDataPredikat ? <ViewDataPredikat /> : <TambahDataPredikat />}
-                    <Adminfooter />
+                    <Appheader/>
+                    {isViewEdit ? <FormEdit /> : <ViewDataPredikat/>
+                    }
+                    <Adminfooter/>
                 </div>
             </div>
         </Fragment>

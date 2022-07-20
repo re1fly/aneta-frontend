@@ -67,7 +67,7 @@ export const getProcessId = (keyProcess) => (dispatch) => {
       }
     )
     .then((response) => {
-      const data = JSON.parse(response.data.variables[2].value);
+      const data = JSON.parse(response?.data?.variables[2]?.value);
       const getValue = data?.data;
       dispatch({ type: "GET_PROCESSID", value: getValue });
     });
@@ -95,8 +95,8 @@ export const GetProvinsi = () => (dispatch) => {
       ],
     })
     .then(function (response) {
-      const dataProvinsi = JSON.parse(response.data.variables[2].value);
-      dispatch({ type: "SET_PROVINSI", value: dataProvinsi.data });
+      const dataProvinsi = JSON.parse(response?.data?.variables[2]?.value);
+      dispatch({ type: "SET_PROVINSI", value: dataProvinsi?.data });
       // console.log(dataProvinsi);
     })
     .catch(function (error) {
@@ -134,7 +134,7 @@ export const GetCity = (id_provinsi) => (dispatch) => {
       ],
     })
     .then(function (response) {
-      const data = JSON.parse(response.data.variables[2].value);
+      const data = JSON.parse(response?.data?.variables[2]?.value);
       dispatch({ type: "SET_CITY", value: data });
       // console.log('city', data);
     })
@@ -173,7 +173,7 @@ export const GetKecamatan = (id_city) => (dispatch) => {
       ],
     })
     .then(function (response) {
-      const data = JSON.parse(response.data.variables[2].value);
+      const data = JSON.parse(response?.data?.variables[2]?.value);
       dispatch({ type: "SET_KECAMATAN", value: data });
       // console.log('Kecamatan', data);
     })
@@ -212,7 +212,7 @@ export const GetKelurahan = (id_kecamatan) => (dispatch) => {
       ],
     })
     .then(function (response) {
-      const data = JSON.parse(response.data.variables[2].value);
+      const data = JSON.parse(response?.data?.variables[2]?.value);
       dispatch({ type: "SET_KELURAHAN", value: data });
       // console.log('Kelurahan', data);
     })

@@ -2,12 +2,10 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {
     Button,
     Card,
-    Col,
     Dropdown,
     Menu,
     message,
     notification,
-    Row,
     Space,
     Table,
     PageHeader
@@ -16,13 +14,10 @@ import {
     AppstoreOutlined,
     EllipsisOutlined,
     DeleteOutlined,
-    DownOutlined,
     EditOutlined,
     MenuOutlined,
-    PlusOutlined, EyeOutlined
+    EyeOutlined
 } from "@ant-design/icons";
-import {Link} from 'react-router-dom';
-
 import Search from "antd/es/input/Search";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
@@ -37,6 +32,7 @@ import {getProcessId, searchGlobal} from "../../../redux/Action";
 import {useDispatch, useSelector} from "react-redux";
 import {FormAdminKelas} from "../../../components/form/AdminKelas";
 import Swal from "sweetalert2";
+import {FilterAcademic} from "../../../components/FilterAcademic";
 
 export default function DataKelasAdmin() {
     const [grid, setGrid] = useState(false);
@@ -55,12 +51,14 @@ export default function DataKelasAdmin() {
         },
     ]);
     const [getKelas, setGetKelas] = useState([]);
+    const defaultAcademic = localStorage.getItem('academic_year');
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [academicYears, setAcademicYears] = useState([]);
     const [waliKelas, setWalikelas] = useState([]);
     const institute = localStorage.getItem('institute');
-    const academic = localStorage.getItem('academic_year');
+    const [academic, setAcademic] = useState(defaultAcademic);
+    const [year, setYear] = useState(localStorage.getItem('year'));
     const [paramsPage, setParamsPage] = useState("1");
 
     const dispatch = useDispatch();
@@ -145,8 +143,8 @@ export default function DataKelasAdmin() {
                                         "kondisi": "where"
                                     }
                                 ],
-                                "order_coloumn": "x_academic_class.class",
-                                "order_by": "asc"
+                                "order_coloumn": "x_academic_class.updated_at",
+                                "order_by": "desc"
                             }
                         },
                         {
@@ -234,7 +232,7 @@ export default function DataKelasAdmin() {
                                 "select": [
                                     "x_academic_year.id as id_academic",
                                     "x_academic_year.academic_year",
-                                    "m_institutes.id"
+                                    "m_institutes.id", "x_academic_year.semester"
                                 ],
                                 "paginate": 1000,
                                 "join": [
@@ -271,10 +269,9 @@ export default function DataKelasAdmin() {
                 const academics = JSON.parse(response.data.variables[3].value);
                 setAcademicYears(academics.data.data);
             })
-
         }
 
-    }, [paramsPage, ProcessId, isViewKelas, refreshState])
+    }, [paramsPage, ProcessId, isViewKelas, refreshState, academic])
 
 
     useEffect(() => {
@@ -422,6 +419,10 @@ export default function DataKelasAdmin() {
     const TableKelas = () => {
         const columns = [
             {
+                title: 'No',
+                dataIndex: 'no',
+            },
+            {
                 title: 'Nama Kelas',
                 dataIndex: 'namaKelas',
                 filters: [],
@@ -434,23 +435,23 @@ export default function DataKelasAdmin() {
             {
                 title: 'Sub Kelas',
                 dataIndex: 'subKelas',
-                defaultSortOrder: 'ascend',
+                // defaultSortOrder: 'ascend',
                 // sorter: (a, b) => a.subKelas - b.subKelas,
             },
             {
                 title: 'Lokasi Kelas',
                 dataIndex: 'lokasiKelas',
-                defaultSortOrder: 'ascend',
+                // defaultSortOrder: 'ascend',
             },
             {
                 title: 'Tahun Akademik',
                 dataIndex: 'tahunAkademik',
-                defaultSortOrder: 'ascend',
+                // defaultSortOrder: 'ascend',
             },
             {
                 title: 'Wali Kelas',
                 dataIndex: 'waliKelas',
-                defaultSortOrder: 'ascend',
+                // defaultSortOrder: 'ascend',
             },
             {
                 title: 'Aksi',
@@ -461,6 +462,7 @@ export default function DataKelasAdmin() {
                         <EyeOutlined style={{color: "black"}} onClick={() => viewDetailKelas(record)}/>
                         <EditOutlined style={{color: "blue"}} onClick={() => viewEditKelas(record)}/>
                         <DeleteOutlined style={{color: 'red'}} onClick={() => deleteKelas(record)}/>
+                        {/*<div className="ribbon"><span>Last Created</span></div>*/}
                     </Space>
                 ),
             },
@@ -468,6 +470,7 @@ export default function DataKelasAdmin() {
 
         const allDataKelas = getKelas.map((data, index) => {
             return {
+                no: index + 1,
                 id: data.id_class,
                 namaKelas: data.class,
                 subKelas: data.sub_class,
@@ -631,6 +634,27 @@ export default function DataKelasAdmin() {
                                         Tambah Data
                                     </Button>
                                     <Filter title1="Nama Kelas" title2="Sub Kelas"/>
+                                    <FilterAcademic getYear={(e) => {
+                                        const {  options, selectedIndex } = e.target;
+                                        setAcademic(e.target.value)
+                                        setYear(options[selectedIndex].text)
+                                        const selectedYear =(options[selectedIndex].text)
+                                        notification.info({
+                                            message: "Tahun Akademik",
+                                            description: 'Memilih Data Akademik tahun ' + selectedYear,
+                                            placement: 'top'
+                                        })
+                                    }}
+                                                    selectYear={academicYears.map((data) => {
+                                                            return (
+                                                                <>
+                                                                    <option value={data.id_academic}>
+                                                                        {data.academic_year} Semester {data.semester}
+                                                                    </option>
+                                                                </>
+                                                            )
+                                                        }
+                                                    )}/>
                                     {/* <Dropdown overlay={_filterMenu}>
                                     <a className="ant-dropdown-link mr-4 font-bold"
                                     onClick={e => e.preventDefault()}>
@@ -709,12 +733,12 @@ export default function DataKelasAdmin() {
                         "value": {
                             "tbl_name": "x_academic_classModel",
                             "tbl_coloumn": {
-                                "academic_year_id": data.tahun_akademik, //api
+                                "academic_year_id": data.tahun_akademik,
                                 "class": data.nama_kelas,
                                 "sub_class": data.sub_kelas,
                                 "sub_sub_class": '-',
                                 "class_location": data.lokasi_kelas,
-                                "calss_advisor_id": data.wali_kelas //api
+                                "calss_advisor_id": data.wali_kelas,
                             }
                         }
                     },
@@ -761,7 +785,6 @@ export default function DataKelasAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-
         axios.post(BASE_URL, {
                 "processDefinitionId": ProcessId[1].proses_def_id,
                 "returnVariables": true,
@@ -777,7 +800,7 @@ export default function DataKelasAdmin() {
                                 "class": data.nama_kelas,
                                 "sub_class": data.sub_kelas,
                                 "class_location": data.lokasi_kelas,
-                                "calss_advisor_id": data.wali_kelas
+                                "calss_advisor_id": data.wali_kelas,
                             }
                         }
                     }
@@ -887,12 +910,14 @@ export default function DataKelasAdmin() {
                 setView={() => setIsViewKelas(true)}
                 title="Tambah Kelas"
                 submit={createKelas}
-                selectYears={academicYears.map((data) => (
-                    <option value={data.id_academic}>{data.academic_year}</option>
-                ))}
+                // selectYears={academicYears.map((data) => (
+                //     <option value={data.id_academic}>{data.academic_year}</option>
+                // ))}
                 selectWaliKelas={waliKelas.map((data) => (
                     <option value={data.id_user}>{data.name}</option>
                 ))}
+                tahunAkademik={year}
+                idTahunAkademik={academic}
                 isDisabled={false}
             />
         )
@@ -903,9 +928,9 @@ export default function DataKelasAdmin() {
                 setView={() => setIsViewKelas(true)}
                 title="Edit Kelas"
                 submit={editKelas}
-                selectYears={academicYears.map((data) => (
-                    <option value={data.id_academic}>{data.academic_year}</option>
-                ))}
+                // selectYears={academicYears.map((data) => (
+                //     <option value={data.id_academic}>{data.academic_year}</option>
+                // ))}
                 selectWaliKelas={waliKelas.map((data) => (
                     <option value={data.id_user}>{data.name}</option>
                 ))}
@@ -925,9 +950,6 @@ export default function DataKelasAdmin() {
             <FormAdminKelas
                 setView={() => setIsViewKelas(true)}
                 title="View Kelas"
-                selectYears={academicYears.map((data) => (
-                    <option value={data.id_academic}>{data.academic_year}</option>
-                ))}
                 selectWaliKelas={waliKelas.map((data) => (
                     <option value={data.id_user}>{data.name}</option>
                 ))}
@@ -960,7 +982,6 @@ export default function DataKelasAdmin() {
                                         <FormDetail/> :
                                         <ViewKelas/>
                     }
-                    {/*{isViewKelas ? <ViewKelas/> : <FormKelas />}*/}
                     <Adminfooter/>
                 </div>
             </div>

@@ -309,12 +309,22 @@ function DataKkmPelajaran() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Mata Pelajaran
                                                     </label>
-                                                    <input
-                                                        type="text"
+                                                    <select
                                                         className="form-control"
-                                                        name='mata_pelajaran'
+                                                        aria-label="Default select example"
+                                                        name="mata_pelajaran"
                                                         required
-                                                    />
+                                                    >
+                                                        <option value="" selected disabled>
+                                                            Pilih Mata Pelajaran
+                                                        </option>
+                                                        <option value="Pelajaran">
+                                                            Matematika
+                                                        </option>
+                                                        <option value="pelajaran">
+                                                            Bahasa Indonesia
+                                                        </option>
+                                                    </select>
                                                 </div>
                                             </div>
 

@@ -63,11 +63,11 @@ export const FormAdminPelajaran = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kode
+                                                    Kode Pelajaran
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    name='kode'
+                                                    name='kode_pelajaran'
                                                     className="form-control"
                                                     defaultValue={props.kode}
                                                     required
@@ -81,27 +81,19 @@ export const FormAdminPelajaran = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kelas
+                                                    Kelompok
                                                 </label>
-                                                {/* <input
-                                                    type="text"
-                                                    name='kelas'
-                                                    className="form-control"
-                                                    defaultValue={props.kode}
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                /> */}
                                                 <select
                                                     className="form-control"
                                                     aria-label="Default select example"
-                                                    name="kelas"
+                                                    name="kelompok"
                                                     required
                                                     disabled={props.isDisabled}
                                                 >
-                                                    <option value={props.idKelas} selected disabled hidden>
-                                                        {props.kelas}
+                                                    <option value={props.idKelompok} selected disabled>
+                                                        {props.kelompok == null ? "Pilih Kelompok Belajar" : props.kelompok}
                                                     </option>
-                                                    {props.selectKelas}
+                                                    {props.selectKelompokBelajar}
                                                 </select>
                                             </div>
                                         </div>
@@ -109,39 +101,45 @@ export const FormAdminPelajaran = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tahun Akademik
+                                                    No urut Rapor
                                                 </label>
-                                                <select
+                                                <input
+                                                    type="text"
+                                                    name='noUrut_rapor'
                                                     className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="tahun_akademik"
+                                                    defaultValue={props.kode}
                                                     required
                                                     disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idTahunAkademik} selected disabled>
-                                                        {props.tahunAkademik}
-                                                    </option>
-                                                    {props.selectYears}
-                                                </select>
+                                                />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="row">
-                                        <div className="col-lg-6 mb-3">
+
+
+                                        <div className="col-lg-12 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Max Siswa
+                                                    Status
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    name='max_siswa'
+                                                <select
                                                     className="form-control"
-                                                    maxLength={4}
-                                                    defaultValue={props.maxSiswa}
+                                                    aria-label="Default select example"
+                                                    name="status"
                                                     required
                                                     disabled={props.isDisabled}
-                                                />
+                                                >
+                                                    <option value={props.status} selected disabled>
+                                                        {props.status == null ? "Pilih Status" : props.status}
+                                                    </option>
+                                                    <option value="true">
+                                                        Aktif
+                                                    </option>
+                                                    <option value="false">
+                                                        Tidak Aktif
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 

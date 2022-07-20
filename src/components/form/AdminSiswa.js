@@ -5,28 +5,28 @@ import Upload from "antd/es/upload/Upload";
 import {PlusOutlined, UserAddOutlined} from "@ant-design/icons";
 
 
-const ButtonFormOrtu = (props) => {
-    return (
-        <>
-            <Divider>
-                <Tooltip title="Tambahkan Orang Tua">
-                    <Button
-                        style={{
-                            marginTop: 10,
-                            width: "50px",
-                            height: "50px",
-                        }}
-                        onClick={props.viewFormOrtu}
-                        size="large"
-                        type="primary"
-                        shape="circle"
-                        icon={<UserAddOutlined/>}
-                    />
-                </Tooltip>
-            </Divider>
-        </>
-    );
-};
+// const ButtonFormOrtu = (props) => {
+//     return (
+//         <>
+//             <Divider>
+//                 <Tooltip title="Tambahkan Orang Tua">
+//                     <Button
+//                         style={{
+//                             marginTop: 10,
+//                             width: "50px",
+//                             height: "50px",
+//                         }}
+//                         onClick={props.viewFormOrtu}
+//                         size="large"
+//                         type="primary"
+//                         shape="circle"
+//                         icon={<UserAddOutlined/>}
+//                     />
+//                 </Tooltip>
+//             </Divider>
+//         </>
+//     );
+// };
 
 const DataFormOrangtua = (props) => {
     let disabledButton = props.isDisabled;
@@ -260,7 +260,7 @@ export const FormAdminSiswa = (props) => {
                                     className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"
                                 ></i>
                                 <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                    Tambah Data Siswa & Orang Tua
+                                    {props.title}
                                 </h4>
                             </div>
 
@@ -524,7 +524,7 @@ export const FormAdminSiswa = (props) => {
                                     </div>
                                     {props.formOrtu ?
                                         <DataFormOrangtua createOrtu={props.createOrtu} setView={props.setView}/> :
-                                        <ButtonFormOrtu viewFormOrtu={props.viewFormOrtu}/>}
+                                        null}
                                 </div>
                             </form>
                         </div>

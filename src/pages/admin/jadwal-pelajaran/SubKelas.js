@@ -22,14 +22,13 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import { useDispatch } from "react-redux";
 import { GetIdClass } from "../../../redux/Action";
+import { useSelector } from "react-redux";
 
-export default function JadwalPelajaranAdmin() {
+export default function JadwalPelajaranAdminSubKelas() {
   const [grid, setGrid] = useState(false)
   const [isViewPelajaran, setIsViewPelajaran] = useState(true);
-  const [getKelas, setGetKelas] = useState([]);
-  // const [getProcessDefId, setGetProcessDefId] = useState([]);
-
-  const academicYear = localStorage.getItem('academic_year')
+  const [getSubKelas, setGetSubKelas] = useState([]);
+  const [getProcessDefId, setGetProcessDefId] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -56,82 +55,133 @@ export default function JadwalPelajaranAdmin() {
   const _onSearch = value => console.log(value);
 
   const institute = localStorage.getItem('institute');
+  const academicYear = localStorage.getItem('academic_year');
 
-  // useEffect(() => {
-  //   axios.post(BASE_URL,
-  //     {
-  //       "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
-  //       "returnVariables": true,
-  //       "variables": [
-  //         {
-  //           "name": "global_get_where",
-  //           "type": "json",
-  //           "value": {
-  //             "tbl_name": "referensi_flowable",
-  //             "pagination": false,
-  //             "total_result": 2,
-  //             "order_coloumn": "referensi_flowable.id",
-  //             "order_by": "asc",
-  //             "data": [
-  //               {
-  //                 "kondisi": "where",
-  //                 "tbl_coloumn": "key",
-  //                 "tbl_value": "globaljoinsubwhereget",
-  //                 "operator": "="
-  //               }, {
-  //                 "kondisi": "where",
-  //                 "tbl_coloumn": "status",
-  //                 "tbl_value": "1",
-  //                 "operator": "="
-  //               }
-  //             ],
-  //             "tbl_coloumn": [
-  //               "*"
-  //             ]
-  //           }
-  //         }
-  //       ]
-  //     }, {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     }
-  //   }).then(function (response) {
-  //     // console.log(response);
-  //     const data = JSON.parse(response?.data?.variables[2]?.value)
-  //     const processId = data[0]?.proses_def_id
-  //     setGetProcessDefId(processId)
-  //   })
-  // })
+  const ClassReducer = useSelector(state => state.dataKelas)
+  const nameClass = ClassReducer.AllClass.kelas
+  const SubClassReducer = ClassReducer.SubClass
 
   useEffect(() => {
     axios.post(BASE_URL,
       {
-        "processDefinitionId": "globalgroupby:2:e74b2da9-f754-11ec-ac5e-66fc627bf211",
+        "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
         "returnVariables": true,
         "variables": [
           {
-            "name": "groupby",
+            "name": "global_get_where",
             "type": "json",
             "value": {
-              "tbl_name": "x_academic_class",
-              "select": [
-                "class"
+              "tbl_name": "referensi_flowable",
+              "pagination": false,
+              "total_result": 2,
+              "order_coloumn": "referensi_flowable.id",
+              "order_by": "asc",
+              "data": [
+                {
+                  "kondisi": "where",
+                  "tbl_coloumn": "key",
+                  "tbl_value": "globaljoinsubwhereget",
+                  "operator": "="
+                }, {
+                  "kondisi": "where",
+                  "tbl_coloumn": "status",
+                  "tbl_value": "1",
+                  "operator": "="
+                }
+              ],
+              "tbl_coloumn": [
+                "*"
+              ]
+            }
+          }
+        ]
+      }, {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(function (response) {
+      const data = JSON.parse(response.data.variables[2].value)
+      const processId = data[0].proses_def_id
+      setGetProcessDefId(processId)
+    })
+  })
+
+  useEffect(() => {
+    axios.post(BASE_URL,
+      {
+        "processDefinitionId": getProcessDefId,
+        "returnVariables": true,
+        "variables": [
+          {
+            "name": "global_join_where_sub",
+            "type": "json",
+            "value": {
+              "tbl_induk": "x_academic_class",
+              "select": ["x_academic_class.id as id_class",
+                "x_academic_class.class",
+                "x_academic_class.sub_class",
+                "x_academic_class.class_location",
+                "x_academic_year.academic_year",
+                "x_academic_year.id as id_academic",
+                "users.name",
+                "x_academic_teachers.id as id_walikelas",
+                "users.institute_id"
+              ],
+              "paginate": 10,
+              "join": [
+                {
+                  "tbl_join": "x_academic_teachers",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_class",
+                  "foregenkey": "calss_advisor_id"
+
+                }, {
+                  "tbl_join": "users",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_teachers",
+                  "foregenkey": "user_id"
+                }, {
+                  "tbl_join": "x_academic_year",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_class",
+                  "foregenkey": "academic_year_id"
+                }
               ],
               "where": [
                 {
-                  "keterangan": "where",
-                  "kolom": "academic_year_id",
+                  "tbl_coloumn": "users",
+                  "tbl_field": "institute_id",
+                  "tbl_value": institute,
                   "operator": "=",
-                  "value": academicYear
+                  "kondisi": "where"
                 }, {
-                  "keterangan": "where",
-                  "kolom": "deleted_at",
+                  "tbl_coloumn": "x_academic_class",
+                  "tbl_field": "academic_year_id",
+                  "tbl_value": academicYear,
                   "operator": "=",
-                  "value": ""
+                  "kondisi": "where"
+                }, {
+                  "tbl_coloumn": "x_academic_class",
+                  "tbl_field": "deleted_at",
+                  "tbl_value": "",
+                  "operator": "=",
+                  "kondisi": "where"
+                }, {
+                  "tbl_coloumn": "x_academic_class",
+                  "tbl_field": "class",
+                  "tbl_value": nameClass,
+                  "operator": "=",
+                  "kondisi": "where"
                 }
               ],
-              "groupby": "class"
+              "order_coloumn": "x_academic_class.class",
+              "order_by": "asc"
             }
+          },
+          {
+            "name": "page",
+            "type": "string",
+            "value": "1"
           }
         ]
       }, {
@@ -140,15 +190,24 @@ export default function JadwalPelajaranAdmin() {
       }
     }
     ).then(function (response) {
-      const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-      const kelas = dataRes?.data
-      setGetKelas(kelas);
+      const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+      const subKelas = dataRes?.data?.data
+      setGetSubKelas(subKelas); 
+      // dispatch({ type: "SET_SUBCLASS", value: subKelas})
     })
-  }, [academicYear])
-
-  const channelList = getKelas.map((data, index) => {
+  }, [getProcessDefId])
+ 
+  const channelList = getSubKelas.map((data, index) => {
     return {
-      kelas: data.class,
+      class: data.class,
+      sub_class: data.sub_class,
+      academic_year: data.academic_year,
+      class_location: data.class_location,
+      id_academic: data.id_academic,
+      id_class: data.id_class,
+      id_walikelas: data.id_walikelas,
+      institute_id: data.institute_id,
+      name: data.name,
     }
   })
 
@@ -185,23 +244,21 @@ export default function JadwalPelajaranAdmin() {
                 </div>
               </div>
             </Card>
-
             <div className="px-1 py-2 ">
               <div className="row">
-                {channelList.map((value, index) => {
-
-                  return (
+              {channelList.map((value, index) => {
+                return(
                     <div className="col-xl-3 col-lg-4 col-md-4">
                       <Link
-                        onClick={() => {
-                          dispatch({ type: 'SET_CLASS', value: value })
-                        }
-                        }
-                        to={{ pathname: `/admin-jadwal-pelajaran-sub-kelas` }}
+                      onClick={() => {
+                        dispatch({ type: 'SET_SUBCLASS', value: value })
+                      }
+                      }
+                        to={{ pathname: `/admin-jadwal-pelajaran-detail` }}
                       >
                         <div
                           className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center">
-                          <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.kelas}</h2>
+                          <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.class} - {value.sub_class}</h2>
                         </div>
                       </Link>
                     </div>

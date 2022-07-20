@@ -1,54 +1,74 @@
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
-import React, {Fragment} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import {PageHeader, Space, Table, Tag} from "antd";
 import {DeleteOutlined, EditOutlined, EyeOutlined} from "@ant-design/icons";
+import axios from "axios";
+import {BASE_URL} from "../../../api/Url";
 
 function CapaianPenilaian() {
+    const [dataCapaian, setDataCapaian] = useState([])
+    const defaultAcademic = localStorage.getItem('academic_year');
+
+    const _getDataCapaian = () => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "Getcapaianpenilaian:1:09b33e3c-fdc1-11ec-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "academic_year" : defaultAcademic
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            const data = resData.data
+            setDataCapaian(data)
+
+        }).catch(error => {
+            alert(error)
+        });
+    }
+
+    useEffect(() => {
+       _getDataCapaian()
+    }, []);
+
+
+
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
     };
-    const getNilai = [
-        {
-            kelas: '1A',
-            mata_pelajaran: 'Penjaskes',
-            kkm: '75',
-            peng: 1,
-            ket_per: 1,
-            skp_spr_per: 1,
-            skp_sos_per: 1,
-            bobot: 1,
-            ket_pen: 1,
-            skp_spr_pen: 3,
-            skp_sos_pen: 5,
-            pts: 1,
-            pas: 1,
-            kirim_nilai: 1,
-            desc: 0
-        },
-        {
-            kelas: '2A',
-            mata_pelajaran: 'Tematik',
-            kkm: '70',
-            peng: 2,
-            ket_per: 4,
-            skp_spr_per: 7,
-            skp_sos_per: 8,
-            bobot: 5,
-            ket_pen: 2,
-            skp_spr_pen: 3,
-            skp_sos_pen: 5,
-            pts: 0,
-            pas: 0,
-            kirim_nilai: 0,
-            desc: 1
-
+    const getNilai = dataCapaian.map(data => {
+        return {
+            kelas: data.kelas,
+            mata_pelajaran: data.mata_pelajaran,
+            kkm: data.kkm,
+            peng: data.perencanaan_peng,
+            ket_per: data.perencanaan_ket,
+            skp_spr_per: data.perencanaan_skp,
+            skp_sos_per: data.perencanaan_sos,
+            bobot: data.bobot,
+            ket_pen: data.penilaian_ket,
+            skp_spr_pen: data.penilaian_skp,
+            skp_sos_pen: data.penilaian_sos,
+            pts: data.pts,
+            pas: data.pas,
+            kirim_nilai: data.kirim_nilai,
+            desc: data.deskripsi
         }
-    ];
+    })
 
     const dataNilai = getNilai.map((data, index) => {
-        // const number = 1++;
 
         return {
             no: index + 1 ,
@@ -74,8 +94,7 @@ function CapaianPenilaian() {
         {
             title: 'No',
             dataIndex: 'no',
-            defaultSortOrder: 'ascend',
-        },,
+        },
         {
             title: 'Kelas',
             dataIndex: 'kelas',
@@ -98,7 +117,6 @@ function CapaianPenilaian() {
         {
             title: 'Mata Pelajaran',
             dataIndex: 'mata_pelajaran',
-            defaultSortOrder: 'ascend',
             filters: [
                 {
                     text: "Penjaskes",
@@ -114,7 +132,6 @@ function CapaianPenilaian() {
         {
             title: 'KKM',
             dataIndex: 'kkm',
-            defaultSortOrder: 'ascend',
         },
         {
             title: 'Jumlah Perencanaan',
@@ -122,29 +139,24 @@ function CapaianPenilaian() {
                 {
                     title: 'Peng',
                     dataIndex: 'peng',
-                    defaultSortOrder: 'ascend',
                 },
                 {
                     title: 'Ket',
                     dataIndex: 'ket_per',
-                    defaultSortOrder: 'ascend',
                 },
                 {
                     title: 'Skp Spr',
                     dataIndex: 'skp_spr_per',
-                    defaultSortOrder: 'ascend',
                 },
                 {
                     title: 'Skp Sos',
                     dataIndex: 'skp_sos_per',
-                    defaultSortOrder: 'ascend',
                 },
             ]
         },
         {
             title: 'Bobot',
             dataIndex: 'bobot',
-            defaultSortOrder: 'ascend',
         },
         {
             title: 'Jumlah Penilaian',
@@ -172,14 +184,13 @@ function CapaianPenilaian() {
                 {
                     title: 'PTS',
                     dataIndex: 'pts',
-                    defaultSortOrder: 'ascend',
                     render: (data) => (
                         <>
                             {data.map((status) => {
-                                let color = status == 0 ? "red" : "green";
+                                let color = status == ['false'] ? "red" : "green";
                                 return (
                                     <Tag style={{borderRadius: "15px"}} color={color} key={status}>
-                                        {status == 1 ? "Sudah" : "Belum"}
+                                        {status == ['true'] ? "Sudah" : "Belum"}
                                     </Tag>
                                 );
                             })}
@@ -189,14 +200,13 @@ function CapaianPenilaian() {
                 {
                     title: 'PAS',
                     dataIndex: 'pas',
-                    defaultSortOrder: 'ascend',
                     render: (data) => (
                         <>
                             {data.map((status) => {
-                                let color = status == 0 ? "red" : "green";
+                                let color = status == ['false'] ? "red" : "green";
                                 return (
                                     <Tag style={{borderRadius: "15px"}} color={color} key={status}>
-                                        {status == 1 ? "Sudah" : "Belum"}
+                                        {status == ['true'] ? "Sudah" : "Belum"}
                                     </Tag>
                                 );
                             })}
@@ -211,14 +221,13 @@ function CapaianPenilaian() {
                 {
                     title: 'Kirim Nilai',
                     dataIndex: 'kirim_nilai',
-                    defaultSortOrder: 'ascend',
                     render: (data) => (
                         <>
                             {data.map((status) => {
-                                let color = status == 0 ? "red" : "green";
+                                let color = status == ['false'] ? "red" : "green";
                                 return (
                                     <Tag style={{borderRadius: "15px"}} color={color} key={status}>
-                                        {status == 1 ? "Sudah" : "Belum"}
+                                        {status == ['true'] ? "Sudah" : "Belum"}
                                     </Tag>
                                 );
                             })}
@@ -228,14 +237,13 @@ function CapaianPenilaian() {
                 {
                     title: 'Deskripsi',
                     dataIndex: 'desc',
-                    defaultSortOrder: 'ascend',
                     render: (data) => (
                         <>
                             {data.map((status) => {
-                                let color = status == 0 ? "red" : "green";
+                                let color = status == ['false'] ? "red" : "green";
                                 return (
                                     <Tag style={{borderRadius: "15px"}} color={color} key={status}>
-                                        {status == 1 ? "Sudah" : "Belum"}
+                                        {status == ['true'] ? "Sudah" : "Belum"}
                                     </Tag>
                                 );
                             })}

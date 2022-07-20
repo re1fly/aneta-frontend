@@ -1,9 +1,12 @@
 import Navheader from "../../../../components/Navheader";
 import Appheader from "../../../../components/Appheader";
 import Adminfooter from "../../../../components/Adminfooter";
-import React, {Fragment} from "react";
+import React, {Fragment, useState} from "react";
 import {Link} from "react-router-dom";
-import { PageHeader} from "antd";
+import {notification, PageHeader} from "antd";
+import axios from "axios";
+import {BASE_URL} from "../../../../api/Url";
+import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 
 function DataNilaiSpiritual() {
     const dataKelas = [
@@ -109,32 +112,66 @@ function DataNilaiSpiritual() {
             "max_student": 40,
         },
     ]
-    const dataSiswa = [
-        {
-            "id_siswa": 10,
-            "nama_siswa": 'Muhammad Aziz'
-        },
-        {
-            "id_siswa": 11,
-            "nama_siswa": 'Muhammad Khoirul'
-        },
-        {
-            "id_siswa": 12,
-            "nama_siswa": 'Troy Gumelar'
-        },
-        {
-            "id_siswa": 13,
-            "nama_siswa": 'Adi Sucipto'
-        },
-        {
-            "id_siswa": 14,
-            "nama_siswa": 'Joko Lee'
-        },
-        {
-            "id_siswa": 15,
-            "nama_siswa": 'Coki Pardede'
+
+    const academic = localStorage.getItem("academic_year");
+    const [dataSiswa, setDataSiswa] = useState(null)
+    const [jmlPenilaian, setjmlPenilaian] = useState(null)
+
+    const _getDataSiswa = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
         }
-    ]
+        axios
+            .post(
+                BASE_URL, {
+                    "processDefinitionId": "getdatainputpenilaian:1:48bd60b3-00e3-11ed-9ea6-c6ec5d98c2df",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_data",
+                            "type": "json",
+                            "value": {
+                                "academic_year_id": academic,
+                                "class_id": data.id_class_filter,
+                                "subjects_id": data.id_mapel_filter,
+                                "competence_aspect_id": 3
+                            }
+                        }
+                    ]
+                }
+                ,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataRes = JSON.parse(response.data.variables[2].value);
+                const resCode = dataRes.status;
+                const dataSiswa = dataRes.data.siswa;
+                const penilaian = dataRes.data.count_p;
+                console.log(dataRes)
+
+                if (resCode === 200) {
+                    setjmlPenilaian(penilaian)
+                    setDataSiswa(dataSiswa);
+                    notification.success({
+                        message: "Data Ditemukan",
+                        description: "Data Dapat dilihat dalam table",
+                        placement: 'top'
+                    })
+                } else {
+                    notification.info({
+                        message: "Not Found",
+                        description: "Data tidak ditemukan",
+                        placement: 'top'
+                    })
+                }
+            })
+    }
 
     return (
         <Fragment>
@@ -152,40 +189,8 @@ function DataNilaiSpiritual() {
                                 />
                             </div>
                         </div>
+                        <GetMapelKelas valueFilter={(e) => _getDataSiswa(e)}/>
                         <div className="row">
-                            <div className="col-lg-6 mb-3">
-                                <div className="form-group">
-                                    <select
-                                        className="form-control"
-                                        aria-label="Default"
-                                        name="pilih_kelas"
-                                    >
-                                        <option value="" selected disabled>
-                                            Pilih Kelas
-                                        </option>
-                                        {dataKelas.map((data) => (
-                                            <option value={data.id_class}>{data.class}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="col-lg-6 mb-3">
-                                <div className="form-group">
-                                    <select
-                                        className="form-control"
-                                        aria-label="Default"
-                                        name="pilih_kelas"
-                                    >
-                                        <option value="" selected disabled>
-                                            Pilih Mata Pelajaran
-                                        </option>
-                                        {dataMapel.map((data) => (
-                                            <option className="text-capitalize"
-                                                    value={data.id_course}>{data.course_name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
                             <div className="col-lg-12 pt-3">
                                 <div className="table-responsive-xl">
                                     <table className="table table-bordered">
@@ -203,7 +208,14 @@ function DataNilaiSpiritual() {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {dataSiswa.map((value) => (
+                                        { dataSiswa == null ?
+                                            <tr>
+                                                <th scope="row" style={{lineHeight: 3.5}}>Data Kosong</th>
+                                                <td scope="row" style={{lineHeight: 3.5}}>Data Kosong</td>
+                                                <td scope="row" style={{lineHeight: 3.5}}>Data Kosong</td>
+                                                <td scope="row" style={{lineHeight: 3.5}}>Data Kosong</td>
+                                            </tr>
+                                            : dataSiswa.map((value) => (
                                             <tr>
                                                 <th scope="row" style={{lineHeight: 3.5}}>{value.nama_siswa}</th>
                                                 <td>

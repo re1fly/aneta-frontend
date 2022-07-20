@@ -300,23 +300,6 @@ function DataAnakOrangtua() {
                 <Card className="card bg-lightblue border-0 text-grey-900">
                     <Row>
                         <Col span={12}>
-                            <Button className="mr-4" type="primary" shape="round" size='middle'
-                                    onClick={() => setIsViewSiswa(false)}>
-                                Tambah Data
-                            </Button>
-                            <Filter title1="Nama" title2="Tanggal Lahir"/>
-                            {/* <Dropdown overlay={_filterMenu}>
-                                <a className="ant-dropdown-link mr-4 font-bold"
-                                   onClick={e => e.preventDefault()}>
-                                    Filter by <DownOutlined/>
-                                </a>
-                            </Dropdown>
-                            <Dropdown overlay={_sortMenu}>
-                                <a className="ant-dropdown-link font-bold"
-                                   onClick={e => e.preventDefault()}>
-                                    Sort by <DownOutlined/>
-                                </a>
-                            </Dropdown> */}
                         </Col>
                         <Col span={12}>
                             <div className="float-right">

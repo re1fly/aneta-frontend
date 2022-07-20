@@ -2,25 +2,6 @@ import {Button, Card, DatePicker, Divider, Tooltip, Upload} from "antd";
 import {UserAddOutlined} from "@ant-design/icons";
 import React from "react";
 
-const ButtonFormOrtu = (props) => {
-    return (
-        <>
-            <Divider>
-                <Tooltip title="Tambahkan Orang Tua">
-                    <Button style={{
-                        marginTop: 10,
-                        width: '50px',
-                        height: '50px',
-                    }}
-                            onClick={props.viewFormOrtu}
-                            size='large' type="primary" shape="circle"
-                            icon={<UserAddOutlined/>}/>
-                </Tooltip>
-            </Divider>
-        </>
-    )
-}
-
 export const DataFormSiswaCreate = (props) => {
     return (
         <div className="container px-3 py-4">
@@ -33,14 +14,15 @@ export const DataFormSiswaCreate = (props) => {
                             <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                                 <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
                                     <i
-                                        onClick={() => props.setView}
+                                        onClick={props.setView}
                                         className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"
                                     ></i>
                                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                        Tambah Data Siswa & Orang Tua
+                                        {props.title}
                                     </h4>
                                 </div>
                                 <div className="card-body p-lg-5 p-4 w-100 border-0">
+                                    <h1 className="mb-4">Form Siswa</h1>
                                     <div className="row">
                                         <div className="col-lg-12 mb-5">
                                             <div className="d-flex justify-content-center">
@@ -261,7 +243,15 @@ export const DataFormSiswaCreate = (props) => {
                                             ></textarea>
                                         </div>
                                     </div>
-                                    {props.formOrtu ? <DataFormOrangtua setView={props.setView}/> : <ButtonFormOrtu  viewFormOrtu={props.viewFormOrtu}/>}
+                                    {<DataFormOrangtua setView={props.setView}
+                                                                        provSiswa="ACEH"
+                                                                        idProvSiswa="11"
+                                                                        kotaSiswa="KABUPATEN SIMEULUE"
+                                                                        idKotaSiswa="1101"
+                                                                        kecSiswa="TEUPAH SELATAN"
+                                                                        idKecSiswa="1101010"
+                                                                        kelurahanSiswa="LATIUNG"
+                                                                        idKelurahanSiswa="1101010001"/>}
                                 </div>
                             </div>
                         </form>

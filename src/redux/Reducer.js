@@ -11,6 +11,7 @@ const AddresReducer = {
 
 const ClassReducer = {
   AllClass: [],
+  SubClass: [],
 };
 
 const processReduce = {
@@ -76,6 +77,12 @@ export const ReducerClass = (state = ClassReducer, action) => {
     return {
       ...state,
       AllClass: action.value,
+    };
+  }
+  if (action.type === "SET_SUBCLASS") {
+    return {
+      ...state,
+      SubClass: action.value,
     };
   }
 

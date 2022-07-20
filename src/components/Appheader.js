@@ -219,7 +219,7 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/admin-tahun-akademik"
+                                            to="/admin-list-tahun-akademik"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
@@ -252,17 +252,6 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/admin-data-siswa"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-book mr-3"></i>
-                                            <span>Data Siswa</span>
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
                                             to="/admin-data-kelas"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
@@ -274,14 +263,15 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/admin-jadwal-pelajaran"
+                                            to="/admin-data-siswa"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
-                                            <i className="feather-calendar mr-3"></i>
-                                            <span>Jadwal Pelajaran</span>
+                                            <i className="feather-book mr-3"></i>
+                                            <span>Data Siswa</span>
                                         </NavLink>
                                     </li>
+
                                     <li className="has-droupdown nav-item">
                                         <Link to="#" className="navi-link">
                                             <i className="feather-book mr-2 droupdown-toggle"></i>
@@ -309,6 +299,17 @@ function Appheader() {
                                                 </NavLink>
                                             </li>
                                         </ul>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-jadwal-pelajaran"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-calendar mr-3"></i>
+                                            <span>Jadwal Pelajaran</span>
+                                        </NavLink>
                                     </li>
                                     <li>
                                         <NavLink

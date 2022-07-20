@@ -1,9 +1,9 @@
 import { applyMiddleware, combineReducers, createStore } from "redux";
 import {
   reducerSearch,
+  reducerProcessId,
   ReducerAddres,
   ReducerClass,
-  reducerProcessId,
 } from "./Reducer";
 import thunk from "redux-thunk";
 

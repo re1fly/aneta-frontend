@@ -21,16 +21,12 @@ function StatusPenilaian() {
         {
             key: '1',
             no: '1',
-            mataPelajaran: 'Pendidikan Agama',
+            mataPelajaran: 'Pendidikan Agama Islam',
             namaPendidik: 'Bambang S.Pd',
             pengetahuan: 'Ok',
-            keterangan: 'Ok',
+            keterampilan: 'Ok',
             sikapSpiritual: 'Ok',
             sikapSosial: 'Ok',
-            _pengetahuan: 'Ok',
-            _keterangan: 'Ok',
-            sikap_Spiritual: 'Ok',
-            sikap_Sosial: 'Ok',
             finalisasi: 'Ok',
             deskripsi: 'Ok',
         },
@@ -40,13 +36,9 @@ function StatusPenilaian() {
             mataPelajaran: 'PPKN',
             namaPendidik: 'Waluyo S.Pd',
             pengetahuan: 'Ok',
-            keterangan: 'Ok',
+            keterampilan: 'Ok',
             sikapSpiritual: 'Ok',
             sikapSosial: '-',
-            _pengetahuan: 'Ok',
-            _keterangan: 'Ok',
-            sikap_Spiritual: '-',
-            sikap_Sosial: 'Ok',
             finalisasi: '-',
             deskripsi: 'Ok',
         },
@@ -56,13 +48,9 @@ function StatusPenilaian() {
             mataPelajaran: 'Penjas',
             namaPendidik: 'Monica S.Pd',
             pengetahuan: '-',
-            keterangan: '-',
+            keterampilan: '-',
             sikapSpiritual: '-',
             sikapSosial: '-',
-            _pengetahuan: '-',
-            _keterangan: '-',
-            sikap_Spiritual: '-',
-            sikap_Sosial: '-',
             finalisasi: '-',
             deskripsi: '-',
         },
@@ -134,20 +122,20 @@ function StatusPenilaian() {
                             pagination={false}
                             bordered>
                             <Column align='center' title="No" dataIndex="no" key="no" />
-                            <Column align='center' width="15%" title="Mata Pelajaran" dataIndex="mataPelajaran" key="mataPelajaran" />
+                            <Column  width="15%" title="Mata Pelajaran" dataIndex="mataPelajaran" key="mataPelajaran" />
                             <Column align='center' width="15%" title="Nama Pendidik" dataIndex="namaPendidik" key="namaPendidik" />
                             <ColumnGroup title="Status Penilaian">
-                                <Column align='center' title="Peng." dataIndex="pengetahuan" key="pengetahuan" />
-                                <Column align='center' title="Ketr." dataIndex="keterangan" key="keterangan" />
-                                <Column align='center' title="Sik. Spr." dataIndex="sikapSpiritual" key="sikapSpiritual" />
-                                <Column align='center' title="Sik. Sos." dataIndex="sikapSosial" key="sikapSosial" />
+                                <Column align='center' title="Pengetahuan" dataIndex="pengetahuan" key="pengetahuan" />
+                                <Column align='center' title="Keterampilan" dataIndex="keterampilan" key="keterampilan" />
+                                <Column align='center' title="Sikap Spiritual" dataIndex="sikapSpiritual" key="sikapSpiritual" />
+                                <Column align='center' title="Sikap Sosial" dataIndex="sikapSosial" key="sikapSosial" />
                             </ColumnGroup>
-                            <ColumnGroup title="Status Penilaian">
+                            {/* <ColumnGroup title="Status Penilaian">
                                 <Column align='center' title="Peng." dataIndex="_pengetahuan" key="_pengetahuan" />
                                 <Column align='center' title="Ketr." dataIndex="_keterangan" key="_keterangan" />
                                 <Column align='center' title="Sik. Spr." dataIndex="sikap_Spiritual" key="sikap_Spiritual" />
                                 <Column align='center' title="Sik. Sos." dataIndex="sikap_Sosial" key="sikap_Sosial" />
-                            </ColumnGroup>
+                            </ColumnGroup> */}
                             <ColumnGroup title="Status Nilai Rapor">
                                 <Column align='center' title="Finalisasi" dataIndex="finalisasi" key="finalisasi" />
                                 <Column align='center' title="Deskripsi" dataIndex="deskripsi" key="deskripsi" />

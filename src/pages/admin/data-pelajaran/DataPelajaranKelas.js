@@ -28,7 +28,7 @@ import {FormAdminDataPelKelas} from "../../../components/form/AdminDataPelKelas"
 import axios from "axios";
 import {BASE_URL} from "../../../api/Url";
 import {FilterAcademic} from "../../../components/FilterAcademic";
-import {FilterKelas} from "../../../components/FilterKelas";
+import {FilterAllClass} from "../../../components/FilterKelas";
 import {searchGlobal} from "../../../redux/Action";
 import {useDispatch, useSelector} from "react-redux";
 import {dateNow} from "../../../components/misc/date";
@@ -79,7 +79,8 @@ function DataPelajaranKelas() {
                                 "x_academic_class.id as id_class",
                                 "x_academic_year.academic_year",
                                 "x_academic_year.id as id_academic",
-                                "x_academic_year.semester"
+                                "x_academic_year.semester",
+                                "x_academic_class.sub_class"
                             ],
                             "paginate": 10,
                             "join": [
@@ -144,9 +145,7 @@ function DataPelajaranKelas() {
             setDataPelajaran(dataPel)
             setBtnPagination(pagination);
 
-        }).catch(error => {
-            alert(error)
-        });
+        })
     }
 
     const _getAcademicYears = () => {
@@ -260,9 +259,7 @@ function DataPelajaranKelas() {
 
             setDataKelas(dataKelas)
 
-        }).catch(error => {
-            alert(error)
-        });
+        })
     }
 
     const _selectMapel = () => {
@@ -323,9 +320,7 @@ function DataPelajaranKelas() {
 
             setDataMapel(dataMapel)
 
-        }).catch(error => {
-            alert(error)
-        });
+        })
     }
 
     const _selectTahunAkademik = () => {
@@ -372,16 +367,13 @@ function DataPelajaranKelas() {
             const dataThAkademik = JSON.parse(response.data.variables[3].value)
             setDataTahunAkademik(dataThAkademik)
 
-        }).catch(error => {
-            alert(error)
-        });
+        })
     }
 
     useEffect(() => {
         _getDataPelajaran()
         _getAcademicYears()
         _selectKelas()
-        console.log('class',selectedClass)
     }, [paramsPage, academic, selectedClass, isViewDataPelajaranKelas])
 
     useEffect(() => {
@@ -451,8 +443,8 @@ function DataPelajaranKelas() {
                 "kondisi": [
                     {
                         "keterangan": "where",
-                        "kolom" : "x_academic_year.institute_id",
-                        "value" : institute
+                        "kolom": "x_academic_year.institute_id",
+                        "value": institute
                     },
                     {
                         "keterangan": "deleted_at",
@@ -507,17 +499,19 @@ function DataPelajaranKelas() {
 
     const data =
         dataPelajaran.map((data, index) => {
+            console.log(data)
             return {
-                no: index +1,
+                no: index + 1,
                 id: data.id_subjects,
                 idMataPelajaran: data.id_subjects_master,
                 mataPelajaran: data.nama_mata,
                 kode: data.code,
                 idKelas: data.id_class,
                 kelas: data.class,
+                subKelas: data.sub_class,
                 idTahunAkademik: data.id_academic,
                 tahunAkademik: data.academic_year,
-                semester: data.semester % 2 == 0 ? 'Genap' : 'Ganjil',
+                semester: data.semester,
                 status: data.aktiv
             }
         })
@@ -531,6 +525,11 @@ function DataPelajaranKelas() {
             {
                 title: "Kelas",
                 dataIndex: "kelas",
+                align: "center",
+            },
+            {
+                title: "Sub Kelas",
+                dataIndex: "subKelas",
                 align: "center",
             },
             {
@@ -555,7 +554,6 @@ function DataPelajaranKelas() {
             {
                 title: "Aksi",
                 dataIndex: "aksi",
-                defaultSortOrder: "descend",
                 align: "center",
                 render: (text, record) => (
                     <Space size="middle">
@@ -616,7 +614,7 @@ function DataPelajaranKelas() {
                 tag3: data.code,
                 kelas: data.class,
                 tahunAkademik: data.academic_year,
-                semester: data.semester % 2 == 0 ? 'Genap' : 'Ganjil',
+                semester: data.semester,
                 status: data.aktiv
             }
         })
@@ -750,10 +748,6 @@ function DataPelajaranKelas() {
                             >
                                 Tambah Data
                             </Button>
-                            <Filter
-                                title1="Tahun Akademik / Semester"
-                                title2="Kelas / Sub Kelas"
-                            />
                             {/* <Dropdown overlay={_filterMenu}>
                             <a className="ant-dropdown-link mr-4 font-bold"
                             onClick={e => e.preventDefault()}>
@@ -824,26 +818,28 @@ function DataPelajaranKelas() {
                         <label className="mont-font fw-600 font-xssss">
                             Kelas / Sub Kelas
                         </label>
-                        <FilterKelas getClass={(e) => {
-                            const {options, selectedIndex} = e.target;
-                            setSelectedClass(e.target.value)
-                            const namaKelas = (options[selectedIndex].text)
-                            notification.info({
-                                message: "Tahun Akademik",
-                                description: 'Memilih Data Kelas ' + namaKelas,
-                                placement: 'top'
-                            })
-                        }}
-                                     selectClass={dataKelas.map((data) => {
-                                             return (
-                                                 <>
-                                                     <option value={data.id_class}>
-                                                         {data.class} / {data.sub_class}
-                                                     </option>
-                                                 </>
-                                             )
-                                         }
-                                     )}/>
+                        <FilterAllClass
+                            getClass={(e) => {
+                                const {options, selectedIndex} = e.target;
+                                setSelectedClass(e.target.value)
+                                const namaKelas = (options[selectedIndex].text)
+                                notification.info({
+                                    message: "Tahun Akademik",
+                                    description: 'Memilih Data Kelas ' + namaKelas,
+                                    placement: 'top'
+                                })
+                            }}
+                            selectClass={dataKelas.map((data) => {
+                                    return (
+                                        <>
+                                            <option value={data.id_class}>
+                                                {data.class} / {data.sub_class}
+                                            </option>
+                                        </>
+                                    )
+                                }
+                            )}
+                        />
                     </div>
                 </div>
                 <div className="mt-4">
@@ -913,9 +909,7 @@ function DataPelajaranKelas() {
                 description: 'Data Pelajaran Kelas berhasil ditambahkan',
                 placement: 'top'
             })
-        }).catch(error => {
-            alert(error)
-        });
+        })
     }
 
     const FormCreate = () => {
@@ -987,9 +981,7 @@ function DataPelajaranKelas() {
                 description: 'Data pelajaran kelas berhasil di update',
                 placement: 'top'
             })
-        }).catch(error => {
-            alert(error)
-        });
+        })
     }
 
     const deleteData = (record) => {
@@ -1041,7 +1033,7 @@ function DataPelajaranKelas() {
                 isViewTable={() => setIsViewDataPelajaranKelas(true)}
                 title="Edit"
                 idKelas={selectedUser.idKelas}
-                namaKelas={selectedUser.kelas}
+                namaKelas={`${selectedUser.kelas} / ${selectedUser.subKelas}`}
                 selectKelas={dataKelas.map((data) => (
                     <option value={data.id_class}>{data.class} / {data.sub_class}</option>
                 ))}
@@ -1052,7 +1044,7 @@ function DataPelajaranKelas() {
                 ))}
                 idThAkademik={selectedUser.idTahunAkademik}
                 thAkademik={selectedUser.tahunAkademik}
-                semester={selectedUser.semester == "Ganjil" ? "1" : "2" }
+                semester={selectedUser.semester}
                 selectThAkademik={dataTahunAkademik.map((data) => (
                     <option value={data.id_academic_year}>{data.academic_year} / Semester {data.semester}</option>
                 ))}
@@ -1069,7 +1061,7 @@ function DataPelajaranKelas() {
                 isViewTable={() => setIsViewDataPelajaranKelas(true)}
                 title="View"
                 idKelas={selectedUser.idKelas}
-                namaKelas={selectedUser.kelas}
+                namaKelas={`${selectedUser.kelas} / ${selectedUser.subKelas}`}
                 idMapel={selectedUser.idMataPelajaran}
                 namaMapel={selectedUser.mataPelajaran}
                 idThAkademik={selectedUser.idTahunAkademik}

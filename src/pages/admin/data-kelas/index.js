@@ -419,6 +419,10 @@ export default function DataKelasAdmin() {
     const TableKelas = () => {
         const columns = [
             {
+                title: 'No',
+                dataIndex: 'no',
+            },
+            {
                 title: 'Nama Kelas',
                 dataIndex: 'namaKelas',
                 filters: [],
@@ -466,6 +470,7 @@ export default function DataKelasAdmin() {
 
         const allDataKelas = getKelas.map((data, index) => {
             return {
+                no: index + 1,
                 id: data.id_class,
                 namaKelas: data.class,
                 subKelas: data.sub_class,

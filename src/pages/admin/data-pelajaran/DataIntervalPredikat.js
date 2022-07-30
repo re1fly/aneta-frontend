@@ -30,6 +30,7 @@ function DataIntervalPredikat() {
     const [isViewEdit, setIsViewEdit] = useState(false);
     const [selectedData, setSelectedData] = useState(null);
 
+
     const getDataInterval = () => {
         axios.post(BASE_URL, {
                 "processDefinitionId": "c6097444-fb4b-11ec-ac5e-66fc627bf211",
@@ -141,7 +142,6 @@ function DataIntervalPredikat() {
                 ).then(function (response) {
                     const res = JSON.parse(response.data.variables[2].value)
                     const resCode = res.status
-
                     if (resCode === true) {
                         getDataInterval()
                         Swal.fire(
@@ -165,6 +165,7 @@ function DataIntervalPredikat() {
         })
 
     }
+
 
     useEffect(() => {
         getDataInterval()
@@ -237,6 +238,7 @@ function DataIntervalPredikat() {
 
 
         return {
+            no: index + 1,
             id: data.id_matpel,
             mataPelajaran: data.matpel,
             ta_smt: `${data.academic_year} / ${data.semester}`,
@@ -259,6 +261,10 @@ function DataIntervalPredikat() {
 
     const TabelDataPredikat = () => {
         const columns = [
+            {
+                title: 'No',
+                dataIndex: 'no',
+            },
             {
                 title: 'Mata Pelajaran',
                 dataIndex: 'mataPelajaran',
@@ -296,7 +302,6 @@ function DataIntervalPredikat() {
             {
                 title: 'Aksi',
                 dataIndex: 'aksi',
-                defaultSortOrder: 'descend',
                 align: "center",
                 render: (text, record) => (
                     <Space size="middle">

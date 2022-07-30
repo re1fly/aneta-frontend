@@ -541,9 +541,12 @@ function DataSiswaAdmin() {
 
     const columns = [
         {
+            title: "no",
+            dataIndex: "no",
+        },
+        {
             title: "NISN",
             dataIndex: "nis",
-            sorter: (a, b) => a.nis - b.nis,
         },
         {
             title: "Name",
@@ -634,6 +637,7 @@ function DataSiswaAdmin() {
         // const birthDate = `${day}-${month}-${year}`;
 
         return {
+            no: index + 1,
             id: siswa.id_siswa,
             user_id: siswa.user_id,
             id_profile: siswa.id,
@@ -952,7 +956,7 @@ function DataSiswaAdmin() {
                                     user_email_verified_at: "required",
                                     user_password: "required",
                                     user_institute: "required",
-                                    user_nisn: "required",
+                                    user_nisn: "required|unique:m_user_profile,nisn",
                                     user_place_of_birth: "required",
                                     user_date_of_birth: "required",
                                     user_mobile_phone: "required",
@@ -1170,7 +1174,7 @@ function DataSiswaAdmin() {
                 } else {
                     notification.error({
                         message: "Error",
-                        description: "Harap isi semua field",
+                        description: "Pastikan NISN belum pernah dibuat dan semua field telah di isi",
                         placement: "top",
                     });
                 }
@@ -1346,9 +1350,11 @@ function DataSiswaAdmin() {
                 setView={() => setIsViewSiswa(true)}
                 title="Tambah Siswa & Orang Tua"
                 submit={createSiswa}
-                selectKelas={dataClass.map((data) => (
-                    <option value={data.id}>{data.class}</option>
-                ))}
+                selectKelas={dataClass.map((data) => {
+                    return (
+                        <option value={data.id}>{data.class} - {data.sub_class}</option>
+                    )
+                })}
                 isDisabled={false}
                 disabledEmail={false}
                 provSiswa="ACEH"
@@ -1373,7 +1379,7 @@ function DataSiswaAdmin() {
                 nisnSiswa={selectedUser.nis}
                 namaSiswa={selectedUser.namaSiswa}
                 selectKelas={dataClass.map((data) => (
-                    <option value={data.id}>{data.class}</option>
+                    <option value={data.id}>{data.class} - {data.sub_class}</option>
                 ))}
                 idKelas={selectedUser.idKelas}
                 namaKelas={selectedUser.kelas}
@@ -1404,7 +1410,7 @@ function DataSiswaAdmin() {
                 nisnSiswa={selectedUser.nis}
                 namaSiswa={selectedUser.namaSiswa}
                 selectKelas={dataClass.map((data) => (
-                    <option value={data.id}>{data.class}</option>
+                    <option value={data.id}>{data.class} - {data.sub_class}</option>
                 ))}
                 idKelas={selectedUser.idKelas}
                 namaKelas={selectedUser.kelas}

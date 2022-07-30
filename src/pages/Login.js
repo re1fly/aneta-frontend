@@ -64,9 +64,7 @@ function Login() {
                     placement: 'top'
                 })
             }
-        }).catch(err => {
-            alert(err)
-        });
+        })
 
     };
 

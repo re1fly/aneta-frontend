@@ -7,13 +7,49 @@ import {Badge, Descriptions, notification, PageHeader, Space, Table, Tag} from "
 import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 import axios from "axios";
 import {BASE_URL} from "../../../../api/Url";
+import {DataNotFound} from "../../../../components/misc/DataNotFound";
 
 function RencanaBobot() {
     const academic = localStorage.getItem("academic_year");
-        const userId = localStorage.getItem("user_id");
+    const userId = localStorage.getItem("user_id");
     const [dataMapel, setDataMapel] = useState([]);
     const [dataKelas, setDataKelas] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null)
+    const [isDataAvailable, setIsDataAvailable] = useState(false)
+
+    const _checkDataMapel = (e) => {
+        axios
+            .post(
+                BASE_URL,
+                {
+                    "processDefinitionId": "perencanaanpenilaan:3:7809f971-1132-11ed-ac5e-66fc627bf211",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_data",
+                            "type": "json",
+                            "value": {
+                                "id_academic" : academic,
+                                "id_class"    : selectedClass,
+                                "id_pelajaran" : e.target.value,
+                                "ph" : "",
+                                "pts" : "",
+                                "pas" : ""
+                            }
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                const resData = JSON.parse(response.data.variables[2].value);
+                setIsDataAvailable(resData.code)
+            })
+    }
 
     const _getDataMapel = () => {
         axios
@@ -164,27 +200,24 @@ function RencanaBobot() {
                 data[el.name] = el.value;
             }
         }
+
         axios
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "GlobalInsertRecord:7:7777c884-d588-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "perencanaanpenilaan:3:7809f971-1132-11ed-ac5e-66fc627bf211",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_Insert",
+                            "name": "get_data",
                             "type": "json",
                             "value": {
-                                "tbl_name": "x_assessment_headerModel",
-                                "tbl_coloumn": {
-                                    "academic_year_id": academic,
-                                    "class_id": data.id_class_filter,
-                                    "subjects_id": data.id_mapel_filter,
-                                    "created_by" : userId,
-                                    "daily_assessment_bobot" : data.bobot_ph,
-                                    "mid_smt_assessment_bobot" : data.bobot_pts,
-                                    "end_smt_assessment_bobot" : data.bobot_pas
-                                }
+                                "id_academic" : academic,
+                                "id_class"    : data.id_class_filter,
+                                "id_pelajaran" : data.id_mapel_filter,
+                                "ph" : data.bobot_ph,
+                                "pts" : data.bobot_pts,
+                                "pas" : data.bobot_pas
                             }
                         }
                     ]
@@ -197,8 +230,8 @@ function RencanaBobot() {
             )
             .then(function (response) {
                 const dataRes = JSON.parse(response.data.variables[2].value);
-                const resCode = dataRes.status;
-                if(resCode == "success") {
+                const resCode = dataRes.code;
+                if(resCode == true) {
                     notification.success({
                         message: "Sukses",
                         description: "Input Bobot Perencanaan Sukses",
@@ -255,6 +288,7 @@ function RencanaBobot() {
                                             className="form-control"
                                             name="id_mapel_filter"
                                             required
+                                            onChange={(e) => _checkDataMapel(e)}
                                         >
                                             <option value="" selected disabled>
                                                 Pilih Mata Pelajaran
@@ -265,6 +299,7 @@ function RencanaBobot() {
                                         </select>
                                     </div>
                                 </div>
+                                { !isDataAvailable ? <DataNotFound/> :
                                 <div className="col-lg-12 pt-5">
                                     <div className="table-responsive-xl">
                                         <table className="table" style={{borderCollapse: 'collapse'}}>
@@ -323,6 +358,7 @@ function RencanaBobot() {
                                         </div>
                                     </div>
                                 </div>
+                                }
                             </div>
                         </form>
                     </div>

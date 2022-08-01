@@ -14,7 +14,6 @@ function NilaiSpiritual() {
     const userId = localStorage.getItem("user_id");
     const [dataMapel, setDataMapel] = useState([]);
     const [dataKelas, setDataKelas] = useState([]);
-    const [isChecked, setIsChecked] = useState(false);
     const [dataKompetensi, setDataKompetensi] = useState([]);
     const [totalPenilaian, setTotalPenilaian] = useState(0);
     const [selectedClass, setSelectedClass] = useState(null)
@@ -155,49 +154,16 @@ function NilaiSpiritual() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "a9ac1598-114b-11ed-9ea6-c6ec5d98c2df",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_join_where_sub",
+                            "name": "get_data",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_competence_detail",
-                                "select": [
-                                    "x_competence_detail.id as id_detail",
-                                    "x_competence_detail.competence_desc"
-
-                                ],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_competence",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_competence_detail",
-                                        "foregenkey": "competence_id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_competence",
-                                        "tbl_field": "academic_courses_id",
-                                        "tbl_value": e.target.value,
-                                        "operator": "="
-                                    }, {
-                                        "tbl_coloumn": "x_competence_detail",
-                                        "tbl_field": "competence_aspect_id",
-                                        "tbl_value": "3",
-                                        "operator": "="
-                                    }
-                                ],
-                                "order_coloumn": "x_competence_detail.competence_desc",
-                                "order_by": "asc"
+                                "id_matpel": e.target.value,
+                                "id_aspect": "3"
                             }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
                         }
                     ]
                 },
@@ -208,10 +174,11 @@ function NilaiSpiritual() {
                 }
             )
             .then(function (response) {
-                const competency = JSON.parse(response.data.variables[3].value);
-                const allCompetency = competency.data.data
+                const competency = JSON.parse(response.data.variables[2].value);
+                const allCompetency = competency.data
                 setDataKompetensi(allCompetency);
-                if(allCompetency.length == 0){
+                console.log(allCompetency)
+                if(allCompetency == null){
                     setTotalPenilaian(0)
                 }else{
                     setTotalPenilaian(1)
@@ -299,6 +266,7 @@ function NilaiSpiritual() {
             })
     }
 
+
     useEffect(() => {
         _getDataKelas()
     }, []);
@@ -368,7 +336,7 @@ function NilaiSpiritual() {
                                                 <thead>
                                                 <tr className='bg-current text-light'>
                                                     <th scope="col" style={{width: 500}}>Penilaian</th>
-                                                    <th scope="col" colspan="3" className='m-auto text-center'>Penilaian
+                                                    <th scope="col" colSpan="3" className='m-auto text-center'>Penilaian
                                                         1
                                                     </th>
                                                 </tr>
@@ -394,6 +362,7 @@ function NilaiSpiritual() {
                                                                 <>
                                                                     {[...Array(Number(totalPenilaian)).keys()]
                                                                         .map((item, index) => {
+                                                                            console.log(data.is_checked)
                                                                             return (
                                                                                 <td style={{borderRightStyle: 'hidden'}}>
                                                                                     <input
@@ -404,10 +373,7 @@ function NilaiSpiritual() {
                                                                                         name="kompetensi"
                                                                                         id={`kompetensi_${data.id_detail}_${index + 1}`}
                                                                                         key={data.id_detail}
-                                                                                        onChange={(e) => {
-                                                                                            setIsChecked(e?.target?.checked)
-                                                                                        }}
-                                                                                        value={isChecked}
+                                                                                        defaultChecked={data.is_checked}
                                                                                     />
                                                                                 </td>
                                                                             )

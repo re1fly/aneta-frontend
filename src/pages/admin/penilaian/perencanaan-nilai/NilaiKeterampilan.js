@@ -201,7 +201,7 @@ function NilaiKeterampilan() {
                                     }, {
                                         "tbl_coloumn": "x_competence_detail",
                                         "tbl_field": "competence_aspect_id",
-                                        "tbl_value": "1",
+                                        "tbl_value": "2",
                                         "operator": "="
                                     }
                                 ],

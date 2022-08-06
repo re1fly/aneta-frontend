@@ -198,6 +198,7 @@ function DataNilaiSpiritual() {
                                                                                 className="form-control"
                                                                                 aria-label="Default"
                                                                                 name={`${value.id_student}_${item.id_check}`}
+                                                                                required
                                                                             >
                                                                                 <option value="">
                                                                                     Pilih Penilaian

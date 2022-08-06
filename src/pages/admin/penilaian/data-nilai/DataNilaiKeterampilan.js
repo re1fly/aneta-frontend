@@ -186,6 +186,7 @@ function DataNilaiKeterampilan() {
                                                                             className="form-control"
                                                                             name={`${value.id_student}_${item.serial}_${item.id}`}
                                                                             placeholder="input nilai (contoh : 90)"
+                                                                            required
                                                                         />
                                                                     </td>
                                                                 ))}

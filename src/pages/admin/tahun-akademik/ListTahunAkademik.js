@@ -20,7 +20,8 @@ import {
     EditOutlined,
     DeleteOutlined,
     EyeOutlined,
-    EllipsisOutlined
+    EllipsisOutlined,
+    PoweroffOutlined
 } from "@ant-design/icons";
 
 import Search from "antd/es/input/Search";
@@ -86,7 +87,7 @@ export default function ListTahunAkademik() {
                         "value": {
                             "tbl_name": "x_academic_year",
                             "pagination": true,
-                            "total_result": 100,
+                            "total_result": 10,
                             "order_coloumn": "x_academic_year.is_active",
                             "order_by": "desc",
                             "data": [
@@ -112,8 +113,9 @@ export default function ListTahunAkademik() {
         ).then(function (response) {
             // console.log(response);
             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
+            console.log(tahunAkademik);
             setGetTahunAkademik(tahunAkademik?.data)
-            // setBtnPagination(tahunAkademik?.links)
+            setBtnPagination(tahunAkademik?.links)
         })
     }, [])
 
@@ -127,18 +129,18 @@ export default function ListTahunAkademik() {
                 tag3: '',
                 periodeAwal: data.periode_start,
                 periodeAkhir: data.periode_end,
-                tahunAkademikAktif: [data.is_active],                                                                                                                                           
+                tahunAkademikAktif: [data.is_active],
             }
         })
 
         return (
             <>
-                <div className="row">                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                <div className="row">
                     {data_sampel.map((value, index) => (
                         <div className="col-xl-4 col-lg-6 col-md-6" /*key={index}*/>
                             <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
                                 <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                                    {value.tahunAkademikAktif == "T" ? 'Aktif' : 'Tidak Aktif'}                                                                                                                                                                                                                                                 
+                                    {value.tahunAkademikAktif == "T" ? 'Aktif' : 'Tidak Aktif'}
                                 </span>
                                 <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
                                     overlay={_Account}>
@@ -251,7 +253,8 @@ export default function ListTahunAkademik() {
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailTahunAkademik(record)} />
+                        <PoweroffOutlined onClick={() => setAktifTahunAkademik(record)} />
+                        {/* <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailTahunAkademik(record)} /> */}
                         <EditOutlined style={{ color: "blue" }} onClick={() => viewEditTahunAkademik(record)} />
                         <DeleteOutlined style={{ color: 'red' }} onClick={() => deleteTahunAkademik(record)} />
                     </Space>
@@ -284,8 +287,8 @@ export default function ListTahunAkademik() {
                     rowClassName="bg-greylight text-grey-900"
                     scroll={{ X: 400 }}
                 />
-                {/* <div className='text-center mt-4'>
-                    {btnPagination.map((dataBtn) => {
+               <div className='text-center mt-4'>
+                    {btnPagination?.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
                         const label = labelBtn
                             .replace(/(&laquo\;)/g, "")
@@ -308,7 +311,7 @@ export default function ListTahunAkademik() {
                             </Button>
                         );
                     })}
-                </div> */}
+                </div>
             </>
         )
     };
@@ -577,21 +580,20 @@ export default function ListTahunAkademik() {
             ]
         }).then(function (response) {
             const dataRes = JSON.parse(response.data.variables[2].value)
-            console.log(dataRes);
             if (dataRes.status == 'success') {
                 // setIsViewPelajaran(true)
                 notification.success({
-                  message: 'Sukses',
-                  description: 'Tahun Akademik berhasil ditambahkan.',
-                  placement: 'top'
+                    message: 'Sukses',
+                    description: 'Tahun Akademik berhasil ditambahkan.',
+                    placement: 'top'
                 })
-              } else {
+            } else {
                 notification.error({
-                  message: 'Error',
-                  description: 'Harap isi semua field',
-                  placement: 'top'
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
                 })
-              }
+            }
             if (data.tahunAkademik_aktif == "T") {
                 localStorage.setItem('academic_year', dataRes.id);
                 localStorage.setItem('year', data.tahun_akademik);
@@ -709,6 +711,57 @@ export default function ListTahunAkademik() {
         })
     }
 
+    const setAktifTahunAkademik = (record) => {
+        Swal.fire({
+            title: 'Apakah anda yakin merubah tahun akademik aktif?',
+            // text: "Anda tidak dapat mengembalikan data yang sudah terhapus",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Batalkan',
+            confirmButtonText: 'Ya',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post(BASE_URL, {
+                    "processDefinitionId": "academicyearchange:1:2c451389-0cbd-11ed-ac5e-66fc627bf211",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_data",
+                            "type": "json",
+                            "value": {
+                                "institute_id": institute,
+                                "academic_id": record.id
+                            }
+                        }
+                    ]
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                }
+                ).then(function (response) {
+                    // console.log(response);
+                    const valueRes = response.data.variables[2].value
+                    const valueResObj = JSON.parse(valueRes)
+                    console.log(valueResObj);
+                    if (valueResObj.status == "success") {
+                        localStorage.setItem('academic_year', record.id);
+                        localStorage.setItem('year', record.tahunAkademik);
+                        localStorage.setItem('semester', record.semester);
+                    }
+                    Swal.fire(
+                        'Tahun Akademik Aktif telah diganti!',
+                        'Tahun Akademik Aktif saat ini ' + record.tahunAkademik + ' Semester ' + record.semester,
+                        'success'
+                    )
+                    pageLoad()
+                })
+            }
+        })
+    }
+
     const viewCreateAkademik = () => {
         setIsViewCreate(true)
         setIsViewTahunAkademik(false)
@@ -732,6 +785,11 @@ export default function ListTahunAkademik() {
         setIsViewDetail(true)
     }
 
+    const setAktif = (record) => {
+        setSelectedUser(record)
+
+    }
+
     const FormCreate = () => {
         return (
             <FormAdminTahunAkademik
@@ -753,15 +811,15 @@ export default function ListTahunAkademik() {
                 setView={() => setIsViewTahunAkademik(true)}
                 title="Edit Tahun Akademik"
                 submit={editTahunAkademik}
-                id = {selectedUser.id}
+                id={selectedUser.id}
                 tahunAkademik={selectedUser.tahunAkademik}
-                semester = {selectedUser.semester}
-                periodeAwal = {selectedUser.periodeAwal}
-                periodeAkhir = {selectedUser.periodeAkhir}
-                tahunAkademikAktif = {selectedUser.tahunAkademikAktif[0]}
-                jumlahMurid = {selectedUser.jumlahMurid}
-                jumlahGuru = {selectedUser.jumlahGuru}
-                jumlahStaff = {selectedUser.jumlahStaff}
+                semester={selectedUser.semester}
+                periodeAwal={selectedUser.periodeAwal}
+                periodeAkhir={selectedUser.periodeAkhir}
+                tahunAkademikAktif={selectedUser.tahunAkademikAktif[0]}
+                jumlahMurid={selectedUser.jumlahMurid}
+                jumlahGuru={selectedUser.jumlahGuru}
+                jumlahStaff={selectedUser.jumlahStaff}
                 isDisabled={false}
                 getTahunAkademik={getTahunAkademik}
                 isDisabledStatus={true}
@@ -776,15 +834,15 @@ export default function ListTahunAkademik() {
                 setView={() => setIsViewTahunAkademik(true)}
                 title="Detail Tahun Akademik"
                 submit={creatTahunAkademik}
-                id = {selectedUser.id}
-                tahunAkademik = {selectedUser.tahunAkademik}
-                semester = {selectedUser.semester}
-                periodeAwal = {selectedUser.periodeAwal}
-                periodeAkhir = {selectedUser.periodeAkhir}
-                tahunAkademikAktif = {selectedUser.tahunAkademikAktif[0]}
-                jumlahMurid = {selectedUser.jumlahMurid}
-                jumlahGuru = {selectedUser.jumlahGuru}
-                jumlahStaff = {selectedUser.jumlahStaff}
+                id={selectedUser.id}
+                tahunAkademik={selectedUser.tahunAkademik}
+                semester={selectedUser.semester}
+                periodeAwal={selectedUser.periodeAwal}
+                periodeAkhir={selectedUser.periodeAkhir}
+                tahunAkademikAktif={selectedUser.tahunAkademikAktif[0]}
+                jumlahMurid={selectedUser.jumlahMurid}
+                jumlahGuru={selectedUser.jumlahGuru}
+                jumlahStaff={selectedUser.jumlahStaff}
                 getTahunAkademik={getTahunAkademik}
                 isDisabled={true}
                 isDisabledStatus={true}

@@ -788,37 +788,43 @@ function DataPelajaranKelas() {
                     </div>
                 </Card>
                 <div className="px-3 row d-flex align-items-center">
-                    <div style={{width: '20%'}}>
+                    <div className="w-25 mr-4">
                         <label className="mont-font fw-600 font-xssss">
                             Tahun Akademik / Semester
                         </label>
-                        <FilterAcademic getYear={(e) => {
-                            const {options, selectedIndex} = e.target;
-                            setAcademic(e.target.value)
-                            setYear(options[selectedIndex].text)
-                            const selectedYear = (options[selectedIndex].text)
-                            notification.info({
-                                message: "Tahun Akademik",
-                                description: 'Memilih Data Akademik tahun ' + selectedYear,
-                                placement: 'top'
-                            })
-                        }}
-                                        selectYear={academicYears.map((data) => {
-                                                return (
-                                                    <>
-                                                        <option value={data.id_academic}>
-                                                            {data.academic_year} Semester {data.semester}
-                                                        </option>
-                                                    </>
-                                                )
-                                            }
-                                        )}/>
+                        <FilterAcademic
+                            getYear={(e) => {
+                                const {options, selectedIndex} = e.target;
+                                setAcademic(e.target.value)
+                                setYear(options[selectedIndex].text)
+                                const selectedYear = (options[selectedIndex].text)
+                                notification.info({
+                                    message: "Tahun Akademik",
+                                    description: 'Memilih Data Akademik tahun ' + selectedYear,
+                                    placement: 'top'
+                                })
+                            }}
+                            selectYear={academicYears.map((data) => {
+                                    return (
+                                        <>
+                                            <option value={data.id_academic}>
+                                                {data.academic_year} Semester {data.semester}
+                                            </option>
+                                        </>
+                                    )
+                                }
+                            )}
+                            academicNow={academic}
+                            id="filter_academic_datpelkelas"
+                        />
                     </div>
                     <div className="w-25">
                         <label className="mont-font fw-600 font-xssss">
                             Kelas / Sub Kelas
                         </label>
                         <FilterAllClass
+                            id="filter_data_pel_kelas"
+                            classNow=""
                             getClass={(e) => {
                                 const {options, selectedIndex} = e.target;
                                 setSelectedClass(e.target.value)

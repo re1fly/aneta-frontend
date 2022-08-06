@@ -40,7 +40,7 @@ export const FormAdminDataInterval = (props) => {
         }
 
         if (dMin > dMax) { //D min
-            document.getElementById('d_min_error').innerHTML = "Nilai harus lebih kecil dari nilai D Maksimal"
+            document.getElementById('d_min_error').innerHTML = "Nilai Predikat diatas harus benar"
         }
         if( dMin < dMax){
             document.getElementById('d_min_error').innerHTML = ""
@@ -82,7 +82,7 @@ export const FormAdminDataInterval = (props) => {
                                                            onKeyUp={(e) => {
                                                                setAMin(e.target.value)
                                                                setBMax(e.target.value - 1)
-                                                               setCMax(0)
+                                                               setCMax(bMax - 1)
                                                                setDMax(0)
                                                                checkValidation()
                                                            }}
@@ -172,7 +172,7 @@ export const FormAdminDataInterval = (props) => {
                                                                setDMax(e.target.value - 1)
                                                                checkValidation()
                                                            }}
-                                                           required
+                                                           disabled
                                                     />
                                                     <span id="c_min_error" style={{color: 'red'}}></span>
                                                 </div>
@@ -188,7 +188,7 @@ export const FormAdminDataInterval = (props) => {
                                                            name="nilai_c_max"
                                                            className="form-control"
                                                            defaultValue={props.nilai_c_max}
-                                                           required
+                                                           disabled
                                                            value={cMax}
                                                     />
                                                     <span id="c_max_error" style={{color: 'red'}}></span>
@@ -215,7 +215,7 @@ export const FormAdminDataInterval = (props) => {
                                                                setDMin(e.target.value)
                                                                checkValidation()
                                                            }}
-                                                           required
+                                                           disabled
                                                     />
                                                     <span id="d_min_error" style={{color: 'red'}}></span>
                                                 </div>
@@ -232,8 +232,8 @@ export const FormAdminDataInterval = (props) => {
                                                            name="nilai_d_max"
                                                            className="form-control"
                                                            defaultValue={props.nilai_d_max}
-                                                           value={dMax}
-                                                           required
+                                                           value={cMin-1}
+                                                           disabled
                                                     />
                                                     <span id="d_max_error" style={{color: 'red'}}></span>
                                                 </div>

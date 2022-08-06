@@ -57,6 +57,7 @@ function DataNilaiUjian() {
                     const dataRes = JSON.parse(response.data.variables[2].value);
                     const resCode = dataRes?.status;
                     const dataSiswa = dataRes?.data;
+                    console.log(dataSiswa)
                     const header = dataRes?.header_id;
 
                     if (resCode === 200) {

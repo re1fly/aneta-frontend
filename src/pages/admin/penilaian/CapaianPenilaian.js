@@ -339,6 +339,8 @@ function CapaianPenilaian() {
                                         Kelas / Sub Kelas
                                     </label>
                                     <FilterAllClass
+                                        id="filter_capaian_penilaian"
+                                        classNow={null}
                                         getClass={(e) => {
                                             const {options, selectedIndex} = e.target;
                                             setSelectedClass(e.target.value)

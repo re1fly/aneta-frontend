@@ -1,0 +1,19 @@
+.rapor-table td, .rapor-table th {
+    border: 1px solid black;
+}
+
+.left-margin {
+    margin-left: 15rem;
+}
+
+.riht-margin {
+    margin-right: 15rem;
+}
+
+.left-margin-l {
+    margin-left: 15rem;
+}
+
+.left-margin-xl {
+    margin-left: 25rem;
+}

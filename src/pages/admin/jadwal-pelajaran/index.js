@@ -13,7 +13,7 @@ import {
   MenuOutlined,
 } from "@ant-design/icons";
 
-import { Link } from 'react-router-dom';
+import { Link, useHistory} from 'react-router-dom';
 import axios from "axios";
 import Search from "antd/es/input/Search";
 import { BASE_URL } from "../../../api/Url";
@@ -57,52 +57,6 @@ export default function JadwalPelajaranAdmin() {
 
   const institute = localStorage.getItem('institute');
 
-  // useEffect(() => {
-  //   axios.post(BASE_URL,
-  //     {
-  //       "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
-  //       "returnVariables": true,
-  //       "variables": [
-  //         {
-  //           "name": "global_get_where",
-  //           "type": "json",
-  //           "value": {
-  //             "tbl_name": "referensi_flowable",
-  //             "pagination": false,
-  //             "total_result": 2,
-  //             "order_coloumn": "referensi_flowable.id",
-  //             "order_by": "asc",
-  //             "data": [
-  //               {
-  //                 "kondisi": "where",
-  //                 "tbl_coloumn": "key",
-  //                 "tbl_value": "globaljoinsubwhereget",
-  //                 "operator": "="
-  //               }, {
-  //                 "kondisi": "where",
-  //                 "tbl_coloumn": "status",
-  //                 "tbl_value": "1",
-  //                 "operator": "="
-  //               }
-  //             ],
-  //             "tbl_coloumn": [
-  //               "*"
-  //             ]
-  //           }
-  //         }
-  //       ]
-  //     }, {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     }
-  //   }).then(function (response) {
-  //     // console.log(response);
-  //     const data = JSON.parse(response?.data?.variables[2]?.value)
-  //     const processId = data[0]?.proses_def_id
-  //     setGetProcessDefId(processId)
-  //   })
-  // })
-
   useEffect(() => {
     axios.post(BASE_URL,
       {
@@ -130,6 +84,8 @@ export default function JadwalPelajaranAdmin() {
                   "value": ""
                 }
               ],
+              "order_by" : "asc",
+              "order_coloumn" : "class",
               "groupby": "class"
             }
           }
@@ -151,6 +107,11 @@ export default function JadwalPelajaranAdmin() {
       kelas: data.class,
     }
   })
+
+  let history = useHistory();
+  const handleSubClass = () => {
+    history.push(`/admin-jadwal-pelajaran-sub-kelas/${"Kelas 2"}`)
+  }
 
   const ViewPelajaran = () => {
     return (
@@ -200,7 +161,9 @@ export default function JadwalPelajaranAdmin() {
                         to={{ pathname: `/admin-jadwal-pelajaran-sub-kelas` }}
                       >
                         <div
-                          className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center">
+                          className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
+                          onClick={handleSubClass}
+                          >
                           <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.kelas}</h2>
                         </div>
                       </Link>

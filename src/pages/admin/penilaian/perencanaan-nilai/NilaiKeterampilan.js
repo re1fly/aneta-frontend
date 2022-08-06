@@ -180,7 +180,8 @@ function NilaiKeterampilan() {
                                 "tbl_induk": "x_competence_detail",
                                 "select": [
                                     "x_competence_detail.id as id_detail",
-                                    "x_competence_detail.competence_desc"
+                                    "x_competence_detail.competence_desc",
+                                    "x_competence_detail.code"
 
                                 ],
                                 "paginate": 1000,
@@ -506,7 +507,7 @@ function NilaiKeterampilan() {
                                                                 color: 'black',
                                                                 textTransform: 'capitalize'
                                                             }}>
-                                                                {data.competence_desc}
+                                                                {data.code} {data.competence_desc}
                                                             </th>
                                                             {totalPenilaian > 0 &&
                                                                 <>

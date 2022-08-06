@@ -79,7 +79,7 @@ function DataNilaiPengetahuan() {
                 data[el.name] = el.value;
             }
         }
-        console.log(data)
+        console.log('dataForm : ',data)
         const splitObject = o => Object.keys(o).map(e => {
             let id_student = e.split("_")[0]
             let serial = e.split("_")[1]
@@ -93,6 +93,7 @@ function DataNilaiPengetahuan() {
                 }
             )
         });
+        console.log('data json : ', splitObject(data))
 
         axios
             .post(
@@ -119,7 +120,6 @@ function DataNilaiPengetahuan() {
             .then(function (response) {
                 const dataRes = JSON.parse(response.data.variables[2].value);
                 const resCode = dataRes.code;
-
                 if (resCode === true) {
                     notification.success({
                         message: "Sukses",
@@ -182,7 +182,8 @@ function DataNilaiPengetahuan() {
                                                                     textTransform: 'capitalize'
                                                                 }}>{value.nama_siswa}</th>
                                                             {
-                                                                jmlPenilaian.map((item, index) => (
+                                                                jmlPenilaian.map((item, index) => {
+                                                                    return(
                                                                     <td>
                                                                         <input
                                                                             type="text"
@@ -190,9 +191,11 @@ function DataNilaiPengetahuan() {
                                                                             key={index}
                                                                             name={`${value.id_student}_${item.serial}_${item.id}`}
                                                                             placeholder="input nilai (contoh : 90)"
+                                                                            required
                                                                         />
                                                                     </td>
-                                                                ))}
+                                                                )})
+                                                            }
                                                         </tr>
                                                     ))}
                                                 </tbody>

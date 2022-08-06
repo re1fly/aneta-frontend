@@ -15,9 +15,12 @@ function NilaiPengetahuan() {
     const [dataMapel, setDataMapel] = useState(null);
     const [dataKelas, setDataKelas] = useState([]);
     const [dataKompetensi, setDataKompetensi] = useState([null]);
+    const [dataPerencanaan, setDataPerencanaan] = useState([null]);
     const [totalPenilaian, setTotalPenilaian] = useState(0);
     const [isChecked, setIsChecked] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null)
+    const [isDataAvailable, setIsDataAvailable] = useState(false)
+
     let jumlahPenilaian = [];
 
     jumlahPenilaian = new Array(20).fill().map((e, i) => {
@@ -111,7 +114,6 @@ function NilaiPengetahuan() {
             .then(function (response) {
                 const dataMapelApi = JSON.parse(response.data.variables[3].value);
                 const getMapel = dataMapelApi?.data?.data
-
                 setDataMapel(getMapel);
             })
     }
@@ -171,49 +173,18 @@ function NilaiPengetahuan() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "45251c4d-1171-11ed-ac5e-66fc627bf211",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_join_where_sub",
+                            "name": "get_data",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_competence_detail",
-                                "select": [
-                                    "x_competence_detail.id as id_detail",
-                                    "x_competence_detail.competence_desc"
-
-                                ],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_competence",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_competence_detail",
-                                        "foregenkey": "competence_id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_competence",
-                                        "tbl_field": "academic_courses_id",
-                                        "tbl_value": e.target.value,
-                                        "operator": "="
-                                    }, {
-                                        "tbl_coloumn": "x_competence_detail",
-                                        "tbl_field": "competence_aspect_id",
-                                        "tbl_value": "1",
-                                        "operator": "="
-                                    }
-                                ],
-                                "order_coloumn": "x_competence_detail.competence_desc",
-                                "order_by": "asc"
+                                "id_aspect": 1,
+                                "id_class": selectedClass,
+                                "id_matpel": e.target.value,
+                                "id_academic": academic
                             }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
                         }
                     ]
                 },
@@ -224,9 +195,21 @@ function NilaiPengetahuan() {
                 }
             )
             .then(function (response) {
-                const competency = JSON.parse(response.data.variables[3].value);
-                const allCompetency = competency?.data?.data
+                const competency = JSON.parse(response.data.variables[2].value);
+                const allPerencanaan = competency?.data
+                const resCode = competency?.code
+                const allCompetency = allPerencanaan?.kompetensi || []
+                const penilaian = allPerencanaan?.jumlah_penilaian
+                console.log(competency)
+
+                setDataPerencanaan(allPerencanaan);
                 setDataKompetensi(allCompetency);
+                setTotalPenilaian(penilaian)
+                if(resCode == 400 || resCode == 500){
+                    setIsDataAvailable(false)
+                }else if (resCode == 200){
+                    setIsDataAvailable(true)
+                }
             })
     }
 
@@ -278,6 +261,7 @@ function NilaiPengetahuan() {
             planing: allPlaning,
             kompetensi: allCompetency
         }
+        console.log(insertToApi)
 
         axios
             .post(
@@ -301,8 +285,8 @@ function NilaiPengetahuan() {
             )
             .then(function (response) {
                 const dataRes = JSON.parse(response.data.variables[2].value);
+                console.log(dataRes)
                 const resCode = dataRes.code;
-
                 if (resCode === 'true') {
                     notification.success({
                         message: "Sukses",
@@ -357,7 +341,7 @@ function NilaiPengetahuan() {
                                                 Pilih Kelas
                                             </option>
                                             {dataKelas.map((data) => (
-                                                <option value={data.id}>{data.class} / {data.sub_class}</option>
+                                                <option value={data.id}>{data.class} / {data.sub_class} {data.id}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -373,7 +357,7 @@ function NilaiPengetahuan() {
                                                 Pilih Mata Pelajaran
                                             </option>
                                             {dataMapel == null ? null : dataMapel?.map((data) => (
-                                                <option value={data.id_subject}>{data.nama_mata}</option>
+                                                <option value={data.id_subject}>{data.nama_mata} {data.id_subject}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -406,7 +390,6 @@ function NilaiPengetahuan() {
                                                     <thead>
                                                     <tr className='bg-current text-light text-center'>
                                                         <th scope="col">Penilaian</th>
-
                                                         {
                                                             totalPenilaian > 0 &&
                                                             <>
@@ -423,7 +406,7 @@ function NilaiPengetahuan() {
                                                     <tbody>
                                                     <tr>
                                                         <th scope="row">Kelompok / Teknik Penilaian</th>
-                                                        {totalPenilaian > 0 &&
+                                                        {dataPerencanaan.planing.length == 0 ?totalPenilaian > 0 &&
                                                             <>
                                                                 {[...Array(Number(totalPenilaian)).keys()]
                                                                     .map((data, index) => {
@@ -447,12 +430,75 @@ function NilaiPengetahuan() {
                                                                             </td>
                                                                         )
                                                                     })}
-                                                            </>
+                                                            </> :
+                                                            dataPerencanaan.planing.map((data) => {
+                                                                if(data.assessment_technique_id == 1){
+                                                                    return (
+                                                                        <td>
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='teknik_penilaian'
+                                                                            >
+                                                                                <option value="1" selected>
+                                                                                    Tes Lisan
+                                                                                </option>
+                                                                                <option value="2">
+                                                                                    Tes Tulis
+                                                                                </option>
+                                                                                <option value="3">
+                                                                                    Penugasan
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                    )
+                                                                }else if(data.assessment_technique_id == 2){
+                                                                    return (
+                                                                        <td>
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='teknik_penilaian'
+                                                                            >
+                                                                                <option value="1" >
+                                                                                    Tes Lisan
+                                                                                </option>
+                                                                                <option value="2" selected>
+                                                                                    Tes Tulis
+                                                                                </option>
+                                                                                <option value="3">
+                                                                                    Penugasan
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                    )
+                                                                }else if(data.assessment_technique_id == 3){
+                                                                    return (
+                                                                        <td>
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='teknik_penilaian'
+                                                                            >
+                                                                                <option value="1">
+                                                                                    Tes Lisan
+                                                                                </option>
+                                                                                <option value="2">
+                                                                                    Tes Tulis
+                                                                                </option>
+                                                                                <option value="3" selected>
+                                                                                    Penugasan
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                    )
+                                                                }
+                                                            })
                                                         }
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Bobot Teknik Penilaian</th>
-                                                        {totalPenilaian > 0 &&
+                                                        {dataPerencanaan.planing.length == 0 ? totalPenilaian > 0 &&
                                                             <>
                                                                 {[...Array(Number(totalPenilaian)).keys()]
                                                                     .map((data, index) => {
@@ -467,12 +513,25 @@ function NilaiPengetahuan() {
                                                                             </td>
                                                                         )
                                                                     })}
-                                                            </>
+                                                            </> :
+                                                            dataPerencanaan.planing.map((data) => {
+                                                                return(
+                                                                    <td>
+                                                                        <input
+                                                                            type="number"
+                                                                            className="form-control"
+                                                                            name='bobot_penilaian'
+                                                                            placeholder="isi bobot penilaian"
+                                                                            defaultValue={data.assessment_bobot}
+                                                                        />
+                                                                    </td>
+                                                                )
+                                                            })
                                                         }
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Nama Penilaian</th>
-                                                        {totalPenilaian > 0 &&
+                                                        {dataPerencanaan.planing.length == 0 ? totalPenilaian > 0 &&
                                                             <>
                                                                 {[...Array(Number(totalPenilaian)).keys()]
                                                                     .map((data, index) => {
@@ -487,7 +546,20 @@ function NilaiPengetahuan() {
                                                                             </td>
                                                                         )
                                                                     })}
-                                                            </>
+                                                            </> :
+                                                            dataPerencanaan.planing.map((data) => {
+                                                                return (
+                                                                    <td>
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control"
+                                                                            name='nama_penilaian'
+                                                                            placeholder="isi nama penilaian"
+                                                                            defaultValue={data.assessment_name}
+                                                                        />
+                                                                    </td>
+                                                                )
+                                                            })
                                                         }
                                                     </tr>
                                                     <tr style={{borderRightStyle: 'hidden'}}>
@@ -509,9 +581,9 @@ function NilaiPengetahuan() {
                                                                     color: 'black',
                                                                     textTransform: 'capitalize'
                                                                 }}>
-                                                                    {data?.competence_desc}
+                                                                    {data?.competence_code} {data?.competence_desc}
                                                                 </th>
-                                                                {totalPenilaian > 0 &&
+                                                                {data.value.length == 0 ? totalPenilaian > 0 &&
                                                                     <>
                                                                         {[...Array(Number(totalPenilaian)).keys()]
                                                                             .map((item, index) => {
@@ -521,7 +593,6 @@ function NilaiPengetahuan() {
                                                                                             type="checkbox"
                                                                                             className="form-control"
                                                                                             style={{zoom: 0.4}}
-                                                                                            // name={`kompetensi_${data.id_detail}_${index + 1}`}
                                                                                             name="kompetensi"
                                                                                             id={`kompetensi_${data?.id_detail}_${index + 1}`}
                                                                                             key={data?.id_detail}
@@ -533,38 +604,31 @@ function NilaiPengetahuan() {
                                                                                     </td>
                                                                                 )
                                                                             })}
-                                                                    </>
+                                                                    </> :
+                                                                    data.value.map((val,index) => {
+                                                                        console.log(val)
+                                                                        return(
+                                                                            <td style={{borderRightStyle: 'hidden'}}>
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    className="form-control"
+                                                                                    style={{zoom: 0.4}}
+                                                                                    name="kompetensi"
+                                                                                    id={`kompetensi_${val?.detail_id}_${index + 1}`}
+                                                                                    key={val?.detail_id}
+                                                                                    onChange={(e) => {
+                                                                                        setIsChecked(e?.target?.checked)
+                                                                                    }}
+                                                                                    value={isChecked}
+                                                                                    defaultChecked={val.is_checked}
+                                                                                />
+                                                                            </td>
+                                                                        )
+                                                                    })
                                                                 }
                                                             </tr>
                                                         ))
                                                     }
-                                                    {/*<tr style={{borderStyle: 'hidden'}}>*/}
-                                                    {/*    <th scope="row" style={{*/}
-                                                    {/*        borderRightStyle: 'hidden',*/}
-                                                    {/*        backgroundColor: 'white',*/}
-                                                    {/*        color: 'black'*/}
-                                                    {/*    }}>*/}
-                                                    {/*        3.1 Mengidentifikasi Gerakan Dasar Senam*/}
-                                                    {/*    </th>*/}
-                                                    {/*    {totalPenilaian > 0 &&*/}
-                                                    {/*        <>*/}
-                                                    {/*            {[...Array(Number(totalPenilaian)).keys()]*/}
-                                                    {/*                .map(data => {*/}
-                                                    {/*                    return (*/}
-                                                    {/*                        <td style={{borderRightStyle: 'hidden'}}>*/}
-                                                    {/*                            <input*/}
-                                                    {/*                                type="checkbox"*/}
-                                                    {/*                                className="form-control"*/}
-                                                    {/*                                style={{zoom: 0.4}}*/}
-                                                    {/*                                name={`kompetensi1_p${data + 1}`}*/}
-                                                    {/*                                placeholder="isi nama penilaian"*/}
-                                                    {/*                            />*/}
-                                                    {/*                        </td>*/}
-                                                    {/*                    )*/}
-                                                    {/*                })}*/}
-                                                    {/*        </>*/}
-                                                    {/*    }*/}
-                                                    {/*</tr>*/}
                                                     </tbody>
                                                 </table>
                                             </div>

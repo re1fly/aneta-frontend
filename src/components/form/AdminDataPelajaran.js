@@ -6,9 +6,6 @@ import Upload from "antd/es/upload/Upload";
 
 export const FormAdminPelajaran = (props) => {
     let disabledButton = props.isDisabled;
-    const handleChange = (e) => {
-        parseInt(e.target.value);
-    };
     return (
         <div className="container px-3 py-4">
             <div className="row">
@@ -104,13 +101,13 @@ export const FormAdminPelajaran = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    No Urut Rapor
+                                                    No urut Rapor
                                                 </label>
                                                 <input
                                                     type="text"
                                                     name='noUrut_rapor'
                                                     className="form-control"
-                                                    defaultValue={props.noUrutRapor}
+                                                    defaultValue={props.kode}
                                                     required
                                                     disabled={props.isDisabled}
                                                 />
@@ -132,15 +129,14 @@ export const FormAdminPelajaran = (props) => {
                                                     name="status"
                                                     required
                                                     disabled={props.isDisabled}
-                                                    onChange={handleChange}
                                                 >
-                                                    <option value={props.idStatus} selected disabled>
+                                                    <option value={props.status} selected disabled>
                                                         {props.status == null ? "Pilih Status" : props.status}
                                                     </option>
-                                                    <option value={true}>
+                                                    <option value="true">
                                                         Aktif
                                                     </option>
-                                                    <option value={false}>
+                                                    <option value="false">
                                                         Tidak Aktif
                                                     </option>
                                                 </select>

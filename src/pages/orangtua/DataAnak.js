@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import Adminfooter from "../../components/Adminfooter";
 import {
     Dropdown,
@@ -26,7 +26,6 @@ import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
 import Filter from '../../components/Filter';
 
-import { BASE_URL } from "../../api/Url";
 
 function DataAnakOrangtua() {
     const [grid, setGrid] = useState(true);
@@ -41,12 +40,7 @@ function DataAnakOrangtua() {
         },
     ]);
 
-    const [getDataAnak, setGetDataAnak] = useState([])
-    console.log(getDataAnak);
-
-    const userId = localStorage.getItem('user_id');
-
-    const onChange = ({ fileList: newFileList }) => {
+    const onChange = ({fileList: newFileList}) => {
         setFileList(newFileList);
     };
 
@@ -66,7 +60,7 @@ function DataAnakOrangtua() {
     };
 
 
-    const _onSelectMenu = ({ key }) => {
+    const _onSelectMenu = ({key}) => {
         message.info(`Click on item ${key}`);
     };
 
@@ -90,29 +84,37 @@ function DataAnakOrangtua() {
 
     const columns = [
         {
-            title: 'NISN',
-            dataIndex: 'nisn',
+            title: 'NIS',
+            dataIndex: 'nis',
             defaultSortOrder: 'ascend',
             // sorter: (a, b) => a.nis - b.nis,
         },
         {
             title: 'Name',
-            dataIndex: 'namaAnak',
+            dataIndex: 'namaSiswa',
+            filters: [
+                {
+                    text: 'John',
+                    value: 'John',
+                },
+                {
+                    text: 'James',
+                    value: 'James',
+                },
+            ],
+            onFilter: (value, record) => record.namaSiswa.indexOf(value) === 0,
+            sorter: (a, b) => a.namaSiswa.length - b.namaSiswa.length,
+            sortDirections: ['descend'],
         },
         {
             title: 'Tanggal Lahir',
-            dataIndex: 'tanggalLahirAnak',
+            dataIndex: 'tanggalLahir',
             defaultSortOrder: 'descend',
+            // sorter: (a, b) => a.tanggalLahir - b.tanggalLahir,
         },
         {
             title: 'Email',
-            dataIndex: 'emailAnak',
-            defaultSortOrder: 'descend',
-
-        },
-        {
-            title: 'Phone',
-            dataIndex: 'noHpAnak',
+            dataIndex: 'email',
             defaultSortOrder: 'descend',
 
         },
@@ -125,7 +127,7 @@ function DataAnakOrangtua() {
                     {status.map(status => {
                         let color = status.length > 5 ? 'red' : 'green';
                         return (
-                            <Tag style={{ borderRadius: '15px' }} color={color} key={status}>
+                            <Tag style={{borderRadius: '15px'}} color={color} key={status}>
                                 {status.toUpperCase()}
                             </Tag>
 
@@ -147,87 +149,46 @@ function DataAnakOrangtua() {
         }
     ];
 
-    const channelList = getDataAnak?.map((data, index) => {
-        return {
-            no: index + 1,
+    const channelList = [
+        {
+            nis: '001',
             imageUrl: 'user.png',
-            namaAnak: data.name,
-            nisn: data.nisn,
-            emailAnak: data.email,
-            tanggalLahirAnak: data.date_of_birth,
-            noHpAnak: data.mobile_phone,
-            status: []
-        }
-    })
+            namaSiswa: 'John Brown',
+            tanggalLahir: '01/01/2020',
+            tag1: '',
+            tag2: 'Kelas 5 A',
+            tag3: '',
+            email: 'johnbrown@email.com',
+            status: ['aktif'],
+        },
+        {
+            nis: '002',
+            imageUrl: 'user.png',
+            namaSiswa: 'John Cena',
+            tanggalLahir: '01/01/2020',
+            tag1: '',
+            tag2: 'Kelas 5 A',
+            tag3: '',
+            email: 'john@email.com',
+            status: ['aktif'],
+        },
+        {
+            nis: '003',
+            imageUrl: 'user.png',
+            namaSiswa: 'John Wick',
+            tanggalLahir: '01/01/2020',
+            tag1: '',
+            tag2: '',
+            tag3: 'Kelas 3 C',
+            email: 'johnwick@email.com',
+            status: ['aktif'],
+        },
+    ];
+
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
     }
-
-    useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "global_join_where_sub",
-                    "type": "json",
-                    "value": {
-                        "tbl_induk": "x_user_parent",
-                        "select": [
-                            "users.name",
-                            "m_user_profile.nisn",
-                            "m_user_profile.date_of_birth",
-                            "users.email",
-                            "m_user_profile.mobile_phone"
-
-                        ],
-                        "paginate": 10,
-                        "join": [
-                            {
-                                "tbl_join": "users",
-                                "refkey": "id",
-                                "tbl_join2": "x_user_parent",
-                                "foregenkey": "user_id"
-                            },
-                            {
-                                "tbl_join": "m_user_profile",
-                                "refkey": "user_id",
-                                "tbl_join2": "users",
-                                "foregenkey": "id"
-                            }
-
-                        ],
-                        "where": [
-                            {
-                                "tbl_coloumn": "x_user_parent",
-                                "tbl_field": "parent_id",
-                                "tbl_value": userId,
-                                "operator": "="
-                            }
-
-                        ],
-                        "order_coloumn": "users.name",
-                        "order_by": "asc"
-                    }
-                },
-                {
-                    "name": "page",
-                    "type": "string",
-                    "value": "1"
-                }
-            ]
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }
-        ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[3].value)
-            setGetDataAnak(dataRes?.data?.data)
-        })
-
-    }, [])
 
     const CardDataSiswa = () => (
         <div className="middle-sidebar-left mt-3">
@@ -236,10 +197,10 @@ function DataAnakOrangtua() {
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                         <div
                             className="card mb-4 d-block w-100 shadow-md rounded-lg p-4 border-0 text-center">
-                            <span
-                                className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                                Aktif
-                            </span>
+                                                <span
+                                                    className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                                    Aktif
+                                                </span>
 
                             <a
                                 href="/default-channel"
@@ -251,29 +212,29 @@ function DataAnakOrangtua() {
                                     className="p-1 w-100"
                                 />
                             </a>
-                            <h4 className="fw-700 font-xs mt-3 mb-3">{value.namaAnak}</h4>
+                            <h4 className="fw-700 font-xs mt-3 mb-3">{value.namaSiswa}</h4>
                             <div className="clearfix"></div>
                             {value.tag1 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
-                                    {value.tag1}
-                                </span>
+                            {value.tag1}
+                          </span>
                             ) : (
                                 ''
                             )}
                             {value.tag2 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 bg-lightblue d-inline-block text-grey-800 mb-1 mr-1">
-                                    {value.tag2}
-                                </span>
+                            {value.tag2}
+                          </span>
                             ) : (
                                 ''
                             )}
                             {value.tag3 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-info d-inline-block text-info mb-1">
-                                    {value.tag3}
-                                </span>
+                            {value.tag3}
+                          </span>
                             ) : (
                                 ''
                             )}
@@ -281,10 +242,10 @@ function DataAnakOrangtua() {
                             <div className="mt-4 mx-auto">
                                 <div className="row ml-3">
                                     <div className="col-3">
-                                        <p className="font-xssss float-left lh-1">NISN</p>
+                                        <p className="font-xssss float-left lh-1">NIS</p>
                                     </div>
                                     <div className="col-9">
-                                        <p className="font-xssss float-left lh-1">: {value.nisn}</p>
+                                        <p className="font-xssss float-left lh-1">: 001</p>
                                     </div>
                                 </div>
 
@@ -293,7 +254,7 @@ function DataAnakOrangtua() {
                                         <p className="font-xssss float-left lh-1">TTL</p>
                                     </div>
                                     <div className="col-9">
-                                        <p className="font-xssss float-left lh-1">: {value.tanggalLahirAnak}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.tanggalLahir}</p>
                                     </div>
                                 </div>
 
@@ -302,15 +263,7 @@ function DataAnakOrangtua() {
                                         <p className="font-xssss float-left lh-1">Email</p>
                                     </div>
                                     <div className="col-9">
-                                        <p className="font-xssss float-left lh-1">: {value.emailAnak}</p>
-                                    </div>
-                                </div>
-                                <div className="row ml-3">
-                                    <div className="col-3">
-                                        <p className="font-xssss float-left lh-1">Phone</p>
-                                    </div>
-                                    <div className="col-9">
-                                        <p className="font-xssss float-left lh-1">: {value.noHpAnak}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.email}</p>
                                     </div>
                                 </div>
                             </div>
@@ -323,12 +276,12 @@ function DataAnakOrangtua() {
 
     const TableDataSiswa = () => (
         <Table className="mt-4"
-            columns={columns}
-            dataSource={channelList}
-            onChange={onChangeTable}
-            pagination={{ position: ['bottomCenter'] }}
-            rowClassName="bg-greylight text-grey-900"
-            scroll={{ x: 400 }}
+               columns={columns}
+               dataSource={channelList}
+               onChange={onChangeTable}
+               pagination={{position: ['bottomCenter']}}
+               rowClassName="bg-greylight text-grey-900"
+               scroll={{ x: 400 }}
         />
     )
 
@@ -351,22 +304,22 @@ function DataAnakOrangtua() {
                         <Col span={12}>
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
-                                    onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
+                                        onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
                                 {grid == false ?
                                     <a>
-                                        <AppstoreOutlined style={{ fontSize: '30px' }}
-                                            onClick={() => setGrid(true)} />
+                                        <AppstoreOutlined style={{fontSize: '30px'}}
+                                                          onClick={() => setGrid(true)}/>
                                     </a> :
                                     <a>
-                                        <MenuOutlined style={{ fontSize: '30px' }}
-                                            onClick={() => setGrid(false)} />
+                                        <MenuOutlined style={{fontSize: '30px'}}
+                                                      onClick={() => setGrid(false)}/>
                                     </a>}
                             </div>
                         </Col>
                     </Row>
                 </Card>
 
-                {grid ? <CardDataSiswa /> : <TableDataSiswa />}
+                {grid ? <CardDataSiswa/> : <TableDataSiswa/>}
             </div>
         )
     }
@@ -380,7 +333,7 @@ function DataAnakOrangtua() {
                             <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                                 <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
                                     <i onClick={() => setIsViewSiswa(true)}
-                                        className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
+                                       className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                                         Tambah Data Siswa
                                     </h4>
@@ -389,7 +342,7 @@ function DataAnakOrangtua() {
                                     <div className="row">
                                         <div className="col-lg-12 mb-5">
                                             <div className="d-flex justify-content-center">
-                                                <Card className="bg-lightblue" style={{ width: 157 }}>
+                                                <Card className="bg-lightblue" style={{width: 157}}>
                                                     <ImgCrop rotate>
                                                         <Upload
                                                             className="avatar-uploader"
@@ -399,7 +352,7 @@ function DataAnakOrangtua() {
                                                             onChange={onChange}
                                                             onPreview={onPreview}
                                                         >
-                                                            {fileList.length < 1 && <PlusOutlined />}
+                                                            {fileList.length < 1 && <PlusOutlined/>}
                                                         </Upload>
                                                     </ImgCrop>
                                                 </Card>
@@ -414,7 +367,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         NISN
                                                     </label>
-                                                    <input type="number" className="form-control" />
+                                                    <input type="number" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -423,7 +376,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Nama Siswa
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -434,7 +387,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tempat Lahir
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -443,7 +396,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tanggal Lahir
                                                     </label>
-                                                    <input type="date" className="form-control" />
+                                                    <input type="date" className="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -454,7 +407,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Email
                                                     </label>
-                                                    <input type="email" className="form-control" />
+                                                    <input type="email" className="form-control"/>
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 mb-3">
@@ -462,7 +415,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         No. HP
                                                     </label>
-                                                    <input type="number" className="form-control" />
+                                                    <input type="number" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -473,7 +426,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Alamat
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -482,7 +435,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Provinsi
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -492,7 +445,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kecamatan
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -501,13 +454,13 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kelurahan
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
                                             <div className="col-lg-12">
                                                 <a className="bg-current text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    onClick={() => setIsViewFormSiswa(false)}
+                                                   onClick={() => setIsViewFormSiswa(false)}
                                                 >
                                                     Selanjutnya
                                                 </a>
@@ -539,7 +492,7 @@ function DataAnakOrangtua() {
                             <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                                 <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
                                     <i onClick={() => setIsViewSiswa(true)}
-                                        className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
+                                       className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                                         Tambah Data Siswa - OrangTua
                                     </h4>
@@ -552,7 +505,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Nama Orang Tua / Wali
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -561,7 +514,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Email
                                                     </label>
-                                                    <input type="email" className="form-control" />
+                                                    <input type="email" className="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -572,7 +525,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tempat Lahir
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -581,7 +534,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Tanggal Lahir
                                                     </label>
-                                                    <input type="date" className="form-control" />
+                                                    <input type="date" className="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -592,7 +545,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Email
                                                     </label>
-                                                    <input type="email" className="form-control" />
+                                                    <input type="email" className="form-control"/>
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 mb-3">
@@ -600,7 +553,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         No. HP
                                                     </label>
-                                                    <input type="number" className="form-control" />
+                                                    <input type="number" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -611,7 +564,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Alamat
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -620,7 +573,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Provinsi
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -630,7 +583,7 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kecamatan
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
@@ -639,13 +592,13 @@ function DataAnakOrangtua() {
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kelurahan
                                                     </label>
-                                                    <input type="text" className="form-control" />
+                                                    <input type="text" className="form-control"/>
                                                 </div>
                                             </div>
 
                                             <div className="col-lg-12">
                                                 <a className="bg-current text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    onClick={() => alert('saved')}
+                                                   onClick={() => alert('saved')}
                                                 >
                                                     Simpan
                                                 </a>
@@ -671,7 +624,7 @@ function DataAnakOrangtua() {
     const TambahSiswa = () => {
         return (
             <>
-                {isViewFormSiswa ? <DataFormSiswa /> : <DataFormOrangtua />}
+                {isViewFormSiswa ? <DataFormSiswa/> : <DataFormOrangtua/>}
             </>
 
         )
@@ -680,11 +633,11 @@ function DataAnakOrangtua() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
-                    {isViewSiswa ? <ViewSiswa /> : <TambahSiswa />}
-                    <Adminfooter />
+                    <Appheader/>
+                    {isViewSiswa ? <ViewSiswa/> : <TambahSiswa/>}
+                    <Adminfooter/>
                 </div>
             </div>
         </Fragment>

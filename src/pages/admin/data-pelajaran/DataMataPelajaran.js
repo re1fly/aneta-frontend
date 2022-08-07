@@ -54,12 +54,11 @@ export default function DataMataPelajaranAdmin() {
   const [year, setYear] = useState(localStorage.getItem('year'));
   const [academic, setAcademic] = useState(academicYear);
   const [academicYears, setAcademicYears] = useState([]);
-  // console.log(academicYears);
 
   const [getPelajaran, setGetPelajaran] = useState([]);
+  const [getKelompokBelajar, setGetKelompokBelajar] = useState([])
   const [btnPagination, setBtnPagination] = useState([]);
   const [paramsPage, setParamsPage] = useState("1");
-  const [getKelompokBelajar, setGetKelompokBelajar] = useState([])
 
   const [handleImage, setHandleImage] = useState('')
   const [_Img, setIMG] = useState('');
@@ -202,8 +201,7 @@ export default function DataMataPelajaranAdmin() {
     dispatch(getProcessId(["getdatajoinwhere"]))
   }, [])
 
-  const getListPelajaran = () => {
-
+  useEffect(() => {
     axios.post(BASE_URL,
       {
         "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
@@ -216,8 +214,9 @@ export default function DataMataPelajaranAdmin() {
               "tbl_induk": "x_academic_subject_master",
               "select": [
                 "x_academic_subject_master.*",
-                "r_kelompok_mapel.kelompok as kel_id",
                 "r_kelompok_mapel.id as id_mapel",
+                "r_kelompok_mapel.kelompok as kel_id",
+                "r_class_type.*",
                 "x_academic_year.id as id_academic",
                 "x_academic_subject_master.id as id_master"
               ],
@@ -231,6 +230,11 @@ export default function DataMataPelajaranAdmin() {
                 {
                   "tbl_join": "r_kelompok_mapel",
                   "foregenkey": "kel_id",
+                  "refkey": "id"
+                },
+                {
+                  "tbl_join": "r_class_type",
+                  "foregenkey": "class_type",
                   "refkey": "id"
                 }
               ],
@@ -255,86 +259,16 @@ export default function DataMataPelajaranAdmin() {
           {
             "name": "page",
             "type": "string",
-            "value": paramsPage
+            "value": "1"
           }
         ]
       }
     ).then(function (response) {
       const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
       setGetPelajaran(pelajaran?.data?.data)
-      const pagination = pelajaran?.data?.links;
-      // console.log(pagination);
-      setBtnPagination(pagination)
+      // const pagination = pelajaran?.data?.links
+      // setBtnPagination(pagination)
     })
-  }
-
-  useEffect(() => {
-
-    getListPelajaran()
-
-    // axios.post(BASE_URL,
-    //   {
-    //     "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
-    //     "returnVariables": true,
-    //     "variables": [
-    //       {
-    //         "name": "global_join_where",
-    //         "type": "json",
-    //         "value": {
-    //           "tbl_induk": "x_academic_subject_master",
-    //           "select": [
-    //             "x_academic_subject_master.*",
-    //             "r_kelompok_mapel.kelompok as kel_id",
-    //             "r_kelompok_mapel.id as id_mapel",
-    //             "x_academic_year.id as id_academic",
-    //             "x_academic_subject_master.id as id_master"
-    //           ],
-    //           "paginate": 10,
-    //           "join": [
-    //             {
-    //               "tbl_join": "x_academic_year",
-    //               "foregenkey": "academic_year_id",
-    //               "refkey": "id"
-    //             },
-    //             {
-    //               "tbl_join": "r_kelompok_mapel",
-    //               "foregenkey": "kel_id",
-    //               "refkey": "id"
-    //             }
-    //           ],
-    //           "where": [
-    //             {
-    //               "tbl_coloumn": "x_academic_subject_master",
-    //               "tbl_field": "academic_year_id",
-    //               "tbl_value": 65,
-    //               "operator": "="
-    //             },
-    //             {
-    //               "tbl_coloumn": "x_academic_subject_master",
-    //               "tbl_field": "deleted_at",
-    //               "tbl_value": "",
-    //               "operator": "="
-    //             }
-    //           ],
-    //           "order_coloumn": "x_academic_subject_master.updated_at",
-    //           "order_by": "desc"
-    //         }
-    //       },
-    //       {
-    //         "name": "page",
-    //         "type": "string",
-    //         "value": "1"
-    //       }
-    //     ]
-    //   }
-    // ).then(function (response) {
-    //   // console.log(response);
-    //   const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
-    //   setGetPelajaran(pelajaran?.data?.data)
-    //   console.log(pelajaran?.data?.data);
-    //   // const pagination = pelajaran?.data?.links
-    //   // setBtnPagination(pagination)
-    // })
 
     axios.post(BASE_URL,
       {
@@ -374,8 +308,7 @@ export default function DataMataPelajaranAdmin() {
             "select": [
               "x_academic_year.id as id_academic",
               "x_academic_year.academic_year",
-              "m_institutes.id",
-              "x_academic_year.semester"
+              "m_institutes.id"
             ],
             "paginate": 10,
             "join": [
@@ -416,14 +349,13 @@ export default function DataMataPelajaranAdmin() {
 
   const CardDataPelajaran = () => {
     const channelList = getPelajaran.map((pelajaran, index) => {
-      console.log(pelajaran);
       return {
         imageUrl: 'user.png',
         namaPelajaran: pelajaran.nama_mata,
         kode: pelajaran.code,
         tag2: '',
         tag3: '',
-        kelompok: pelajaran.kel_id,
+        kelompok: pelajaran.kelompok,
         noUrutRapor: pelajaran.urut_lapor,
         status: [pelajaran.status],
       }
@@ -547,11 +479,11 @@ export default function DataMataPelajaranAdmin() {
   };
 
   const TabelDataPelajaran = () => {
+    const color = 'green'
 
     const channelList = getPelajaran.map((pelajaran, index) => {
       return {
         no: index + 1,
-        idPelajaran: pelajaran.id_master,
         namaPelajaran: pelajaran.nama_mata,
         kode: pelajaran.code,
         idKelompok: pelajaran.id_mapel,
@@ -910,7 +842,7 @@ export default function DataMataPelajaranAdmin() {
     console.log(data)
 
     axios.post(BASE_URL, {
-      "processDefinitionId": "datamatapelajaraninsert1:15:87f224ed-01a8-11ed-9ea6-c6ec5d98c2df",
+      "processDefinitionId": "datamatapelajaraninsert1:13:a8f250c5-fc3d-11ec-ac5e-66fc627bf211",
       "returnVariables": true,
       "variables": [
         {
@@ -920,16 +852,19 @@ export default function DataMataPelajaranAdmin() {
             "data": {
               "code": "required",
               "nama_mata": "required",
-
               "urut_lapor": "required",
-              "kel_id": "required",
+              "kelompok": "required",
               "status": "required",
+              "deleted_at": "required",
+              "updated_at": "required"
             },
             "code": data.kode_pelajaran,
             "nama_mata": data.nama_pelajaran,
             "urut_lapor": data.noUrut_rapor,
-            "kel_id": data.kelompok,
+            "kelompok": 1,
             "status": data.status,
+            "deleted_at": dateNow,
+            "updated_at": dateNow
           }
         },
         {
@@ -943,14 +878,20 @@ export default function DataMataPelajaranAdmin() {
               "nama_mata": data.nama_pelajaran,
               "urut_lapor": data.noUrut_rapor,
               "status": data.status,
-              "kel_id": data.kelompok,
+              "deleted_at": dateNow,
+              "updated_at": dateNow
             }
           }
         },
         {
-          "name": "academic_year_id",
-          "type": "string",
-          "value": academicYear
+          "name": "r_kelompok_mapel",
+          "type": "json",
+          "value": {
+            "tbl_name": "r_kelompok_mapel",
+            "tbl_coloumn": {
+              "kel_id": 1
+            }
+          }
         },
         {
           "name": "image_data",
@@ -967,26 +908,23 @@ export default function DataMataPelajaranAdmin() {
         "Content-Type": "application/json",
       }
     }).then(function (response) {
-      // console.log("insert :", response);
-      const valueRes = response.data.variables[10].value
-      const valueResObj = JSON.parse(valueRes)
-      console.log(valueResObj);
-      if (valueResObj.status == 'success') {
-        setIsViewCreate(false)
-        setIsViewPelajaran(true)
-        notification.success({
-          message: 'Sukses',
-          description: 'Pelajaran berhasil ditambahkan.',
-          placement: 'top'
-        })
-        // pageLoad()
-      } else {
-        notification.error({
-          message: 'Error',
-          description: 'Harap isi semua field',
-          placement: 'top'
-        })
-      }
+      console.log("insert :", response);
+      // if (response.data.variables[5].value == 200) {
+      //   setIsViewCreate(false)
+      //   setIsViewPelajaran(true)
+      //   notification.success({
+      //     message: 'Sukses',
+      //     description: 'Pelajaran berhasil ditambahkan.',
+      //     placement: 'top'
+      //   })
+      // pageLoad()
+      // } else {
+      //   notification.error({
+      //     message: 'Error',
+      //     description: 'Harap isi semua field',
+      //     placement: 'top'
+      //   })
+      // }
     })
   }
 
@@ -997,10 +935,9 @@ export default function DataMataPelajaranAdmin() {
       if (el.name !== "") data[el.name] = el.value;
     }
     console.log(data)
-    // console.log(selectedUser.idKelompok);
 
     axios.post(BASE_URL, {
-      "processDefinitionId": "bc121392-fb41-11ec-ac5e-66fc627bf211",
+      "processDefinitionId": "updatepelajaran1:2:f978ef91-ef05-11ec-a658-66fc627bf211",
       "returnVariables": true,
       "variables": [
         {
@@ -1008,32 +945,32 @@ export default function DataMataPelajaranAdmin() {
           "type": "json",
           "value": {
             "data": {
-              "code": "required",
-              "nama_mata": "required",
-              "urut_lapor": "required",
-              "kel_id": "required",
-              "status": "required",
+              "course_name": "required",
+              "course_code": "required",
+              "max_student": "required",
+              "course_grade_id": "required",
+              "academic_year_id": "required"
             },
-            "code": data.kode_pelajaran,
-            "nama_mata": data.nama_pelajaran,
-            "urut_lapor": data.noUrut_rapor,
-            "kel_id": data.kelompok,
-            "status": data.status,
+            "course_name": data.nama_pelajaran,
+            "course_code": data.kode,
+            "max_student": data.max_siswa,
+            "course_grade_id": data.kelas,
+            "academic_year_id": data.tahun_akademik
           }
         },
         {
-          "name": "x_academic_subject_master",
+          "name": "x_academic_subjects",
           "type": "json",
           "value": {
-            "tbl_name": "x_academic_subject_master",
-            "id": selectedUser.idPelajaran,
+            "tbl_name": "x_academic_subjects",
+            "id": selectedUser.id,
             "tbl_coloumn": {
-              "academic_year_id": academicYear,
-              "status": data.status,
-              "code": data.kode_pelajaran,
-              "nama_mata": data.nama_pelajaran,
-              "urut_lapor": data.noUrut_rapor,
-              "kel_id": data.kelompok,
+              "course_name": data.nama_pelajaran,
+              "course_code": data.kode,
+              "max_student": data.max_siswa,
+              "course_grade_id": data.kelas,
+              "academic_year_id": data.tahun_akademik,
+              "updated_at": dateNow, // => done
             }
           }
         }
@@ -1043,9 +980,7 @@ export default function DataMataPelajaranAdmin() {
         "Content-Type": "application/json",
       }
     }).then(function (response) {
-      const valueRes = response.data.variables[4].value
-      const valueResObj = JSON.parse(valueRes)
-      if (valueResObj.status == 'success') {
+      if (response.data.variables[3].value == 200) {
         setIsViewCreate(false)
         setIsViewPelajaran(true)
         notification.success({
@@ -1053,7 +988,7 @@ export default function DataMataPelajaranAdmin() {
           description: 'Pelajaran berhasil di update.',
           placement: 'top'
         })
-        // pageLoad()
+        pageLoad()
       } else {
         notification.error({
           message: 'Error',
@@ -1078,18 +1013,15 @@ export default function DataMataPelajaranAdmin() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios.post(BASE_URL, {
-          "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+          "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
           "returnVariables": true,
           "variables": [
             {
-              "name": "global_updatedata",
+              "name": "global_delete",
               "type": "json",
               "value": {
-                "tbl_name": "x_academic_subject_master",
-                "id": record.idPelajaran,
-                "tbl_coloumn": {
-                  "deleted_at": dateNow
-                }
+                "tbl_name": "x_academic_subjectsModel",
+                "id": record.id
               }
             }
           ]
@@ -1103,10 +1035,10 @@ export default function DataMataPelajaranAdmin() {
           setRefreshState(true);
           Swal.fire(
             'Data telah terhapus!',
-            'Menghapus data mata pelajaran ' + record.namaPelajaran,
+            'Menghapus data siswa bernama ' + record.namaPelajaran,
             'success'
           )
-          // pageLoad()
+          pageLoad()
         })
       }
     })
@@ -1150,23 +1082,17 @@ export default function DataMataPelajaranAdmin() {
   }
 
   const FormEdit = () => {
-    const idStatus = selectedUser.status == "true" ? 1 : 2
     const status = selectedUser.status == "true" ? "Aktif" : "Tidak Aktif"
     return (
       <FormAdminPelajaran
         setView={() => setIsViewPelajaran(true)}
         title="Edit Pelajaran"
         submit={editPelajaran}
-        selectKelompokBelajar={getKelompokBelajar.map((data) => (
-          <option value={data.id}>{data.kelompok}</option>
-        ))}
         namaPelajaran={selectedUser.namaPelajaran}
         kode={selectedUser.kode}
-        idKelompok={selectedUser.idKelompok}
         kelompok={selectedUser.kelompok}
         noUrutRapor={selectedUser.noUrutRapor}
         kurikulum={selectedUser.kurikulum}
-        idStatus={idStatus}
         status={status}
         isDisabled={false}
       />
@@ -1182,7 +1108,6 @@ export default function DataMataPelajaranAdmin() {
         submit={createPelajaran}
         namaPelajaran={selectedUser.namaPelajaran}
         kode={selectedUser.kode}
-        idKelompok={selectedUser.idKelompok}
         kelompok={selectedUser.kelompok}
         noUrutRapor={selectedUser.noUrutRapor}
         kurikulum={selectedUser.kurikulum}

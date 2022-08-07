@@ -633,6 +633,7 @@ export default function DataKelasAdmin() {
                                             onClick={viewCreateKelas}>
                                         Tambah Data
                                     </Button>
+                                    <Filter title1="Nama Kelas" title2="Sub Kelas"/>
                                     <FilterAcademic getYear={(e) => {
                                         const {  options, selectedIndex } = e.target;
                                         setAcademic(e.target.value)

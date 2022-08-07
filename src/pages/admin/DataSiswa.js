@@ -70,7 +70,6 @@ function DataSiswaAdmin() {
     const [isViewCreate, setIsViewCreate] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    console.log(selectedUser)
 
     const [dataProvinsi, setDataProvinsi] = useState();
     const [dataKota, setDataKota] = useState();
@@ -300,6 +299,7 @@ function DataSiswaAdmin() {
             .then(function (response) {
                 const dataClass = JSON.parse(response.data.variables[2].value);
                 setDataClass(dataClass);
+                console.log(dataClass)
             })
     }, [academic, paramsPage, refreshState, isViewSiswa]);
 
@@ -648,7 +648,6 @@ function DataSiswaAdmin() {
             tempatLahir: siswa.place_of_birth,
             email: siswa.email,
             kelas: siswa.class,
-            sub_kelas: siswa.sub_class,
             idKelas: siswa.class_id,
             noHp: siswa.mobile_phone,
             tag1: "",
@@ -838,10 +837,8 @@ function DataSiswaAdmin() {
                             >
                                 Tambah Data
                             </Button>
-                            <FilterAcademic
-                                academicNow={academic}
-                                id="filter_academic_data_siswa"
-                                getYear={(e) => {
+                            <Filter title1="Nama" title2="Tanggal Lahir" allowClear/>
+                            <FilterAcademic getYear={(e) => {
                                 const {  options, selectedIndex } = e.target;
                                 const year =(options[selectedIndex].text)
                                 setAcademic(e.target.value)
@@ -919,7 +916,6 @@ function DataSiswaAdmin() {
     }
 
     const viewEditSiswa = (record) => {
-        console.log(record)
         setSelectedUser(record)
         setIsViewEdit(true)
         setIsViewCreate(false)
@@ -1354,11 +1350,9 @@ function DataSiswaAdmin() {
                 setView={() => setIsViewSiswa(true)}
                 title="Tambah Siswa & Orang Tua"
                 submit={createSiswa}
-                selectKelas={dataClass.map((data) => {
-                    return (
-                        <option value={data.id}>{data.class} - {data.sub_class}</option>
-                    )
-                })}
+                selectKelas={dataClass.map((data) => (
+                    <option value={data.id}>{data.class}</option>
+                ))}
                 isDisabled={false}
                 disabledEmail={false}
                 provSiswa="ACEH"
@@ -1383,10 +1377,10 @@ function DataSiswaAdmin() {
                 nisnSiswa={selectedUser.nis}
                 namaSiswa={selectedUser.namaSiswa}
                 selectKelas={dataClass.map((data) => (
-                    <option value={data.id}>{data.class} - {data.sub_class}</option>
+                    <option value={data.id}>{data.class}</option>
                 ))}
                 idKelas={selectedUser.idKelas}
-                namaKelas={`${selectedUser.kelas} - ${selectedUser.sub_kelas}`}
+                namaKelas={selectedUser.kelas}
                 tempatLahirSiswa={selectedUser.tempatLahir}
                 tanggalLahirSiswa={selectedUser.tanggalLahir}
                 emailSiswa={selectedUser.email}
@@ -1414,10 +1408,10 @@ function DataSiswaAdmin() {
                 nisnSiswa={selectedUser.nis}
                 namaSiswa={selectedUser.namaSiswa}
                 selectKelas={dataClass.map((data) => (
-                    <option value={data.id}>{data.class} - {data.sub_class}</option>
+                    <option value={data.id}>{data.class}</option>
                 ))}
                 idKelas={selectedUser.idKelas}
-                namaKelas={`${selectedUser.kelas} - ${selectedUser.sub_kelas}`}
+                namaKelas={selectedUser.kelas}
                 tempatLahirSiswa={selectedUser.tempatLahir}
                 tanggalLahirSiswa={selectedUser.tanggalLahir}
                 emailSiswa={selectedUser.email}

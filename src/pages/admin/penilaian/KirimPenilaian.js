@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react"
-import axios from "axios";
+import { useState } from "react";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
@@ -13,23 +12,15 @@ import {
     PicCenterOutlined
 } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
-// import Filter from "../../../components/Filter";
-import { BASE_URL } from "../../../api/Url";
+
+import Filter from "../../../components/Filter";
 
 function KirimPenilaian() {
-
-    const [getKirimPenilaian, setGetKirimPenilaian] = useState([])
-    console.log(getKirimPenilaian);
-
     const [grid, setGrid] = useState(false);
     const [isViewKirimPenilaian, setIsViewKirimPenilaian] = useState(true);
 
-    const academicYear = localStorage.getItem('academic_year');
-    const institute = localStorage.getItem('institute');
-
     const { Column, ColumnGroup } = Table;
     const { Option } = Select;
-
     const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
     };
@@ -55,112 +46,6 @@ function KirimPenilaian() {
         console.log('params', pagination, filters, sorter, extra);
     }
 
-    useEffect(() => {
-        axios.post(BASE_URL,
-            {
-
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "global_join_where_sub",
-                        "type": "json",
-                        "value": {
-                            "tbl_induk": "x_assessment_header",
-                            "select": [
-                                "x_assessment_header.*",
-                                "x_academic_class.class",
-                                "x_academic_subjects",
-                                "x_academic_subjects_schedule",
-                                "x_academic_teachers",
-                                "x_academic_subject_master.nama_mata",
-                                "users.*",
-
-                                "x_academic_year.academic_year as tahun_akademic"
-                            ],
-                            "paginate": 10,
-                            "join": [
-                                {
-                                    "tbl_join": "x_academic_class",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "class_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subjects",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "subjects_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subject_master",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects",
-                                    "foregenkey": "academic_subjects_master_id"
-                                },
-
-                                {
-                                    "tbl_join": "x_academic_year",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "academic_year_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subjects_schedule",
-                                    "refkey": "academic_subjects_id",
-                                    "tbl_join2": "x_academic_subjects",
-                                    "foregenkey": "id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_teachers",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule",
-                                    "foregenkey": "teachers_id"
-                                },
-
-                                {
-                                    "tbl_join": "users",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "created_by"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_assessment_header",
-                                    "tbl_field": "id",
-                                    "tbl_value": "102",
-                                    "operator": "="
-                                },
-
-                                {
-                                    "tbl_coloumn": "x_assessment_header",
-                                    "tbl_field": "deleted_at",
-                                    "tbl_value": "",
-                                    "operator": "="
-                                }
-
-                            ],
-                            "order_coloumn": "x_assessment_header.updated_at",
-                            "order_by": "desc"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "type": "string",
-                        "value": "1"
-                    }
-                ]
-            }
-        ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[3]?.value)
-            console.log(dataRes);
-            setGetKirimPenilaian(dataRes?.data?.data)
-            // setBtnPagination(tahunAkademik?.links)
-        })
-    }, [])
-
-
     const TabelKirimPenilaian = () => {
         const columns = [
             {
@@ -170,7 +55,7 @@ function KirimPenilaian() {
                 responsive: ['sm'],
             },
             {
-                title: 'Kelas/Sub Kelas',
+                title: 'Kelas',
                 dataIndex: 'kelas',
                 sortDirections: ['descend'],
             },
@@ -200,11 +85,6 @@ function KirimPenilaian() {
                 defaultSortOrder: 'descend',
             },
             {
-                title: 'Dibuat oleh',
-                dataIndex: 'dibuatOleh',
-                defaultSortOrder: 'descend',
-            },
-            {
                 title: 'Aksi',
                 dataIndex: 'aksi',
                 defaultSortOrder: 'descend',
@@ -214,21 +94,31 @@ function KirimPenilaian() {
                     </Space>
                 ),
             },
-
         ];
 
-        const data = getKirimPenilaian.map((data, index) => {
-            return {
-                no: index + 1,
-                kelas: data.class,
-                mataPelajaran: data.nama_mata,
-                pendidik: data.nama_guru,
-                ta_smt: data.tahun_akademic,
-                status: data.status,
-                tanggalProses: data.send_date,
-                dibuatOleh: data.name
-            }
-        })
+        const data = [
+            {
+                no: '001',
+                kelas: '2A',
+                mataPelajaran: "Penjaskes",
+                pendidik: "Nursyila S.Pd",
+                ta_smt: "2020/Ganjil",
+                status: "Terkirim",
+                tanggalProses: "12 Juni 2022, 16.00",
+                aksi: "",
+
+            },
+            {
+                no: '002',
+                kelas: '2B',
+                mataPelajaran: "Penjaskes",
+                pendidik: "Nursyila S.Pd",
+                ta_smt: "2020/Ganjil",
+                status: "Perbaikan",
+                tanggalProses: "12 Juni 2022, 16.00",
+                aksi: "",
+            },
+        ];
 
         return (
             <Table className=""
@@ -347,7 +237,7 @@ function KirimPenilaian() {
                 <PageHeader
                     className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                     onBack={() => window.history.back()}
-                    title="Kirim Penilaian"
+                    title="Kirim Penilain"
                 />
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <div className="row">
@@ -356,7 +246,7 @@ function KirimPenilaian() {
                                 onClick={() => setIsViewKirimPenilaian(false)}>
                                 Tambah Data
                             </Button>
-                            {/* <Filter title1="Kelas" title2="Mata Pelajaran" /> */}
+                            <Filter title1="Kelas" title2="Mata Pelajaran" />
                             {/* <Dropdown overlay={_filterMenu}>
                             <a className="ant-dropdown-link mr-4 font-bold"
                             onClick={e => e.preventDefault()}>

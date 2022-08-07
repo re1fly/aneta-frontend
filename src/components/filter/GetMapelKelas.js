@@ -7,8 +7,7 @@ import {MapelByAcademic} from "./MapelByAcademic";
 export const GetMapelKelas = (props) => {
     const academic = localStorage.getItem("academic_year");
     const [dataClass, setDataClass] = useState([]);
-    const [dataMapel, setDataMapel] = useState(null);
-    const [selectedClass, setSelectedClass] = useState(null)
+    const [dataMapel, setDataMapel] = useState([]);
 
     const _getDataKelas = () => {
         axios
@@ -71,55 +70,38 @@ export const GetMapelKelas = (props) => {
                             "name": "global_join_where_sub",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_academic_subject_master",
-                                "select" : [
+                                "tbl_induk": "x_academic_subjects",
+                                "select": [
                                     "x_academic_subjects.id as id_subject",
                                     "x_academic_subject_master.nama_mata"
                                 ],
                                 "paginate": 1000,
                                 "join": [
                                     {
-                                        "tbl_join": "x_academic_year",
+                                        "tbl_join": "x_academic_subject_master",
                                         "refkey": "id",
-                                        "tbl_join2": "x_academic_subject_master",
-                                        "foregenkey": "academic_year_id"
-                                    },{
-                                        "tbl_join": "x_academic_subjects",
-                                        "refkey": "academic_subjects_master_id",
-                                        "tbl_join2": "x_academic_subject_master",
-                                        "foregenkey": "id"
+                                        "tbl_join2": "x_academic_subjects",
+                                        "foregenkey": "academic_subjects_master_id"
                                     }
                                 ],
+
                                 "where": [
                                     {
-                                        "tbl_coloumn": "x_academic_subjects",
+                                        "tbl_coloumn": "x_academic_subject_master",
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
-                                        "operator": "=",
-                                        "kondisi" : "where"
-                                    },{
-                                        "tbl_coloumn": "x_academic_subjects",
-                                        "tbl_field": "course_grade_id",
-                                        "tbl_value": selectedClass,
-                                        "operator": "=",
-                                        "kondisi" : "where"
-                                    },{
+                                        "operator": "="
+                                    },
+                                    {
                                         "tbl_coloumn": "x_academic_subject_master",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
-                                        "operator": "=",
-                                        "kondisi" : "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_subjects",
-                                        "tbl_field": "course_grade_id",
-                                        "tbl_value": "",
-                                        "operator": "!=",
-                                        "kondisi" : "where"
+                                        "operator": "="
                                     }
+
                                 ],
                                 "order_coloumn": "x_academic_subject_master.nama_mata",
-                                "order_by": "desc"
+                                "order_by": "asc"
                             }
                         },
                         {
@@ -145,11 +127,8 @@ export const GetMapelKelas = (props) => {
 
     useEffect(() => {
         _getDataKelas()
-    }, []);
-
-    useEffect(() => {
         _getDataMapel()
-    }, [selectedClass]);
+    }, []);
 
     return (
         <>
@@ -158,14 +137,13 @@ export const GetMapelKelas = (props) => {
                 <div className="row">
                     <div className="col-lg-4 mb-3">
                         <ClassByAcademic
-                            onChangeKelas={(e) => setSelectedClass(e.target.value)}
                             selectKelas={dataClass.map((data) => (
-                                <option value={data.id}>{data.class} / {data.sub_class}</option>
+                                <option value={data.id}>{data.class}</option>
                             ))}
                         />
                     </div>
                     <div className="col-lg-4 mb-3">
-                        <MapelByAcademic selectMapel={dataMapel == null ? null : dataMapel.map((data) => (
+                        <MapelByAcademic selectMapel={dataMapel.map((data) => (
                             <option value={data.id_subject}>{data.nama_mata}</option>
                         ))}/>
                     </div>

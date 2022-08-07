@@ -358,23 +358,12 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/admin-input-deskripsi-nilai"
+                                            to="/admin-input-deskripsi"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
                                             <i className="feather-hard-drive mr-3"></i>
-                                            <span>Input Data Deskripsi Nilai</span>
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
-                                            to="/admin-input-deskripsi-sikap"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-hard-drive mr-3"></i>
-                                            <span>Input Data Deskripsi Sikap</span>
+                                            <span>Input Data Deskripsi</span>
                                         </NavLink>
                                     </li>
                                     <li>
@@ -402,24 +391,6 @@ function Appheader() {
                                             <li className="nav-item">
                                                 <NavLink className="navi-link nav-content-bttn open-font" to="/admin-cetak-rapor">
                                                     <span>Cetak Rapor</span>
-                                                </NavLink>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li className="has-droupdown nav-item">
-                                        <Link to="#" className="navi-link">
-                                            <i className="feather-pocket mr-2 droupdown-toggle"></i>
-                                            <span>EkstraKurikuler</span>
-                                        </Link>
-                                        <ul className="submenu">
-                                            <li className="nav-item">
-                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-data-ekstrakurikuler">
-                                                    <span>Data Ekstrakurikuler</span>
-                                                </NavLink>
-                                            </li>
-                                            <li className="nav-item">
-                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-input-data-ekstrakurikuler">
-                                                    <span>Input Nilai EkstraKurikuler</span>
                                                 </NavLink>
                                             </li>
                                         </ul>
@@ -623,7 +594,7 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/orangtua-nilai-anak"
+                                            to="/orangtua-data-anak"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
@@ -634,7 +605,7 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/orangtua-erapor-anak"
+                                            to="/orangtua-data-anak"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
@@ -645,7 +616,7 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/orangtua-evaluasi-anak"
+                                            to="/orangtua-data-anak"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
@@ -656,7 +627,7 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/orangtua-konsultasi-anak"
+                                            to="/orangtua-data-anak"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >

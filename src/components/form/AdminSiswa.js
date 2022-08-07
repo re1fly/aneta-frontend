@@ -3,7 +3,6 @@ import {Button, Card, DatePicker, Divider, Tooltip} from "antd";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
 import {PlusOutlined, UserAddOutlined} from "@ant-design/icons";
-import {RequiredTooltip} from "../misc/RequiredTooltip";
 
 
 // const ButtonFormOrtu = (props) => {
@@ -293,7 +292,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    NISN <RequiredTooltip />
+                                                    NISN
                                                 </label>
                                                 <input
                                                     type="text"
@@ -309,7 +308,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Nama Siswa <RequiredTooltip />
+                                                    Nama Siswa
                                                 </label>
                                                 <input
                                                     type="text"
@@ -326,7 +325,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-12 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kelas <RequiredTooltip />
+                                                    Kelas
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -351,7 +350,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tempat Lahir <RequiredTooltip />
+                                                    Tempat Lahir
                                                 </label>
                                                 <input
                                                     type="text"
@@ -367,7 +366,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tanggal Lahir <RequiredTooltip />
+                                                    Tanggal Lahir
                                                 </label>
                                                 <input
                                                     type="date"
@@ -385,7 +384,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Email <RequiredTooltip />
+                                                    Email
                                                 </label>
                                                 <input
                                                     type="email"
@@ -400,7 +399,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    No. HP <RequiredTooltip />
+                                                    No. HP
                                                 </label>
                                                 <input
                                                     type="number"
@@ -417,7 +416,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Provinsi <RequiredTooltip />
+                                                    Provinsi
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -436,7 +435,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kota <RequiredTooltip />
+                                                    Kota
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -456,7 +455,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kecamatan <RequiredTooltip />
+                                                    Kecamatan
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -475,7 +474,7 @@ export const FormAdminSiswa = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kelurahan <RequiredTooltip />
+                                                    Kelurahan
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -493,7 +492,7 @@ export const FormAdminSiswa = (props) => {
 
                                         <div className="col-lg-12 mb-3">
                                             <label className="mont-font fw-600 font-xsss">
-                                                Alamat <RequiredTooltip />
+                                                Alamat
                                             </label>
                                             <textarea
                                                 className="form-control mb-0 p-3 bg-greylight lh-16"

@@ -29,148 +29,13 @@ import axios from "axios";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 
-import { BASE_URL } from "../../../api/Url";
-
 function JadwalPelajaranSiswa() {
+    const user = localStorage.getItem('user_name');
+
     const [grid, setGrid] = useState(false);
     const [calendar, setCalendar] = useState(true);
-    const [getJadwalPelajaran, setGetJadwalPelajaran] = useState([]);
-    const [getKelasSiswa, setGetKelas] = useState([]);
-
-    const userName = localStorage.getItem('user_name');
-    const userId = localStorage.getItem('user_id')
-
-    const senin = getJadwalPelajaran?.filter((data) => {
-        return data.hari === "senin"
-    })
-
-    const selasa = getJadwalPelajaran?.filter((data) => {
-        return data.hari === "selasa"
-    })
-
-    const rabu = getJadwalPelajaran?.filter((data) => {
-        return data.hari === "rabu"
-    })
-
-    const kamis = getJadwalPelajaran?.filter((data) => {
-        return data.hari === "kamis"
-    })
-
-    const jumat = getJadwalPelajaran?.filter((data) => {
-        return data.hari === "jumat"
-    })
-
-    const sabtu = getJadwalPelajaran?.filter((data) => {
-        return data.hari === "sabtu"
-    })
 
     const _onSearch = value => console.log(value);
-
-    useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "e81e093e-028d-11ed-ac5e-66fc627bf211",
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "get_data",
-                    "type": "json",
-                    "value": {
-                        "user_id": userId,
-                        "academic_id": 65
-                    }
-                }
-            ]
-        },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            }
-        ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            setGetJadwalPelajaran(dataRes?.data);
-        })
-
-        axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubfirst:1:20ca0e47-eb01-11ec-a658-66fc627bf211",
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "global_join_where_sub_first",
-                    "type": "json",
-                    "value": {
-                        "tbl_induk": "x_academic_students",
-                        "select": [
-                            "m_user_profile.nisn",
-                            "users.name",
-                            "x_academic_class.class",
-                            "x_academic_year.semester",
-                            "x_academic_year.academic_year",
-                            "x_academic_class.sub_class"
-                        ],
-                        "join": [
-                            {
-                                "tbl_join": "users",
-                                "refkey": "id",
-                                "tbl_join2": "x_academic_students",
-                                "foregenkey": "user_id"
-                            },
-                            {
-                                "tbl_join": "m_user_profile",
-                                "refkey": "user_id",
-                                "tbl_join2": "users",
-                                "foregenkey": "id"
-
-                            }, {
-                                "tbl_join": "x_academic_class",
-                                "refkey": "id",
-                                "tbl_join2": "x_academic_students",
-                                "foregenkey": "class_id"
-                            }, {
-                                "tbl_join": "m_institutes",
-                                "refkey": "id",
-                                "tbl_join2": "users",
-                                "foregenkey": "institute_id"
-                            }, {
-                                "tbl_join": "x_academic_year",
-                                "refkey": "institute_id",
-                                "tbl_join2": "m_institutes",
-                                "foregenkey": "id"
-                            }
-                        ],
-
-                        "where": [
-                            {
-                                "tbl_coloumn": "x_academic_year",
-                                "tbl_field": "is_active",
-                                "tbl_value": "T",
-                                "operator": "="
-                            }, {
-                                "tbl_coloumn": "x_academic_students",
-                                "tbl_field": "user_id",
-                                "tbl_value": userId,
-                                "operator": "="
-                            }, {
-                                "tbl_coloumn": "x_academic_class",
-                                "tbl_field": "deleted_at",
-                                "tbl_value": "",
-                                "operator": "="
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            }
-        ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
-            setGetKelas([dataRes?.data])
-        })
-    }, [userId])
 
     const CalendarData = () => {
         return (
@@ -180,25 +45,25 @@ function JadwalPelajaranSiswa() {
 
     const TableJadwalPelajaran = () => {
         const columns = [
-            // {
-            //     title: 'Kelas',
-            //     dataIndex: 'kelas',
-            //     align: 'center',
-            // },
+            {
+                title: 'Kelas',
+                dataIndex: 'kelas',
+                align: 'center',
+            },
             {
                 title: 'Mata Pelajaran',
                 dataIndex: 'namaPelajaran',
                 align: 'center',
-                // filters: [
-                //     {
-                //         text: 'Tematik 1',
-                //         value: 'Tematik 1',
-                //     },
-                //     {
-                //         text: 'Tematik 2',
-                //         value: 'Tematik 2',
-                //     },
-                // ],
+                filters: [
+                    {
+                        text: 'Tematik 1',
+                        value: 'Tematik 1',
+                    },
+                    {
+                        text: 'Tematik 2',
+                        value: 'Tematik 2',
+                    },
+                ],
                 // onFilter: (value, record) => record.namaPelajaran.indexOf(value) === 0,
                 // sorter: (a, b) => a.namaPelajaran.length - b.namaPelajaran.length,
             },
@@ -206,16 +71,16 @@ function JadwalPelajaranSiswa() {
                 title: 'Guru/Tenaga Pengajar',
                 dataIndex: 'namaPengajar',
                 align: 'center',
-                // filters: [
-                //     {
-                //         text: 'Sri Wahyuni S.pd',
-                //         value: 'Sri Wahyuni S.pd',
-                //     },
-                //     {
-                //         text: 'Siti Mulyani S.pd',
-                //         value: 'Siti Mulyani S.pd',
-                //     },
-                // ],
+                filters: [
+                    {
+                        text: 'Sri Wahyuni S.pd',
+                        value: 'Sri Wahyuni S.pd',
+                    },
+                    {
+                        text: 'Siti Mulyani S.pd',
+                        value: 'Siti Mulyani S.pd',
+                    },
+                ],
                 // onFilter: (value, record) => record.namaPengajar.indexOf(value) === 0,
                 // sorter: (a, b) => a.namaPengajar.length - b.namaPengajar.length,
             },
@@ -224,74 +89,45 @@ function JadwalPelajaranSiswa() {
                 dataIndex: 'waktu',
                 align: 'center'
             },
+            {
+                title: 'Aksi',
+                key: 'action',
+                align: 'center',
+                responsive: ['sm'],
+                render: (text, record) => (
+                    <Space size="middle">
+                        <EditOutlined style={{ color: "blue" }} onClick={() => notification.open({
+                            message: 'Edit',
+                            description:
+                                'Edit user bernama ' + record.namaPelajaran,
+                            duration: 2
+
+                        })} />
+                        <DeleteOutlined style={{ color: 'red' }} onClick={() => notification.open({
+                            message: 'Delete',
+                            description:
+                                'Hapus user bernama ' + record.namaPelajaran,
+                            duration: 2
+                        })} />
+                    </Space>
+                ),
+            },
         ];
 
-        const kelasSiswa = getKelasSiswa.map((siswa, index) => {
-            const kelas = getKelasSiswa[0].class
-            const kelasStr = JSON.stringify(kelas)
-            const tingkatKelas = kelasStr.charAt(7)
-        
-            return {
-                kelas: tingkatKelas,
-                subKelas: siswa.sub_class,
-                semester: siswa.semester,
-                tahunAkademik: siswa.academic_year,
-            }
-        })
-
-        const kelas = `${kelasSiswa[0]?.kelas} ${"/"} ${kelasSiswa[0]?.subKelas}`
-
-        const dataSenin = senin[0]?.data?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
-
-        console.log(dataSenin);
-
-        const dataSelasa = selasa[0]?.data?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
-
-        const dataRabu = rabu?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: data.class,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
-
-        const dataKamis = kamis?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: data.class,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
-
-        const dataJumat = jumat?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: data.class,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
+        const data = [
+            {
+                kelas: '2/B',
+                namaPelajaran: 'Tematik 1',
+                namaPengajar: 'Sri Wahyuni S.pd',
+                waktu: '07.30 - 08.30',
+            },
+            {
+                kelas: '2/B',
+                namaPelajaran: 'Tematik 2',
+                namaPengajar: 'Siti Mulyani S.pd',
+                waktu: '08.30 - 09.30',
+            },
+        ];
 
         function onChangeTable(pagination, filters, sorter, extra) {
             console.log('params', pagination, filters, sorter, extra);
@@ -306,7 +142,7 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataSenin}
+                    dataSource={data}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
@@ -319,51 +155,11 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataSelasa}
+                    dataSource={data}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
                     scroll={{ x: 400 }} />
-
-                <div className="mt-4">
-                    <div className="bg-grey">
-                        <p className="strong text-black pl-4 mb-0">RABU</p>
-                    </div>
-                </div>
-                <Table className=""
-                    columns={columns}
-                    dataSource={dataRabu}
-                    onChange={onChangeTable}
-                    pagination={{ position: ['none'] }}
-                    rowClassName="bg-greylight text-grey-900"
-                    scroll={{ x: 400 }} />
-
-                <div className="mt-4">
-                    <div className="bg-grey">
-                        <p className="strong text-black pl-4 mb-0">KAMIS</p>
-                    </div>
-                </div>
-                <Table className=""
-                    columns={columns}
-                    dataSource={dataKamis}
-                    onChange={onChangeTable}
-                    pagination={{ position: ['none'] }}
-                    rowClassName="bg-greylight text-grey-900"
-                    scroll={{ x: 400 }} />
-
-                <div className="mt-4">
-                    <div className="bg-grey">
-                        <p className="strong text-black pl-4 mb-0">JUMAT</p>
-                    </div>
-                </div>
-                <Table className=""
-                    columns={columns}
-                    dataSource={dataJumat}
-                    onChange={onChangeTable}
-                    pagination={{ position: ['none'] }}
-                    rowClassName="bg-greylight text-grey-900"
-                    scroll={{ x: 400 }} />
-
             </>
         );
     };

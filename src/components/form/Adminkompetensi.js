@@ -1,13 +1,15 @@
 import {React, useEffect, useState} from "react";
-import { Table, Button } from "antd";
+import {Table, Button} from "antd";
 import axios from "axios";
 import {BASE_URL} from "../../api/Url";
 
 export const FormKompetensi = (props) => {
-    const institute =  localStorage.getItem('institute')
+    const institute = localStorage.getItem('institute')
     const [selectedYear, setSelectedYear] = useState(null)
+    const [selectedClass, setSelectedClass] = useState(null)
     const [dataSemester, setDataSemester] = useState([])
     const [dataMapel, setDataMapel] = useState([]);
+    const [dataKelas, setDataKelas] = useState([]);
 
     const _getAcademicYears = () => {
         axios.post(BASE_URL, {
@@ -60,7 +62,63 @@ export const FormKompetensi = (props) => {
             setDataSemester(academics.data.data);
         })
     }
-    const _getDataMapel = () => {
+    const _getDataKelas = (e) => {
+        axios
+            .post(
+                BASE_URL,
+                {
+                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_get_where",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_class",
+                                "pagination": false,
+                                "total_result": 2,
+                                "order_coloumn": "x_academic_class.class",
+                                "order_by": "asc",
+                                "data": [
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "academic_year_id",
+                                        "tbl_value": e.target.value,
+                                        "operator": "="
+                                    },
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "="
+                                    }
+                                ],
+                                "tbl_coloumn": [
+                                    "*"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                console.log(response)
+                const resClass = JSON.parse(response?.data?.variables[2]?.value) || [];
+                if (resClass.status == false) {
+                    setDataKelas([]);
+                    setSelectedYear(e.target.value)
+                } else {
+                    setDataKelas(resClass);
+                    setSelectedYear(e.target.value)
+                }
+            })
+    }
+    const _getDataMapel = (e) => {
         axios
             .post(
                 BASE_URL,
@@ -73,7 +131,7 @@ export const FormKompetensi = (props) => {
                             "type": "json",
                             "value": {
                                 "tbl_induk": "x_academic_subject_master",
-                                "select" : [
+                                "select": [
                                     "x_academic_subjects.id as id_subject",
                                     "x_academic_subject_master.nama_mata"
                                 ],
@@ -84,7 +142,7 @@ export const FormKompetensi = (props) => {
                                         "refkey": "id",
                                         "tbl_join2": "x_academic_subject_master",
                                         "foregenkey": "academic_year_id"
-                                    },{
+                                    }, {
                                         "tbl_join": "x_academic_subjects",
                                         "refkey": "academic_subjects_master_id",
                                         "tbl_join2": "x_academic_subject_master",
@@ -97,20 +155,26 @@ export const FormKompetensi = (props) => {
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": selectedYear,
                                         "operator": "=",
-                                        "kondisi" : "where"
-                                    },{
+                                        "kondisi": "where"
+                                    }, {
+                                        "tbl_coloumn": "x_academic_subjects",
+                                        "tbl_field": "course_grade_id",
+                                        "tbl_value": e.target.value,
+                                        "operator": "=",
+                                        "kondisi": "where"
+                                    }, {
                                         "tbl_coloumn": "x_academic_subject_master",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
                                         "operator": "=",
-                                        "kondisi" : "where"
+                                        "kondisi": "where"
                                     },
                                     {
                                         "tbl_coloumn": "x_academic_subjects",
                                         "tbl_field": "course_grade_id",
                                         "tbl_value": "",
                                         "operator": "!=",
-                                        "kondisi" : "where"
+                                        "kondisi": "where"
                                     }
                                 ],
                                 "order_coloumn": "x_academic_subject_master.nama_mata",
@@ -143,9 +207,13 @@ export const FormKompetensi = (props) => {
         _getAcademicYears()
     }, []);
 
-    useEffect(() => {
-        _getDataMapel()
-    }, [selectedYear]);
+    // useEffect(() => {
+    //     _getDataKelas()
+    // }, [selectedYear]);
+
+    // useEffect(() => {
+    //     _getDataMapel()
+    // }, [selectedClass]);
 
 
     function onChangeTable(pagination, filters, sorter, extra) {
@@ -207,7 +275,8 @@ export const FormKompetensi = (props) => {
                     id="select_semester_kompetensi"
                     className="form-control w250"
                     name="semester_kompetensi"
-                    onChange={(e) => setSelectedYear(e.target.value)}
+                    onChange={(e) => _getDataKelas(e)}
+                    required
                 >
                     <option value="" selected disabled hidden>
                         Pilih Semester
@@ -221,53 +290,42 @@ export const FormKompetensi = (props) => {
                                 </>
                             )
                         }
-                    )}}
+                    )}
                 </select>,
             kelas:
                 <select
                     className="form-control w125"
                     name="kelas"
+                    onChange={(e) => _getDataMapel(e)}
+                    required
                 >
                     <option value="" selected disabled hidden>
                         Pilih Kelas
                     </option>
-                    <option value="Kelas 1">
-                        Kelas 1
-                    </option>
-                    <option value="Kelas 2">
-                        Kelas 2
-                    </option>
-                    <option value="Kelas 3">
-                        Kelas 3
-                    </option>
-                    <option value="Kelas 4">
-                        Kelas 4
-                    </option>
-                    <option value="Kelas 5">
-                        Kelas 5
-                    </option>
-                    <option value="Kelas 6">
-                        Kelas 6
-                    </option>
+                    {dataKelas?.length == 0 ? null : dataKelas?.map((data) => (
+                        <option value={data?.id}>{data?.class} / {data?.sub_class}</option>
+                    ))}
                 </select>,
             mataPelajaran:
                 <select
                     className="form-control w200"
                     name="mata_pelajaran"
+                    required
                 >
                     <option value="" selected disabled hidden>
                         Pilih Mata Pelajaran
                     </option>
-                    {dataMapel.map((data) => (
+                    {dataMapel.length == 0 ? null : dataMapel?.map((data) => (
                         <option value={data.id_subject}>{data.nama_mata}</option>
                     ))}
                 </select>,
             kode:
-                <input name="kode_kompetensi" className="form-control w75" />,
+                <input name="kode_kompetensi" className="form-control w75" required/>,
             kompetensiInti:
                 <select
                     className="form-control w175"
                     name="kompetensi"
+                    required
                 >
                     <option value="" selected disabled hidden>
                         Pilih Kompetensi
@@ -278,9 +336,9 @@ export const FormKompetensi = (props) => {
                     <option value="4">Sikap Sosial</option>
                 </select>,
             kompetensiDasar:
-                <textarea name="ket_kd" className="form-control w150" />,
+                <textarea name="ket_kd" className="form-control w150" required/>,
             keterangan:
-                <textarea name="ket" className="form-control w150" />,
+                <textarea name="ket" className="form-control w150" required/>,
         },
     ];
 
@@ -295,23 +353,23 @@ export const FormKompetensi = (props) => {
                     {/*    <Button className='ml-2' onClick={increment} shape="circle">+</Button>*/}
                     {/*</div>*/}
                     <form id="competence_form"
-                        onSubmit={props.submit}
+                          onSubmit={props.submit}
                         // method="POST"
                     >
                         <div className="card-body p-4 w-90 bg-current border-0 d-flex rounded-lg mx-4 py-8">
                             <i onClick={props.setView}
-                                className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
+                               className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                             <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                                 Tambah Kompetensi
                             </h4>
                         </div>
                         <Table className="mx-4 py-8"
-                            columns={columns}
-                            dataSource={data}
-                            onChange={onChangeTable}
-                            pagination={false}
-                            rowClassName="bg-greylight text-grey-900"
-                            scroll={{ x: 400 }} />
+                               columns={columns}
+                               dataSource={data}
+                               onChange={onChangeTable}
+                               pagination={false}
+                               rowClassName="bg-greylight text-grey-900"
+                               scroll={{x: 400}}/>
                         <div className="row mx-2 py-8 mt-5">
                             <div className="col-lg-12">
 

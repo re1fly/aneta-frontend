@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"
+import axios from "axios";
+import { GetMapelKelas } from "../../../components/filter/GetMapelKelas";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
 import React, { Fragment } from "react";
-import { PageHeader, Select, Card, Table, Row, Button, Space, Menu, Dropdown, message } from "antd"
+import { PageHeader, notification, Select, Card, Table, Row, Button, Space, Menu, Dropdown, message } from "antd"
 import {
     AppstoreOutlined,
     MenuOutlined,
@@ -12,15 +14,28 @@ import {
     PicCenterOutlined
 } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
-
-import Filter from "../../../components/Filter";
+import { BASE_URL } from "../../../api/Url";
+import { dateNow } from "../../../components/misc/date";
+import { DataNotFound } from "../../../components/misc/DataNotFound";
 
 function KirimPenilaian() {
+
+    const [getKirimPenilaian, setGetKirimPenilaian] = useState([]);
+    const [dataKirimNilai, setDataKirimNilai] = useState(null);
+    const idHeader = dataKirimNilai?.id_header
+
+    console.log(JSON.stringify(dataKirimNilai, null, 2));
+
+
     const [grid, setGrid] = useState(false);
     const [isViewKirimPenilaian, setIsViewKirimPenilaian] = useState(true);
 
+    const academicYear = localStorage.getItem('academic_year');
+    const institute = localStorage.getItem('institute');
+
     const { Column, ColumnGroup } = Table;
     const { Option } = Select;
+
     const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
     };
@@ -46,6 +61,102 @@ function KirimPenilaian() {
         console.log('params', pagination, filters, sorter, extra);
     }
 
+    // kirim penilaian tampilan depan
+    useEffect(() => {
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where_sub",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_assessment_header",
+                            "select": [
+                                "x_academic_class.class",
+                                "x_academic_class.sub_class",
+                                "x_academic_subject_master.nama_mata",
+                                "users.name",
+                                "x_academic_year.academic_year",
+                                "x_academic_year.semester",
+                                "x_assessment_header.status",
+                                "x_assessment_header.send_date",
+                                "x_assessment_header.id"
+                            ],
+                            "paginate": 10,
+                            "join": [
+                                {
+                                    "tbl_join": "x_academic_class",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_assessment_header",
+                                    "foregenkey": "class_id"
+                                },
+                                {
+                                    "tbl_join": "x_academic_subjects",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_assessment_header",
+                                    "foregenkey": "subjects_id"
+                                },
+                                {
+                                    "tbl_join": "x_academic_subject_master",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_subjects",
+                                    "foregenkey": "academic_subjects_master_id"
+                                },
+
+                                {
+                                    "tbl_join": "x_academic_year",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_assessment_header",
+                                    "foregenkey": "academic_year_id"
+                                },
+                                {
+                                    "tbl_join": "x_academic_subjects_schedule",
+                                    "refkey": "academic_subjects_id",
+                                    "tbl_join2": "x_academic_subjects",
+                                    "foregenkey": "id"
+                                },
+                                {
+                                    "tbl_join": "x_academic_teachers",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_subjects_schedule",
+                                    "foregenkey": "teachers_id"
+                                }, {
+                                    "tbl_join": "users",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_teachers",
+                                    "foregenkey": "user_id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "x_assessment_header",
+                                    "tbl_field": "academic_year_id",
+                                    "tbl_value": academicYear,
+                                    "operator": "="
+                                },
+
+                            ],
+                            "order_coloumn": "x_assessment_header.updated_at",
+                            "order_by": "desc"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[3]?.value)
+            setGetKirimPenilaian(dataRes?.data?.data)
+        })
+
+    }, [academicYear])
+
+
     const TabelKirimPenilaian = () => {
         const columns = [
             {
@@ -55,7 +166,7 @@ function KirimPenilaian() {
                 responsive: ['sm'],
             },
             {
-                title: 'Kelas',
+                title: 'Kelas/Sub Kelas',
                 dataIndex: 'kelas',
                 sortDirections: ['descend'],
             },
@@ -84,6 +195,11 @@ function KirimPenilaian() {
                 dataIndex: 'tanggalProses',
                 defaultSortOrder: 'descend',
             },
+            // {
+            //     title: 'Dibuat oleh',
+            //     dataIndex: 'dibuatOleh',
+            //     defaultSortOrder: 'descend',
+            // },
             {
                 title: 'Aksi',
                 dataIndex: 'aksi',
@@ -94,31 +210,21 @@ function KirimPenilaian() {
                     </Space>
                 ),
             },
+
         ];
 
-        const data = [
-            {
-                no: '001',
-                kelas: '2A',
-                mataPelajaran: "Penjaskes",
-                pendidik: "Nursyila S.Pd",
-                ta_smt: "2020/Ganjil",
-                status: "Terkirim",
-                tanggalProses: "12 Juni 2022, 16.00",
-                aksi: "",
-
-            },
-            {
-                no: '002',
-                kelas: '2B',
-                mataPelajaran: "Penjaskes",
-                pendidik: "Nursyila S.Pd",
-                ta_smt: "2020/Ganjil",
-                status: "Perbaikan",
-                tanggalProses: "12 Juni 2022, 16.00",
-                aksi: "",
-            },
-        ];
+        const data = getKirimPenilaian.map((data, index) => {
+            return {
+                no: index + 1,
+                kelas: `${data.class} / ${data.sub_class}`,
+                mataPelajaran: data.nama_mata,
+                pendidik: data.name,
+                ta_smt: `${data.academic_year} / ${data.semester}`,
+                status: data.status,
+                tanggalProses: data.send_date,
+                // dibuatOleh: ''
+            }
+        })
 
         return (
             <Table className=""
@@ -132,20 +238,35 @@ function KirimPenilaian() {
     }
 
     const CardKirimPenilaian = () => {
-        const channelList = [
-            {
-                // imageUrl: 'user.png',
-                title: 'Penjaskes',
-                tag1: 'Kelas 2A',
-                tag2: '2020 / Ganjil',
-            },
-            {
-                // imageUrl: 'user.png',
-                title: 'Penjaskes',
-                tag2: '2020 / Ganjil',
-                tag1: 'Kelas 2A',
-            },
-        ];
+        // // const channelList = [
+        //     {
+        //         // imageUrl: 'user.png',
+        //         title: 'Penjaskes',
+        //         tag1: 'Kelas 2A',
+        //         tag2: '2020 / Ganjil',
+        //     },
+        //     {
+        //         // imageUrl: 'user.png',
+        //         title: 'Penjaskes',
+        //         tag2: '2020 / Ganjil',
+        //         tag1: 'Kelas 2A',
+        //     },
+        // ];
+
+        const channelList = getKirimPenilaian.map((data, index) => {
+            return {
+                no: index + 1,
+                tag1: `${data.class} / ${data.sub_class}`,
+                mataPelajaran: data.nama_mata,
+                pendidik: data.name,
+                tag2: `${data.academic_year} / ${data.semester}`,
+                status: data.status,
+                tanggalProses: data.send_date,
+                // dibuatOleh: ''
+            }
+        })
+
+        console.log(channelList);
 
         return (
             <div className="row">
@@ -153,7 +274,7 @@ function KirimPenilaian() {
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                         <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
                             <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                                Aktif
+                                {channelList.status}
                             </span>
                             <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
                                 overlay={_Account}>
@@ -169,7 +290,7 @@ function KirimPenilaian() {
                                     className="p-1 w-100"
                                 />
                             </a> */}
-                            <h4 className="fw-700 font-xs mt-5">{value.title}</h4>
+                            <h4 className="fw-700 font-xs mt-5">{channelList.mataPelajaran}</h4>
                             <div className="clearfix"></div>
                             {value.tag1 ? (
                                 <span
@@ -202,7 +323,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Pendidik</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: Nursyila S.Pd</p>
+                                        <p className="font-xssss float-left lh-1">: {channelList.pendidik}</p>
                                     </div>
                                 </div>
 
@@ -211,7 +332,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Status</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: Terkirim</p>
+                                        <p className="font-xssss float-left lh-1">: {channelList.status}</p>
                                     </div>
                                 </div>
 
@@ -220,7 +341,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Tanggal Proses</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: 12 Juni 2022, 16.00</p>
+                                        <p className="font-xssss float-left lh-1">: {channelList.tanggalProses}</p>
                                     </div>
                                 </div>
                             </div>
@@ -237,7 +358,7 @@ function KirimPenilaian() {
                 <PageHeader
                     className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                     onBack={() => window.history.back()}
-                    title="Kirim Penilain"
+                    title="Kirim Penilaian"
                 />
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <div className="row">
@@ -246,7 +367,7 @@ function KirimPenilaian() {
                                 onClick={() => setIsViewKirimPenilaian(false)}>
                                 Tambah Data
                             </Button>
-                            <Filter title1="Kelas" title2="Mata Pelajaran" />
+                            {/* <Filter title1="Kelas" title2="Mata Pelajaran" /> */}
                             {/* <Dropdown overlay={_filterMenu}>
                             <a className="ant-dropdown-link mr-4 font-bold"
                             onClick={e => e.preventDefault()}>
@@ -284,6 +405,110 @@ function KirimPenilaian() {
                 </div>
             </div>
         )
+    }
+
+    // data (Tambah data)
+    const _getDataKirimPenilaian = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        console.log(data)
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "getkirimpenilaiandetail:1:15ba37d7-1547-11ed-9ea6-c6ec5d98c2df",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "id_academic": academicYear,
+                            "id_class": data.id_class_filter, // 86
+                            "id_matpel":  data.id_mapel_filter //225 220
+                        }
+                    }
+                ]
+            }
+            ,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response.data.variables[2].value);
+            const dataKirim = dataRes.data
+            const rsCode = dataRes.code
+            
+
+            if (rsCode === true) {
+                setDataKirimNilai(dataKirim);
+                notification.success({
+                    message: "Data Ditemukan",
+                    description: "Data Dapat dilihat dalam table",
+                    placement: 'top'
+                })
+            } else {
+                setDataKirimNilai(null);
+                notification.info({
+                    message: "Not Found",
+                    description: "Data tidak ditemukan",
+                    placement: 'top'
+                })
+            }
+
+        }, [academicYear, data?.id_class_filter, data?.id_mapel_filter])
+    }
+
+    const onSubmit = (e) => {
+        axios
+            .post(
+                BASE_URL, {
+                "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_updatedata",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "x_assessment_headerModel",
+                            "id": idHeader,
+                            "tbl_coloumn": {
+                                "is_value_sent": true,
+                                "send_date": dateNow,
+                                "status": "terkirim"
+                            }
+                        }
+                    }
+                ]
+            },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataRes = JSON.parse(response.data.variables[2].value);
+                const rsCode = dataRes.status
+                console.log(rsCode);
+
+                if (rsCode === "success") {
+                    notification.success({
+                        message: "Sukses",
+                        description: "Penilaian berhasil di kirim",
+                        placement: 'top'
+                    })
+                } else {
+                    notification.info({
+                        message: "Gagal",
+                        description: "Penilaian tidak berhasil di kirim",
+                        placement: 'top'
+                    })
+                }
+            })
     }
 
     const TambahKirimPenilaian = () => {
@@ -360,21 +585,45 @@ function KirimPenilaian() {
         const data = [
             {
                 key: "1",
-                nilaiKkm: "75",
-                predikat1: "A : Sangat Baik",
-                predikat2: "B : Baik",
-                predikat3: "C : Cukup",
-                predikat4: "D : Kurang"
+                nilaiKkm: dataKirimNilai?.interval_predikat?.data[0]?.min,
+                predikat1: `${dataKirimNilai?.interval_predikat?.data[0]?.name} : Sangat Baik`,
+                predikat2: `${dataKirimNilai?.interval_predikat?.data[1]?.name} : Baik`,
+                predikat3: `${dataKirimNilai?.interval_predikat?.data[2]?.name} : Cukup`,
+                predikat4: `${dataKirimNilai?.interval_predikat?.data[1]?.name} : Kurang`,
             },
             {
                 key: "2",
-                nilaiKkm: "75",
-                predikat1: ">= 91",
-                predikat2: "83 >= Nilai < 91",
-                predikat3: "75 >= Nilai < 83",
-                predikat4: "< 75"
+                nilaiKkm: dataKirimNilai?.interval_predikat?.data[0]?.kkm,
+                predikat1: `>= ${dataKirimNilai?.interval_predikat?.data[0]?.min}`,
+                predikat2: `${dataKirimNilai?.interval_predikat?.data[1]?.min} >= Nilai < ${dataKirimNilai?.interval_predikat?.data[1]?.max}`,
+                predikat3: `${dataKirimNilai?.interval_predikat?.data[2]?.min} >= Nilai < ${dataKirimNilai?.interval_predikat?.data[2]?.max}`,
+                predikat4: `< ${dataKirimNilai?.interval_predikat?.data[2]?.min}`
             },
         ]
+
+        const data_sampel1 = () => {
+            var tmp = []
+            dataKirimNilai?.siswa?.map((data, index) => {
+                tmp.push({
+                    key: '1',
+                    no: '1',
+                    namaSiswa: data.nama_siswa,
+                    kelas: data.kelas,
+                    kkm: data.kkm,
+                    // pengetahuan
+                    nilaiPengetahuan: dataKirimNilai?.siswa[index]?.data_nilai[0].given_value,
+                    predikatPengetahuan: dataKirimNilai?.siswa[index]?.data_nilai[0].predikat,
+                    // keterampilan
+                    nilaiKeterampilan: dataKirimNilai?.siswa[index]?.data_nilai[1].given_value,
+                    predikatKeterampilan: dataKirimNilai?.siswa[index]?.data_nilai[1].predikat,
+                    // spiritual
+                    predikatSpiritual: dataKirimNilai?.siswa[index]?.data_nilai[2].predikat,
+                    // sikap
+                    predikatSosial: dataKirimNilai?.siswa[index]?.data_nilai[2].predikat,
+                })
+            })
+            return tmp;
+        }
 
         const data_sampel = [
             {
@@ -425,105 +674,66 @@ function KirimPenilaian() {
                     onBack={() => setIsViewKirimPenilaian(true)}
                     title="Kirim Penilaian"
                 />
-                <div className="row d-flex align-items-center">
-                    <div className="col-lg-5">
-                        <Card className="shadow-md my-6 rounded">
-                            <Row>
-                                <Select style={{ width: '100%' }}
-                                    showSearch
-                                    placeholder="Pilih Kelas ...."
-                                    optionFilterProp="children"
-                                    onChange={onChange}
-                                    onSearch={onSearch}
-                                    filterOption={(input, option) =>
-                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                >
-                                    <Option value="kelas1">Kelas 1</Option>
-                                    <Option value="kelas2">Kelas 2</Option>
-                                    <Option value="kelas3">Kelas 3</Option>
-                                </Select>
-                            </Row>
-                        </Card>
-                    </div>
-                    <div className="col-lg-5">
-                        <Card className="shadow-md my-6 rounded">
-                            <Row>
-                                <Select style={{ width: '100%' }}
-                                    showSearch
-                                    placeholder="Pilih Mata Pelajaran ...."
-                                    optionFilterProp="children"
-                                    onChange={onChange}
-                                    onSearch={onSearch}
-                                    filterOption={(input, option) =>
-                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                >
-                                    <Option value="matematika">Matematika</Option>
-                                    <Option value="bahasaIndonesia">Bahasa Indonesia</Option>
-                                    <Option value="ilmuPengetahuanAlam">Ilmu Pengetahuan Alam</Option>
-                                </Select>
-                            </Row>
-                        </Card>
-                    </div>
-                    <div className="col-lg-2">
-                        <button
-                            className="bg-current border-0 text-center text-white font-xs fw-600 p-2 w150 rounded-xl d-inline-block"
-                            type="submit"
-                        >
-                            Pratinjau
-                        </button>
-                    </div>
-                </div>
-                <div className="mt-4 bg-grey">
-                    <p className="font-xssss strong text-black pl-4 mb-0">Tabel Interval Predikat - Penjaskes</p>
-                </div>
-                <Table className="mt-0 py-8"
-                    columns={columns}
-                    dataSource={data}
-                    onChange={onChangeTable}
-                    pagination={false}
-                    rowClassName="bg-greylight text-grey-900"
-                    scroll={{ x: 400 }}
-                    bordered />
+                <GetMapelKelas valueFilter={(e) => _getDataKirimPenilaian(e)} />
+                {dataKirimNilai == null ?
+                    <DataNotFound />
+                    :
+                    <>
+                        <div className="mt-4 bg-grey">
+                            <p className="font-xssss strong text-black pl-4 mb-0">Tabel Interval Predikat - {dataKirimNilai?.interval_predikat?.nama_matpel}</p>
+                        </div>
+                        <Table className="mt-0 py-8"
+                            columns={columns}
+                            dataSource={data}
+                            onChange={onChangeTable}
+                            pagination={false}
+                            rowClassName="bg-greylight text-grey-900"
+                            scroll={{ x: 400 }}
+                            bordered />
 
-                <Table
-                    dataSource={data_sampel}
-                    className="mt-4"
-                    align='center'
-                    pagination={false}
-                    bordered>
-                    <Column align='center' title="No" dataIndex="no" key="no" />
-                    <Column align='center' title="Nama Siswa" dataIndex="namaSiswa" key="namaSiswa" />
-                    <Column align='center' title="Kelas" dataIndex="kelas" key="kelas" />
-                    <Column align='center' title="KKM" dataIndex="kkm" key="kkm" />
-                    <ColumnGroup title="Pengetahuan">
-                        <Column align='center' title="Nilai" dataIndex="nilaiPengetahuan" key="nilaiPengetahuan" />
-                        <Column align='center' title="Predikat" dataIndex="predikatPengetahuan" key="predikatPengetahuan" />
-                    </ColumnGroup>
-                    <ColumnGroup title="Keterampilan">
-                        <Column align='center' title="Nilai" dataIndex="nilaiKeterampilan" key="nilaiKeterampilan" />
-                        <Column align='center' title="Predikat" dataIndex="predikatKeterampilan" key="predikatKeterampilan" />
-                    </ColumnGroup>
-                    <ColumnGroup align='center' title="Sikap Spiritual">
-                        <Column align='center' title="Predikat" dataIndex="predikatSpiritual" key="predikatSpiritual" />
-                    </ColumnGroup>
-                    <ColumnGroup align='center' title="Sikap Sosial">
-                        <Column align='center' title="Predikat" dataIndex="predikatSosial" key="predikatSosial" />
-                    </ColumnGroup>
-                </Table>
+                        <Table
+                            dataSource={data_sampel1()}
+                            className="mt-4"
+                            align='center'
+                            pagination={false}
+                            bordered>
+                            <Column align='center' title="No" dataIndex="no" key="no" />
+                            <Column align='center' title="Nama Siswa" dataIndex="namaSiswa" key="namaSiswa" />
+                            <Column align='center' title="Kelas" dataIndex="kelas" key="kelas" />
+                            <Column align='center' title="KKM" dataIndex="kkm" key="kkm" />
+                            <ColumnGroup title="Pengetahuan">
+                                <Column align='center' title="Nilai" dataIndex="nilaiPengetahuan" key="nilaiPengetahuan" />
+                                <Column align='center' title="Predikat" dataIndex="predikatPengetahuan" key="predikatPengetahuan" />
+                            </ColumnGroup>
+                            <ColumnGroup title="Keterampilan">
+                                <Column align='center' title="Nilai" dataIndex="nilaiKeterampilan" key="nilaiKeterampilan" />
+                                <Column align='center' title="Predikat" dataIndex="predikatKeterampilan" key="predikatKeterampilan" />
+                            </ColumnGroup>
+                            <ColumnGroup align='center' title="Sikap Spiritual">
+                                <Column align='center' title="Predikat" dataIndex="predikatSpiritual" key="predikatSpiritual" />
+                            </ColumnGroup>
+                            <ColumnGroup align='center' title="Sikap Sosial">
+                                <Column align='center' title="Predikat" dataIndex="predikatSosial" key="predikatSosial" />
+                            </ColumnGroup>
+                        </Table>
 
-                <div className="col-lg-12 mt-5 mb-5 d-flex justify-content-end">
-                    <button
-                        className="bg-current border-0 text-center text-white font-xsss p-3 fw-600 w150 rounded-xl d-inline-block mr-2 mt-5"
-                        type="submit"
-                    >
-                        Kirim
-                    </button>
-                    <button
-                        className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"
-                    >
-                        Batal
-                    </button>
-                </div>
+                        <div className="col-lg-12 mt-5 mb-5 d-flex justify-content-end">
+                            <button
+                                className="bg-current border-0 text-center text-white font-xsss p-3 fw-600 w150 rounded-xl d-inline-block mr-2 mt-5"
+                                type="submit"
+                                onClick={onSubmit}
+                            >
+                                Kirim
+                            </button>
+                            <button
+                                className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"
+                                onClick={() => setIsViewKirimPenilaian(true)}
+                            >
+                                Batal
+                            </button>
+                        </div>
+                    </>
+                }
             </div>
         )
     }

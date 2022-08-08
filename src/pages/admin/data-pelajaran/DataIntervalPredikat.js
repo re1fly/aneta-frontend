@@ -142,7 +142,6 @@ function DataIntervalPredikat() {
                 ).then(function (response) {
                     const res = JSON.parse(response.data.variables[2].value)
                     const resCode = res.status
-
                     if (resCode === true) {
                         getDataInterval()
                         Swal.fire(
@@ -167,47 +166,6 @@ function DataIntervalPredikat() {
 
     }
 
-    useEffect(() => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoinfirst:1:e973019e-00cc-11ed-9ea6-c6ec5d98c2df",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "global_get_where",
-                        "type": "json",
-                        "value": {
-                            "tbl_name": "test",
-                            "pagination": false,
-                            "total_result": 2,
-                            "order_coloumn": "test.id",
-                            "order_by": "asc",
-                            "data": [
-                                {
-                                    "kondisi": "where",
-                                    "tbl_coloumn": "id",
-                                    "tbl_value": "1",
-                                    "operator": "="
-                                }
-                            ],
-                            "tbl_coloumn": [
-                                "*"
-                            ]
-                        }
-                    }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            }
-        ).then(function (response) {
-            const resData = JSON.parse(response.data.variables[2].value)
-            console.log(resData.data.json)
-
-        }).catch(error => {
-            alert(error)
-        });
-    }, [])
 
     useEffect(() => {
         getDataInterval()

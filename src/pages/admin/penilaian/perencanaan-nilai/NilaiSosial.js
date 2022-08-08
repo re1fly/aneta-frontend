@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import {Badge, Descriptions, notification, PageHeader, Space, Table, Tag} from "antd";
 import axios from "axios";
 import {BASE_URL} from "../../../../api/Url";
+import {DataNotFound} from "../../../../components/misc/DataNotFound";
 
 
 function NilaiSosial() {
@@ -13,9 +14,9 @@ function NilaiSosial() {
     const userId = localStorage.getItem("user_id");
     const [dataMapel, setDataMapel] = useState([]);
     const [dataKelas, setDataKelas] = useState([]);
-    const [isChecked, setIsChecked] = useState(false);
     const [dataKompetensi, setDataKompetensi] = useState([]);
-    const [totalPenilaian, setTotalPenilaian] = useState(1);
+    const [totalPenilaian, setTotalPenilaian] = useState(0);
+    const [selectedClass, setSelectedClass] = useState(null)
 
     const _getDataMapel = () => {
         axios
@@ -29,38 +30,54 @@ function NilaiSosial() {
                             "name": "global_join_where_sub",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_academic_subjects",
-                                "select": [
+                                "tbl_induk": "x_academic_subject_master",
+                                "select" : [
                                     "x_academic_subjects.id as id_subject",
                                     "x_academic_subject_master.nama_mata"
                                 ],
                                 "paginate": 1000,
                                 "join": [
                                     {
-                                        "tbl_join": "x_academic_subject_master",
+                                        "tbl_join": "x_academic_year",
                                         "refkey": "id",
-                                        "tbl_join2": "x_academic_subjects",
-                                        "foregenkey": "academic_subjects_master_id"
+                                        "tbl_join2": "x_academic_subject_master",
+                                        "foregenkey": "academic_year_id"
+                                    },{
+                                        "tbl_join": "x_academic_subjects",
+                                        "refkey": "academic_subjects_master_id",
+                                        "tbl_join2": "x_academic_subject_master",
+                                        "foregenkey": "id"
                                     }
                                 ],
-
                                 "where": [
                                     {
-                                        "tbl_coloumn": "x_academic_subject_master",
+                                        "tbl_coloumn": "x_academic_subjects",
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
-                                        "operator": "="
-                                    },
-                                    {
+                                        "operator": "=",
+                                        "kondisi" : "where"
+                                    },{
+                                        "tbl_coloumn": "x_academic_subjects",
+                                        "tbl_field": "course_grade_id",
+                                        "tbl_value": selectedClass,
+                                        "operator": "=",
+                                        "kondisi" : "where"
+                                    },{
                                         "tbl_coloumn": "x_academic_subject_master",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
-                                        "operator": "="
+                                        "operator": "=",
+                                        "kondisi" : "where"
+                                    },{
+                                        "tbl_coloumn": "x_academic_subjects",
+                                        "tbl_field": "course_grade_id",
+                                        "tbl_value": "",
+                                        "operator": "!=",
+                                        "kondisi" : "where"
                                     }
-
                                 ],
                                 "order_coloumn": "x_academic_subject_master.nama_mata",
-                                "order_by": "asc"
+                                "order_by": "desc"
                             }
                         },
                         {
@@ -137,49 +154,16 @@ function NilaiSosial() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "a9ac1598-114b-11ed-9ea6-c6ec5d98c2df",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_join_where_sub",
+                            "name": "get_data",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_competence_detail",
-                                "select": [
-                                    "x_competence_detail.id as id_detail",
-                                    "x_competence_detail.competence_desc"
-
-                                ],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_competence",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_competence_detail",
-                                        "foregenkey": "competence_id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_competence",
-                                        "tbl_field": "academic_courses_id",
-                                        "tbl_value": e.target.value,
-                                        "operator": "="
-                                    }, {
-                                        "tbl_coloumn": "x_competence_detail",
-                                        "tbl_field": "competence_aspect_id",
-                                        "tbl_value": "1",
-                                        "operator": "="
-                                    }
-                                ],
-                                "order_coloumn": "x_competence_detail.competence_desc",
-                                "order_by": "asc"
+                                "id_matpel": e.target.value,
+                                "id_aspect": "4"
                             }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
                         }
                     ]
                 },
@@ -190,9 +174,15 @@ function NilaiSosial() {
                 }
             )
             .then(function (response) {
-                const competency = JSON.parse(response.data.variables[3].value);
-                const allCompetency = competency.data.data
+                const competency = JSON.parse(response.data.variables[2].value);
+                const allCompetency = competency.data
                 setDataKompetensi(allCompetency);
+                console.log(allCompetency)
+                if(allCompetency == null){
+                    setTotalPenilaian(0)
+                }else{
+                    setTotalPenilaian(1)
+                }
             })
     }
 
@@ -235,6 +225,7 @@ function NilaiSosial() {
             kompetensi: allCompetency
         }
 
+
         axios
             .post(
                 BASE_URL, {
@@ -276,11 +267,15 @@ function NilaiSosial() {
             })
     }
 
+
     useEffect(() => {
         _getDataKelas()
-        _getDataMapel()
     }, []);
 
+    useEffect(() => {
+        _getDataMapel()
+        setDataKompetensi([])
+    }, [selectedClass]);
 
     return (
         <Fragment>
@@ -305,12 +300,13 @@ function NilaiSosial() {
                                         <select
                                             className="form-control"
                                             name="id_class_filter"
+                                            onChange={(e) => setSelectedClass(e.target.value)}
                                         >
                                             <option value="" selected disabled>
                                                 Pilih Kelas
                                             </option>
                                             {dataKelas.map((data) => (
-                                                <option value={data.id}>{data.class}</option>
+                                                <option value={data.id}>{data.class} / {data.sub_class}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -331,85 +327,92 @@ function NilaiSosial() {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="col-lg-12 pt-5">
+                                { totalPenilaian == 0 ?
+                                    <DataNotFound/>
+                                    :
+                                    <div className="col-lg-12 pt-5">
 
-                                    <div className="table-responsive-xl">
-                                        <table className="table" style={{borderCollapse: 'collapse'}}>
-                                            <thead>
-                                            <tr className='bg-current text-light'>
-                                                <th scope="col" style={{width: 500}}>Penilaian</th>
-                                                <th scope="col" colspan="3" className='m-auto text-center'>Penilaian 1
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <th scope="row" style={{borderBottomStyle: 'hidden'}}>
-                                                    <h4><b>Kompetensi Dasar / Butir Sikap Sosial</b></h4>
-                                                </th>
-                                            </tr>
-                                            {
-                                                dataKompetensi.map((data) => (
-                                                    <tr style={{borderStyle: 'hidden'}}>
-                                                        <th scope="row" style={{
-                                                            borderRightStyle: 'hidden',
-                                                            backgroundColor: 'white',
-                                                            color: 'black',
-                                                            textTransform: 'capitalize'
-                                                        }}>
-                                                            {data.competence_desc}
-                                                        </th>
-                                                        {totalPenilaian > 0 &&
-                                                            <>
-                                                                {[...Array(Number(totalPenilaian)).keys()]
-                                                                    .map((item, index) => {
-                                                                        return (
-                                                                            <td style={{borderRightStyle: 'hidden'}}>
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    className="form-control"
-                                                                                    style={{zoom: 0.4}}
-                                                                                    // name={`kompetensi_${data.id_detail}_${index + 1}`}
-                                                                                    name="kompetensi"
-                                                                                    id={`kompetensi_${data.id_detail}_${index + 1}`}
-                                                                                    key={data.id_detail}
-                                                                                    onChange={(e) => {
-                                                                                        setIsChecked(e?.target?.checked)
-                                                                                    }}
-                                                                                    value={isChecked}
-                                                                                />
-                                                                            </td>
-                                                                        )
-                                                                    })}
-                                                            </>
-                                                        }
-                                                    </tr>
-                                                ))
-                                            }
-                                            </tbody>
-                                        </table>
+                                        <div className="table-responsive-xl">
+                                            <table className="table" style={{borderCollapse: 'collapse'}}>
+                                                <thead>
+                                                <tr className='bg-current text-light'>
+                                                    <th scope="col" style={{width: 500}}>Penilaian</th>
+                                                    <th scope="col" colSpan="3" className='m-auto text-center'>Penilaian
+                                                        1
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <th scope="row" style={{borderBottomStyle: 'hidden'}}>
+                                                        <h4><b>Kompetensi Dasar / Butir Sikap Sosial</b></h4>
+                                                    </th>
+                                                </tr>
+                                                {
+                                                    dataKompetensi.map((data) => (
+                                                        <tr style={{borderStyle: 'hidden'}}>
+                                                            <th scope="row" style={{
+                                                                borderRightStyle: 'hidden',
+                                                                backgroundColor: 'white',
+                                                                color: 'black',
+                                                                textTransform: 'capitalize'
+                                                            }}>
+                                                                {data.competence_desc}
+                                                            </th>
+                                                            {totalPenilaian > 0 &&
+                                                                <>
+                                                                    {[...Array(Number(totalPenilaian)).keys()]
+                                                                        .map((item, index) => {
+                                                                            console.log(data.is_checked)
+                                                                            return (
+                                                                                <td style={{borderRightStyle: 'hidden'}}>
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        className="form-control"
+                                                                                        style={{zoom: 0.4}}
+                                                                                        // name={`kompetensi_${data.id_detail}_${index + 1}`}
+                                                                                        name="kompetensi"
+                                                                                        id={`kompetensi_${data.id_detail}_${index + 1}`}
+                                                                                        key={data.id_detail}
+                                                                                        defaultChecked={data.is_checked}
+                                                                                    />
+                                                                                </td>
+                                                                            )
+                                                                        })}
+                                                                </>
+                                                            }
+                                                        </tr>
+                                                    ))
+                                                }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </form>
+                        { totalPenilaian == 0 ?
+                            null
+                            :
+                            <div className="row">
+                                <div className="col">
+                                    <div className="mt-5 mb-4 float-right">
+                                        <button
+                                            className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                            onClick={_submitNilai}
+                                        >
+                                            Simpan
+                                        </button>
+                                        <a
+                                            onClick={() => window.history.back()}
+                                            className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                        >
+                                            Batal
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                        <div className="row">
-                            <div className="col">
-                                <div className="mt-5 mb-4 float-right">
-                                    <button
-                                        className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                        onClick={_submitNilai}
-                                    >
-                                        Simpan
-                                    </button>
-                                    <a
-                                        onClick={() => window.history.back()}
-                                        className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                    >
-                                        Batal
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
                     <Adminfooter/>
                 </div>

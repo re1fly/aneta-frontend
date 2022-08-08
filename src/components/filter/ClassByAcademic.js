@@ -6,6 +6,7 @@ export const ClassByAcademic = (props) => {
             <select
                 className="form-control"
                 name="id_class_filter"
+                onChange={props.onChangeKelas}
             >
                 <option value="" selected disabled>
                     Pilih Kelas

@@ -13,7 +13,7 @@ import {
   MenuOutlined,
 } from "@ant-design/icons";
 
-import { Link } from 'react-router-dom';
+import { Link, useHistory} from 'react-router-dom';
 import axios from "axios";
 import Search from "antd/es/input/Search";
 import { BASE_URL } from "../../../api/Url";
@@ -58,7 +58,8 @@ export default function JadwalPelajaranAdminSubKelas() {
   const academicYear = localStorage.getItem('academic_year');
 
   const ClassReducer = useSelector(state => state.dataKelas)
-  const nameClass = ClassReducer.AllClass.kelas
+  const nameClass = ClassReducer.AllClass.kelas // kelas 2
+  console.log(nameClass);
   const SubClassReducer = ClassReducer.SubClass
 
   useEffect(() => {
@@ -109,7 +110,7 @@ export default function JadwalPelajaranAdminSubKelas() {
   useEffect(() => {
     axios.post(BASE_URL,
       {
-        "processDefinitionId": getProcessDefId,
+        "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
         "returnVariables": true,
         "variables": [
           {
@@ -174,7 +175,7 @@ export default function JadwalPelajaranAdminSubKelas() {
                   "kondisi": "where"
                 }
               ],
-              "order_coloumn": "x_academic_class.class",
+              "order_coloumn": "x_academic_class.sub_class",
               "order_by": "asc"
             }
           },
@@ -184,6 +185,81 @@ export default function JadwalPelajaranAdminSubKelas() {
             "value": "1"
           }
         ]
+        // "processDefinitionId": getProcessDefId,
+        // "returnVariables": true,
+        // "variables": [
+        //   {
+        //     "name": "global_join_where_sub",
+        //     "type": "json",
+        //     "value": {
+        //       "tbl_induk": "x_academic_class",
+        //       "select": ["x_academic_class.id as id_class",
+        //         "x_academic_class.class",
+        //         "x_academic_class.sub_class",
+        //         "x_academic_class.class_location",
+        //         "x_academic_year.academic_year",
+        //         "x_academic_year.id as id_academic",
+        //         "users.name",
+        //         "x_academic_teachers.id as id_walikelas",
+        //         "users.institute_id"
+        //       ],
+        //       "paginate": 10,
+        //       "join": [
+        //         {
+        //           "tbl_join": "x_academic_teachers",
+        //           "refkey": "id",
+        //           "tbl_join2": "x_academic_class",
+        //           "foregenkey": "calss_advisor_id"
+
+        //         }, {
+        //           "tbl_join": "users",
+        //           "refkey": "id",
+        //           "tbl_join2": "x_academic_teachers",
+        //           "foregenkey": "user_id"
+        //         }, {
+        //           "tbl_join": "x_academic_year",
+        //           "refkey": "id",
+        //           "tbl_join2": "x_academic_class",
+        //           "foregenkey": "academic_year_id"
+        //         }
+        //       ],
+        //       "where": [
+        //         {
+        //           "tbl_coloumn": "users",
+        //           "tbl_field": "institute_id",
+        //           "tbl_value": institute,
+        //           "operator": "=",
+        //           "kondisi": "where"
+        //         }, {
+        //           "tbl_coloumn": "x_academic_class",
+        //           "tbl_field": "academic_year_id",
+        //           "tbl_value": academicYear,
+        //           "operator": "=",
+        //           "kondisi": "where"
+        //         }, {
+        //           "tbl_coloumn": "x_academic_class",
+        //           "tbl_field": "deleted_at",
+        //           "tbl_value": "",
+        //           "operator": "=",
+        //           "kondisi": "where"
+        //         }, {
+        //           "tbl_coloumn": "x_academic_class",
+        //           "tbl_field": "class",
+        //           "tbl_value": nameClass,
+        //           "operator": "=",
+        //           "kondisi": "where"
+        //         }
+        //       ],
+        //       "order_coloumn": "x_academic_class.class",
+        //       "order_by": "asc"
+        //     }
+        //   },
+        //   {
+        //     "name": "page",
+        //     "type": "string",
+        //     "value": "1"
+        //   }
+        // ]
       }, {
       headers: {
         "Content-Type": "application/json",
@@ -192,11 +268,11 @@ export default function JadwalPelajaranAdminSubKelas() {
     ).then(function (response) {
       const dataRes = JSON.parse(response?.data?.variables[3]?.value);
       const subKelas = dataRes?.data?.data
-      setGetSubKelas(subKelas); 
+      setGetSubKelas(subKelas);
       // dispatch({ type: "SET_SUBCLASS", value: subKelas})
     })
   }, [getProcessDefId])
- 
+
   const channelList = getSubKelas.map((data, index) => {
     return {
       class: data.class,
@@ -210,6 +286,11 @@ export default function JadwalPelajaranAdminSubKelas() {
       name: data.name,
     }
   })
+
+  let history = useHistory();
+  const handleSubClass = (id) => {
+    history.push(`/admin-jadwal-pelajaran-detail-${id}`)
+  }
 
   const ViewPelajaran = () => {
     return (
@@ -246,21 +327,22 @@ export default function JadwalPelajaranAdminSubKelas() {
             </Card>
             <div className="px-1 py-2 ">
               <div className="row">
-              {channelList.map((value, index) => {
-                return(
+                {channelList.map((value, index) => {
+                  return (
                     <div className="col-xl-3 col-lg-4 col-md-4">
-                      <Link
-                      onClick={() => {
-                        dispatch({ type: 'SET_SUBCLASS', value: value })
-                      }
-                      }
+                      {/* <Link
+                        onClick={() => {
+                          dispatch({ type: 'SET_SUBCLASS', value: value })
+                        }
+                        }
                         to={{ pathname: `/admin-jadwal-pelajaran-detail` }}
-                      >
+                      > */}
                         <div
-                          className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center">
+                          className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
+                          onClick={()=> handleSubClass(value.id_class)}>
                           <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.class} - {value.sub_class}</h2>
                         </div>
-                      </Link>
+                      {/* </Link> */}
                     </div>
                   )
                 })}

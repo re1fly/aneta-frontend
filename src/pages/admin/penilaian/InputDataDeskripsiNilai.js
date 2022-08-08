@@ -5,14 +5,21 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
 import React, { Fragment, useState, useEffect } from "react";
-import { PageHeader, Select, Card, Row, Table, Input } from "antd"
+import { useDispatch, useSelector } from "react-redux";
+import { getProcessId } from "../../../redux/Action";
+import { PageHeader, notification, Select, Card, Row, Table, Input } from "antd"
+import { GetMapelKelas } from "../../../components/filter/GetMapelKelas";
+import { DataNotFound } from "../../../components/misc/DataNotFound";
 
 function InputDataDeskripsiNilai() {
+    const userId = localStorage.getItem("user_id");
+    const institute = localStorage.getItem('institute');
+    const academic = localStorage.getItem('academic_year');
 
-    const [dataDeskripsi, setDataDeskripsi] = useState([])
-
-    const { Option } = Select;
-    const { TextArea } = Input;
+    const [getKelas, setGetKelas] = useState([]);
+    const [selectClass, setSelectClass] = useState([]);
+    const [deskripsiNilai, setDeskripsiNilai] = useState(null)
+    // console.log(JSON.stringify(deskripsiNilai, null, 2));
 
     function onChange(value) {
         console.log(`selected ${value}`);
@@ -22,150 +29,187 @@ function InputDataDeskripsiNilai() {
         console.log('search:', val);
     }
 
-    function onChangeTable(pagination, filters, sorter, extra) {
-        console.log('params', pagination, filters, sorter, extra);
-    }
-
-    useEffect(() => {
+    const _getDataDeskripsiNilai = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        console.log(data)
         axios.post(BASE_URL,
             {
-
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getinputdeskripsi:1:11a7f7fc-14b5-11ed-9ea6-c6ec5d98c2df",
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_join_where_sub",
+                        "name": "get_data",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_assessment_actual_desc",
-                            "select": [
-                                "x_assessment_actual_desc.*",
-                                "x_assessment_header",
-                                "x_academic_students",
-                                "users.*",
-                                "r_competence_aspect"
-                            ],
-                            "paginate": 10,
-                            "join": [
-                                {
-                                    "tbl_join": "x_assessment_header",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_actual_desc",
-                                    "foregenkey": "assessment_header_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_students",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_actual_desc",
-                                    "foregenkey": "student_id"
-                                },
-                                {
-                                    "tbl_join": "users",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_students",
-                                    "foregenkey": "user_id"
-                                },
-                                {
-                                    "tbl_join": "r_competence_aspect",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_actual_desc",
-                                    "foregenkey": "competence_aspect_id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_assessment_header",
-                                    "tbl_field": "class_id",
-                                    "tbl_value": "86",
-                                    "operator": "="
-                                }, {
-                                    "tbl_coloumn": "x_assessment_header",
-                                    "tbl_field": "subjects_id",
-                                    "tbl_value": "219",
-                                    "operator": "="
-                                }
-                            ],
-                            "order_coloumn": "x_assessment_actual_desc.given_value",
-                            "order_by": "desc"
+                            "id_class": data.id_class_filter, // 86 untuk test data.id_class_filter
+                            "id_academic": academic,
+                            "id_matpel": data.id_mapel_filter // 219 untuk test data.id_mapel_filter
                         }
-                    },
-                    {
-                        "name": "page",
-                        "type": "string",
-                        "value": "1"
                     }
                 ]
             }
+            ,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
         ).then(function (response) {
-            // console.log(response);
-            const dataRes = JSON.parse(response?.data?.variables[3]?.value)
-            console.log(dataRes?.data?.data);
-            // setGetKirimPenilaian(dataRes?.data?.data)
-        })
-    }, [])
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            // console.log(dataRes.siswa);
+            setDeskripsiNilai(dataRes?.siswa)
 
-    const columns = [
-        {
-            title: 'No',
-            dataIndex: 'no',
-            defaultSortOrder: 'ascend',
-            responsive: ['sm'],
-        },
-        {
-            title: 'Nama Siswa',
-            dataIndex: 'namaSiswa',
-            sortDirections: ['descend'],
-        },
-        {
-            title: 'Nilai Pengetahuan',
-            dataIndex: 'nilaiPengetahuan',
-            defaultSortOrder: 'descend',
-            align: 'center'
-        },
-        {
-            title: 'Deskripsi Pengetahuan',
-            dataIndex: 'deskripsiPengetahuan',
-            defaultSortOrder: 'descend',
-        },
-        {
-            title: 'Nilai Keterampilan',
-            dataIndex: 'nilaiKeterampilan',
-            defaultSortOrder: 'descend',
-            align: 'center'
-        },
-        {
-            title: 'Deskripsi Keterampilan',
-            dataIndex: 'deskripsiKeterampilan',
-            defaultSortOrder: 'descend',
-        },
-    ];
+            // if (dataRes[0].data.length >= 2) {
+            //     setDeskripsiNilai(dataRes?.siswa)
+            //     notification.success({
+            //         message: "Data Ditemukan",
+            //         description: "Data Dapat dilihat dalam table",
+            //         placement: 'top'
+            //     })
+            // } else {
+            //     setDeskripsiNilai(null)
+            //     notification.info({
+            //         message: "Not Found",
+            //         description: "Data tidak ditemukan",
+            //         placement: 'top'
+            //     })
+            // }
 
-    const dataSample = [
-        // {
-        //     no: '001',
-        //     namaSiswa: 'Boy Jati Asmara',
-        //     nilaiPengetahuan: "75",
-        //     deskripsiPengetahuan: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-        //     nilaiKeterampilan: "75",
-        //     deskripsiKeterampilan: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-        // },
-        // {
-        //     no: '002',
-        //     namaSiswa: 'Rochy Putiari',
-        //     nilaiPengetahuan: "75",
-        //     deskripsiPengetahuan: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-        //     nilaiKeterampilan: "75",
-        //     deskripsiKeterampilan: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-        // },
-        // {
-        //     no: '003',
-        //     namaSiswa: 'Yaris Riyadi',
-        //     nilaiPengetahuan: "75",
-        //     deskripsiPengetahuan: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-        //     nilaiKeterampilan: "75",
-        //     deskripsiKeterampilan: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-        // },
-    ];
+        }, [academic])
+    }
+
+    const _submitNilai = (e) => {
+        const formCV = document.querySelector('#form_deskripsi');
+        const formData = new FormData(formCV);
+
+        const deskripsiPengetahuan = formData.getAll('deskripsi_pengetahuan');
+        const deskripsiKeterampilan = formData.getAll('deskripsi_keterampilan');
+        const nilaiPengetahuan = formData.getAll('nilai_pengetahuan')
+        const nilaiKeterampilan = formData.getAll('nilai_keterampilan')
+        console.log(nilaiKeterampilan);
+
+        const allDeskripsi = [];
+        const Pengetahuan = [];
+        const Keterampilan = [];
+
+        for (let i = 0; i < deskripsiPengetahuan.length; i++) {
+            Pengetahuan.push(
+                {
+                    // "assessment_header_id": 102, 
+                    "id_aspect": 1,
+                    "competence_aspect": "Pengetahuan",
+                    "given_description": deskripsiPengetahuan[i]
+                },
+            );
+        }
+        for (let i = 0; i < deskripsiPengetahuan.length; i++) {
+            Keterampilan.push(
+                {
+                    // "assessment_header_id": 102, 
+                    "id_aspect": 2,
+                    "competence_aspect": "Keterampilan",
+                    "given_description": deskripsiKeterampilan[i]
+                },
+            );
+        }
+        const checkDataFunc = () => {
+            let checkData1 =[];
+            deskripsiNilai.map((dd, i) => {
+                if (dd.data.length != 0) {
+                    checkData1.push('ada')
+                } else {
+                    checkData1.push('kosong')
+
+                }
+            })
+            return !checkData1.includes('kosong');
+        }
+        // console.log(checkDataFunc());
+
+        if (checkDataFunc()) {
+            deskripsiNilai.map((siswa, i) => {
+                allDeskripsi.push(
+                    {
+                        "nama_siswa": siswa.nama_siswa,
+                        "id_siswa": siswa.id_siswa,
+                        "data": [
+                            {
+                                ...Pengetahuan[i],
+                                "given_value": siswa?.data[0]?.given_value,
+                                "assessment_header_id": siswa?.data[0]?.assessment_header_id,
+                                
+                            },
+                            {
+                                ...Keterampilan[i],
+                                "given_value": siswa?.data[1]?.given_value,
+                                "assessment_header_id": siswa?.data[0]?.assessment_header_id,
+                            }
+                        ]
+                    },
+                );
+            });
+        }
+
+        console.log(JSON.stringify(allDeskripsi, null, 2));
+
+        if (checkDataFunc()) {
+            axios
+                .post(
+                    BASE_URL, {
+                    "processDefinitionId": "inputdatadeskripsi:3:4ab68e43-14b4-11ed-ac5e-66fc627bf211",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_data",
+                            "type": "json",
+                            "value": {
+                                "created_by": userId,
+                                "siswa":
+                                    allDeskripsi,
+                            }
+                        }
+                    ]
+                },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                )
+                .then(function (response) {
+                    const dataRes = JSON.parse(response.data.variables[2].value);
+                    console.log(dataRes);
+                    const resCode = dataRes.code;
+                    console.log(resCode);
+                    if (resCode === true) {
+                        notification.success({
+                            message: "Sukses",
+                            description: "Deskripsi nilai berhasil di input",
+                            placement: 'top'
+                        })
+                    } else {
+                        notification.info({
+                            message: "Gagal",
+                            description: "Deskripsi nilai tidak berhasil di input",
+                            placement: 'top'
+                        })
+                    }
+                })
+        } else {
+            console.log("data ada yang kosong");
+            notification.info({
+                message: "Gagal Simpan data",
+                description: "Data ada yang kosong",
+                placement: 'top'
+            })
+        }
+
+    }
+
 
     return (
         <Fragment>
@@ -179,72 +223,105 @@ function InputDataDeskripsiNilai() {
                             onBack={() => window.history.back()}
                             title="Input Data Deskripsi Nilai (Rapor)"
                         />
-                        <div className="row d-flex align-items-center">
-                            <div className="col-lg-5">
-                                <Card className="shadow-md my-6 rounded">
-                                    <Row>
-                                        <Select style={{ width: '100%' }}
-                                            showSearch
-                                            placeholder="Pilih Kelas ...."
-                                            optionFilterProp="children"
-                                            onChange={onChange}
-                                            onSearch={onSearch}
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                        >
-                                            <Option value="kelas1">Kelas 1</Option>
-                                            <Option value="kelas2">Kelas 2</Option>
-                                            <Option value="kelas3">Kelas 3</Option>
-                                        </Select>
-                                    </Row>
-                                </Card>
-                            </div>
-                            <div className="col-lg-5">
-                                <Card className="shadow-md my-6 rounded">
-                                    <Row>
-                                        <Select style={{ width: '100%' }}
-                                            showSearch
-                                            placeholder="Pilih Mata Pelajaran ...."
-                                            optionFilterProp="children"
-                                            onChange={onChange}
-                                            onSearch={onSearch}
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                        >
-                                            <Option value="matematika">Matematika</Option>
-                                            <Option value="bahasaIndonesia">Bahasa Indonesia</Option>
-                                            <Option value="ilmuPengetahuanAlam">Ilmu Pengetahuan Alam</Option>
-                                        </Select>
-                                    </Row>
-                                </Card>
-                            </div>
-                            <div className="col-lg-2">
-                                <button
-                                    className="bg-current border-0 text-center text-white font-xs fw-600 p-2 w150 rounded-xl d-inline-block"
-                                    type="submit"
-                                >
-                                    Proses
-                                </button>
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <Table className=""
-                                columns={columns}
-                                dataSource={dataSample}
-                                onChange={onChangeTable}
-                                pagination={false}
-                                rowClassName="bg-greylight text-grey-900"
-                                scroll={{ x: 400 }} />
-                        </div>
+                        <GetMapelKelas valueFilter={(e) => _getDataDeskripsiNilai(e)} />
+                        {deskripsiNilai == null || deskripsiNilai.length == 0 ?
+                            <DataNotFound />
+                            :
+                            <form id="form_deskripsi">
+                                <div className="mt-4">
+                                    <table className="table table-bordered">
+                                        <thead>
+                                            <tr className="bg-current text-light text-center">
+                                                <th scope="col">No</th>
+                                                <th scope="col">Nama Siswa</th>
+                                                <th scope="col">Nilai Pengetahuan</th>
+                                                <th scope="col">Deskripsi Pengetahuan</th>
+                                                <th scope="col">Nilai Keterampilan</th>
+                                                <th scope="col">Deskripsi Keterampilan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {deskripsiNilai?.map((siswa, index) => {
+                                                return (
+                                                    <tr>
+                                                        <td className="text-center">
+                                                            {index + 1}
+                                                        </td>
+                                                        <th className="text-center">
+                                                            {siswa.nama_siswa}
+                                                        </th>
+                                                        {siswa?.data == null || siswa.data.length == 0 ? (
+                                                            <>
+                                                                <td className="text-center">
+                                                                    
+                                                                </td>
+                                                                <td>
+                                                                    <textarea
+                                                                        className="form-control"
+                                                                        aria-label="Default"
+                                                                        name='deskripsi_pengetahuan'
+                                                                    />
+                                                                </td>
+                                                                <td className="text-center">
+                                                                    
+                                                                </td>
+                                                                <td>
+                                                                    <textarea
+                                                                        className="form-control"
+                                                                        aria-label="Default"
+                                                                        name='deskripsi_keterampilan'
+                                                                    />
+                                                                </td>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <td className="text-center" >
+                                                                    {/* <input name="nilai_pengetahuan" defaultValue={siswa?.data[0]?.given_value} /> */}
+                                                                    {siswa?.data[0]?.given_value}
+                                                                </td>
+                                                                <td>
+                                                                    <textarea
+                                                                        className="form-control"
+                                                                        aria-label="Default"
+                                                                        name='deskripsi_pengetahuan'
+                                                                        defaultValue={siswa?.data[0]?.given_description}
+                                                                    />
+                                                                </td>
+                                                                <td className="text-center">
+                                                                    {/* <input name="nilai_keterampilan" defaultValue={siswa?.data[1]?.given_value} /> */}
+                                                                    {siswa?.data[1]?.given_value}
+                                                                </td>
+                                                                <td>
+                                                                    <textarea
+                                                                        className="form-control"
+                                                                        aria-label="Default"
+                                                                        name='deskripsi_keterampilan'
+                                                                        defaultValue={siswa?.data[1]?.given_description}
+                                                                    />
+                                                                </td>
+                                                            </>
+                                                        )}
+
+                                                    </tr>
+                                                )
+                                            })}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </form>
+                        }
                         <div className="col-lg-12 mt-5 mb-5 d-flex justify-content-end">
                             <button
                                 className="bg-current border-0 text-center text-white font-xsss p-3 fw-600 w150 rounded-xl d-inline-block mr-2 mt-5"
                                 type="submit"
+                                onClick={_submitNilai}
                             >
                                 Simpan
                             </button>
                             <button
                                 className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"
+                                onClick={() => setDeskripsiNilai(null)}
                             >
                                 Batal
                             </button>

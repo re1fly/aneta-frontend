@@ -1,10 +1,44 @@
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
-import React, { Fragment } from "react";
-import { PageHeader, Select, Card, Row, Table, Input, Button } from "antd"
+import { BASE_URL } from "../../../api/Url";
+import React, { Fragment, useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { PageHeader, Select, Card, Row, Table, Input, Button, Modal } from "antd"
+import { getProcessId } from "../../../redux/Action";
+import ERapor from "../../../components/pdf/ERapor";
+import { useReactToPrint } from "react-to-print"
+
 
 function CetakRapor() {
+
+    const [getKelas, setGetKelas] = useState([]);
+    const [getTahunAkademik, setGetTahunAkademik] = useState([])
+    const [refreshState, setRefreshState] = useState(false);
+
+    const [dataRapor, setDataRapor] = useState([])
+    const [getErapor, setGetErapor] = useState([])
+    console.log(getErapor);
+    const [selectClass, setSelectClass] = useState([]);
+    const [selectAcademic, setSelectAcademic] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null)
+
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const institute = localStorage.getItem('institute');
+    const academic = localStorage.getItem('academic_year');
+
+    const dispatch = useDispatch();
+    const getProcess = useSelector(state => state.processId);
+    let ProcessId = getProcess.DataProcess;
+    let getKeyGlobalJoin;
+
+    let componentRef = useRef();
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current
+    });
 
     const { Option } = Select;
     const { TextArea } = Input;
@@ -22,47 +56,304 @@ function CetakRapor() {
         console.log('params', pagination, filters, sorter, extra);
     }
 
-    const data = [
-        {
-            key: '1',
-            no: '1',
-            namaSiswa: 'Boy Jati Asmara',
-            kelas: '1A',
-            raporTengahSemester: <Button className="rounded-xl">
-                <i className="feather-printer mr-2"></i>Cetak PDF
-            </Button>,
-            raporAkhirSemester: <Button className="rounded-xl">
-                <i className="feather-printer mr-2"></i>Cetak PDF
-            </Button>,
-            tanggalCetak: "07 Juni 2022, 13.00"
-        },
-        {
-            key: '2',
-            no: '2',
-            namaSiswa: 'Rochy Putiray',
-            kelas: '1A',
-            raporTengahSemester: <Button className="rounded-xl">
-                <i className="feather-printer mr-2"></i>Cetak PDF
-            </Button>,
-            raporAkhirSemester: <Button className="rounded-xl">
-                <i className="feather-printer mr-2"></i>Cetak PDF
-            </Button>,
-            tanggalCetak: "05 Juni 2022, 15.00"
-        },
-        {
-            key: '3',
-            no: '3',
-            namaSiswa: 'Yaris Riyadi',
-            kelas: '1A',
-            raporTengahSemester: <Button className="rounded-xl">
-                <i className="feather-printer mr-2"></i>Cetak PDF
-            </Button>,
-            raporAkhirSemester: <Button className="rounded-xl">
-                <i className="feather-printer mr-2"></i>Cetak PDF
-            </Button>,
-            tanggalCetak: "02 Juni 2022, 09.00"
+    useEffect(() => {
+        dispatch(getProcessId(["globaljoinsubwhereget"]))
+    }, [])
+
+    useEffect(() => {
+        if (ProcessId.length != 0) {
+            setRefreshState(false)
+
+            getKeyGlobalJoin = ProcessId.find(item => item.key === "globaljoinsubwhereget");
+            getKeyGlobalJoin = getKeyGlobalJoin.proses_def_id
+
+            axios.post(BASE_URL,
+                {
+                    "processDefinitionId": getKeyGlobalJoin,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_class",
+                                "select": ["x_academic_class.id as id_class",
+                                    "x_academic_class.class",
+                                    "x_academic_class.sub_class",
+                                    "x_academic_class.class_location",
+                                    "x_academic_year.academic_year",
+                                    "x_academic_year.id as id_academic",
+                                    "users.name",
+                                    "x_academic_teachers.id as id_walikelas",
+                                    "users.institute_id"
+                                ],
+                                "paginate": 1000,
+                                "join": [
+                                    {
+                                        "tbl_join": "x_academic_teachers",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "calss_advisor_id"
+
+                                    }, {
+                                        "tbl_join": "users",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_teachers",
+                                        "foregenkey": "user_id"
+                                    }, {
+                                        "tbl_join": "x_academic_year",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "academic_year_id"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "users",
+                                        "tbl_field": "institute_id",
+                                        "tbl_value": institute,
+                                        "operator": "="
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "academic_year_id",
+                                        "tbl_value": academic,
+                                        "operator": "=",
+                                        "kondisi": "where"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "=",
+                                        "kondisi": "where"
+                                    }
+                                ],
+                                "order_coloumn": "x_academic_class.updated_at",
+                                "order_by": "desc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+            ).then(function (response) {
+                const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+                setGetKelas(dataRes?.data?.data);
+            })
+
+            axios.post(BASE_URL,
+                {
+                    "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_get_where",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_year",
+                                "pagination": true,
+                                "total_result": 10,
+                                "order_coloumn": "x_academic_year.is_active",
+                                "order_by": "desc",
+                                "data": [
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "institute_id",
+                                        "tbl_value": institute,
+                                        "operator": "="
+                                    }
+                                ],
+                                "tbl_coloumn": [
+                                    "*"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                }
+            ).then(function (response) {
+                // console.log(response);
+                const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
+                setGetTahunAkademik(tahunAkademik?.data)
+            })
         }
+    }, [ProcessId, refreshState, academic])
+
+    const handleDataErapor = () => {
+        console.log(selectAcademic, selectClass);
+        setRefreshState(true)
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "geteraport:1:e554a53c-12df-11ed-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "id_academic": selectAcademic,
+                            "id_class": selectClass
+                        }
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            if (dataRes.code == true) {
+                console.log("succes", dataRes.data);
+                setRefreshState(false);
+                setGetErapor(dataRes?.data)
+            } else {
+                setRefreshState(false);
+                setGetErapor([])
+            }
+        }).catch(error => {
+            console.log(error);
+            setRefreshState(false);
+        })
+    }
+
+    const getDataRapor = () => {
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "jsoneraport:1:a84a08c9-13a1-11ed-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "id_user": selectedUser?.id,
+                            "id_academic": academic
+                        }
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            setDataRapor(dataRes?.data)
+        })
+    }
+
+    useEffect(() => {
+        getDataRapor()
+    }, [selectedUser?.id])
+
+    const columns = [
+        {
+            title: 'No',
+            dataIndex: 'no',
+            align: "center"
+
+        },
+        {
+            title: 'Nama Siswa',
+            dataIndex: 'namaSiswa',
+            align: "center"
+
+        },
+        {
+            title: 'Kelas',
+            align: "center",
+
+            children: [
+                {
+                    title: 'Semua',
+                    align: "center",
+                    dataIndex: 'kelas',
+                    defaultSortOrder: 'ascend',
+                },
+            ]
+        },
+        {
+            title: 'Cetak Rapor Tengah Semester',
+            align: "center",
+            children: [
+                {
+                    title: <Button className="rounded-xl" >
+                        <i className="feather-printer mr-2"></i>Cetak PDF
+                    </Button>,
+                    align: "center",
+                    dataIndex: 'raporTengahSemester',
+                    defaultSortOrder: 'ascend',
+                    render: (record) => {
+                        return(
+                            <Button className="rounded-xl" >
+                                <i className="feather-printer mr-2"></i>Cetak PDF
+                            </Button>
+                        )
+                    }
+                },
+            ],
+        },
+        {
+            title: 'Cetak Rapor Akhir Semester',
+            align: "center",
+            children: [
+                {
+                    title: <Button className="rounded-xl" >
+                        <i className="feather-printer mr-2"></i>Cetak PDF
+                    </Button>,
+                    align: "center",
+                    dataIndex: 'raporAkhirSemester',
+                    defaultSortOrder: 'ascend',
+                    render: (text, record) => {
+                        return(
+                            <Button className="rounded-xl" onClick={() => {
+                                console.log(record);
+                                setModalVisible(true);
+                                setSelectedUser(record);
+                                } } >
+                                <i className="feather-printer mr-2"></i>Cetak PDF
+                            </Button>
+                        )
+                    }
+                },
+            ]
+        },
+        {
+            title: 'Tanggal Cetak Terakhir',
+            children: [
+                {
+                    title: '',
+                    align: "center",
+                    dataIndex: 'tanggalCetakTerakhir',
+                    defaultSortOrder: 'ascend',
+                },
+            ]
+        },
+
     ]
+
+    const channelList = getErapor.map((data, index) => {
+        return {
+            key: '1',
+            no: index + 1,
+            id: data.id_user,
+            namaSiswa: data.name,
+            kelas: data.class,
+            // raporTengahSemester:
+            //     <Button className="rounded-xl" >
+            //         <i className="feather-printer mr-2"></i>Cetak PDF
+            //     </Button>,
+            // raporAkhirSemester: <Button className="rounded-xl" onClick={() => setModalVisible(true)}>
+            //     <i className="feather-printer mr-2"></i>Cetak PDF
+            // </Button>,
+            tanggalCetak: data.last_print
+        }
+    });
 
     return (
         <Fragment>
@@ -80,37 +371,48 @@ function CetakRapor() {
                             <div className="col-lg-5">
                                 <Card className="shadow-md my-6 rounded">
                                     <Row>
-                                        <Select style={{ width: '100%' }}
-                                            showSearch
-                                            placeholder="Pilih Kelas ...."
-                                            optionFilterProp="children"
-                                            onChange={onChange}
-                                            onSearch={onSearch}
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                        <select style={{ width: '100%' }}
+                                            name="select_class"
+                                            className='w600 h35'
+                                            onChange={(e) => setSelectClass(e.target.value)}
                                         >
-                                            <Option value="kelas1">Kelas 1</Option>
-                                            <Option value="kelas2">Kelas 2</Option>
-                                            <Option value="kelas3">Kelas 3</Option>
-                                        </Select>
+                                            <option selected disabled>
+                                                Pilih Kelas
+                                            </option>
+                                            {getKelas.map((data, i) => {
+                                                return (
+                                                    <>
+                                                        <option value={data.id_class}>
+                                                            {`${data.class} / ${data.sub_class}`}
+                                                        </option>
+                                                    </>
+                                                )
+                                            })}
+                                        </select>
                                     </Row>
                                 </Card>
                             </div>
                             <div className="col-lg-5">
                                 <Card className="shadow-md my-6 rounded">
                                     <Row>
-                                        <Select style={{ width: '100%' }}
-                                            showSearch
-                                            placeholder="Pilih Tahun Akademik / Semester ...."
-                                            optionFilterProp="children"
-                                            onChange={onChange}
-                                            onSearch={onSearch}
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                        <select style={{ width: '100%' }}
+                                            name="select_academic"
+                                            className='w600 h35'
+                                            onChange={(e) => setSelectAcademic(e.target.value)}
                                         >
-                                            <Option value="2022 / 1">2022 / 1</Option>
-                                            <Option value="2022 / 2">2022 / 2</Option>
-                                        </Select>
+                                            <option selected disabled>
+                                                Pilih Tahun Akademik / Semester
+                                            </option>
+                                            {getTahunAkademik.map((data, i) => {
+                                                return (
+                                                    <>
+                                                        <option value={data.id}>
+                                                            {`${data.academic_year} / ${data.semester}`}
+                                                        </option>
+                                                    </>
+                                                )
+                                            })}
+                                        </select>
                                     </Row>
                                 </Card>
                             </div>
@@ -118,45 +420,70 @@ function CetakRapor() {
                                 <button
                                     className="bg-current border-0 text-center text-white font-xs fw-600 p-2 w150 rounded-xl d-inline-block"
                                     type="submit"
+                                    onClick={() => handleDataErapor()}
                                 >
                                     Proses
                                 </button>
                             </div>
                         </div>
                         <div className="mt-4">
-                            <Table
-                                dataSource={data}
+                            {/* <Table
+                                dataSource={channelList}
                                 className="mt-4"
                                 align='center'
                                 pagination={false}
                                 bordered>
-                                <Column title="No" dataIndex="no" key="no" align='center'/>
-                                <Column title="Nama Siswa" dataIndex="namaSiswa" key="namaSiswa" width="20%"/>
+                                <Column title="No" dataIndex="no" key="no" align='center' />
+                                <Column title="Nama Siswa" dataIndex="namaSiswa" key="namaSiswa" width="20%" />
                                 <ColumnGroup title="Kelas" align='center' >
                                     <Column title="Semua"
-                                            align='center'
-                                            dataIndex="kelas"
-                                            key="kelas" />
+                                        align='center'
+                                        dataIndex="kelas"
+                                        key="kelas" />
                                 </ColumnGroup>
                                 <ColumnGroup title="Cetak Rapor Tengah Semester" align='center'>
-                                    <Column title={<Button className="rounded-xl"><i className="feather-printer mr-2"/>Cetak Semua PDF</Button>} 
-                                            align='center'
-                                            dataIndex="raporTengahSemester"
-                                            key="raporTengahSemester" />
+                                    <Column title={<Button className="rounded-xl"><i className="feather-printer mr-2" />Cetak Semua PDF</Button>}
+                                        align='center'
+                                        dataIndex="raporTengahSemester"
+                                        key="raporTengahSemester" />
                                 </ColumnGroup>
                                 <ColumnGroup title="Cetak Rapor Akhir Semester" align='center'>
-                                    <Column title={<Button className="rounded-xl"><i className="feather-printer mr-2"/>Cetak Semua PDF</Button>}
-                                            align='center'
-                                            dataIndex="raporAkhirSemester"
-                                            key="raporAkhirSemester" />
+                                    <Column title={<Button className="rounded-xl"><i className="feather-printer mr-2" />Cetak Semua PDF</Button>}
+                                        align='center'
+                                        dataIndex="raporAkhirSemester"
+                                        key="raporAkhirSemester" />
+                                </ColumnGroup> */}
+                                {/* <ColumnGroup title="Tanggal Cetak Terakhir" align='center'> */}
+                                    {/* <Column title="11 Juni 2022, 16.00" */}
+                                    {/* <Column
+                                        align='center'
+                                        dataIndex="tanggalCetak"
+                                        key="tanggalCetak" />
                                 </ColumnGroup>
-                                <ColumnGroup title="Tanggal Cetak Terakhir" align='center'>
-                                    <Column title="11 Juni 2022, 16.00"
-                                            align='center'
-                                            dataIndex="tanggalCetak"
-                                            key="tanggalCetak" />
-                                </ColumnGroup>
-                            </Table>
+                            </Table> */}
+                            <Table className="py-8"
+                                columns={columns}
+                                dataSource={channelList}
+                                onChange={onChangeTable}
+                                pagination={false}
+                                rowClassName="bg-greylight text-grey-900"
+                                scroll={{ x: 400 }}
+                                size='middle'
+                                bordered />
+
+                            <Modal
+                                title=""
+                                okText="Cetak Rapor"
+                                width={1500}
+                                style={{
+                                    top: 20,
+                                }}
+                                visible={modalVisible}
+                                onOk={handlePrint}
+                                onCancel={() => setModalVisible(false)}
+                            >
+                                <ERapor ref={componentRef} data={dataRapor} />
+                            </Modal>
                         </div>
                     </div>
                     <Adminfooter />

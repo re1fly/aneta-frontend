@@ -5,96 +5,316 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
 import React, { Fragment, useState, useEffect } from "react";
-import { PageHeader, Select, Card, Row, Table, Input } from "antd"
+import { useDispatch, useSelector } from "react-redux";
+import { getProcessId } from "../../../redux/Action";
+import { PageHeader, notification, Select, Card, Row, Table, Input } from "antd"
+import { DataNotFound } from "../../../components/misc/DataNotFound";
 
 function InputDataDeskripsiSikap() {
+    const userId = localStorage.getItem("user_id");
+    const institute = localStorage.getItem('institute');
+    const academic = localStorage.getItem('academic_year');
 
+    const [getKelas, setGetKelas] = useState([]);
+    const [selectClass, setSelectClass] = useState([]);
     const [deskripsiSikap, setDeskripsiSikap] = useState([])
-    console.log(deskripsiSikap);
+    console.log(deskripsiSikap.length);
+    // console.log(JSON.stringify(deskripsiSikap, null, 2));
+    const [refreshState, setRefreshState] = useState(false);
 
-    const { Option } = Select;
-    const { TextArea } = Input;
-
-    function onChange(value) {
-        console.log(`selected ${value}`);
-    }
-
-    function onSearch(val) {
-        console.log('search:', val);
-    }
-
-    function onChangeTable(pagination, filters, sorter, extra) {
-        console.log('params', pagination, filters, sorter, extra);
-    }
+    const dispatch = useDispatch();
+    const getProcess = useSelector(state => state.processId);
+    let ProcessId = getProcess.DataProcess;
+    let getKeyGlobalJoin;
 
     useEffect(() => {
+        dispatch(getProcessId(["globaljoinsubwhereget"]))
+    }, [])
+
+    useEffect(() => {
+        if (ProcessId.length != 0) {
+            setRefreshState(false)
+
+            getKeyGlobalJoin = ProcessId.find(item => item.key === "globaljoinsubwhereget");
+            getKeyGlobalJoin = getKeyGlobalJoin?.proses_def_id
+
+            axios.post(BASE_URL,
+                {
+                    "processDefinitionId": getKeyGlobalJoin,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_class",
+                                "select": ["x_academic_class.id as id_class",
+                                    "x_academic_class.class",
+                                    "x_academic_class.sub_class",
+                                    "x_academic_class.class_location",
+                                    "x_academic_year.academic_year",
+                                    "x_academic_year.id as id_academic",
+                                    "users.name",
+                                    "x_academic_teachers.id as id_walikelas",
+                                    "users.institute_id"
+                                ],
+                                "paginate": 1000,
+                                "join": [
+                                    {
+                                        "tbl_join": "x_academic_teachers",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "calss_advisor_id"
+
+                                    }, {
+                                        "tbl_join": "users",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_teachers",
+                                        "foregenkey": "user_id"
+                                    }, {
+                                        "tbl_join": "x_academic_year",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "academic_year_id"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "users",
+                                        "tbl_field": "institute_id",
+                                        "tbl_value": institute,
+                                        "operator": "="
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "academic_year_id",
+                                        "tbl_value": academic,
+                                        "operator": "=",
+                                        "kondisi": "where"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "=",
+                                        "kondisi": "where"
+                                    }
+                                ],
+                                "order_coloumn": "x_academic_class.updated_at",
+                                "order_by": "desc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                }, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+            ).then(function (response) {
+                const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+                setGetKelas(dataRes?.data?.data);
+            })
+        }
+    }, [ProcessId, refreshState, academic])
+
+    const _getDataDeskripsiSikap = () => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId":"inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
                 "returnVariables": true,
                 "variables": [
                     {
                         "name": "get_data",
                         "type": "json",
                         "value": {
-                           "id_class" : 86
+                            "id_class": selectClass,
+                            "id_academic": academic
                         }
                     }
                 ]
             }
         ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
-            // console.log(dataRes.siswa);
-            setDeskripsiSikap(dataRes.siswa)
+            // console.log(response);
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            const dataSikap = dataRes?.siswa
+            const resCode = dataRes?.code;
+            // console.log(dataRes);
+            // console.log(resCode);
+
+            if (resCode == true) {
+                setDeskripsiSikap(dataSikap);
+                notification.success({
+                    message: "Data Ditemukan",
+                    description: "Data Dapat dilihat dalam table",
+                    placement: 'top'
+                })
+                // console.log(dataSikap.length);
+            } else {
+                setDeskripsiSikap([]);
+                notification.info({
+                    message: "Not Found",
+                    description: "Data tidak ditemukan",
+                    placement: 'top'
+                })
+                // console.log(dataSikap.length);
+            }
         })
-    }, [])
+    }
 
-    const columns = [
-        {
-            title: 'No',
-            dataIndex: 'no',
-            defaultSortOrder: 'ascend',
-            responsive: ['sm'],
-        },
-        {
-            title: 'Nama Siswa',
-            dataIndex: 'namaSiswa',
-            sortDirections: ['descend'],
-        },
-        {
-            title: 'Predikat Sikap Sosial',
-            dataIndex: 'predikatSosial',
-            defaultSortOrder: 'descend',
-            align: 'center'
-        },
-        {
-            title: 'Deskripsi Sikap Sosial',
-            dataIndex: 'deskripsiSosial',
-            defaultSortOrder: 'descend',
-        },
-        {
-            title: 'Predikat Sikap Spiritual',
-            dataIndex: 'predikatSpiritual',
-            defaultSortOrder: 'descend',
-            align: 'center'
-        },
-        {
-            title: 'Deskripsi Sikap Spiritual',
-            dataIndex: 'deskripsiSpiritual',
-            defaultSortOrder: 'descend',
-        },
-    ];
+    // useEffect(() => {
+    //     axios.post(BASE_URL,
+    //         {
+    //             "processDefinitionId": "inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
+    //             "returnVariables": true,
+    //             "variables": [
+    //                 {
+    //                     "name": "get_data",
+    //                     "type": "json",
+    //                     "value": {
+    //                         "id_class": selectClass,
+    //                         "id_academic": academic
+    //                     }
+    //                 }
+    //             ]
+    //         }
+    //     ).then(function (response) {
+    //         const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+    //         const dataSikap = dataRes?.siswa
+    //         const resCode = dataRes?.code;
+    //         // console.log(resCode);
 
-    const channelList = deskripsiSikap?.map((data, index) => {
-        return {
-            no: '001',
-            namaSiswa: data.nama_siswa,
-            predikatSosial: "Baik",
-            deskripsiSosial: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
-            predikatSpiritual: "Sangat Baik",
-            deskripsiSpiritual: <TextArea rows={3} placeholder="Memiliki Penguasaan Pengetahuan Yang Baik" />,
+    //         if (resCode === true) {
+    //             setDeskripsiSikap(dataSikap);
+    //             notification.success({
+    //                 message: "Data Ditemukan",
+    //                 description: "Data Dapat dilihat dalam table",
+    //                 placement: 'top'
+    //             })
+    //         } else {
+    //             setDeskripsiSikap(null);
+    //             notification.info({
+    //                 message: "Not Found",
+    //                 description: "Data tidak ditemukan",
+    //                 placement: 'top'
+    //             })
+    //         }
+    //     })
+    // }, [selectClass, academic])
+
+    const _submitNilai = (e) => {
+        const formCV = document.querySelector('#form_deskripsi');
+        const formData = new FormData(formCV);
+
+        const predikatSosial = formData.getAll('predikat_sosial');
+        const deskripsiSosial = formData.getAll('deskripsi_sosial');
+        const predikatSpiritual = formData.getAll('predikat_spiritual');
+        const deskripsiSpiritual = formData.getAll('deskripsi_spiritual');
+
+        const allDeskripsi = [];
+        const Spritual = [];
+        const Sosial = [];
+        const filterIndicator = (val) => {
+            let indicator = 0;
+            if (val == '1') {
+                indicator = "Sangat Kurang";
+            } else if (val == '2') {
+                indicator = "Kurang";
+            } else if (val == '3') {
+                indicator = "Cukup";
+            } else if (val == '4') {
+                indicator = "Baik";
+            } else if (val == '5') {
+                indicator = "Sangat Baik";
+            }
+            return indicator
         }
-    })
+        for (let i = 0; i < predikatSosial.length; i++) {
+            Spritual?.push(
+                {
+                    "competence_aspect": "Sikap Spiritual",
+                    "id_aspect": 3,
+                    "indicator_name": filterIndicator(predikatSpiritual[i]),
+                    "id_indikator": predikatSpiritual[i],
+                    "given_desc": deskripsiSpiritual[i]
+                },
+            );
+        }
+        for (let i = 0; i < predikatSosial.length; i++) {
+            Sosial?.push(
+
+                {
+                    "competence_aspect": "Sikap Sosial",
+                    "id_aspect": 4,
+                    "indicator_name": filterIndicator(predikatSosial[i]),
+                    "id_indikator": predikatSosial[i],
+                    "given_desc": deskripsiSosial[i]
+                },
+            );
+        }
+
+        deskripsiSikap.map((siswa, i) => {
+            allDeskripsi?.push(
+                {
+                    "id_academic": academic,
+                    "nama_siswa": siswa.nama_siswa,
+                    "id_siswa": siswa.id_siswa,
+                    "id_class": siswa.id_class,
+                    "data": [
+                        Spritual[i],
+                        Sosial[i]
+                    ]
+                },
+            );
+        });
+        console.log(allDeskripsi)
+
+        axios
+            .post(
+                BASE_URL, {
+                "processDefinitionId": "cb03c73a-148d-11ed-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "created_by": userId,
+                            "siswa":
+                                allDeskripsi,
+                        }
+                    }
+                ]
+            },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                console.log(response)
+                const dataRes = JSON.parse(response.data.variables[2].value);
+                const resCode = dataRes.status;
+                if (resCode === true) {
+                    notification.success({
+                        message: "Sukses",
+                        description: "Deskripsi sikap berhasil di input",
+                        placement: 'top'
+                    })
+                } else {
+                    notification.info({
+                        message: "Gagal",
+                        description: "Deskripsi sikap tidak berhasil di input",
+                        placement: 'top'
+                    })
+                }
+            })
+    }
 
     return (
         <Fragment>
@@ -108,76 +328,238 @@ function InputDataDeskripsiSikap() {
                             onBack={() => window.history.back()}
                             title="Input Data Deskripsi Sikap (Rapor)"
                         />
-                        <div className="row d-flex align-items-center">
-                            <div className="col-lg-5">
-                                <Card className="shadow-md my-6 rounded">
-                                    <Row>
-                                        <Select style={{ width: '100%' }}
-                                            showSearch
-                                            placeholder="Pilih Kelas ...."
-                                            optionFilterProp="children"
-                                            onChange={onChange}
-                                            onSearch={onSearch}
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                        <form
+                            id="form_deskripsi">
+                            <div className="row d-flex align-items-center">
+                                <div className="col-lg-10">
+                                    <Card className="shadow-md my-6 rounded">
+                                        <Row>
+                                            <select style={{ width: '100%' }}
+                                                name="select_class"
+                                                className='600 h35'
+                                                onChange={(e) => setSelectClass(e.target.value)}
+                                            >
+                                                <option selected disabled>
+                                                    Pilih Kelas
+                                                </option>
+                                                {getKelas.map((data, i) => {
+                                                    return (
+                                                        <>
+                                                            <option value={data.id_class}>
+                                                                {`${data.class} / ${data.sub_class}`}
+                                                            </option>
+                                                        </>
+                                                    )
+                                                })}
+                                            </select>
+                                        </Row>
+                                    </Card>
+                                </div>
+                                <div className="col-lg-2">
+                                    <button
+                                        className="bg-current border-0 text-center text-white font-xs fw-600 p-2 w150 rounded-xl d-inline-block"
+                                        type="button"
+                                        onClick={_getDataDeskripsiSikap}
+                                    >
+                                        Proses
+                                    </button>
+                                </div>
+                            </div>
+                            {deskripsiSikap.length == 0 ?
+                                <DataNotFound />
+                                :
+                                <div className="mt-4">
+                                    <div className="table-custom mb-0">
+                                        <table className="table table-bordered">
+                                            <thead>
+                                                <tr className="bg-current text-light text-center">
+                                                    <th scope="col">No</th>
+                                                    <th scope="col">Nama Siswa</th>
+                                                    <th scope="col">Predikat Sikap Sosial</th>
+                                                    <th scope="col">Deskripsi Sikap Sosial</th>
+                                                    <th scope="col">Predikat Sikap Spiritual</th>
+                                                    <th scope="col">Deskripsi Sikap Spiritual</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {deskripsiSikap?.map((siswa, index) => {
+                                                    return (
+                                                        <>
+                                                            <tr>
+                                                                <td>
+                                                                    {index + 1}
+                                                                </td>
+                                                                <th scope="row" className="text-center">
+                                                                    <span name="nama_siswa">{siswa.nama_siswa}</span>
+                                                                </th>
+                                                                {siswa?.data == null ? (
+                                                                    <>
+                                                                        <td className="text-center">
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='predikat_sosial'
+                                                                            >
+                                                                                <option value="" disabled selected>
+                                                                                    Pilih Predikat
+                                                                                </option>
+                                                                                <option value="1" >
+                                                                                    Sangat Kurang
+                                                                                </option>
+                                                                                <option value="2">
+                                                                                    Kurang
+                                                                                </option>
+                                                                                <option value="3">
+                                                                                    Cukup
+                                                                                </option>
+                                                                                <option value="4">
+                                                                                    Baik
+                                                                                </option>
+                                                                                <option value="5">
+                                                                                    Sangat Baik
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <textarea
+                                                                                className="form-control "
+                                                                                aria-label="Default"
+                                                                                name='deskripsi_sosial'
+                                                                            />
+                                                                        </td>
+                                                                        <td className="text-center">
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='predikat_spiritual'
+                                                                            >
+                                                                                <option value="" disabled selected>
+                                                                                    Pilih Predikat
+                                                                                </option>
+                                                                                <option value="1">
+                                                                                    Sangat Kurang
+                                                                                </option>
+                                                                                <option value="2">
+                                                                                    Kurang
+                                                                                </option>
+                                                                                <option value="3">
+                                                                                    Cukup
+                                                                                </option>
+                                                                                <option value="4">
+                                                                                    Baik
+                                                                                </option>
+                                                                                <option value="5">
+                                                                                    Sangat Baik
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <textarea
+                                                                                className="form-control "
+                                                                                aria-label="Default"
+                                                                                name='deskripsi_spiritual'
+                                                                            />
+                                                                        </td>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <td className="text-center">
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='predikat_sosial'
+                                                                            >
+                                                                                <option value="" disabled selected={siswa?.data[1].id_indikator == 0 ? true : false}>
+                                                                                    Pilih Predikat
+                                                                                </option>
+                                                                                <option value="1" selected={siswa?.data[1].id_indikator == 1 ? true : false}>
+                                                                                    Sangat Kurang
+                                                                                </option>
+                                                                                <option value="2" selected={siswa?.data[1].id_indikator == 2 ? true : false}>
+                                                                                    Kurang
+                                                                                </option>
+                                                                                <option value="3" selected={siswa?.data[1].id_indikator == 3 ? true : false}>
+                                                                                    Cukup
+                                                                                </option>
+                                                                                <option value="4" selected={siswa?.data[1].id_indikator == 4 ? true : false}>
+                                                                                    Baik
+                                                                                </option>
+                                                                                <option value="5" selected={siswa?.data[1].id_indikator == 5 ? true : false}>
+                                                                                    Sangat Baik
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <textarea
+                                                                                className="form-control "
+                                                                                aria-label="Default"
+                                                                                name='deskripsi_sosial'
+                                                                                defaultValue={siswa?.data[1]?.given_desc}
+                                                                            />
+                                                                        </td>
+                                                                        <td className="text-center">
+                                                                            <select
+                                                                                className="form-control"
+                                                                                aria-label="Default"
+                                                                                name='predikat_spiritual'
+                                                                            >
+                                                                                <option value="" disabled selected={siswa?.data[0].id_indikator == 0 ? true : false}>
+                                                                                    Pilih Predikat
+                                                                                </option>
+                                                                                <option value="1" selected={siswa?.data[0].id_indikator == 1 ? true : false}>
+                                                                                    Sangat Kurang
+                                                                                </option>
+                                                                                <option value="2" selected={siswa?.data[0].id_indikator == 2 ? true : false}>
+                                                                                    Kurang
+                                                                                </option>
+                                                                                <option value="3" selected={siswa?.data[0].id_indikator == 3 ? true : false}>
+                                                                                    Cukup
+                                                                                </option>
+                                                                                <option value="4" selected={siswa?.data[0].id_indikator == 4 ? true : false}>
+                                                                                    Baik
+                                                                                </option>
+                                                                                <option value="5" selected={siswa?.data[0].id_indikator == 5 ? true : false}>
+                                                                                    Sangat Baik
+                                                                                </option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <textarea
+                                                                                className="form-control "
+                                                                                aria-label="Default"
+                                                                                name='deskripsi_spiritual'
+                                                                                defaultValue={siswa?.data[0]?.given_desc}
+                                                                            />
+                                                                        </td>
+                                                                    </>
+                                                                )}
+                                                            </tr>
+                                                        </>
+
+                                                    )
+                                                })}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="col-lg-12 mt-5 mb-5 d-flex justify-content-end">
+                                        <button
+                                            className="bg-current border-0 text-center text-white font-xsss p-3 fw-600 w150 rounded-xl d-inline-block mr-2 mt-5"
+                                            type="button"
+                                            onClick={_submitNilai}
                                         >
-                                            <Option value="kelas1">Kelas 1</Option>
-                                            <Option value="kelas2">Kelas 2</Option>
-                                            <Option value="kelas3">Kelas 3</Option>
-                                        </Select>
-                                    </Row>
-                                </Card>
-                            </div>
-                            <div className="col-lg-5">
-                                <Card className="shadow-md my-6 rounded">
-                                    <Row>
-                                        <Select style={{ width: '100%' }}
-                                            showSearch
-                                            placeholder="Pilih Mata Pelajaran ...."
-                                            optionFilterProp="children"
-                                            onChange={onChange}
-                                            onSearch={onSearch}
-                                            filterOption={(input, option) =>
-                                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                            Simpan
+                                        </button>
+                                        <button
+                                            className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"
+                                            onClick={() => setDeskripsiSikap([])}
                                         >
-                                            <Option value="matematika">Matematika</Option>
-                                            <Option value="bahasaIndonesia">Bahasa Indonesia</Option>
-                                            <Option value="ilmuPengetahuanAlam">Ilmu Pengetahuan Alam</Option>
-                                        </Select>
-                                    </Row>
-                                </Card>
-                            </div>
-                            <div className="col-lg-2">
-                                <button
-                                    className="bg-current border-0 text-center text-white font-xs fw-600 p-2 w150 rounded-xl d-inline-block"
-                                    type="submit"
-                                >
-                                    Proses
-                                </button>
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <Table className=""
-                                columns={columns}
-                                dataSource={channelList}
-                                onChange={onChangeTable}
-                                pagination={false}
-                                rowClassName="bg-greylight text-grey-900"
-                                scroll={{ x: 400 }} />
-                        </div>
-                        <div className="col-lg-12 mt-5 mb-5 d-flex justify-content-end">
-                            <button
-                                className="bg-current border-0 text-center text-white font-xsss p-3 fw-600 w150 rounded-xl d-inline-block mr-2 mt-5"
-                                type="submit"
-                            >
-                                Simpan
-                            </button>
-                            <button
-                                className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"
-                            >
-                                Batal
-                            </button>
-                        </div>
+                                            Batal
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </form>
                     </div>
                     <Adminfooter />
                 </div>

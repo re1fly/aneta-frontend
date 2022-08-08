@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { DatePicker, Input, PageHeader, Select, Button } from "antd";
 import moment from 'moment';
+import { RequiredTooltip } from "../misc/RequiredTooltip";
 
 export const FormAdminTahunAkademik = (props) => {
     let disabledButton = props.isDisabled;
@@ -27,7 +28,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tahun Akademik
+                                                    Tahun Akademik <RequiredTooltip />
                                                 </label>
                                                 <DatePicker
                                                     className="form-control"
@@ -43,7 +44,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Semester
+                                                    Semester <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -70,7 +71,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Periode Awal
+                                                    Periode Awal <RequiredTooltip />
                                                 </label>
                                                     <DatePicker
                                                         className="form-control"
@@ -86,7 +87,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Periode AKhir
+                                                    Periode AKhir <RequiredTooltip />
                                                 </label>
                                                 <DatePicker
                                                     className="form-control"
@@ -104,7 +105,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tahun Akademik Aktif
+                                                    Tahun Akademik Aktif <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -131,7 +132,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Jumlah Murid
+                                                    Jumlah Murid <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="number"
@@ -149,7 +150,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Jumlah Guru
+                                                    Jumlah Guru <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="number"
@@ -165,7 +166,7 @@ export const FormAdminTahunAkademik = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Jumlah Staff
+                                                    Jumlah Staff <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="number"

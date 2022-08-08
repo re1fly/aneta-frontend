@@ -7,6 +7,7 @@ import {Badge, Descriptions, notification, PageHeader, Space, Table, Tag} from "
 import axios from "axios";
 import {BASE_URL} from "../../../../api/Url";
 import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
+import {DataNotFound} from "../../../../components/misc/DataNotFound";
 
 function DataNilaiUjian() {
     const academic = localStorage.getItem("academic_year");
@@ -44,25 +45,37 @@ function DataNilaiUjian() {
                 }
             )
             .then(function (response) {
-                const dataRes = JSON.parse(response.data.variables[2].value);
-                const resCode = dataRes.status;
-                const dataSiswa = dataRes.data;
-                const header = dataRes.header_id;
-
-                if (resCode === 200) {
-                    setDataSiswa(dataSiswa);
-                    setHeaderId(header)
-                    notification.success({
-                        message: "Data Ditemukan",
-                        description: "Data Dapat dilihat dalam table",
-                        placement: 'top'
-                    })
-                } else {
+                if (response.data.variables[2].value == "") {
+                    setDataSiswa(null)
+                    setHeaderId(null)
                     notification.info({
                         message: "Not Found",
                         description: "Data tidak ditemukan",
                         placement: 'top'
                     })
+                } else {
+                    const dataRes = JSON.parse(response.data.variables[2].value);
+                    const resCode = dataRes?.status;
+                    const dataSiswa = dataRes?.data;
+                    console.log(dataSiswa)
+                    const header = dataRes?.header_id;
+
+                    if (resCode === 200) {
+                        setDataSiswa(dataSiswa);
+                        setHeaderId(header)
+                        notification.success({
+                            message: "Data Ditemukan",
+                            description: "Data Dapat dilihat dalam table",
+                            placement: 'top'
+                        })
+                    } else {
+                        setDataSiswa(null)
+                        notification.info({
+                            message: "Not Found",
+                            description: "Data tidak ditemukan",
+                            placement: 'top'
+                        })
+                    }
                 }
             })
     }
@@ -87,7 +100,7 @@ function DataNilaiUjian() {
                 }
             )
         });
-        if(splitObject(data).length < 1){
+        if (splitObject(data).length < 1) {
             notification.error({
                 message: "Data Kosong",
                 description: "Mohon pilih kelas dan mata pelajaran terlebih dahulu, lalu input penilaian.",
@@ -156,71 +169,70 @@ function DataNilaiUjian() {
                         </div>
 
                         <GetMapelKelas valueFilter={(e) => _getDataSiswa(e)}/>
-
-                        <form onSubmit={_submitPenilaian} method="POST">
-                            <div className="row">
-                                <div className="col-lg-12 pt-3">
-                                    <div className="table-responsive-xl">
-                                        <table className="table table-bordered">
-                                            <thead>
-                                            <tr className='bg-current text-light'>
-                                                <th scope="col">Nama Siswa</th>
-                                                <th scope="col" className='text-center'>PTS</th>
-                                                <th scope="col" className='text-center'>PAS</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            { dataSiswa == null ?
-                                                <tr>
-                                                    <th scope="row" style={{lineHeight: 3.5}}>Data Kosong</th>
-                                                    <td scope="row" style={{lineHeight: 3.5}}>Data Kosong</td>
-                                                    <td scope="row" style={{lineHeight: 3.5}}>Data Kosong</td>
-                                                </tr> :
-                                                dataSiswa.map((value) => (
-                                                <tr>
-                                                    <th scope="row" style={{lineHeight: 3.5, textTransform: 'capitalize'}}>
-                                                        {value.nama_siswa}
-                                                    </th>
-                                                    <td>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            name={`${value.id_student}_1`}
-                                                            placeholder="input nilai (contoh : 75)"
-                                                            required
-                                                        />
-                                                    </td>
-                                                    <td>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            name={`${value.id_student}_2`}
-                                                            placeholder="input nilai (contoh : 75)"
-                                                            required
-                                                        />
-                                                    </td>
+                        {dataSiswa == null ?
+                            <DataNotFound/>
+                            :
+                            <form onSubmit={_submitPenilaian} method="POST">
+                                <div className="row">
+                                    <div className="col-lg-12 pt-3">
+                                        <div className="table-responsive-xl">
+                                            <table className="table table-bordered">
+                                                <thead>
+                                                <tr className='bg-current text-light'>
+                                                    <th scope="col">Nama Siswa</th>
+                                                    <th scope="col" className='text-center'>PTS</th>
+                                                    <th scope="col" className='text-center'>PAS</th>
                                                 </tr>
-                                            ))}
-                                            </tbody>
-                                        </table>
-                                        <div className="mt-5 float-right">
-                                            <button
-                                                className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                type="submit"
-                                            >
-                                                Simpan
-                                            </button>
-                                            <a
-                                                onClick={() => window.history.back()}
-                                                className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                            >
-                                                Batal
-                                            </a>
+                                                </thead>
+                                                <tbody>
+                                                {
+                                                    dataSiswa.map((value) => (
+                                                        <tr>
+                                                            <th scope="row"
+                                                                style={{lineHeight: 3.5, textTransform: 'capitalize'}}>
+                                                                {value.nama_siswa}
+                                                            </th>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name={`${value.id_student}_1`}
+                                                                    placeholder="input nilai (contoh : 75)"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name={`${value.id_student}_2`}
+                                                                    placeholder="input nilai (contoh : 75)"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <div className="mt-5 float-right">
+                                                <button
+                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                    type="submit"
+                                                >
+                                                    Simpan
+                                                </button>
+                                                <a
+                                                    onClick={() => window.history.back()}
+                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                >
+                                                    Batal
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        }
                     </div>
                     <Adminfooter/>
                 </div>

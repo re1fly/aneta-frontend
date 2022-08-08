@@ -5,6 +5,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
 import { GetCity, GetKecamatan, GetKelurahan, GetProvinsi } from "../../redux/Action";
+import {RequiredTooltip} from "../../components/misc/RequiredTooltip"
 
 export const FormAdminGuru = (props) => {
 
@@ -21,6 +22,44 @@ export const FormAdminGuru = (props) => {
     const [idKecamatan, setIdKecamatan] = useState('');
     const [idKelurahan, setIdKelurahan] = useState('');
 
+    const [handleImage, setHandleImage] = useState('')
+    const [_Img, setIMG] = useState('');
+    const [_ImgBase64, setIMGBase64] = useState('');
+
+    const getBase64 = (img, callback) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(img);
+    };
+
+    function toDataURL(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                callback(reader.result);
+            }
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    }
+
+    const onChangeImage = (info) => {
+        console.log("tet", info);
+        if (info.file.status === 'done') {
+            getBase64(info.file.originFileObj, (url) => {
+                setIMG(url);
+                toDataURL(url, function (dataUrl) {
+                    setIMGBase64(dataUrl);
+                    setHandleImage(dataUrl);
+                    console.log('RESULT:', dataUrl)
+                })
+            });
+        }
+    };
+
     useEffect(() => {
         dispatch(GetProvinsi());
         if (idProv != '') {
@@ -35,17 +74,18 @@ export const FormAdminGuru = (props) => {
     }, [idProv, idCity, idKecamatan])
 
     useEffect(() => {
-        if (props.location=='edit'|| props.location=='detail') {
+        if (props.location == 'edit' || props.location == 'detail') {
             setIdProv(props.idProvinsi);
             setIdCity(props.idKota);
             setIdKecamatan(props.idKec);
             setIdKelurahan(props.idKel);
         }
-     
+
     }, [])
-    
+
 
     let disabledButton = props.isDisabled;
+
     return (
         <div className="container px-3 py-4">
             <div className="row">
@@ -69,14 +109,26 @@ export const FormAdminGuru = (props) => {
                                                 <Card className="bg-lightblue" style={{ width: 157 }}>
                                                     <ImgCrop rotate>
                                                         <Upload
-                                                            name="image_siswa"
+                                                            name="image_guru"
                                                             listType="picture-card"
                                                             className="avatar-uploader"
                                                             showUploadList={false}
                                                             action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                                            onChange={onChangeImage}
                                                         // onPreview={onPreview}
                                                         >
-                                                            <PlusOutlined />
+                                                            {_Img ? (
+                                                                <img
+                                                                    src={_Img}
+                                                                    alt="avatar"
+                                                                    style={{
+                                                                        width: '100%',
+                                                                    }}
+
+                                                                />
+                                                            ) : (
+                                                                <PlusOutlined />
+                                                            )}
                                                         </Upload>
                                                     </ImgCrop>
                                                 </Card>
@@ -89,7 +141,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Nama
+                                                    Nama <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="text"
@@ -105,7 +157,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Nomor HP
+                                                    Nomor HP <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="text"
@@ -123,7 +175,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tempat Lahir
+                                                    Tempat Lahir <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="text"
@@ -139,7 +191,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tanggal Lahir
+                                                    Tanggal Lahir <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="date"
@@ -157,7 +209,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Email
+                                                    Email <RequiredTooltip />
                                                 </label>
                                                 <input
                                                     type="text"
@@ -173,7 +225,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Nomor SK
+                                                    Nomor SK 
                                                 </label>
                                                 <input
                                                     type="text"
@@ -191,7 +243,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Provinsi
+                                                    Provinsi <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -220,7 +272,7 @@ export const FormAdminGuru = (props) => {
                                                     <option selected={idProv == '' ? false : true}>
                                                         {props.provinsi == undefined ? "Pilih Provinsi" : idProv != props.idProvinsi ? "Pilih Provinsi" : props.provinsi}
                                                     </option>
-                                                   
+
 
                                                     {provinsi.map((data, i) => {
                                                         return (
@@ -236,7 +288,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kota / Kabupaten
+                                                    Kota / Kabupaten <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -260,7 +312,7 @@ export const FormAdminGuru = (props) => {
                                                     }
                                                     }
                                                 >
-                                                    
+
                                                     <option selected={idCity == '' ? false : true}>
                                                         {props.kota == undefined ? "Pilih Kota" : idCity != props.idKota ? "Pilih Kota" : props.kota}
                                                     </option>
@@ -280,7 +332,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kecamatan
+                                                    Kecamatan <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -315,7 +367,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kelurahan
+                                                    Kelurahan <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -345,7 +397,7 @@ export const FormAdminGuru = (props) => {
                                         <div className="col-lg-12 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Status
+                                                    Status <RequiredTooltip />
                                                 </label>
                                                 <select
                                                     className="form-control"
@@ -370,7 +422,7 @@ export const FormAdminGuru = (props) => {
                                     <div className="row">
                                         <div className="col-lg-12 mb-3">
                                             <label className="mont-font fw-600 font-xsss">
-                                                Alamat
+                                                Alamat <RequiredTooltip />
                                             </label>
                                             <textarea
                                                 className="form-control mb-0 p-3 bg-greylight lh-16"

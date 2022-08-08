@@ -7,6 +7,7 @@ import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 import axios from "axios";
 import {BASE_URL} from "../../../../api/Url";
 import "../../../../style/custom.css";
+import {DataNotFound} from "../../../../components/misc/DataNotFound";
 
 function DataNilaiKeterampilan() {
     const academic = localStorage.getItem("academic_year");
@@ -47,8 +48,8 @@ function DataNilaiKeterampilan() {
             .then(function (response) {
                 const dataRes = JSON.parse(response.data.variables[2].value);
                 const resCode = dataRes.status;
-                const dataSiswa = dataRes.data.siswa;
-                const penilaian = dataRes.data.count_p;
+                const dataSiswa = dataRes?.data?.siswa;
+                const penilaian = dataRes?.data?.count_p;
                 console.log(dataRes)
 
                 if (resCode === 200) {
@@ -60,6 +61,7 @@ function DataNilaiKeterampilan() {
                         placement: 'top'
                     })
                 } else {
+                    setDataSiswa(null);
                     notification.info({
                         message: "Not Found",
                         description: "Data tidak ditemukan",
@@ -150,68 +152,67 @@ function DataNilaiKeterampilan() {
                             </div>
                         </div>
                         <GetMapelKelas valueFilter={(e) => _getDataSiswa(e)}/>
-
-                        <form onSubmit={_submitPenilaian} method="POST">
-                            <div className="row">
-                                <div className="col-lg-12 pt-3">
-                                    <div className="table-custom">
-                                        <table className="table table-bordered">
-                                            <thead>
-                                            <tr className='bg-current text-light'>
-                                                <th scope="col">Nama Siswa</th>
-                                                {jmlPenilaian == null ? <th scope="col">Data Penilaian</th> :
-                                                    jmlPenilaian.map((item, index) => (
-                                                        <th scope="col"
-                                                            className='text-center'>Penilaian {item.serial}</th>
-                                                    ))}
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {dataSiswa == null ?
-                                                <tr>
-                                                    <th scope="row" style={{lineHeight: 3.5}}>Data Kosong</th>
-                                                    <td scope="row" style={{lineHeight: 3.5}}>Data Kosong</td>
+                        { dataSiswa == null ?
+                            <DataNotFound/>
+                            :
+                            <form onSubmit={_submitPenilaian} method="POST">
+                                <div className="row">
+                                    <div className="col-lg-12 pt-3">
+                                        <div className="table-custom">
+                                            <table className="table table-bordered">
+                                                <thead>
+                                                <tr className='bg-current text-light'>
+                                                    <th scope="col">Nama Siswa</th>
+                                                    {jmlPenilaian == null ? <th scope="col">Data Penilaian</th> :
+                                                        jmlPenilaian.map((item, index) => (
+                                                            <th scope="col"
+                                                                className='text-center'>Penilaian {item.serial}</th>
+                                                        ))}
                                                 </tr>
-                                                :
-                                                dataSiswa.map((value) => (
-                                                    <tr>
-                                                        <th scope="row"
-                                                            style={{lineHeight: 3.5, textTransform: 'capitalize'}}>
-                                                            {value.nama_siswa}
-                                                        </th>
-                                                        {jmlPenilaian == null ? <th scope="col">Data Kosong</th> :
-                                                            jmlPenilaian.map((item, index) => (
-                                                                <td>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        name={`${value.id_student}_${item.serial}_${item.id}`}
-                                                                        placeholder="input nilai (contoh : 90)"
-                                                                    />
-                                                                </td>
-                                                            ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div className="mt-5 float-right">
-                                        <button
-                                            className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                            type="submit"
-                                        >
-                                            Simpan
-                                        </button>
-                                        <a
-                                            onClick={() => window.history.back()}
-                                            className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                        >
-                                            Batal
-                                        </a>
+                                                </thead>
+                                                <tbody>
+                                                {
+                                                    dataSiswa.map((value) => (
+                                                        <tr>
+                                                            <th scope="row"
+                                                                style={{lineHeight: 3.5, textTransform: 'capitalize'}}>
+                                                                {value.nama_siswa}
+                                                            </th>
+                                                            {
+                                                                jmlPenilaian.map((item, index) => (
+                                                                    <td>
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control"
+                                                                            name={`${value.id_student}_${item.serial}_${item.id}`}
+                                                                            placeholder="input nilai (contoh : 90)"
+                                                                            required
+                                                                        />
+                                                                    </td>
+                                                                ))}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div className="mt-5 float-right">
+                                            <button
+                                                className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                type="submit"
+                                            >
+                                                Simpan
+                                            </button>
+                                            <a
+                                                onClick={() => window.history.back()}
+                                                className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                            >
+                                                Batal
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        }
                     </div>
                     <Adminfooter/>
                 </div>

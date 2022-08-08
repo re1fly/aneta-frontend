@@ -11,6 +11,8 @@ import Upload from "antd/es/upload/Upload";
 import {LoadingOutlined, PlusOutlined, SearchOutlined, UserAddOutlined} from "@ant-design/icons";
 import {BASE_URL} from "../../api/Url";
 import {Link} from "react-router-dom";
+import {RequiredTooltip} from "../../components/misc/RequiredTooltip";
+import {ReactSearchAutocomplete} from "react-search-autocomplete";
 
 const lineChart = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',],
@@ -51,10 +53,12 @@ function BerandaAdmin() {
     const academicYear = localStorage.getItem("academic_year");
     ;
     const [visible, setVisible] = useState(false);
-    const [formPic, setFormPic] = useState(false);
+    const [formPic, setFormPic] = useState(true);
     const [dataDashboard, setDataDashboard] = useState({})
     const [submittedNpsn, setSubmittedNpsn] = useState(false);
     const [dataNpsn, setDataNpsn] = useState({})
+    const [dataNpsnSearch, setDataNpsnSearch] = useState([])
+    console.log(dataNpsnSearch)
 
 
     useEffect(() => {
@@ -114,10 +118,9 @@ function BerandaAdmin() {
             ).then(function (response) {
                 const resData = response.data.variables[2].value;
                 const academic = JSON.parse(resData);
-                console.log(academic);
                 if (academic.status == false) {
                     const btn = (
-                        <Button href='/admin-tahun-akademik' type="primary" shape="round" size="middle">
+                        <Button href='/admin-list-tahun-akademik' type="primary" shape="round" size="middle">
                             Disini
                         </Button>
                     );
@@ -283,18 +286,18 @@ function BerandaAdmin() {
     const PicForm = () => {
         return (
             <>
-                <h1 className="mt-5">PIC Form</h1>
-                <div className="row mt-5">
+                <h1 className="mt-5 pt-5">PIC Form</h1>
+                <div className="row mt-4">
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Name
+                                Name <RequiredTooltip />
                             </label>
                             <input
                                 name="name_pic"
                                 type="text"
                                 className="form-control"
-                                defaultValue="Joko"
+                                defaultValue=""
                                 required
                             />
                         </div>
@@ -303,13 +306,13 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Phone
+                                Phone <RequiredTooltip />
                             </label>
                             <input
                                 type="number"
                                 name="phone_pic"
                                 className="form-control"
-                                defaultValue="0139912392"
+                                defaultValue=""
                                 required
                             />
                         </div>
@@ -319,13 +322,13 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Mobile Phone
+                                Mobile Phone <RequiredTooltip />
                             </label>
                             <input
                                 type="number"
                                 name="mobile_pic"
                                 className="form-control"
-                                defaultValue="31231312"
+                                defaultValue=""
                                 required
                             />
                         </div>
@@ -333,13 +336,13 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Email
+                                Email <RequiredTooltip />
                             </label>
                             <input
                                 name="email_pic"
                                 type="email"
                                 className="form-control"
-                                defaultValue="dsjsj@gmail.com"
+                                defaultValue=""
                                 required
                             />
                         </div>
@@ -349,13 +352,13 @@ function BerandaAdmin() {
                     <div className="col-lg-12 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Posisi
+                                Posisi / Jabatan <RequiredTooltip />
                             </label>
                             <input
                                 name="position_pic"
                                 type="text"
                                 className="form-control"
-                                defaultValue="skaksk"
+                                defaultValue=""
                                 required
                             />
                         </div>
@@ -375,6 +378,7 @@ function BerandaAdmin() {
                         onClick={() => {
                             setDataNpsn({})
                             setSubmittedNpsn(false)
+                            setDataNpsnSearch([])
                         }}
                     >
                         Reset
@@ -384,24 +388,24 @@ function BerandaAdmin() {
         )
     }
 
-    const ButtonPic = () => {
-        return (
-            <>
-                <Divider>
-                    <Tooltip title="Tambahkan PIC">
-                        <Button style={{
-                            marginTop: 10,
-                            width: '50px',
-                            height: '50px',
-                        }}
-                                onClick={() => setFormPic(true)}
-                                size='large' type="primary" shape="circle"
-                                icon={<UserAddOutlined/>}/>
-                    </Tooltip>
-                </Divider>
-            </>
-        )
-    }
+    // const ButtonPic = () => {
+    //     return (
+    //         <>
+    //             <Divider>
+    //                 <Tooltip title="Tambahkan PIC">
+    //                     <Button style={{
+    //                         marginTop: 10,
+    //                         width: '50px',
+    //                         height: '50px',
+    //                     }}
+    //                             onClick={() => setFormPic(true)}
+    //                             size='large' type="primary" shape="circle"
+    //                             icon={<UserAddOutlined/>}/>
+    //                 </Tooltip>
+    //             </Divider>
+    //         </>
+    //     )
+    // }
 
     const CreateInstitute = (e) => {
         e.preventDefault();
@@ -410,7 +414,7 @@ function BerandaAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-
+        console.log(data)
         axios.post(BASE_URL,
             {
                 "processDefinitionId": "createinstitute:9:597cfe71-e864-11ec-a658-66fc627bf211",
@@ -444,7 +448,7 @@ function BerandaAdmin() {
                                 "pic_email": "required",
                                 "pic_postition": "required"
                             },
-                            "institute_npsn": dataNpsn.npsn,
+                            "institute_npsn": dataNpsnSearch?.npsn,
                             "institute_bentuk_sekolah": data.type_institute,
                             "institute_status": data.status_institute,
                             "user_id": userId,
@@ -529,6 +533,7 @@ function BerandaAdmin() {
         )
             .then(function (response) {
                 const message = response.data.variables[8].value;
+                console.log(response)
                 if (response.data.variables[7].value == 422) {
                     notification.error({
                         message: "Error",
@@ -547,9 +552,125 @@ function BerandaAdmin() {
 
     }
 
-
     const FormInstitute = () => {
+
+        const dataSearch = [dataNpsnSearch] || {}
+
+        const handleOnSearch = (string, results) => {
+            axios.post(BASE_URL, {
+                    "processDefinitionId": "getwherenojoinfirst:1:e973019e-00cc-11ed-9ea6-c6ec5d98c2df",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_get_where",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "dapodik_sekolah",
+                                "pagination": false,
+                                "total_result": 2,
+                                "order_coloumn": "dapodik_sekolah.nama",
+                                "order_by": "asc",
+                                "data": [
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "npsn",
+                                        "tbl_value": string,
+                                        "operator": "="
+                                    }
+                                ],
+                                "tbl_coloumn": [
+                                    "nama",
+                                    "status_sekolah",
+                                    "bentuk_pendidikan",
+                                    "npsn"
+                                ]
+                            }
+                        }
+                    ]
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                }
+            ).then(function (response) {
+                const resData = JSON.parse(response.data.variables[2].value);
+                const resCode = resData.code
+                const data = resData.data
+
+                if(resCode == 200){
+                    setDataNpsnSearch(data)
+                    // setSubmittedNpsn(true)
+                }else if(resCode == 404){
+                    notification.info({
+                        message: 'Tidak ditemukan',
+                        description: 'Mohon masukkan NPSN yang sudah terdaftar di KEMENDIKBUD.',
+                        placement: 'top'
+                    })
+                }else{
+                    notification.error({
+                        message: 'Error',
+                        description: 'Mohon hubungi Admin',
+                        placement: 'top'
+                    })
+                }
+                console.log(resData)
+            });
+            // onSearch will have as the first callback parameter
+            // the string searched and for the second the results.
+            console.log('hasil data',string, results)
+            console.log('hasill', dataSearch)
+        }
+
+        const handleOnHover = (result) => {
+            // the item hovered
+            console.log(result)
+        }
+
+        const handleOnSelect = (item) => {
+            // the item selected
+            console.log(item)
+        }
+
+        const handleOnFocus = () => {
+            console.log('Focused')
+        }
+
+        const formatResult = (dataSearch) => {
+            console.log('res',dataSearch)
+            return (
+                <>
+                    {/*<span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>*/}
+                    {/*<span style={{ display: 'block', textAlign: 'left' }}>id: {item.id}</span>*/}
+                    <span style={{ display: 'block', textAlign: 'left' }}>name: {dataSearch.name}</span>
+                </>
+            )
+        }
+
         const FormNpsn = () => {
+            // const npsn = [dataNpsn];
+            const items = [
+                {
+                    id: 0,
+                    name: 'Cobol'
+                },
+                {
+                    id: 1,
+                    name: 'JavaScript'
+                },
+                {
+                    id: 2,
+                    name: 'Basic'
+                },
+                {
+                    id: 3,
+                    name: 'PHP'
+                },
+                {
+                    id: 4,
+                    name: 'Java'
+                }
+            ]
+
             return (
                 <div className="row">
                     <div className="col-lg-6">
@@ -557,23 +678,36 @@ function BerandaAdmin() {
                             <label className="mont-font fw-600 font-xsss">
                                 NPSN
                             </label>
-                            <input
-                                name="npsn_institute"
-                                type="text"
-                                className="form-control"
-                            />
+                            {/*<input*/}
+                            {/*    name="npsn_institute"*/}
+                            {/*    type="text"*/}
+                            {/*    className="form-control"*/}
+                            {/*/>*/}
+                            <div style={{ width: 400 }}>
+                                <ReactSearchAutocomplete
+                                    items={items}
+                                    onSearch={handleOnSearch}
+                                    onHover={handleOnHover}
+                                    onSelect={handleOnSelect}
+                                    onFocus={handleOnFocus}
+                                    autoFocus
+                                    formatResult={formatResult}
+                                />
+                            </div>
                         </div>
+
+                        <p>Sekolah Anda : <a className='text-info' onClick={() => setSubmittedNpsn(true)}>{dataSearch[0]?.npsn} - {dataSearch[0]?.nama}</a></p>
                     </div>
-                    <div className="col-lg-6">
-                        <button
-                            className="bg-current hovering-pan border-0 ml-5 text-white font-xsss fw-600 p-2 rounded-lg"
-                            style={{marginTop: '35px'}}
-                            type='button'
-                            onClick={(e) => getDataNpsn(e)}
-                        >
-                            Submit Npsn
-                        </button>
-                    </div>
+                    {/*<div className="col-lg-6">*/}
+                    {/*    <button*/}
+                    {/*        className="bg-current hovering-pan border-0 text-white font-xsss fw-600 p-2 rounded-lg"*/}
+                    {/*        style={{marginTop: '35px'}}*/}
+                    {/*        type='button'*/}
+                    {/*        onClick={(e) => getDataNpsn(e)}*/}
+                    {/*    >*/}
+                    {/*        Submit Npsn*/}
+                    {/*    </button>*/}
+                    {/*</div>*/}
 
                 </div>
             )
@@ -585,13 +719,13 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Name
+                                Name <RequiredTooltip />
                             </label>
                             <input
                                 name="name_institute"
                                 type="text"
                                 className="form-control"
-                                defaultValue={dataNpsn.nama}
+                                defaultValue={dataSearch[0]?.nama}
                                 disabled
                                 required
                             />
@@ -601,7 +735,7 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Phone
+                                Phone <RequiredTooltip />
                             </label>
                             <input
                                 type="number"
@@ -616,7 +750,7 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Email
+                                Email <RequiredTooltip />
                             </label>
                             <input
                                 name="email_institute"
@@ -635,7 +769,6 @@ function BerandaAdmin() {
                                 type="number"
                                 name="fax_institute"
                                 className="form-control"
-                                required
                             />
                         </div>
                     </div>
@@ -644,30 +777,50 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Provinsi
+                                Provinsi <RequiredTooltip />
                             </label>
-                            <input
-                                name="state_institute"
-                                type="text"
+                            <select
                                 className="form-control"
-                                defaultValue="11"
+                                aria-label="Default select example"
+                                name="state_institute"
                                 required
-                            />
+                            >
+                                <option value="11" selected disabled hidden>
+                                    ACEH
+                                </option>
+                            </select>
+                            {/*<input*/}
+                            {/*    name="state_institute"*/}
+                            {/*    type="text"*/}
+                            {/*    className="form-control"*/}
+                            {/*    defaultValue="11"*/}
+                            {/*    required*/}
+                            {/*/>*/}
                         </div>
                     </div>
 
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Kota / Kabupaten
+                                Kota / Kabupaten <RequiredTooltip />
                             </label>
-                            <input
-                                type="text"
-                                name="city_institute"
+                            <select
                                 className="form-control"
-                                defaultValue="1101"
+                                aria-label="Default select example"
+                                name="city_institute"
                                 required
-                            />
+                            >
+                                <option value="1101" selected disabled hidden>
+                                    KABUPATEN SIMEULUE
+                                </option>
+                            </select>
+                            {/*<input*/}
+                            {/*    type="text"*/}
+                            {/*    name="city_institute"*/}
+                            {/*    className="form-control"*/}
+                            {/*    defaultValue="1101"*/}
+                            {/*    required*/}
+                            {/*/>*/}
                         </div>
                     </div>
                 </div>
@@ -675,36 +828,56 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Kecamatan
+                                Kecamatan <RequiredTooltip />
                             </label>
-                            <input
-                                type="text"
-                                name="district_institute"
+                            <select
                                 className="form-control"
-                                defaultValue="1101010"
+                                aria-label="Default select example"
+                                name="district_institute"
                                 required
-                            />
+                            >
+                                <option value="1101010" selected disabled hidden>
+                                    TEUPAH SELATAN
+                                </option>
+                            </select>
+                            {/*<input*/}
+                            {/*    type="text"*/}
+                            {/*    name="district_institute"*/}
+                            {/*    className="form-control"*/}
+                            {/*    defaultValue="1101010"*/}
+                            {/*    required*/}
+                            {/*/>*/}
                         </div>
                     </div>
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Kelurahan
+                                Kelurahan <RequiredTooltip />
                             </label>
-                            <input
-                                type="text"
-                                name="subdistrict_institute"
+                            <select
                                 className="form-control"
-                                defaultValue="1101010001"
+                                aria-label="Default select example"
+                                name="subdistrict_institute"
                                 required
-                            />
+                            >
+                                <option value="1101010001" selected disabled hidden>
+                                    LATIUNG
+                                </option>
+                            </select>
+                            {/*<input*/}
+                            {/*    type="text"*/}
+                            {/*    name="subdistrict_institute"*/}
+                            {/*    className="form-control"*/}
+                            {/*    defaultValue="1101010001"*/}
+                            {/*    required*/}
+                            {/*/>*/}
                         </div>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-lg-12 mb-3">
                         <label className="mont-font fw-600 font-xsss">
-                            Alamat
+                            Alamat <RequiredTooltip />
                         </label>
                         <textarea
                             className="form-control mb-0 p-3 bg-greylight lh-16"
@@ -725,7 +898,6 @@ function BerandaAdmin() {
                                 type="text"
                                 name="website_institute"
                                 className="form-control"
-                                required
                             />
                         </div>
                     </div>
@@ -733,7 +905,7 @@ function BerandaAdmin() {
                     <div className="col-lg-6 mb-3">
                         <div className="form-group">
                             <label className="mont-font fw-600 font-xsss">
-                                Tahun Berdiri
+                                Tahun Berdiri <RequiredTooltip />
                             </label>
                             <DatePicker
                                 className="form-control"
@@ -748,33 +920,33 @@ function BerandaAdmin() {
                 <div className="row">
                     <div className="col-lg-6 mb-3">
                         <label className="mont-font fw-600 font-xsss">
-                            Tipe Sekolah
+                            Tipe Sekolah <RequiredTooltip />
                         </label>
                         <input
                             type="text"
                             name="type_institute"
                             className="form-control"
-                            defaultValue={dataNpsn.bentuk_pendidikan}
+                            defaultValue={dataSearch[0]?.bentuk_pendidikan}
                             disabled
                             required
                         />
                     </div>
                     <div className="col-lg-6 mb-3">
                         <label className="mont-font fw-600 font-xsss">
-                            Status Sekolah
+                            Status Sekolah <RequiredTooltip />
                         </label>
                         <input
                             type="text"
                             name="status_institute"
                             className="form-control"
-                            defaultValue={dataNpsn.status_sekolah}
+                            defaultValue={dataSearch[0]?.status_sekolah}
                             disabled
                             required
                         />
                     </div>
                 </div>
 
-                {formPic ? <PicForm/> : <ButtonPic/>}
+                <PicForm />
             </>
         )
         return (

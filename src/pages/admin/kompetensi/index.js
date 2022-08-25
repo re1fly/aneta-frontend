@@ -52,6 +52,7 @@ export default function KompetensiAdmin() {
     const [getKelas, setGetKelas] = useState([]);
     const [getkompetensiInsert, setGetKompetensiInsert] = useState([]); // => Harus nya kompetensi (4)
     const [selectedClass, setSelectedClass] = useState(null)
+    const [selectedMapel, setSelectedMapel] = useState(null)
     const [dataMapel, setDataMapel] = useState(null);
 
     const _getDataKelas = () => {
@@ -103,7 +104,7 @@ export default function KompetensiAdmin() {
                 setGetKelas(data);
             })
     }
-    const _getDataMapel = (e) => {
+    const _getDataMapel = () => {
         axios
             .post(
                 BASE_URL,
@@ -145,7 +146,7 @@ export default function KompetensiAdmin() {
                                     {
                                         "tbl_coloumn": "x_academic_subjects",
                                         "tbl_field": "course_grade_id",
-                                        "tbl_value": e.target.value,
+                                        "tbl_value": selectedClass,
                                         "operator": "=",
                                         "kondisi": "where"
                                     },
@@ -187,7 +188,7 @@ export default function KompetensiAdmin() {
                 setDataMapel(getMapel);
             })
     }
-    const _getKompetensi = (e) => {
+    const _getKompetensi = () => {
         axios.post(BASE_URL, {
                 "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
                 "returnVariables": true,
@@ -251,7 +252,7 @@ export default function KompetensiAdmin() {
                                 {
                                     "tbl_coloumn": "x_competence",
                                     "tbl_field": "academic_courses_id",
-                                    "tbl_value": e.target.value,
+                                    "tbl_value": selectedMapel,
                                     "operator": "="
                                 },{
                                     "tbl_coloumn": "x_competence",
@@ -287,7 +288,18 @@ export default function KompetensiAdmin() {
     }, []);
 
     useEffect(() => {
-        setGetKompetensi([])
+        _getDataMapel()
+    }, [selectedClass]);
+
+    useEffect(() => {
+        _getKompetensi()
+    }, [selectedMapel]);
+
+    useEffect(() => {
+        setSelectedMapel(null)
+        if(selectedMapel == null){
+            setGetKompetensi([])
+        }
     }, [selectedClass]);
 
 
@@ -670,11 +682,8 @@ export default function KompetensiAdmin() {
                                                         id="id_class_comp"
                                                         name="id_class_comp"
                                                         key="id_class_comp"
-                                                        onChange={(e) => {
-                                                            _getDataMapel(e)
-                                                            setSelectedClass(e.target.value)
-                                                        }}
-                                                        value={selectedClass?.id}
+                                                        onChange={(e) => setSelectedClass(e.target.value)}
+                                                        value={selectedClass}
                                                     >
                                                         <option value="" selected disabled>
                                                             Pilih Kelas
@@ -693,7 +702,8 @@ export default function KompetensiAdmin() {
                                                         id="id_mapel_comp"
                                                         key="id_mapel_comp"
                                                         name="id_mapel_comp"
-                                                        onChange={(e) => _getKompetensi(e)}
+                                                        onChange={(e) => setSelectedMapel(e.target.value)}
+                                                        value={selectedMapel}
                                                     >
                                                         <option value="" selected disabled>
                                                             Pilih Mata Pelajaran

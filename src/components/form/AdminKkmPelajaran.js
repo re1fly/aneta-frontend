@@ -72,9 +72,13 @@ export const FormKkmPelajaran = (props) => {
                                                     aria-label="Default select example"
                                                     name="tingkat_kelas"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    disabled={disableEditPelajaran ? true : props.isDisabled}
                                                 >
-                                                    <option value={props.tingkatKelas} selected disabled>
+                                                    <option value={props.idTingkatKelas} selected disabled>
+                                                        {props.tingkatKelas == null ? "Pilih Tingkat Kelas" : props.tingkatKelas}
+                                                    </option>
+                                                    {props.selectTingkatKelas}
+                                                    {/* <option value={props.tingkatKelas} selected disabled>
                                                         {props.tingkatKelas == null ? "Pilih Tingkat Kelas" : props.tingkatKelas}
                                                     </option>
                                                     <option value={1}>
@@ -94,7 +98,7 @@ export const FormKkmPelajaran = (props) => {
                                                     </option>
                                                     <option value={6}>
                                                         Kelas 6
-                                                    </option>
+                                                    </option> */}
                                                 </select>
                                             </div>
                                         </div>

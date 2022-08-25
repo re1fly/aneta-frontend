@@ -17,8 +17,6 @@ import {
     DownOutlined,
     AppstoreOutlined,
     MenuOutlined,
-    DeleteOutlined,
-    EditOutlined,
     CalendarOutlined,
     TableOutlined,
     EllipsisOutlined,
@@ -35,10 +33,40 @@ function JadwalPelajaranSiswa() {
     const [grid, setGrid] = useState(false);
     const [calendar, setCalendar] = useState(true);
     const [getJadwalPelajaran, setGetJadwalPelajaran] = useState([]);
+    const [dataSenin1, setDataSenin1] = useState([])
+    const [dataSelasa1, setDataSelasa1] = useState([])
     const [getKelasSiswa, setGetKelas] = useState([]);
 
     const userName = localStorage.getItem('user_name');
     const userId = localStorage.getItem('user_id')
+    const academicYear = localStorage.getItem('academic_id')
+
+    const kelas = `${getKelasSiswa[0]?.class} ${"/"} ${getKelasSiswa[0]?.sub_class}`
+    console.log(kelas);
+
+    const dataMapper = (dailyData) => {
+        let pelajaran = []
+        dailyData.map(function(data, index) {
+            pelajaran.push({
+                hari: data?.hari,
+                kelas: kelas,
+                namaPelajaran: data?.mata_pelarajan,
+                namaPengajar: data?.nama_guru,
+                waktu: data?.jam_mulai,
+            })
+        })
+        return pelajaran
+    }
+
+    const setDailyData = () => {
+        getJadwalPelajaran.filter((data) => {
+            if(data.hari === "senin") {
+                setDataSenin1(dataMapper(data.data))
+            } else if (data.hari === "selasa") {
+                setDataSelasa1(dataMapper(data.data))
+            } 
+        })
+    }
 
     const senin = getJadwalPelajaran?.filter((data) => {
         return data.hari === "senin"
@@ -67,6 +95,10 @@ function JadwalPelajaranSiswa() {
     const _onSearch = value => console.log(value);
 
     useEffect(() => {
+        setDailyData()
+    },[getJadwalPelajaran])
+
+    useEffect(() => {
         axios.post(BASE_URL, {
             "processDefinitionId": "e81e093e-028d-11ed-ac5e-66fc627bf211",
             "returnVariables": true,
@@ -76,7 +108,7 @@ function JadwalPelajaranSiswa() {
                     "type": "json",
                     "value": {
                         "user_id": userId,
-                        "academic_id": 65
+                        "academic_id": academicYear
                     }
                 }
             ]
@@ -88,7 +120,11 @@ function JadwalPelajaranSiswa() {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            setGetJadwalPelajaran(dataRes?.data);
+            console.log(dataRes);
+            if(dataRes.code == true){
+                setGetJadwalPelajaran(dataRes?.data);
+            }
+            
         })
 
         axios.post(BASE_URL, {
@@ -170,6 +206,8 @@ function JadwalPelajaranSiswa() {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value)
             setGetKelas([dataRes?.data])
         })
+
+
     }, [userId])
 
     const CalendarData = () => {
@@ -180,44 +218,20 @@ function JadwalPelajaranSiswa() {
 
     const TableJadwalPelajaran = () => {
         const columns = [
-            // {
-            //     title: 'Kelas',
-            //     dataIndex: 'kelas',
-            //     align: 'center',
-            // },
+            {
+                title: 'Kelas',
+                dataIndex: 'kelas',
+                align: 'center',
+            },
             {
                 title: 'Mata Pelajaran',
                 dataIndex: 'namaPelajaran',
                 align: 'center',
-                // filters: [
-                //     {
-                //         text: 'Tematik 1',
-                //         value: 'Tematik 1',
-                //     },
-                //     {
-                //         text: 'Tematik 2',
-                //         value: 'Tematik 2',
-                //     },
-                // ],
-                // onFilter: (value, record) => record.namaPelajaran.indexOf(value) === 0,
-                // sorter: (a, b) => a.namaPelajaran.length - b.namaPelajaran.length,
             },
             {
                 title: 'Guru/Tenaga Pengajar',
                 dataIndex: 'namaPengajar',
                 align: 'center',
-                // filters: [
-                //     {
-                //         text: 'Sri Wahyuni S.pd',
-                //         value: 'Sri Wahyuni S.pd',
-                //     },
-                //     {
-                //         text: 'Siti Mulyani S.pd',
-                //         value: 'Siti Mulyani S.pd',
-                //     },
-                // ],
-                // onFilter: (value, record) => record.namaPengajar.indexOf(value) === 0,
-                // sorter: (a, b) => a.namaPengajar.length - b.namaPengajar.length,
             },
             {
                 title: 'Waktu Mulai - Waktu Selesai',
@@ -226,32 +240,17 @@ function JadwalPelajaranSiswa() {
             },
         ];
 
-        const kelasSiswa = getKelasSiswa.map((siswa, index) => {
-            const kelas = getKelasSiswa[0].class
-            const kelasStr = JSON.stringify(kelas)
-            const tingkatKelas = kelasStr.charAt(7)
-        
-            return {
-                kelas: tingkatKelas,
-                subKelas: siswa.sub_class,
-                semester: siswa.semester,
-                tahunAkademik: siswa.academic_year,
-            }
-        })
-
-        const kelas = `${kelasSiswa[0]?.kelas} ${"/"} ${kelasSiswa[0]?.subKelas}`
+        // const kelas = `${getKelasSiswa[0]?.class} ${"/"} ${getKelasSiswa[0]?.sub_class}`
 
         const dataSenin = senin[0]?.data?.map((data, index) => {
             return {
-                hari: data.hari,
+                hari: data?.hari,
                 kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
+                namaPelajaran: data?.mata_pelarajan,
+                namaPengajar: data?.nama_guru,
+                waktu: data?.jam_mulai,
             }
         })
-
-        console.log(dataSenin);
 
         const dataSelasa = selasa[0]?.data?.map((data, index) => {
             return {
@@ -263,30 +262,40 @@ function JadwalPelajaranSiswa() {
             }
         })
 
-        const dataRabu = rabu?.map((data, index) => {
+        const dataRabu = rabu[0]?.map((data, index) => {
             return {
                 hari: data.hari,
-                kelas: data.class,
+                kelas: kelas,
                 namaPelajaran: data.mata_pelarajan,
                 namaPengajar: data.nama_guru,
                 waktu: data.jam_mulai,
             }
         })
 
-        const dataKamis = kamis?.map((data, index) => {
+        const dataKamis = kamis[0]?.map((data, index) => {
             return {
                 hari: data.hari,
-                kelas: data.class,
+                kelas: kelas,
                 namaPelajaran: data.mata_pelarajan,
                 namaPengajar: data.nama_guru,
                 waktu: data.jam_mulai,
             }
         })
 
-        const dataJumat = jumat?.map((data, index) => {
+        const dataJumat = jumat[0]?.map((data, index) => {
             return {
                 hari: data.hari,
-                kelas: data.class,
+                kelas: kelas,
+                namaPelajaran: data.mata_pelarajan,
+                namaPengajar: data.nama_guru,
+                waktu: data.jam_mulai,
+            }
+        })
+
+        const dataSabtu = sabtu[0]?.map((data, index) => {
+            return {
+                hari: data.hari,
+                kelas: kelas,
                 namaPelajaran: data.mata_pelarajan,
                 namaPengajar: data.nama_guru,
                 waktu: data.jam_mulai,
@@ -306,7 +315,8 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataSenin}
+                    dataSource={dataSenin1 !== undefined ? dataSenin1 : []}
+                    // dataSource={dataSenin !== undefined ? dataSenin : []}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
@@ -319,7 +329,7 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataSelasa}
+                    dataSource={dataSelasa1}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
@@ -354,6 +364,19 @@ function JadwalPelajaranSiswa() {
                 <div className="mt-4">
                     <div className="bg-grey">
                         <p className="strong text-black pl-4 mb-0">JUMAT</p>
+                    </div>
+                </div>
+                <Table className=""
+                    columns={columns}
+                    dataSource={dataJumat}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
+
+                <div className="mt-4">
+                    <div className="bg-grey">
+                        <p className="strong text-black pl-4 mb-0">SABTU</p>
                     </div>
                 </div>
                 <Table className=""

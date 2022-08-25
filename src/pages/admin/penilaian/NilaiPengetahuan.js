@@ -7,7 +7,7 @@ import "../../../../style/custom.css";
 import axios from "axios";
 import { BASE_URL } from "../../../../api/Url";
 
-function NilaiKeterampilan() {
+function NilaiPengetahuan() {
   const academic = localStorage.getItem("academic_year");
   const userId = localStorage.getItem("user_id");
   const [dataMapel, setDataMapel] = useState([]);
@@ -177,7 +177,7 @@ function NilaiKeterampilan() {
                   {
                     tbl_coloumn: "x_competence_detail",
                     tbl_field: "competence_aspect_id",
-                    tbl_value: "2",
+                    tbl_value: "1",
                     operator: "=",
                   },
                 ],
@@ -218,7 +218,7 @@ function NilaiKeterampilan() {
 
     for (let i = 0; i < totalPenilaian; i++) {
       allPlaning.push({
-        competence_aspect_id: "2",
+        competence_aspect_id: "1",
         serial: i + 1,
         assessment_technique_id: teknikPenilaian[i],
         assessment_bobot: bobotPenilaian[i],
@@ -254,6 +254,151 @@ function NilaiKeterampilan() {
       kompetensi: allCompetency,
     };
 
+    console.log(insertToApi);
+
+<<<<<<< HEAD
+                setDataMapel(getMapel);
+            })
+    }
+
+    const _getDataKelas = () => {
+        axios
+            .post(
+                BASE_URL,
+                {
+                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_get_where",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_class",
+                                "pagination": false,
+                                "total_result": 2,
+                                "order_coloumn": "x_academic_class.class",
+                                "order_by": "asc",
+                                "data": [
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "academic_year_id",
+                                        "tbl_value": academic,
+                                        "operator": "="
+                                    },
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "="
+                                    }
+                                ],
+                                "tbl_coloumn": [
+                                    "*"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                const data = JSON.parse(response.data.variables[2].value);
+                setDataKelas(data);
+            })
+    }
+
+    const _getCompetency = (e) => {
+        axios
+            .post(
+                BASE_URL,
+                {
+                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_competence_detail",
+                                "select": [
+                                    "x_competence_detail.id as id_detail",
+                                    "x_competence_detail.competence_desc",
+                                    "x_competence_detail.code"
+
+                                ],
+                                "paginate": 1000,
+                                "join": [
+                                    {
+                                        "tbl_join": "x_competence",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_competence_detail",
+                                        "foregenkey": "competence_id"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_competence",
+                                        "tbl_field": "academic_courses_id",
+                                        "tbl_value": e.target.value,
+                                        "operator": "="
+                                    }, {
+                                        "tbl_coloumn": "x_competence_detail",
+                                        "tbl_field": "competence_aspect_id",
+                                        "tbl_value": "1",
+                                        "operator": "="
+                                    }
+                                ],
+                                "order_coloumn": "x_competence_detail.competence_desc",
+                                "order_by": "asc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                const competency = JSON.parse(response.data.variables[3].value);
+                const allCompetency = competency.data.data
+                setDataKompetensi(allCompetency);
+            })
+    }
+
+
+    const _submitNilai = (e) => {
+        const formCV = document.querySelector('#form_perencanaan');
+        const formData = new FormData(formCV);
+
+        const teknikPenilaian = formData.getAll('teknik_penilaian');
+        console.log(teknikPenilaian);
+
+        const bobotPenilaian = formData.getAll('bobot_penilaian');
+        const namaPenilaian = formData.getAll('nama_penilaian');
+        const classId = formData.get('id_class_filter');
+        const subjectId = formData.get('id_mapel_filter');
+        const allPlaning = [];
+
+        for (let i = 0; i < totalPenilaian; i++) {
+            allPlaning.push({
+                competence_aspect_id: "1",
+                serial: i + 1,
+                assessment_technique_id: teknikPenilaian[i],
+                assessment_bobot: bobotPenilaian[i],
+                assessment_name: namaPenilaian[i],
+            });
+=======
     axios
       .post(
         BASE_URL,
@@ -272,6 +417,7 @@ function NilaiKeterampilan() {
           headers: {
             "Content-Type": "application/json",
           },
+>>>>>>> 5349ad846f14dcea83babc84a75d86786e2286f9
         }
       )
       .then(function (response) {
@@ -281,14 +427,14 @@ function NilaiKeterampilan() {
         if (resCode === "true") {
           notification.success({
             message: "Sukses",
-            description: "Perencanaan nilai keterampilan berhasil di input",
+            description: "Perencanaan nilai pengetahuan berhasil di input",
             placement: "top",
           });
         } else {
           notification.info({
             message: "Gagal",
             description:
-              "Perencanaan nilai keterampilan gagal. Pastikan Form telah diisi semua",
+              "Perencanaan nilai pengetahuan gagal. Pastikan Form telah diisi semua",
             placement: "top",
           });
         }
@@ -312,7 +458,7 @@ function NilaiKeterampilan() {
                 <PageHeader
                   className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                   onBack={() => window.history.back()}
-                  title="Rencana Nilai keterampilan"
+                  title="Rencana Nilai Pengetahuan"
                 />
               </div>
             </div>
@@ -572,4 +718,4 @@ function NilaiKeterampilan() {
   );
 }
 
-export default NilaiKeterampilan;
+export default NilaiPengetahuan;

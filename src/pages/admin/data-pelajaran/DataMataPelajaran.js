@@ -22,7 +22,8 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
-  EyeOutlined
+  EyeOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 
 import Search from "antd/es/input/Search";
@@ -54,16 +55,12 @@ export default function DataMataPelajaranAdmin() {
   const [year, setYear] = useState(localStorage.getItem('year'));
   const [academic, setAcademic] = useState(academicYear);
   const [academicYears, setAcademicYears] = useState([]);
-  // console.log(academicYears);
 
   const [getPelajaran, setGetPelajaran] = useState([]);
+  console.log(getPelajaran);
   const [btnPagination, setBtnPagination] = useState([]);
   const [paramsPage, setParamsPage] = useState("1");
   const [getKelompokBelajar, setGetKelompokBelajar] = useState([])
-
-  const [handleImage, setHandleImage] = useState('')
-  const [_Img, setIMG] = useState('');
-  const [_ImgBase64, setIMGBase64] = useState('');
 
   const dispatch = useDispatch();
   const searchRedux = useSelector(state => state.search);
@@ -71,39 +68,6 @@ export default function DataMataPelajaranAdmin() {
 
   const getProcess = useSelector(state => state.processId);
   let ProcessId = getProcess.DataProcess;
-
-  const getBase64 = (img, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-  };
-
-  function toDataURL(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      var reader = new FileReader();
-      reader.onloadend = function () {
-        callback(reader.result);
-      }
-      reader.readAsDataURL(xhr.response);
-    };
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.send();
-  }
-
-  const onChangeImage = (info) => {
-    if (info.file.status === 'done') {
-      getBase64(info.file.originFileObj, (url) => {
-        setIMG(url);
-        toDataURL(url, function (dataUrl) {
-          setIMGBase64(dataUrl);
-          setHandleImage(dataUrl);
-          console.log('RESULT:', dataUrl)
-        })
-      });
-    }
-  };
 
   function capitalizeFirstLetter(string) {
     let result = '';
@@ -113,27 +77,27 @@ export default function DataMataPelajaranAdmin() {
     const splittedText = string?.split(' ');
 
     if (splittedText?.length === 1) {
-        result =
-            splittedText[0]?.charAt(0)?.toUpperCase() +
-            splittedText[0]?.slice(1)?.toLowerCase();
+      result =
+        splittedText[0]?.charAt(0)?.toUpperCase() +
+        splittedText[0]?.slice(1)?.toLowerCase();
     } else if (splittedText?.length > 1) {
-        for (let i = 0; i < splittedText?.length; i++) {
-            if (i !== splittedText?.length - 1) {
-                let res =
-                    splittedText[i]?.charAt(0)?.toUpperCase() +
-                    splittedText[i]?.slice(1)?.toLowerCase() +
-                    ' ';
-                initText += res;
-            } else {
-                lastText =
-                    splittedText[i]?.charAt(0)?.toUpperCase() +
-                    splittedText[i]?.slice(1)?.toLowerCase();
-            }
+      for (let i = 0; i < splittedText?.length; i++) {
+        if (i !== splittedText?.length - 1) {
+          let res =
+            splittedText[i]?.charAt(0)?.toUpperCase() +
+            splittedText[i]?.slice(1)?.toLowerCase() +
+            ' ';
+          initText += res;
+        } else {
+          lastText =
+            splittedText[i]?.charAt(0)?.toUpperCase() +
+            splittedText[i]?.slice(1)?.toLowerCase();
         }
-        result = initText + lastText;
+      }
+      result = initText + lastText;
     }
     return result;
-}
+  }
 
   function onChangeTable(pagination, filters, sorter, extra) {
     console.log('params', pagination, filters, sorter, extra);
@@ -158,74 +122,43 @@ export default function DataMataPelajaranAdmin() {
   }, [DataSearch])
 
   const _onSearch = (value) => {
-    const processDef = ProcessId[0].proses_def_id;
-    const variableSearch = {
-      "name": "global_join_where",
-      "type": "json",
-      "value": {
-        "tbl_induk": "x_academic_subjects",
-        "paginate": 10,
-        "join": [
-          {
-            "tbl_join": "x_academic_year",
-            "foregenkey": "academic_year_id",
-            "refkey": "id"
-          },
-
-          {
-            "tbl_join": "x_academic_class",
-            "foregenkey": "course_grade_id",
-            "refkey": "id"
-          }
-        ],
-        "where": [
-          {
-            "tbl_coloumn": "x_academic_subjects",
-            "tbl_field": "course_name",
-            "tbl_value": value,
-            "operator": "ILIKE"
-          },
-          {
-            "tbl_coloumn": "x_academic_subjects",
-            "tbl_field": "course_code",
-            "tbl_value": value,
-            "operator": "ILIKE"
-          },
-          {
-            "tbl_coloumn": "x_academic_subjects",
-            "tbl_field": "max_student",
-            "tbl_value": value,
-            "operator": "ILIKE"
-          },
-          {
-            "tbl_coloumn": "x_academic_subjects",
-            "tbl_field": "aktiv",
-            "tbl_value": value,
-            "operator": "ILIKE"
-          },
-          {
-            "tbl_coloumn": "x_academic_class",
-            "tbl_field": "class",
-            "tbl_value": value,
-            "operator": "ILIKE"
-          },
-          {
-            "tbl_coloumn": "x_academic_year",
-            "tbl_field": "academic_year",
-            "tbl_value": value,
-            "operator": "ILIKE"
-          }
-        ],
-        "kondisi": {
-          "keterangan": "where",
-          "kolom": "x_academic_subjects.academic_year_id",
-          "value": academicYear
-        },
-        "order_coloumn": "x_academic_subjects.course_name",
-        "order_by": "asc"
-      }
+    if (value == "") {
+      window.location.reload();
+    } else {
+      notification.info({
+        message: "Search",
+        description: "Mencari data : " + value,
+        duration: 1,
+        icon: <SearchOutlined />,
+      });
+      axios.post(BASE_URL,
+        {
+          "processDefinitionId": "caridatamatapelajaran:1:474cd8b2-22ca-11ed-ac5e-66fc627bf211",
+          "returnVariables": true,
+          "variables": [
+            {
+              "name": "get_data",
+              "type": "json",
+              "value": {
+                "id_academic": academic,
+                "paginate": 10,
+                "cari": value
+              }
+            },
+            {
+              "name": "page",
+              "type": "string",
+              "value": "1"
+            }
+          ]
+        }
+      ).then(function (response) {
+        const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
+        setGetPelajaran(pelajaran?.data?.data)
+        const pagination = pelajaran?.data?.links;
+        setBtnPagination(pagination)
+      })
     }
-    dispatch(searchGlobal(value, paramsPage, processDef, variableSearch))
   }
 
   useEffect(() => {
@@ -236,50 +169,15 @@ export default function DataMataPelajaranAdmin() {
 
     axios.post(BASE_URL,
       {
-        "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+        "processDefinitionId": "datamatapelajaran:1:83110c70-22b9-11ed-9ea6-c6ec5d98c2df",
         "returnVariables": true,
         "variables": [
           {
-            "name": "global_join_where",
+            "name": "get_data",
             "type": "json",
             "value": {
-              "tbl_induk": "x_academic_subject_master",
-              "select": [
-                "x_academic_subject_master.*",
-                "r_kelompok_mapel.kelompok as kel_id",
-                "r_kelompok_mapel.id as id_mapel",
-                "x_academic_year.id as id_academic",
-                "x_academic_subject_master.id as id_master"
-              ],
-              "paginate": 10,
-              "join": [
-                {
-                  "tbl_join": "x_academic_year",
-                  "foregenkey": "academic_year_id",
-                  "refkey": "id"
-                },
-                {
-                  "tbl_join": "r_kelompok_mapel",
-                  "foregenkey": "kel_id",
-                  "refkey": "id"
-                }
-              ],
-              "where": [
-                {
-                  "tbl_coloumn": "x_academic_subject_master",
-                  "tbl_field": "academic_year_id",
-                  "tbl_value": academicYear,
-                  "operator": "="
-                },
-                {
-                  "tbl_coloumn": "x_academic_subject_master",
-                  "tbl_field": "deleted_at",
-                  "tbl_value": "",
-                  "operator": "="
-                }
-              ],
-              "order_coloumn": "x_academic_subject_master.updated_at",
-              "order_by": "desc"
+              "id_academic": academic,
+              "paginate": 10
             }
           },
           {
@@ -292,8 +190,8 @@ export default function DataMataPelajaranAdmin() {
     ).then(function (response) {
       const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
       setGetPelajaran(pelajaran?.data?.data)
+      console.log(pelajaran);
       const pagination = pelajaran?.data?.links;
-      // console.log(pagination);
       setBtnPagination(pagination)
     })
   }
@@ -520,8 +418,8 @@ export default function DataMataPelajaranAdmin() {
         idPelajaran: pelajaran.id_master,
         namaPelajaran: pelajaran.nama_mata,
         kode: pelajaran.code,
-        idKelompok: pelajaran.id_mapel,
-        kelompok: capitalizeFirstLetter(pelajaran.kel_id),
+        idKelompok: pelajaran.id_kelompok,
+        kelompok: capitalizeFirstLetter(pelajaran.kelompok),
         noUrutRapor: pelajaran.urut_lapor,
         kurikulum: pelajaran.max_student,
         status: [JSON.stringify(pelajaran.status)],
@@ -649,7 +547,7 @@ export default function DataMataPelajaranAdmin() {
                     onClick={viewCreatePelajaran}>
                     Tambah Data
                   </Button>
-                  <Filter title1="Mata Pelajaran" title2="Kelas" />
+                  {/* <Filter title1="Mata Pelajaran" title2="Kelas" /> */}
                   <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
                     selectYear={academicYears.map((data) => {
                       return (
@@ -966,41 +864,58 @@ export default function DataMataPelajaranAdmin() {
     // console.log(selectedUser.idKelompok);
 
     axios.post(BASE_URL, {
-      "processDefinitionId": "bc121392-fb41-11ec-ac5e-66fc627bf211",
+      // "processDefinitionId": "bc121392-fb41-11ec-ac5e-66fc627bf211",
+      // "returnVariables": true,
+      // "variables": [
+      //   {
+      //     "name": "validasi",
+      //     "type": "json",
+      //     "value": {
+      //       "data": {
+      //         "code": "required",
+      //         "nama_mata": "required",
+      //         "urut_lapor": "required",
+      //         "kel_id": "required",
+      //         "status": "required",
+      //       },
+      //       "code": data.kode_pelajaran,
+      //       "nama_mata": data.nama_pelajaran,
+      //       "urut_lapor": data.noUrut_rapor,
+      //       "kel_id": data.kelompok,
+      //       "status": data.status,
+      //     }
+      //   },
+      //   {
+      //     "name": "x_academic_subject_master",
+      //     "type": "json",
+      //     "value": {
+      //       "tbl_name": "x_academic_subject_master",
+      //       "id": selectedUser.idPelajaran,
+      //       "tbl_coloumn": {
+      //         "academic_year_id": academicYear,
+      //         "status": data.status,
+      //         "code": data.kode_pelajaran,
+      //         "nama_mata": data.nama_pelajaran,
+      //         "urut_lapor": data.noUrut_rapor,
+      //         "kel_id": data.kelompok,
+      //       }
+      //     }
+      //   }
+      // ]
+      "processDefinitionId": "updatedatamatapelajaran:1:d4b358a9-22bd-11ed-ac5e-66fc627bf211",
       "returnVariables": true,
       "variables": [
         {
-          "name": "validasi",
+          "name": "get_data",
           "type": "json",
           "value": {
-            "data": {
-              "code": "required",
-              "nama_mata": "required",
-              "urut_lapor": "required",
-              "kel_id": "required",
-              "status": "required",
-            },
-            "code": data.kode_pelajaran,
+            "nama_mata_hidden": data.nama_pelajaranhidden,
             "nama_mata": data.nama_pelajaran,
+            "academic_year_id": academic,
+            "code": data.kode_pelajaran,
             "urut_lapor": data.noUrut_rapor,
-            "kel_id": data.kelompok,
             "status": data.status,
-          }
-        },
-        {
-          "name": "x_academic_subject_master",
-          "type": "json",
-          "value": {
-            "tbl_name": "x_academic_subject_master",
-            "id": selectedUser.idPelajaran,
-            "tbl_coloumn": {
-              "academic_year_id": academicYear,
-              "status": data.status,
-              "code": data.kode_pelajaran,
-              "nama_mata": data.nama_pelajaran,
-              "urut_lapor": data.noUrut_rapor,
-              "kel_id": data.kelompok,
-            }
+            "kel_id": data.kelompok
           }
         }
       ]
@@ -1009,9 +924,10 @@ export default function DataMataPelajaranAdmin() {
         "Content-Type": "application/json",
       }
     }).then(function (response) {
-      const valueRes = response.data.variables[4].value
+      const valueRes = response.data.variables[2].value
       const valueResObj = JSON.parse(valueRes)
-      if (valueResObj.status == 'success') {
+      console.log(valueResObj);
+      if (valueResObj.code == true) {
         setIsViewCreate(false)
         setIsViewPelajaran(true)
         notification.success({
@@ -1027,7 +943,6 @@ export default function DataMataPelajaranAdmin() {
           placement: 'top'
         })
       }
-      console.log(response)
     })
   }
 
@@ -1044,18 +959,30 @@ export default function DataMataPelajaranAdmin() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios.post(BASE_URL, {
-          "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+          // "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+          // "returnVariables": true,
+          // "variables": [
+          //   {
+          //     "name": "global_updatedata",
+          //     "type": "json",
+          //     "value": {
+          //       "tbl_name": "x_academic_subject_master",
+          //       "id": record.idPelajaran,
+          //       "tbl_coloumn": {
+          //         "deleted_at": dateNow
+          //       }
+          //     }
+          //   }
+          // ]
+          "processDefinitionId": "deletedatamatapelajaran:1:7d2a5efa-22bf-11ed-ac5e-66fc627bf211",
           "returnVariables": true,
           "variables": [
             {
-              "name": "global_updatedata",
+              "name": "get_data",
               "type": "json",
               "value": {
-                "tbl_name": "x_academic_subject_master",
-                "id": record.idPelajaran,
-                "tbl_coloumn": {
-                  "deleted_at": dateNow
-                }
+                "nama_matpel": record.namaPelajaran,
+                "academic_year_id": academic
               }
             }
           ]

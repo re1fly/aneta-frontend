@@ -475,6 +475,10 @@ export default function JadwalPelajaranAdminDetail() {
     }
   };
 
+  const detailCalendar = () => {
+    
+  }
+
   const CalendarData = () => {
     const monthCellRender = (value) => {
       const num = getMonthData(value);
@@ -499,7 +503,7 @@ export default function JadwalPelajaranAdminDetail() {
       );
     };
 
-    return <Calendar dateCellRender={dateCellRender} monthCellRender={monthCellRender} />;
+    return <Calendar onSelect={(e)=>{console.log(e)}} dateCellRender={dateCellRender} monthCellRender={monthCellRender} />;
   };
 
   const TableJadwalPelajaran = () => {

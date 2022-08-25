@@ -22,7 +22,8 @@ import {
     EditOutlined,
     DeleteOutlined,
     PlusOutlined,
-    EyeOutlined
+    EyeOutlined,
+    SearchOutlined,
 } from "@ant-design/icons";
 
 import Search from "antd/es/input/Search";
@@ -58,12 +59,9 @@ export default function DataMataPelajaranAdmin() {
 
     const [getKkmPelajaran, setGetKkmPelajaran] = useState([])
     const [getPelajaran, setGetPelajaran] = useState([]);
+    const [tingkatKelas, setTingkatKelas] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
-
-    const [handleImage, setHandleImage] = useState('')
-    const [_Img, setIMG] = useState('');
-    const [_ImgBase64, setIMGBase64] = useState('');
 
     const dispatch = useDispatch();
     const searchRedux = useSelector(state => state.search);
@@ -71,39 +69,6 @@ export default function DataMataPelajaranAdmin() {
 
     const getProcess = useSelector(state => state.processId);
     let ProcessId = getProcess.DataProcess;
-
-    const getBase64 = (img, callback) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result));
-        reader.readAsDataURL(img);
-    };
-
-    function toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            var reader = new FileReader();
-            reader.onloadend = function () {
-                callback(reader.result);
-            }
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    }
-
-    const onChangeImage = (info) => {
-        if (info.file.status === 'done') {
-            getBase64(info.file.originFileObj, (url) => {
-                setIMG(url);
-                toDataURL(url, function (dataUrl) {
-                    setIMGBase64(dataUrl);
-                    setHandleImage(dataUrl);
-                    console.log('RESULT:', dataUrl)
-                })
-            });
-        }
-    };
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -128,74 +93,98 @@ export default function DataMataPelajaranAdmin() {
     }, [DataSearch])
 
     const _onSearch = (value) => {
-        const processDef = ProcessId[0].proses_def_id;
-        const variableSearch = {
-            "name": "global_join_where",
-            "type": "json",
-            "value": {
-                "tbl_induk": "x_academic_subjects",
-                "paginate": 10,
-                "join": [
-                    {
-                        "tbl_join": "x_academic_year",
-                        "foregenkey": "academic_year_id",
-                        "refkey": "id"
-                    },
+        if (value == "") {
+            window.location.reload();
+        } else {
+            notification.info({
+                message: "Search",
+                description: "Mencari data : " + value,
+                duration: 1,
+                icon: <SearchOutlined />,
+            });
+            axios.post(BASE_URL,
+                {
+                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_subject_master",
+                                "paginate": 1000,
+                                "select": [
+                                    "x_academic_subject_master.*",
+                                    "x_academic_year.academic_year as academic_year",
+                                    "x_academic_year.semester as semester",
+                                    "x_academic_subject_master.id as id_master",
+                                    "r_class_type.*",
+                                    "r_class_type.id as id_tingkat"
+                                ],
+                                "join": [
+                                    {
+                                        "tbl_join": "x_academic_year",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_subject_master",
+                                        "foregenkey": "academic_year_id"
+                                    },
+                                    {
+                                        "tbl_join": "r_class_type",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_subject_master",
+                                        "foregenkey": "tingkat"
+                                    }
+                                ],
+                                "kondisi": [
+                                    {
+                                        "keterangan": "where",
+                                        "kolom": "x_academic_subject_master.academic_year_id",
+                                        "value": academic
+                                    },
+                                    {
+                                        "keterangan": "deleted_at",
+                                        "kolom": "x_academic_subject_master.deleted_at"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_academic_subject_master",
+                                        "tbl_field": "nama_mata",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    },
+                                    {
+                                        "tbl_coloumn": "r_class_type",
+                                        "tbl_field": "class_type",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_subject_master",
+                                        "tbl_field": "kkm",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    }
 
-                    {
-                        "tbl_join": "x_academic_class",
-                        "foregenkey": "course_grade_id",
-                        "refkey": "id"
-                    }
-                ],
-                "where": [
-                    {
-                        "tbl_coloumn": "x_academic_subjects",
-                        "tbl_field": "course_name",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_subjects",
-                        "tbl_field": "course_code",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_subjects",
-                        "tbl_field": "max_student",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_subjects",
-                        "tbl_field": "aktiv",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_class",
-                        "tbl_field": "class",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_year",
-                        "tbl_field": "academic_year",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    }
-                ],
-                "kondisi": {
-                    "keterangan": "where",
-                    "kolom": "x_academic_subjects.academic_year_id",
-                    "value": academicYear
-                },
-                "order_coloumn": "x_academic_subjects.course_name",
-                "order_by": "asc"
-            }
+                                ],
+                                "order_coloumn": "x_academic_subject_master.updated_at",
+                                "order_by": "desc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": paramsPage
+                        }
+                    ]
+                }
+            ).then(function (response) {
+                const dataRes = JSON.parse(response?.data?.variables[3]?.value)
+                setGetKkmPelajaran(dataRes?.data?.data)
+                const pagination = dataRes?.data?.links
+                setBtnPagination(pagination)
+            })
         }
-        dispatch(searchGlobal(value, paramsPage, processDef, variableSearch))
     }
 
     useEffect(() => {
@@ -217,13 +206,20 @@ export default function DataMataPelajaranAdmin() {
                                 "x_academic_subject_master.*",
                                 "x_academic_year.academic_year as academic_year",
                                 "x_academic_year.semester as semester",
-                                "x_academic_subject_master.id as id_master"
+                                "x_academic_subject_master.id as id_master",
+                                "r_class_type.*",
+                                "r_class_type.id as id_tingkat"
                             ],
                             "paginate": 10,
                             "join": [
                                 {
                                     "tbl_join": "x_academic_year",
                                     "foregenkey": "academic_year_id",
+                                    "refkey": "id"
+                                },
+                                {
+                                    "tbl_join": "r_class_type",
+                                    "foregenkey": "tingkat",
                                     "refkey": "id"
                                 }
                             ],
@@ -267,56 +263,21 @@ export default function DataMataPelajaranAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+                "processDefinitionId": "datamatapelajaran:1:83110c70-22b9-11ed-9ea6-c6ec5d98c2df",
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_join_where",
+                        "name": "get_data",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_academic_subject_master",
-                            "select": [
-                                "x_academic_subject_master.*",
-                                "r_kelompok_mapel.kelompok as kel_id",
-                                "r_kelompok_mapel.id as id_mapel",
-                                "x_academic_year.id as id_academic",
-                                "x_academic_subject_master.id as id_master"
-                            ],
-                            "paginate": 10000,
-                            "join": [
-                                {
-                                    "tbl_join": "x_academic_year",
-                                    "foregenkey": "academic_year_id",
-                                    "refkey": "id"
-                                },
-                                {
-                                    "tbl_join": "r_kelompok_mapel",
-                                    "foregenkey": "kel_id",
-                                    "refkey": "id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_academic_subject_master",
-                                    "tbl_field": "academic_year_id",
-                                    "tbl_value": academicYear,
-                                    "operator": "="
-                                },
-                                {
-                                    "tbl_coloumn": "x_academic_subject_master",
-                                    "tbl_field": "deleted_at",
-                                    "tbl_value": "",
-                                    "operator": "="
-                                },
-                            ],
-                            "order_coloumn": "x_academic_subject_master.updated_at",
-                            "order_by": "desc"
+                            "id_academic": academic,
+                            "paginate": 1000
                         }
                     },
                     {
                         "name": "page",
                         "type": "string",
-                        "value": "1"
+                        "value": paramsPage
                     }
                 ]
             }
@@ -326,54 +287,88 @@ export default function DataMataPelajaranAdmin() {
         })
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "global_join_where",
-                    "type": "json",
-                    "value": {
-                        "tbl_induk": "x_academic_year",
-                        "select": [
-                            "x_academic_year.id as id_academic",
-                            "x_academic_year.academic_year",
-                            "m_institutes.id",
-                            "x_academic_year.semester"
-                        ],
-                        "paginate": 10,
-                        "join": [
-                            {
-                                "tbl_join": "m_institutes",
-                                "foregenkey": "institute_id",
-                                "refkey": "id"
-                            }
-                        ],
-                        "where": [
-                            {
-                                "tbl_coloumn": "x_academic_year",
-                                "tbl_field": "institute_id",
-                                "tbl_value": institute,
-                                "operator": "="
-                            }
-                        ],
-                        "order_coloumn": "x_academic_year.academic_year",
-                        "order_by": "asc"
+                "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_year",
+                            "select": [
+                                "x_academic_year.id as id_academic",
+                                "x_academic_year.academic_year",
+                                "m_institutes.id",
+                                "x_academic_year.semester"
+                            ],
+                            "paginate": 1000,
+                            "join": [
+                                {
+                                    "tbl_join": "m_institutes",
+                                    "foregenkey": "institute_id",
+                                    "refkey": "id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "x_academic_year",
+                                    "tbl_field": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ],
+                            "order_coloumn": "x_academic_year.academic_year",
+                            "order_by": "asc"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
                     }
-                },
-                {
-                    "name": "page",
-                    "type": "string",
-                    "value": "1"
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
                 }
-            ]
-        }, {
-            headers: {
-                "Content-Type": "application/json",
             }
-        }
         ).then(function (response) {
             const academics = JSON.parse(response?.data?.variables[3]?.value);
             setAcademicYears(academics?.data?.data);
+        })
+
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_get_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "r_class_type",
+                            "pagination": false,
+                            "total_result": 2,
+                            "order_coloumn": "r_class_type.id",
+                            "order_by": "asc",
+                            "data": [
+                                {
+                                    "kondisi": "where",
+                                    "tbl_coloumn": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ],
+                            "tbl_coloumn": [
+                                "*"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            setTingkatKelas(dataRes)
         })
     }, [academic, paramsPage, isViewKkm, refreshState])
 
@@ -400,7 +395,7 @@ export default function DataMataPelajaranAdmin() {
                                     {value.status == true ? 'Nonaktif' : 'Aktif'}
                                 </span>
                                 <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
-                                    overlay={_Account}>
+                                          overlay={_Account}>
                                     <EllipsisOutlined />
                                 </Dropdown>
                                 {/* <a
@@ -509,7 +504,8 @@ export default function DataMataPelajaranAdmin() {
                 idPelajaran: kkm.id_master,
                 mataPelajaran: kkm.nama_mata,
                 ta_semester: `${kkm.academic_year} / ${kkm.semester}`,
-                tingkatKelas: kkm.tingkat,
+                idTingkatKelas: kkm.id_tingkat,
+                tingkatKelas: kkm.class_type,
                 nilaiKkm: kkm.kkm
             }
         })
@@ -556,12 +552,12 @@ export default function DataMataPelajaranAdmin() {
         return (
             <>
                 <Table className=""
-                    columns={columns}
-                    dataSource={channelList}
-                    onChange={onChangeTable}
-                    pagination={false}
-                    rowClassName="bg-greylight text-grey-900"
-                    scroll={{ x: 400 }} />
+                       columns={columns}
+                       dataSource={channelList}
+                       onChange={onChangeTable}
+                       pagination={false}
+                       rowClassName="bg-greylight text-grey-900"
+                       scroll={{ x: 400 }} />
                 <div className='text-center mt-4'>
                     {btnPagination.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
@@ -605,21 +601,21 @@ export default function DataMataPelajaranAdmin() {
                             <div className="row">
                                 <div className="col-lg-8 col-md-6 my-2">
                                     <Button className="mr-4" type="primary" shape="round" size='middle'
-                                        onClick={viewCreateKkm}>
+                                            onClick={viewCreateKkm}>
                                         Tambah Data
                                     </Button>
-                                    <Filter title1="Mata Pelajaran" title2="Kelas" />
+                                    {/* <Filter title1="Mata Pelajaran" title2="Kelas" /> */}
                                     <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
-                                        selectYear={academicYears.map((data) => {
-                                            return (
-                                                <>
-                                                    <option value={data.id_academic}>
-                                                        {data.academic_year} Semester {data.semester}
-                                                    </option>
-                                                </>
-                                            )
-                                        }
-                                        )} />
+                                                    selectYear={academicYears.map((data) => {
+                                                            return (
+                                                                <>
+                                                                    <option value={data.id_academic}>
+                                                                        {data.academic_year} Semester {data.semester}
+                                                                    </option>
+                                                                </>
+                                                            )
+                                                        }
+                                                    )} />
                                     {/* <Dropdown overlay={_filterMenu}>
                     <a className="ant-dropdown-link mr-4 font-bold"
                     onClick={e => e.preventDefault()}>
@@ -635,15 +631,15 @@ export default function DataMataPelajaranAdmin() {
                                 </div>
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                        onSearch={_onSearch} style={{ width: '80%' }} />
+                                            onSearch={_onSearch} style={{ width: '80%' }} />
                                     {grid == false ?
                                         <a>
                                             <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
-                                                onClick={() => setGrid(true)} />
+                                                              onClick={() => setGrid(true)} />
                                         </a> :
                                         <a>
                                             <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
-                                                onClick={() => setGrid(false)} />
+                                                          onClick={() => setGrid(false)} />
                                         </a>}
                                 </div>
                             </div>
@@ -684,31 +680,45 @@ export default function DataMataPelajaranAdmin() {
         console.log(data)
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "updatekkm:1:f009fa63-fa0c-11ec-9ea6-c6ec5d98c2df",
+            // "processDefinitionId": "updatekkm:1:f009fa63-fa0c-11ec-9ea6-c6ec5d98c2df",
+            // "returnVariables": true,
+            // "variables": [
+            //     {
+            //         "name": "validasi",
+            //         "type": "json",
+            //         "value": {
+            //             "data": {
+            //                 "tingkat": "required",
+            //                 "kkm": "required"
+            //             },
+            //             "tingkat": data.tingkat_kelas,
+            //             "kkm": data.nilai_kkm
+            //         }
+            //     },
+            //     {
+            //         "name": "x_academic_subject_master",
+            //         "type": "json",
+            //         "value": {
+            //             "tbl_name": "x_academic_subject_master",
+            //             "id": data.mata_pelajaran,
+            //             "tbl_coloumn": {
+            //                 "tingkat": data.tingkat_kelas,
+            //                 "kkm": data.nilai_kkm
+            //             }
+            //         }
+            //     }
+            // ]
+            "processDefinitionId": "4dbf4ce8-234d-11ed-ac5e-66fc627bf211",
             "returnVariables": true,
             "variables": [
                 {
-                    "name": "validasi",
+                    "name": "get_data",
                     "type": "json",
                     "value": {
-                        "data": {
-                            "tingkat": "required",
-                            "kkm": "required"
-                        },
+                        "matpel": data.mata_pelajaran,
+                        "academic_year_id": data.ta_semester,
                         "tingkat": data.tingkat_kelas,
                         "kkm": data.nilai_kkm
-                    }
-                },
-                {
-                    "name": "x_academic_subject_master",
-                    "type": "json",
-                    "value": {
-                        "tbl_name": "x_academic_subject_master",
-                        "id": data.mata_pelajaran,
-                        "tbl_coloumn": {
-                            "tingkat": data.tingkat_kelas,
-                            "kkm": data.nilai_kkm
-                        }
                     }
                 }
             ]
@@ -717,24 +727,25 @@ export default function DataMataPelajaranAdmin() {
                 "Content-Type": "application/json",
             }
         }).then(function (response) {
-            console.log("insert :", response);
-            const valueRes = response.data.variables[4].value
+            // console.log("insert :", response);
+            const valueRes = response.data.variables[2].value
             const valueResObj = JSON.parse(valueRes)
-            if (valueResObj.status == 'success') {
-              setIsViewCreate(false)
-              setIsViewKkm(true)
-              notification.success({
-                message: 'Sukses',
-                description: 'KKM Pelajaran berhasil ditambahkan.',
-                placement: 'top'
-              })
-            // pageLoad()
+            console.log(valueResObj);
+            if (valueResObj.code == true) {
+                setIsViewCreate(false)
+                setIsViewKkm(true)
+                notification.success({
+                    message: 'Sukses',
+                    description: 'KKM Pelajaran berhasil ditambahkan.',
+                    placement: 'top'
+                })
+                // pageLoad()
             } else {
-              notification.error({
-                message: 'Error',
-                description: 'Harap isi semua field',
-                placement: 'top'
-              })
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                })
             }
         })
     }
@@ -750,32 +761,46 @@ export default function DataMataPelajaranAdmin() {
 
         axios.post(BASE_URL, {
 
-            "processDefinitionId": "updatekkm:2:9e5b7dcc-01c3-11ed-ac5e-66fc627bf211",
+            // "processDefinitionId": "updatekkm:2:9e5b7dcc-01c3-11ed-ac5e-66fc627bf211",
+            // "returnVariables": true,
+            // "variables": [
+            //     {
+            //         "name": "validasi",
+            //         "type": "json",
+            //         "value": {
+            //             "data": {
+            //                 "tingkat": "required",
+            //                 "kkm": "required"
+            //             },
+            //             "tingkat": data.tingkat_kelas,
+            //             "kkm": data.nilai_kkm
+            //         }
+            //     },
+            //     {
+            //         "name": "x_academic_subject_master",
+            //         "type": "json",
+            //         "value": {
+            //             "tbl_name": "x_academic_subject_master",
+            //             "id": selectedUser.idPelajaran,
+            //             "tbl_coloumn": {
+            //                 "tingkat": data.tingkat_kelas,
+            //                 "kkm": data.nilai_kkm,
+            //                 "is_edit": true
+            //             }
+            //         }
+            //     }
+            // ]
+            "processDefinitionId": "4dbf4ce8-234d-11ed-ac5e-66fc627bf211",
             "returnVariables": true,
             "variables": [
                 {
-                    "name": "validasi",
+                    "name": "get_data",
                     "type": "json",
                     "value": {
-                        "data": {
-                            "tingkat": "required",
-                            "kkm": "required"
-                        },
+                        "matpel": data.mata_pelajaran,
+                        "academic_year_id": data.ta_semester,
                         "tingkat": data.tingkat_kelas,
                         "kkm": data.nilai_kkm
-                    }
-                },
-                {
-                    "name": "x_academic_subject_master",
-                    "type": "json",
-                    "value": {
-                        "tbl_name": "x_academic_subject_master",
-                        "id": selectedUser.idPelajaran,
-                        "tbl_coloumn": {
-                            "tingkat": data.tingkat_kelas,
-                            "kkm": data.nilai_kkm,
-                            "is_edit": true
-                        }
                     }
                 }
             ]
@@ -784,25 +809,24 @@ export default function DataMataPelajaranAdmin() {
                 "Content-Type": "application/json",
             }
         }).then(function (response) {
-            const valueRes = response.data.variables[4].value
+            const valueRes = response.data.variables[2].value
             const valueResObj = JSON.parse(valueRes)
-            if (valueResObj.status == 'success') {
-              setIsViewCreate(false)
-              setIsViewKkm(true)
-              notification.success({
-                message: 'Sukses',
-                description: 'KKM Pelajaran berhasil di update.',
-                placement: 'top'
-              })
-            //   pageLoad()
+            if (valueResObj.code == true) {
+                setIsViewCreate(false)
+                setIsViewKkm(true)
+                notification.success({
+                    message: 'Sukses',
+                    description: 'KKM Pelajaran berhasil di update.',
+                    placement: 'top'
+                })
+                //   pageLoad()
             } else {
-              notification.error({
-                message: 'Error',
-                description: 'Harap isi semua field',
-                placement: 'top'
-              })
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                })
             }
-            console.log(response)
         })
     }
 
@@ -819,26 +843,26 @@ export default function DataMataPelajaranAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_updatedata",
-                            "type": "json",
-                            "value": {
-                                "tbl_name": "x_academic_subject_master",
-                                "id": record.idPelajaran,
-                                "tbl_coloumn": {
-                                    "kkm": null
+                        "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                        "returnVariables": true,
+                        "variables": [
+                            {
+                                "name": "global_updatedata",
+                                "type": "json",
+                                "value": {
+                                    "tbl_name": "x_academic_subject_master",
+                                    "id": record.idPelajaran,
+                                    "tbl_coloumn": {
+                                        "kkm": null
+                                    }
                                 }
                             }
+                        ]
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json",
                         }
-                    ]
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
                     }
-                }
                 ).then(function (response) {
                     console.log(response);
                     setRefreshState(true);
@@ -886,6 +910,9 @@ export default function DataMataPelajaranAdmin() {
                 selectPelajaran={getPelajaran.map((data) => (
                     <option value={data.id_master}>{data.nama_mata}</option>
                 ))}
+                selectTingkatKelas={tingkatKelas.map((data) => (
+                    <option value={data.id}>{data.class_type}</option>
+                ))}
                 idTa_semester={academic}
                 ta_semester={`${year} / ${semester}`}
                 isDisableFormPelajaran={false}
@@ -903,8 +930,13 @@ export default function DataMataPelajaranAdmin() {
                 selectPelajaran={getPelajaran.map((data) => (
                     <option value={data.id_master}>{data.nama_mata}</option>
                 ))}
+                selectTingkatKelas={tingkatKelas.map((data) => (
+                    <option value={data.id}>{data.class_type}</option>
+                ))}
                 mataPelajaran={selectedUser.mataPelajaran}
+                idTa_semester={academic}
                 ta_semester={selectedUser.ta_semester}
+                idTingkatKelas={selectedUser.idTingkatKelas}
                 tingkatKelas={selectedUser.tingkatKelas}
                 nilaiKkm={selectedUser.nilaiKkm}
                 isDisabled={false}

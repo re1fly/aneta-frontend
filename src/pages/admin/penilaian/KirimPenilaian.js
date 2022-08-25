@@ -220,7 +220,7 @@ function KirimPenilaian() {
                 mataPelajaran: data.nama_mata,
                 pendidik: data.name,
                 ta_smt: `${data.academic_year} / ${data.semester}`,
-                status: data.status,
+                status: data.status.charAt(0).toUpperCase() + data.status.slice(1),
                 tanggalProses: data.send_date,
                 // dibuatOleh: ''
             }
@@ -238,20 +238,6 @@ function KirimPenilaian() {
     }
 
     const CardKirimPenilaian = () => {
-        // // const channelList = [
-        //     {
-        //         // imageUrl: 'user.png',
-        //         title: 'Penjaskes',
-        //         tag1: 'Kelas 2A',
-        //         tag2: '2020 / Ganjil',
-        //     },
-        //     {
-        //         // imageUrl: 'user.png',
-        //         title: 'Penjaskes',
-        //         tag2: '2020 / Ganjil',
-        //         tag1: 'Kelas 2A',
-        //     },
-        // ];
 
         const channelList = getKirimPenilaian.map((data, index) => {
             return {
@@ -290,7 +276,7 @@ function KirimPenilaian() {
                                     className="p-1 w-100"
                                 />
                             </a> */}
-                            <h4 className="fw-700 font-xs mt-5">{channelList.mataPelajaran}</h4>
+                            <h4 className="fw-700 font-xs mt-5">{value.mataPelajaran}</h4>
                             <div className="clearfix"></div>
                             {value.tag1 ? (
                                 <span
@@ -323,7 +309,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Pendidik</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {channelList.pendidik}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.pendidik}</p>
                                     </div>
                                 </div>
 
@@ -332,7 +318,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Status</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {channelList.status}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.status.charAt(0).toUpperCase() + value.status.slice(1)}</p>
                                     </div>
                                 </div>
 
@@ -341,7 +327,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Tanggal Proses</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {channelList.tanggalProses}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.tanggalProses.split(' ')[0]}</p>
                                     </div>
                                 </div>
                             </div>
@@ -585,7 +571,7 @@ function KirimPenilaian() {
         const data = [
             {
                 key: "1",
-                nilaiKkm: dataKirimNilai?.interval_predikat?.data[0]?.min,
+                nilaiKkm: dataKirimNilai?.interval_predikat?.data[0]?.kkm,
                 predikat1: `${dataKirimNilai?.interval_predikat?.data[0]?.name} : Sangat Baik`,
                 predikat2: `${dataKirimNilai?.interval_predikat?.data[1]?.name} : Baik`,
                 predikat3: `${dataKirimNilai?.interval_predikat?.data[2]?.name} : Cukup`,

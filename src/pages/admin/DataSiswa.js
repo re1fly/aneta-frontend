@@ -70,6 +70,12 @@ function DataSiswaAdmin() {
     const [isViewCreate, setIsViewCreate] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    console.log(selectedUser)
+
+    const [dataProvinsi, setDataProvinsi] = useState();
+    const [dataKota, setDataKota] = useState();
+    const [dataKecamatan, setDataKecamatan] = useState();
+    const [dataKelurahan, setDataKelurahan] = useState();
 
     const dispatch = useDispatch();
     const searchRedux = useSelector((state) => state.search);
@@ -252,54 +258,39 @@ function DataSiswaAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_join_where_sub",
+                            "name": "global_get_where",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_academic_class",
-                                "select" : [
-                                    "x_academic_class.id",
-                                    "r_class_type.class_type as class",
-                                    "x_academic_class.sub_class"
-                                ],
-                                "paginate": false,
-                                "join": [
+                                "tbl_name": "x_academic_class",
+                                "pagination": false,
+                                "total_result": 2,
+                                "order_coloumn": "x_academic_class.class",
+                                "order_by": "asc",
+                                "data": [
                                     {
-                                        "tbl_join": "r_class_type",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "class"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_academic_class",
-                                        "tbl_field": "academic_year_id",
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "academic_year_id",
                                         "tbl_value": academic,
                                         "operator": "="
-                                    },{
-                                        "tbl_coloumn": "x_academic_class",
-                                        "tbl_field": "deleted_at",
+                                    },
+                                    {
+                                        "kondisi": "where",
+                                        "tbl_coloumn": "deleted_at",
                                         "tbl_value": "",
                                         "operator": "="
                                     }
                                 ],
-                                "order_coloumn": "x_academic_class.id",
-                                "order_by": "asc"
+                                "tbl_coloumn": [
+                                    "*"
+                                ]
                             }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
                         }
                     ]
-                }
-
-                ,
+                },
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -307,9 +298,8 @@ function DataSiswaAdmin() {
                 }
             )
             .then(function (response) {
-                console.log(response)
-                const dataClass = JSON.parse(response.data.variables[3].value);
-                setDataClass(dataClass.data);
+                const dataClass = JSON.parse(response.data.variables[2].value);
+                setDataClass(dataClass);
             })
     }, [academic, paramsPage, refreshState, isViewSiswa]);
 
@@ -952,7 +942,6 @@ function DataSiswaAdmin() {
             if (el.name !== "") data[el.name] = el.value;
         }
 
-        console.log(data)
         axios
             .post(
                 BASE_URL,

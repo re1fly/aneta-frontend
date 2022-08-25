@@ -13,7 +13,6 @@ import {
     Tag,
     Space,
     notification,
-    Modal,
 } from "antd";
 import {
     AppstoreOutlined,
@@ -50,8 +49,8 @@ function DataGuruAdmin() {
     const institute = localStorage.getItem('institute');
     const academicYear = localStorage.getItem('academic_year')
 
-    const [academic, setAcademic] = useState(academicYear);
-    const [academicYears, setAcademicYears] = useState([]);
+    const [academic, setAcademic] = useState(academicYear); 
+    const [academicYears, setAcademicYears] = useState([]); 
 
     const [getGuru, setGetGuru] = useState([]);
     // console.log(JSON.stringify(getGuru, null, 2));
@@ -327,185 +326,10 @@ function DataGuruAdmin() {
 
     }, [academic, paramsPage, isViewGuru, refreshState])
 
-    const _exportDataExcel = () => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "exportguru:1:b30eac41-1d47-11ed-9ea6-c6ec5d98c2df",
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "get_data",
-                    "type": "json",
-                    "value": {
-                        "academic_year_id": academic
-                    }
-                }
-            ]
-        }).then(response => {
-            const resData = JSON.parse(response.data.variables[2].value)
-            const dataExcel = resData.data
-            const byteCharacters = atob(dataExcel);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-            const url = window.URL.createObjectURL(new Blob([blob]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'DataGuru.xlsx'); //or any other extension
-            document.body.appendChild(link);
-            link.click();
-        })
-    }
-
-    const convertBase64 = (uploaded) => {
-        return new Promise((resolve, reject) => {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(uploaded);
-
-            fileReader.onload = () => {
-                resolve(fileReader.result);
-            };
-
-            fileReader.onerror = (error) => {
-                reject(error)
-            }
-        })
-    }
-
-    const _changeExcelFormat = async (e) => {
-        let uploaded = e.target.files[0];
-        const base64 = await convertBase64(uploaded);
-        const getLinkUrl = base64.split(',')[1]
-        console.log(getLinkUrl);
-
-        axios.post(BASE_URL,
-            {
-                "processDefinitionId": "importguru:1:5922a770-21f9-11ed-9ea6-c6ec5d98c2df",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "get_data",
-                        "type": "json",
-                        "value": {
-                            "file_base64": getLinkUrl,
-                            "file_type": "xlsx",
-                            "type": "update_create",
-                            "institute_id": institute
-                        }
-                    }
-                ]
-            }, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }
-        ).then(function (response) {
-            const resData = JSON.parse(response.data.variables[2].value)
-            console.log(resData);
-            const resCode = resData.data
-            if (resCode == "success") {
-                setRefreshState(true);
-                notification.success({
-                    message: "Sukses",
-                    description: 'Data Guru berhasil di Import',
-                    placement: 'top'
-                })
-            } else {
-                notification.error({
-                    message: "Error",
-                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
-                    placement: 'top'
-                })
-            }
-        })
-
-    }
-
-    const _changeExcelFormatNew = async (e) => {
-        let uploaded = e.target.files[0];
-        const base64 = await convertBase64(uploaded);
-        const getLinkUrl = base64.split(',')[1]
-        // console.log(getLinkUrl);
-
-        axios.post(BASE_URL,
-            {
-                "processDefinitionId": "importguru:1:5922a770-21f9-11ed-9ea6-c6ec5d98c2df",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "get_data",
-                        "type": "json",
-                        "value": {
-                            "file_base64": getLinkUrl,
-                            "file_type": "xlsx",
-                            "type": "clear",
-                            "institute_id": institute
-                        }
-                    }
-                ]
-            }, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }
-        ).then(function (response) {
-            const resData = JSON.parse(response.data.variables[2].value)
-            console.log(resData);
-            const resCode = resData.data
-            if (resCode == "success") {
-                setRefreshState(true);
-                notification.success({
-                    message: "Sukses",
-                    description: 'Data Guru berhasil di Import',
-                    placement: 'top'
-                })
-            } else {
-                notification.error({
-                    message: "Error",
-                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
-                    placement: 'top'
-                })
-            }
-        })
-
-    }
-
-    const _modalImportNew = () => {
-        Modal.warning({
-            title: 'Jika anda memilih fitur ini, maka semua data guru akan di replace dengan data excel yang anda impor.',
-            width: '800px',
-            content: (
-                <div>
-                    {/*<p>Klik Button dibawah ini untuk mengimpor data :</p>*/}
-                    <label id='label_import_new' htmlFor="file_excel_kelas_baru"
-                        className="bg-dark border-0 text-center text-white ant-btn-round mr-4 mt-3"
-                        style={{ padding: '4px 16px', cursor: 'pointer' }}>
-                        Upload File Disini
-                    </label>
-                    <input
-                        onChange={_changeExcelFormatNew}
-                        name="new_excel_initiator"
-                        className="w100"
-                        type="file"
-                        id="file_excel_kelas_baru"
-                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                        style={{ display: "none" }}
-                    />
-                </div>
-            ),
-            okText: 'Batal',
-            okType: 'danger'
-        });
-
-    }
-
     const CardDataGuru = () => {
         const channelList = getGuru.map((guru, index) => {
-            const dataSk = guru?.sk_date
-            const tahunAktifGuru = dataSk?.substring(0, 4)
+            const dataSk = guru.sk_date
+            const tahunAktifGuru = dataSk.substring(0, 4)
 
             return {
                 imageUrl: `http://10.1.6.109/storage/${guru.image}`,
@@ -775,31 +599,6 @@ function DataGuruAdmin() {
                                 onClick={viewCreateGuru}>
                                 Tambah Data
                             </Button>
-                            <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
-                                shape="round" size='middle'
-                                onClick={() => _exportDataExcel()}>
-                                Export Data
-                            </Button>
-                            <label for="file_excel_kelas"
-                                className="bg-dark border-0 text-center text-white ant-btn-round mr-4"
-                                style={{ padding: '4px 16px', cursor: 'pointer' }}>
-                                Import Data
-                            </label>
-                            <input
-                                onChange={_changeExcelFormat}
-                                name="excel_initiator"
-                                className="w100"
-                                type="file"
-                                id="file_excel_kelas"
-                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                style={{ display: "none" }}
-                            />
-                            <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
-                                shape="round" size='middle'
-                                onClick={_modalImportNew}>
-                                Import Data Baru
-                            </Button>
-
                             <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
                                 selectYear={academicYears.map((data) => {
                                     return (

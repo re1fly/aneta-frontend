@@ -48,6 +48,7 @@ function RencanaBobot() {
             .then(function (response) {
                 const resData = JSON.parse(response.data.variables[2].value);
                 setIsDataAvailable(resData.code)
+                console.log(response)
             })
     }
 
@@ -65,7 +66,7 @@ function RencanaBobot() {
                             "value": {
                                 "tbl_induk": "x_academic_subject_master",
                                 "select" : [
-                                    "x_academic_subjects.id as id_subject",
+                                    "x_academic_subjects.academic_subjects_master_id as id_subject",
                                     "x_academic_subject_master.nama_mata"
                                 ],
                                 "paginate": 1000,
@@ -129,46 +130,58 @@ function RencanaBobot() {
             .then(function (response) {
                 const dataMapelApi = JSON.parse(response.data.variables[3].value);
                 const getMapel = dataMapelApi.data.data
-
                 setDataMapel(getMapel);
             })
     }
-
+    
     const _getDataKelas = () => {
         axios
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_get_where",
+                            "name": "global_join_where_sub",
                             "type": "json",
                             "value": {
-                                "tbl_name": "x_academic_class",
-                                "pagination": false,
-                                "total_result": 2,
-                                "order_coloumn": "x_academic_class.class",
-                                "order_by": "asc",
-                                "data": [
+                                "tbl_induk": "x_academic_class",
+                                "select" : [
+                                    "x_academic_class.id",
+                                    "r_class_type.class_type as class",
+                                    "x_academic_class.sub_class"
+                                ],
+                                "paginate": false,
+                                "join": [
                                     {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "academic_year_id",
+                                        "tbl_join": "r_class_type",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "class"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
                                         "operator": "="
-                                    },
-                                    {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "deleted_at",
+                                    },{
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "deleted_at",
                                         "tbl_value": "",
                                         "operator": "="
                                     }
                                 ],
-                                "tbl_coloumn": [
-                                    "*"
-                                ]
+                                "order_coloumn": "x_academic_class.id",
+                                "order_by": "asc"
                             }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
                         }
                     ]
                 },
@@ -179,8 +192,8 @@ function RencanaBobot() {
                 }
             )
             .then(function (response) {
-                const data = JSON.parse(response.data.variables[2].value);
-                setDataKelas(data);
+                const data = JSON.parse(response.data.variables[3].value);
+                setDataKelas(data.data);
             })
     }
 

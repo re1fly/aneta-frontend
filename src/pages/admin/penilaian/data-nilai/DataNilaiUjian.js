@@ -100,6 +100,7 @@ function DataNilaiUjian() {
                 }
             )
         });
+        console.log(splitObject(data))
         if (splitObject(data).length < 1) {
             notification.error({
                 message: "Data Kosong",
@@ -131,6 +132,7 @@ function DataNilaiUjian() {
                 .then(function (response) {
                     const dataRes = JSON.parse(response.data.variables[2].value);
                     const resCode = dataRes.code;
+                    console.log(response)
 
                     if (resCode === true) {
                         notification.success({

@@ -13,6 +13,7 @@ import {
     Tag,
     Space,
     notification,
+    Modal,
 } from "antd";
 import {
     AppstoreOutlined,
@@ -49,8 +50,8 @@ function DataGuruAdmin() {
     const institute = localStorage.getItem('institute');
     const academicYear = localStorage.getItem('academic_year')
 
-    const [academic, setAcademic] = useState(academicYear); 
-    const [academicYears, setAcademicYears] = useState([]); 
+    const [academic, setAcademic] = useState(academicYear);
+    const [academicYears, setAcademicYears] = useState([]);
 
     const [getGuru, setGetGuru] = useState([]);
     // console.log(JSON.stringify(getGuru, null, 2));
@@ -326,13 +327,188 @@ function DataGuruAdmin() {
 
     }, [academic, paramsPage, isViewGuru, refreshState])
 
+    const _exportDataExcel = () => {
+        axios.post(BASE_URL, {
+            "processDefinitionId": "exportguru:1:b30eac41-1d47-11ed-9ea6-c6ec5d98c2df",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "get_data",
+                    "type": "json",
+                    "value": {
+                        "academic_year_id": academic
+                    }
+                }
+            ]
+        }).then(response => {
+            const resData = JSON.parse(response.data.variables[2].value)
+            const dataExcel = resData.data
+            const byteCharacters = atob(dataExcel);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'DataGuru.xlsx'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        })
+    }
+
+    const convertBase64 = (uploaded) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(uploaded);
+
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error)
+            }
+        })
+    }
+
+    const _changeExcelFormat = async (e) => {
+        let uploaded = e.target.files[0];
+        const base64 = await convertBase64(uploaded);
+        const getLinkUrl = base64.split(',')[1]
+        console.log(getLinkUrl);
+
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "importguru:1:5922a770-21f9-11ed-9ea6-c6ec5d98c2df",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "file_base64": getLinkUrl,
+                            "file_type": "xlsx",
+                            "type": "update_create",
+                            "institute_id": institute
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.data
+            if (resCode == "success") {
+                setRefreshState(true);
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Guru berhasil di Import',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
+                    placement: 'top'
+                })
+            }
+        })
+
+    }
+
+    const _changeExcelFormatNew = async (e) => {
+        let uploaded = e.target.files[0];
+        const base64 = await convertBase64(uploaded);
+        const getLinkUrl = base64.split(',')[1]
+        // console.log(getLinkUrl);
+
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "importguru:1:5922a770-21f9-11ed-9ea6-c6ec5d98c2df",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "file_base64": getLinkUrl,
+                            "file_type": "xlsx",
+                            "type": "clear",
+                            "institute_id": institute
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.data
+            if (resCode == "success") {
+                setRefreshState(true);
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Guru berhasil di Import',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
+                    placement: 'top'
+                })
+            }
+        })
+
+    }
+
+    const _modalImportNew = () => {
+        Modal.warning({
+            title: 'Jika anda memilih fitur ini, maka semua data guru akan di replace dengan data excel yang anda impor.',
+            width: '800px',
+            content: (
+                <div>
+                    {/*<p>Klik Button dibawah ini untuk mengimpor data :</p>*/}
+                    <label id='label_import_new' htmlFor="file_excel_kelas_baru"
+                        className="bg-dark border-0 text-center text-white ant-btn-round mr-4 mt-3"
+                        style={{ padding: '4px 16px', cursor: 'pointer' }}>
+                        Upload File Disini
+                    </label>
+                    <input
+                        onChange={_changeExcelFormatNew}
+                        name="new_excel_initiator"
+                        className="w100"
+                        type="file"
+                        id="file_excel_kelas_baru"
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        style={{ display: "none" }}
+                    />
+                </div>
+            ),
+            okText: 'Batal',
+            okType: 'danger'
+        });
+
+    }
+
     const CardDataGuru = () => {
         const channelList = getGuru.map((guru, index) => {
-            const dataSk = guru.sk_date
-            const tahunAktifGuru = dataSk.substring(0, 4)
+            const dataSk = guru?.sk_date
+            const tahunAktifGuru = dataSk?.substring(0, 4)
 
             return {
-                imageUrl: `http://10.1.6.109/storage/${guru.image}`,
+                imageUrl: guru.imageUrl,
                 namaGuru: guru.name,
                 nomorSk: guru.sk_number,
                 tahunAktif: tahunAktifGuru,
@@ -599,6 +775,31 @@ function DataGuruAdmin() {
                                 onClick={viewCreateGuru}>
                                 Tambah Data
                             </Button>
+                            <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={() => _exportDataExcel()}>
+                                Export Data
+                            </Button>
+                            <label for="file_excel_kelas"
+                                className="bg-dark border-0 text-center text-white ant-btn-round mr-4"
+                                style={{ padding: '4px 16px', cursor: 'pointer' }}>
+                                Import Data
+                            </label>
+                            <input
+                                onChange={_changeExcelFormat}
+                                name="excel_initiator"
+                                className="w100"
+                                type="file"
+                                id="file_excel_kelas"
+                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                style={{ display: "none" }}
+                            />
+                            <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={_modalImportNew}>
+                                Import Data Baru
+                            </Button>
+
                             <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
                                 selectYear={academicYears.map((data) => {
                                     return (
@@ -643,6 +844,125 @@ function DataGuruAdmin() {
         console.log(data);
 
         axios.post(BASE_URL, {
+            // "processDefinitionId": "insertdataguru:18:b6bbf8a6-eb91-11ec-9ea6-c6ec5d98c2df",
+            // "returnVariables": true,
+            // "variables": [
+            //     {
+            //         "name": "validasi",
+            //         "type": "json",
+            //         "value": {
+            //             "data": {
+            //                 "user_email": "required",
+            //                 "user_name": "required",
+            //                 "user_role_id": "required",
+            //                 "user_email_verified_at": "required",
+            //                 "user_password": "required",
+            //                 "user_place_of_birth": "required",
+            //                 "user_date_of_birth": "required",
+            //                 "user_mobile_phone": "required",
+            //                 "user_state_id": "required",
+            //                 "user_city_id": "required",
+            //                 "user_district_id": "required",
+            //                 "user_sub_discrict_id": "required",
+            //                 "user_address": "required",
+            //                 "user_image": "required",
+            //                 "user_image_type": "required",
+            //                 "user_academic_year_id": "required",
+            //                 "user_register_date": "required",
+            //                 "status": "required",
+            //                 // "sk_number": "required",
+            //                 "created_at": "required",
+            //                 "updated_at": "required",
+            //                 "institute_id": "required"
+
+            //             },
+            //             "user_email": data.email_guru,
+            //             "user_name": data.nama_guru,
+            //             "user_role_id": 2,
+            //             "user_email_verified_at": dateNow,
+            //             "user_password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
+            //             "user_place_of_birth": data.tempatlahir_guru,
+            //             "user_date_of_birth": data.tanggallahir_guru,
+            //             "user_mobile_phone": data.nomortelefon_guru,
+            //             "user_state_id": data.provinsi_guru,
+            //             "user_city_id": data.kota_guru,
+            //             "user_district_id": data.kecamatan_guru,
+            //             "user_sub_discrict_id": data.kelurahan_guru,
+            //             "user_address": data.alamat_guru,
+            //             "user_image": data.image_base64,
+            //             "user_image_type": "string",
+            //             "user_academic_year_id": academicYear,
+            //             "user_register_date": dateNow,
+            //             "status": data.status_guru,
+            //             // "sk_number": data.sk_guru,
+            //             "created_at": dateNow,
+            //             "updated_at": dateNow,
+            //             "institute_id": institute,
+            //         }
+            //     },
+            //     {
+            //         "name": "user_email",
+            //         "type": "string",
+            //         "value": data.email_guru,
+            //     },
+            //     {
+            //         "name": "users",
+            //         "type": "json",
+            //         "value": {
+            //             "tbl_name": "usersModel",
+            //             "tbl_coloumn": {
+            //                 "name": data.nama_guru,
+            //                 "email": data.email_guru,
+            //                 "user_role_id": 2,
+            //                 "institute_id": institute,
+            //                 "email_verified_at": dateNow,
+            //                 "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
+            //             }
+            //         }
+            //     },
+            //     {
+            //         "name": "m_profile",
+            //         "type": "json",
+            //         "value": {
+            //             "tbl_name": "m_user_profile",
+            //             "tbl_coloumn": {
+            //                 "place_of_birth": data.tempatlahir_guru,
+            //                 "date_of_birth": data.tanggallahir_guru,
+            //                 "mobile_phone": data.nomortelefon_guru,
+            //                 "state_id": data.provinsi_guru,
+            //                 "city_id": data.kota_guru,
+            //                 "district_id": data.kecamatan_guru,
+            //                 "sub_discrict_id": data.kelurahan_guru,
+            //                 "address": data.alamat_guru
+            //             }
+            //         }
+            //     },
+            //     {
+            //         "name": "upload_image",
+            //         "type": "json",
+            //         "value": {
+            //             "image": data.image_base64,
+            //             "image_type": "png",
+            //             "nama_folder": "image_guru"
+            //         }
+            //     },
+            //     {
+            //         "name": "x_academic_teachers",
+            //         "type": "json",
+            //         "value": {
+            //             "tbl_name": "x_academic_teachers",
+            //             "tbl_coloumn": {
+            //                 "academic_year_id": academicYear,
+            //                 "register_date": dateNow,
+            //                 "sk_number": data.sk_guru,
+            //                 "sk_date": dateNow,
+            //                 "status": data.status_guru,
+            //                 // "created_at": dateNow, // => done
+            //                 // "updated_at": dateNow // => done
+            //             }
+            //         }
+            //     }
+            // ]
             "processDefinitionId": "insertdataguru:18:b6bbf8a6-eb91-11ec-9ea6-c6ec5d98c2df",
             "returnVariables": true,
             "variables": [
@@ -669,11 +989,18 @@ function DataGuruAdmin() {
                             "user_academic_year_id": "required",
                             "user_register_date": "required",
                             "status": "required",
-                            // "sk_number": "required",
                             "created_at": "required",
                             "updated_at": "required",
-                            "institute_id": "required"
-
+                            "institute_id": "required",
+                            "employment_status": "required",
+                            "religion": "required",
+                            "tmt_appointment": "required",
+                            "agency_appointment": "required",
+                            "source_of_salary": "required",
+                            "mother_name": "required",
+                            "profession_husband_or_wife": "required",
+                            "citizenship": "required",
+                            "nik": "required"
                         },
                         "user_email": data.email_guru,
                         "user_name": data.nama_guru,
@@ -693,16 +1020,24 @@ function DataGuruAdmin() {
                         "user_academic_year_id": academicYear,
                         "user_register_date": dateNow,
                         "status": data.status_guru,
-                        // "sk_number": data.sk_guru,
                         "created_at": dateNow,
                         "updated_at": dateNow,
                         "institute_id": institute,
+                        "employment_status": data.status_kepegawaian,
+                        "religion": data.agama,
+                        "tmt_appointment": data.tmt_pengangkatan,
+                        "agency_appointment": data.lembaga_pengangkatan,
+                        "source_of_salary": data.sumber_gaji,
+                        "mother_name": data.nama_ibu,
+                        "profession_husband_or_wife": data.pekerjaan_pasangan,
+                        "citizenship": data.kewarganegaraan,
+                        "nik": data.nik
                     }
                 },
                 {
                     "name": "user_email",
                     "type": "string",
-                    "value": data.email_guru,
+                    "value": ""
                 },
                 {
                     "name": "users",
@@ -715,7 +1050,7 @@ function DataGuruAdmin() {
                             "user_role_id": 2,
                             "institute_id": institute,
                             "email_verified_at": dateNow,
-                            "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
+                            "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6"
                         }
                     }
                 },
@@ -732,7 +1067,48 @@ function DataGuruAdmin() {
                             "city_id": data.kota_guru,
                             "district_id": data.kecamatan_guru,
                             "sub_discrict_id": data.kelurahan_guru,
-                            "address": data.alamat_guru
+                            "address": data.alamat_guru,
+                            "nuptk": data.nuptk,
+                            "nip": data.nip,
+                            "gender": data.jenis_kelamin,
+                            "employment_status": data.status_kepegawaian,
+                            "religion": data.agama,
+                            "phone": data.nomortelefon2_guru,
+                            "village_name": data.nama_dusun,
+                            "rt": data.rt,
+                            "rw": data.rw,
+                            "postal_code": data.kode_pos,
+                            "additional_task": data.tugas_tambahan,
+                            "sk_cpns": data.sk_cpns,
+                            "date_cpns": data.tanggal_cpns,
+                            "sk_appointment": data.sk_pengangkatan,
+                            "tmt_appointment": data.tmt_pengangkatan,
+                            "agency_appointment": data.lembaga_pengangkatan,
+                            "group_rank": data.pangkat_golongan,
+                            "source_of_salary": data.sumber_gaji,
+                            "mother_name": data.nama_ibu,
+                            "marital_status": data.status_perkawinan,
+                            "name_husband_or_wife": data.nama_pasangan,
+                            "nip_husband_or_wife": data.nip_pasangan,
+                            "profession_husband_or_wife": data.pekerjaan_pasangan,
+                            "tmt_pns": data.tmt_pns,
+                            "already_licensed_principal": data.lisensi_kepsek,
+                            "ever_working_training": data.diklat_kepegawaian,
+                            "braille_skill": data.lkeahian_braille,
+                            "sign_language_skill": data.bahasa_isyarat,
+                            "npwp": data.npwp,
+                            "name_of_the_taxpayer": data.nama_wajibpajak,
+                            "citizenship": data.kewarganegaraan,
+                            "nik": data.nik,
+                            "no_kk": data.no_kk,
+                            "bank": data.bank,
+                            "no_rek": data.no_rekening,
+                            "account_name": data.nama_rekening,
+                            "karpeg": data.kerpeg,
+                            "karis": data.karis_karsu,
+                            "latitude": data.lintang,
+                            "longitude": data.bujur,
+                            "nuks": data.nuks
                         }
                     }
                 },
@@ -755,42 +1131,30 @@ function DataGuruAdmin() {
                             "register_date": dateNow,
                             "sk_number": data.sk_guru,
                             "sk_date": dateNow,
-                            "status": data.status_guru,
-                            // "created_at": dateNow, // => done
-                            // "updated_at": dateNow // => done
+                            "status": data.status_guru
                         }
                     }
                 }
             ]
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }
-        ).then(function (response) {
-            if (response.data.variables[8].value == 200) {
-                if (response.data.variables[10].value == 404) {
-                    setIsViewCreate(false)
-                    setIsViewGuru(true)
-                    notification.success({
-                        message: 'Sukses',
-                        description: 'Guru berhasil ditambahkan.',
-                        placement: 'top'
-                    });
-                } else if (response.data.variables[10].value == 200) {
-                    notification.error({
-                        message: 'Error',
-                        description: 'Email sudah terdaftar, mohon masukkan email lain.',
-                        placement: 'top'
-                    });
-                } else {
-                    notification.error({
-                        message: 'error',
-                        description: 'Email sudah terdaftar, mohon masukan email lain.',
-                        placement: "top"
-                    });
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
                 }
-                // pageLoad()
+            }
+        ).then(function (response) {
+            console.log("Insert :", response);
+            const valueRes = response.data.variables[20].value;
+            const valueResObj = JSON.parse(valueRes);
+            console.log(valueResObj);
+            if (valueResObj.status == "success") {
+                setIsViewCreate(false)
+                setIsViewGuru(true)
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Guru berhasil ditambahkan.',
+                    placement: 'top'
+                });
             } else {
                 notification.error({
                     message: 'Error',
@@ -798,10 +1162,40 @@ function DataGuruAdmin() {
                     placement: 'top'
                 });
             }
-            // console.log(response)
-        }).catch(error => {
-            alert('Email Telah di gunakan, silahkan gunakan email lain.')
-        });
+                // if (response.data.variables[8].value == 200) {
+                //     if (response.data.variables[10].value == 404) {
+                //         setIsViewCreate(false)
+                //         setIsViewGuru(true)
+                //         notification.success({
+                //             message: 'Sukses',
+                //             description: 'Guru berhasil ditambahkan.',
+                //             placement: 'top'
+                //         });
+                //     } else if (response.data.variables[10].value == 200) {
+                //         notification.error({
+                //             message: 'Error',
+                //             description: 'Email sudah terdaftar, mohon masukkan email lain.',
+                //             placement: 'top'
+                //         });
+                //     } else {
+                //         notification.error({
+                //             message: 'error',
+                //             description: 'Email sudah terdaftar, mohon masukan email lain.',
+                //             placement: "top"
+                //         });
+                //     }
+                //     // pageLoad()
+                // } else {
+                //     notification.error({
+                //         message: 'Error',
+                //         description: 'Harap isi semua field',
+                //         placement: 'top'
+                //     });
+                // }
+                // console.log(response)
+            }).catch(error => {
+                // alert('Email Telah di gunakan, silahkan gunakan email lain.')
+            });
     };
 
     const editGuru = (e) => {

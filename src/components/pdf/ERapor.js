@@ -7,7 +7,6 @@ const ERapor = React.forwardRef((props, ref) => {
     console.log(JSON.stringify(data, null, 2));
 
     const [predicate, setPredicate] = useState('')
-    console.log(predicate);
     const [predicateSocial, setPredicateSocial] = useState('')
 
     function capitalizeFirstLetter(string) {
@@ -213,7 +212,7 @@ const ERapor = React.forwardRef((props, ref) => {
                     </tr>
 
                     <tr>
-                        <td className="strong pl-2" colSpan={6}>{capitalizeFirstLetter(data?.mata_pelajaran.pengetahuan[0].nama_kelompok)}</td>
+                        <td className="strong pl-2" colSpan={6}>{capitalizeFirstLetter(data?.mata_pelajaran?.pengetahuan[0]?.nama_kelompok)}</td>
                     </tr>
                     {data?.mata_pelajaran.pengetahuan[0]?.data.map((item, index) => (
                         <tr>
@@ -227,7 +226,7 @@ const ERapor = React.forwardRef((props, ref) => {
                     ))}
 
                     <tr>
-                        <td className="strong pl-2" colSpan={6}>{capitalizeFirstLetter(data?.mata_pelajaran.pengetahuan[1].nama_kelompok)}</td>
+                        <td className="strong pl-2" colSpan={6}>{capitalizeFirstLetter(data?.mata_pelajaran?.pengetahuan[1]?.nama_kelompok)}</td>
                     </tr>
                     {data?.mata_pelajaran.pengetahuan[1]?.data.map((item, index) => (
                         <tr>
@@ -273,7 +272,7 @@ const ERapor = React.forwardRef((props, ref) => {
                     ))}
 
                     <tr>
-                        <td className="strong pl-2" colSpan={6}>{capitalizeFirstLetter(data?.mata_pelajaran.keterampilan[1].nama_kelompok)}</td>
+                        <td className="strong pl-2" colSpan={6}>{capitalizeFirstLetter(data?.mata_pelajaran?.keterampilan[1]?.nama_kelompok)}</td>
                     </tr>
                     {data?.mata_pelajaran.keterampilan[1]?.data.map((item, index) => (
                         <tr>

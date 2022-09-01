@@ -16,10 +16,8 @@ function InputDataDeskripsiNilai() {
     const institute = localStorage.getItem('institute');
     const academic = localStorage.getItem('academic_year');
 
-    const [getKelas, setGetKelas] = useState([]);
-    const [selectClass, setSelectClass] = useState([]);
     const [deskripsiNilai, setDeskripsiNilai] = useState(null)
-    // console.log(JSON.stringify(deskripsiNilai, null, 2));
+    console.log(JSON.stringify(deskripsiNilai, null, 2));
 
     function onChange(value) {
         console.log(`selected ${value}`);
@@ -90,9 +88,9 @@ function InputDataDeskripsiNilai() {
         const deskripsiKeterampilan = formData.getAll('deskripsi_keterampilan');
         const nilaiPengetahuan = formData.getAll('nilai_pengetahuan')
         const nilaiKeterampilan = formData.getAll('nilai_keterampilan')
-        console.log(nilaiKeterampilan);
 
         const allDeskripsi = [];
+        console.log(allDeskripsi);
         const Pengetahuan = [];
         const Keterampilan = [];
 
@@ -182,9 +180,9 @@ function InputDataDeskripsiNilai() {
                 )
                 .then(function (response) {
                     const dataRes = JSON.parse(response.data.variables[2].value);
-                    console.log(dataRes);
+                    // console.log(dataRes);
                     const resCode = dataRes.code;
-                    console.log(resCode);
+                    // console.log(resCode);
                     if (resCode === true) {
                         notification.success({
                             message: "Sukses",

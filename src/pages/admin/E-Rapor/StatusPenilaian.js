@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
 import Navheader from "../../../components/Navheader";
@@ -8,168 +7,118 @@ import Adminfooter from "../../../components/Adminfooter";
 import { PageHeader, Card, Row, Select, Table, Tag } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { BASE_URL } from "../../../api/Url";
-import { getProcessId } from "../../../redux/Action";
 
 function StatusPenilaian() {
   const [statusPenilaian, setStatusPenilaian] = useState([]);
   const [getKelas, setGetKelas] = useState([]);
+  console.log(getKelas);
   const [getTahunAkademik, setGetTahunAkademik] = useState([]);
   const [refreshState, setRefreshState] = useState(false);
 
   const [selectClass, setSelectClass] = useState([]);
+  console.log(selectClass);
   const [selectAcademic, setSelectAcademic] = useState([]);
 
   const institute = localStorage.getItem("institute");
   const academic = localStorage.getItem("academic_year");
 
-  const dispatch = useDispatch();
-  const getProcess = useSelector((state) => state.processId);
-  let ProcessId = getProcess.DataProcess;
-  let getKeyGlobalJoin;
-
   const { Column, ColumnGroup } = Table;
 
   useEffect(() => {
-    dispatch(getProcessId(["globaljoinsubwhereget"]));
-  }, []);
-
-  useEffect(() => {
-    if (ProcessId.length != 0) {
-      setRefreshState(false);
-
-      getKeyGlobalJoin = ProcessId.find(
-        (item) => item.key === "globaljoinsubwhereget"
-      );
-      getKeyGlobalJoin = getKeyGlobalJoin.proses_def_id;
-
-      axios
-        .post(
-          BASE_URL,
+    axios.post(BASE_URL,
+      {
+        "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+        "returnVariables": true,
+        "variables": [
           {
-            processDefinitionId: getKeyGlobalJoin,
-            returnVariables: true,
-            variables: [
-              {
-                name: "global_join_where_sub",
-                type: "json",
-                value: {
-                  tbl_induk: "x_academic_class",
-                  select: [
-                    "x_academic_class.id as id_class",
-                    "x_academic_class.class",
-                    "x_academic_class.sub_class",
-                    "x_academic_class.class_location",
-                    "x_academic_year.academic_year",
-                    "x_academic_year.id as id_academic",
-                    "users.name",
-                    "x_academic_teachers.id as id_walikelas",
-                    "users.institute_id",
-                  ],
-                  paginate: 1000,
-                  join: [
-                    {
-                      tbl_join: "x_academic_teachers",
-                      refkey: "id",
-                      tbl_join2: "x_academic_class",
-                      foregenkey: "calss_advisor_id",
-                    },
-                    {
-                      tbl_join: "users",
-                      refkey: "id",
-                      tbl_join2: "x_academic_teachers",
-                      foregenkey: "user_id",
-                    },
-                    {
-                      tbl_join: "x_academic_year",
-                      refkey: "id",
-                      tbl_join2: "x_academic_class",
-                      foregenkey: "academic_year_id",
-                    },
-                  ],
-                  where: [
-                    {
-                      tbl_coloumn: "users",
-                      tbl_field: "institute_id",
-                      tbl_value: institute,
-                      operator: "=",
-                    },
-                    {
-                      tbl_coloumn: "x_academic_class",
-                      tbl_field: "academic_year_id",
-                      tbl_value: academic,
-                      operator: "=",
-                      kondisi: "where",
-                    },
-                    {
-                      tbl_coloumn: "x_academic_class",
-                      tbl_field: "deleted_at",
-                      tbl_value: "",
-                      operator: "=",
-                      kondisi: "where",
-                    },
-                  ],
-                  order_coloumn: "x_academic_class.updated_at",
-                  order_by: "desc",
-                },
-              },
-              {
-                name: "page",
-                type: "string",
-                value: "1",
-              },
-            ],
+            "name": "global_join_where_sub",
+            "type": "json",
+            "value": {
+              "tbl_induk": "x_academic_class",
+              "select": [
+                "x_academic_class.id",
+                "r_class_type.class_type as class",
+                "x_academic_class.sub_class"
+              ],
+              "paginate": false,
+              "join": [
+                {
+                  "tbl_join": "r_class_type",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_class",
+                  "foregenkey": "class"
+                }
+              ],
+              "where": [
+                {
+                  "tbl_coloumn": "x_academic_class",
+                  "tbl_field": "academic_year_id",
+                  "tbl_value": academic,
+                  "operator": "="
+                }, {
+                  "tbl_coloumn": "x_academic_class",
+                  "tbl_field": "deleted_at",
+                  "tbl_value": "",
+                  "operator": "="
+                }
+              ],
+              "order_coloumn": "x_academic_class.id",
+              "order_by": "asc"
+            }
           },
           {
-            headers: {
-              "Content-Type": "application/json",
-            },
+            "name": "page",
+            "type": "string",
+            "value": "1"
           }
-        )
-        .then(function (response) {
-          const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-          setGetKelas(dataRes?.data?.data);
-        });
-
-      axios
-        .post(BASE_URL, {
-          processDefinitionId:
-            "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
-          returnVariables: true,
-          variables: [
-            {
-              name: "global_get_where",
-              type: "json",
-              value: {
-                tbl_name: "x_academic_year",
-                pagination: true,
-                total_result: 10,
-                order_coloumn: "x_academic_year.is_active",
-                order_by: "desc",
-                data: [
-                  {
-                    kondisi: "where",
-                    tbl_coloumn: "institute_id",
-                    tbl_value: institute,
-                    operator: "=",
-                  },
-                ],
-                tbl_coloumn: ["*"],
-              },
-            },
-            {
-              name: "page",
-              type: "string",
-              value: "1",
-            },
-          ],
-        })
-        .then(function (response) {
-          // console.log(response);
-          const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value);
-          setGetTahunAkademik(tahunAkademik?.data);
-        });
+        ]
+      }, {
+      headers: {
+        "Content-Type": "application/json",
+      }
     }
-  }, [ProcessId, refreshState, academic]);
+    ).then(function (response) {
+      const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+      setGetKelas(dataRes?.data);
+    })
+
+    axios
+      .post(BASE_URL, {
+        processDefinitionId: "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+        returnVariables: true,
+        variables: [
+          {
+            name: "global_get_where",
+            type: "json",
+            value: {
+              tbl_name: "x_academic_year",
+              pagination: true,
+              total_result: 10,
+              order_coloumn: "x_academic_year.is_active",
+              order_by: "desc",
+              data: [
+                {
+                  kondisi: "where",
+                  tbl_coloumn: "institute_id",
+                  tbl_value: institute,
+                  operator: "=",
+                },
+              ],
+              tbl_coloumn: ["*"],
+            },
+          },
+          {
+            name: "page",
+            type: "string",
+            value: "1",
+          },
+        ],
+      })
+      .then(function (response) {
+        const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value);
+        setGetTahunAkademik(tahunAkademik?.data);
+      });
+  }, [academic, institute]);
 
   const getStatusPenilaian = () => {
     console.log(selectAcademic, selectClass);
@@ -289,7 +238,7 @@ function StatusPenilaian() {
                       {getKelas.map((data, i) => {
                         return (
                           <>
-                            <option value={data.id_class}>
+                            <option value={data.id}>
                               {`${data.class} / ${data.sub_class}`}
                             </option>
                           </>

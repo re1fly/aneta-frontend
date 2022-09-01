@@ -112,6 +112,7 @@ export default function JadwalPelajaranAdminDetail() {
                 "x_academic_teachers.id as id_teacher",
                 "x_academic_class.class",
                 "x_academic_class.sub_class",
+                "r_class_type.class_type",
 
               ],
               "paginate": 10,
@@ -145,6 +146,12 @@ export default function JadwalPelajaranAdminDetail() {
                   "refkey": "id",
                   "tbl_join2": "x_academic_teachers",
                   "foregenkey": "user_id"
+                },
+                {
+                  "tbl_join": "r_class_type",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_class",
+                  "foregenkey": "class"
                 }
               ],
               "where": [
@@ -188,6 +195,7 @@ export default function JadwalPelajaranAdminDetail() {
       }
     }
     ).then(function (response) {
+      console.log(response);
       const dataRes = JSON.parse(response?.data?.variables[3]?.value);
       const pelajaran = dataRes?.data?.data
       setGetJadwalPelajaran(pelajaran);
@@ -552,7 +560,7 @@ export default function JadwalPelajaranAdminDetail() {
       return {
         id: data.id_shedule,
         hari: data.hari,
-        kelas: data.class,
+        kelas: data.class_type,
         subKelas: data.sub_class,
         idPelajaran: data.id_subjects,
         namaPelajaran: data.nama_mata,
@@ -568,7 +576,7 @@ export default function JadwalPelajaranAdminDetail() {
       return {
         id: data.id_shedule,
         hari: data.hari,
-        kelas: data.class,
+        kelas: data.class_type,
         subKelas: data.sub_class,
         idPelajaran: data.id_subjects,
         namaPelajaran: data.nama_mata,
@@ -584,7 +592,7 @@ export default function JadwalPelajaranAdminDetail() {
       return {
         id: data.id_shedule,
         hari: data.hari,
-        kelas: data.class,
+        kelas: data.class_type,
         subKelas: data.sub_class,
         idPelajaran: data.id_subjects,
         namaPelajaran: data.nama_mata,
@@ -600,7 +608,7 @@ export default function JadwalPelajaranAdminDetail() {
       return {
         id: data.id_shedule,
         hari: data.hari,
-        kelas: data.class,
+        kelas: data.class_type,
         subKelas: data.sub_class,
         idPelajaran: data.id_subjects,
         namaPelajaran: data.nama_mata,
@@ -616,7 +624,7 @@ export default function JadwalPelajaranAdminDetail() {
       return {
         id: data.id_shedule,
         hari: data.hari,
-        kelas: data.class,
+        kelas: data.class_type,
         subKelas: data.sub_class,
         idPelajaran: data.id_subjects,
         namaPelajaran: data.nama_mata,
@@ -632,7 +640,7 @@ export default function JadwalPelajaranAdminDetail() {
       return {
         id: data.id_shedule,
         hari: data.hari,
-        kelas: data.class,
+        kelas: data.class_type,
         subKelas: data.sub_class,
         idPelajaran: data.id_subjects,
         namaPelajaran: data.nama_mata,

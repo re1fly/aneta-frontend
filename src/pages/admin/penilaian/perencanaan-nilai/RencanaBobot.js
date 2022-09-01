@@ -29,12 +29,12 @@ function RencanaBobot() {
                             "name": "get_data",
                             "type": "json",
                             "value": {
-                                "id_academic" : academic,
-                                "id_class"    : selectedClass,
-                                "id_pelajaran" : e.target.value,
-                                "ph" : "",
-                                "pts" : "",
-                                "pas" : ""
+                                "id_academic": academic,
+                                "id_class": selectedClass,
+                                "id_pelajaran": e.target.value,
+                                "ph": null,
+                                "pts": null,
+                                "pas": null
                             }
                         }
                     ]
@@ -65,7 +65,7 @@ function RencanaBobot() {
                             "type": "json",
                             "value": {
                                 "tbl_induk": "x_academic_subject_master",
-                                "select" : [
+                                "select": [
                                     "x_academic_subjects.academic_subjects_master_id as id_subject",
                                     "x_academic_subject_master.nama_mata"
                                 ],
@@ -76,7 +76,7 @@ function RencanaBobot() {
                                         "refkey": "id",
                                         "tbl_join2": "x_academic_subject_master",
                                         "foregenkey": "academic_year_id"
-                                    },{
+                                    }, {
                                         "tbl_join": "x_academic_subjects",
                                         "refkey": "academic_subjects_master_id",
                                         "tbl_join2": "x_academic_subject_master",
@@ -89,25 +89,25 @@ function RencanaBobot() {
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
                                         "operator": "=",
-                                        "kondisi" : "where"
-                                    },{
+                                        "kondisi": "where"
+                                    }, {
                                         "tbl_coloumn": "x_academic_subjects",
                                         "tbl_field": "course_grade_id",
                                         "tbl_value": selectedClass,
                                         "operator": "=",
-                                        "kondisi" : "where"
-                                    },{
+                                        "kondisi": "where"
+                                    }, {
                                         "tbl_coloumn": "x_academic_subject_master",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
                                         "operator": "=",
-                                        "kondisi" : "where"
-                                    },{
+                                        "kondisi": "where"
+                                    }, {
                                         "tbl_coloumn": "x_academic_subjects",
                                         "tbl_field": "course_grade_id",
                                         "tbl_value": "",
                                         "operator": "!=",
-                                        "kondisi" : "where"
+                                        "kondisi": "where"
                                     }
                                 ],
                                 "order_coloumn": "x_academic_subject_master.nama_mata",
@@ -133,7 +133,7 @@ function RencanaBobot() {
                 setDataMapel(getMapel);
             })
     }
-    
+
     const _getDataKelas = () => {
         axios
             .post(
@@ -147,7 +147,7 @@ function RencanaBobot() {
                             "type": "json",
                             "value": {
                                 "tbl_induk": "x_academic_class",
-                                "select" : [
+                                "select": [
                                     "x_academic_class.id",
                                     "r_class_type.class_type as class",
                                     "x_academic_class.sub_class"
@@ -167,7 +167,7 @@ function RencanaBobot() {
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
                                         "operator": "="
-                                    },{
+                                    }, {
                                         "tbl_coloumn": "x_academic_class",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
@@ -225,12 +225,12 @@ function RencanaBobot() {
                             "name": "get_data",
                             "type": "json",
                             "value": {
-                                "id_academic" : academic,
-                                "id_class"    : data.id_class_filter,
-                                "id_pelajaran" : data.id_mapel_filter,
-                                "ph" : data.bobot_ph,
-                                "pts" : data.bobot_pts,
-                                "pas" : data.bobot_pas
+                                "id_academic": academic,
+                                "id_class": data.id_class_filter,
+                                "id_pelajaran": data.id_mapel_filter,
+                                "ph": data.bobot_ph,
+                                "pts": data.bobot_pts,
+                                "pas": data.bobot_pas
                             }
                         }
                     ]
@@ -244,13 +244,13 @@ function RencanaBobot() {
             .then(function (response) {
                 const dataRes = JSON.parse(response.data.variables[2].value);
                 const resCode = dataRes.code;
-                if(resCode == true) {
+                if (resCode == true) {
                     notification.success({
                         message: "Sukses",
                         description: "Input Bobot Perencanaan Sukses",
                         placement: 'top'
                     })
-                }else{
+                } else {
                     notification.error({
                         message: "Gagal",
                         description: "Mohon cek kembali inputan anda",
@@ -312,65 +312,65 @@ function RencanaBobot() {
                                         </select>
                                     </div>
                                 </div>
-                                { !isDataAvailable ? <DataNotFound/> :
-                                <div className="col-lg-12 pt-5">
-                                    <div className="table-responsive-xl">
-                                        <table className="table" style={{borderCollapse: 'collapse'}}>
-                                            <thead>
-                                            <tr className='bg-current text-light'>
-                                                <th scope="col">Bobot Penilaian Harian (PH)</th>
-                                                <th scope="col">Bobot Penilaian Tengah Semester (PTS)</th>
-                                                <th scope="col">Bobot Penilaian Akhir Semester (PAS)</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input
-                                                        type="number"
-                                                        className="form-control"
-                                                        name='bobot_ph'
-                                                        placeholder="isi bobot penilaian"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        type="number"
-                                                        className="form-control"
-                                                        name='bobot_pts'
-                                                        placeholder="isi bobot penilaian"
-                                                        required
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        type="number"
-                                                        className="form-control"
-                                                        name='bobot_pas'
-                                                        placeholder="isi bobot penilaian"
-                                                        required
-                                                    />
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                        <div className="pt-10 mt-5 float-right">
-                                            <button
-                                                className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                type="submit"
-                                            >
-                                                Simpan
-                                            </button>
-                                            <a
-                                                onClick={() => window.history.back()}
-                                                className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                            >
-                                                Kembali
-                                            </a>
+                                {!isDataAvailable ? <DataNotFound/> :
+                                    <div className="col-lg-12 pt-5">
+                                        <div className="table-responsive-xl">
+                                            <table className="table" style={{borderCollapse: 'collapse'}}>
+                                                <thead>
+                                                <tr className='bg-current text-light'>
+                                                    <th scope="col">Bobot Penilaian Harian (PH)</th>
+                                                    <th scope="col">Bobot Penilaian Tengah Semester (PTS)</th>
+                                                    <th scope="col">Bobot Penilaian Akhir Semester (PAS)</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            name='bobot_ph'
+                                                            placeholder="isi bobot penilaian"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            name='bobot_pts'
+                                                            placeholder="isi bobot penilaian"
+                                                            required
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            name='bobot_pas'
+                                                            placeholder="isi bobot penilaian"
+                                                            required
+                                                        />
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                            <div className="pt-10 mt-5 float-right">
+                                                <button
+                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                    type="submit"
+                                                >
+                                                    Simpan
+                                                </button>
+                                                <a
+                                                    onClick={() => window.history.back()}
+                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                >
+                                                    Kembali
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 }
                             </div>
                         </form>

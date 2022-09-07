@@ -23,7 +23,7 @@ function DataNilaiKeterampilan() {
         axios
             .post(
                 BASE_URL, {
-                    "processDefinitionId": "getdatainputpenilaian:1:48bd60b3-00e3-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "getdatainputpenilaian:1:cd9b3e46-2d9a-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -37,11 +37,11 @@ function DataNilaiKeterampilan() {
                             }
                         }
                     ]
-                }
-                ,
+                },
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -96,7 +96,7 @@ function DataNilaiKeterampilan() {
         axios
             .post(
                 BASE_URL, {
-                    "processDefinitionId": "insertinputdatanilai:2:b872dd7d-0278-11ed-ac5e-66fc627bf211",
+                    "processDefinitionId": "insertinputdatanilai:1:56c8e397-2d9b-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -112,6 +112,7 @@ function DataNilaiKeterampilan() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -152,7 +153,7 @@ function DataNilaiKeterampilan() {
                             </div>
                         </div>
                         <GetMapelKelas valueFilter={(e) => _getDataSiswa(e)}/>
-                        { dataSiswa == null ?
+                        {dataSiswa == null ?
                             <DataNotFound/>
                             :
                             <form onSubmit={_submitPenilaian} method="POST">

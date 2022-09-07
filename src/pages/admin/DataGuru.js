@@ -174,7 +174,7 @@ function DataGuruAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -276,7 +276,7 @@ function DataGuruAdmin() {
         getListGuru()
 
         axios.post(BASE_URL, {
-            "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
+            "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
             "returnVariables": true,
             "variables": [
                 {
@@ -317,8 +317,9 @@ function DataGuruAdmin() {
             ]
         }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }
         ).then(function (response) {
             const academics = JSON.parse(response?.data?.variables[3]?.value);
@@ -329,7 +330,7 @@ function DataGuruAdmin() {
 
     const _exportDataExcel = () => {
         axios.post(BASE_URL, {
-            "processDefinitionId": "exportguru:1:b30eac41-1d47-11ed-9ea6-c6ec5d98c2df",
+            "processDefinitionId": "exportguru:1:902728ed-2cc8-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -383,7 +384,7 @@ function DataGuruAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "importguru:1:5922a770-21f9-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "importguru:1:d1f6b158-2cc8-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -399,8 +400,9 @@ function DataGuruAdmin() {
                 ]
             }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
@@ -432,7 +434,7 @@ function DataGuruAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "importguru:1:5922a770-21f9-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "importguru:1:d1f6b158-2cc8-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -448,8 +450,9 @@ function DataGuruAdmin() {
                 ]
             }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
@@ -844,126 +847,7 @@ function DataGuruAdmin() {
         console.log(data);
 
         axios.post(BASE_URL, {
-            // "processDefinitionId": "insertdataguru:18:b6bbf8a6-eb91-11ec-9ea6-c6ec5d98c2df",
-            // "returnVariables": true,
-            // "variables": [
-            //     {
-            //         "name": "validasi",
-            //         "type": "json",
-            //         "value": {
-            //             "data": {
-            //                 "user_email": "required",
-            //                 "user_name": "required",
-            //                 "user_role_id": "required",
-            //                 "user_email_verified_at": "required",
-            //                 "user_password": "required",
-            //                 "user_place_of_birth": "required",
-            //                 "user_date_of_birth": "required",
-            //                 "user_mobile_phone": "required",
-            //                 "user_state_id": "required",
-            //                 "user_city_id": "required",
-            //                 "user_district_id": "required",
-            //                 "user_sub_discrict_id": "required",
-            //                 "user_address": "required",
-            //                 "user_image": "required",
-            //                 "user_image_type": "required",
-            //                 "user_academic_year_id": "required",
-            //                 "user_register_date": "required",
-            //                 "status": "required",
-            //                 // "sk_number": "required",
-            //                 "created_at": "required",
-            //                 "updated_at": "required",
-            //                 "institute_id": "required"
-
-            //             },
-            //             "user_email": data.email_guru,
-            //             "user_name": data.nama_guru,
-            //             "user_role_id": 2,
-            //             "user_email_verified_at": dateNow,
-            //             "user_password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
-            //             "user_place_of_birth": data.tempatlahir_guru,
-            //             "user_date_of_birth": data.tanggallahir_guru,
-            //             "user_mobile_phone": data.nomortelefon_guru,
-            //             "user_state_id": data.provinsi_guru,
-            //             "user_city_id": data.kota_guru,
-            //             "user_district_id": data.kecamatan_guru,
-            //             "user_sub_discrict_id": data.kelurahan_guru,
-            //             "user_address": data.alamat_guru,
-            //             "user_image": data.image_base64,
-            //             "user_image_type": "string",
-            //             "user_academic_year_id": academicYear,
-            //             "user_register_date": dateNow,
-            //             "status": data.status_guru,
-            //             // "sk_number": data.sk_guru,
-            //             "created_at": dateNow,
-            //             "updated_at": dateNow,
-            //             "institute_id": institute,
-            //         }
-            //     },
-            //     {
-            //         "name": "user_email",
-            //         "type": "string",
-            //         "value": data.email_guru,
-            //     },
-            //     {
-            //         "name": "users",
-            //         "type": "json",
-            //         "value": {
-            //             "tbl_name": "usersModel",
-            //             "tbl_coloumn": {
-            //                 "name": data.nama_guru,
-            //                 "email": data.email_guru,
-            //                 "user_role_id": 2,
-            //                 "institute_id": institute,
-            //                 "email_verified_at": dateNow,
-            //                 "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
-            //             }
-            //         }
-            //     },
-            //     {
-            //         "name": "m_profile",
-            //         "type": "json",
-            //         "value": {
-            //             "tbl_name": "m_user_profile",
-            //             "tbl_coloumn": {
-            //                 "place_of_birth": data.tempatlahir_guru,
-            //                 "date_of_birth": data.tanggallahir_guru,
-            //                 "mobile_phone": data.nomortelefon_guru,
-            //                 "state_id": data.provinsi_guru,
-            //                 "city_id": data.kota_guru,
-            //                 "district_id": data.kecamatan_guru,
-            //                 "sub_discrict_id": data.kelurahan_guru,
-            //                 "address": data.alamat_guru
-            //             }
-            //         }
-            //     },
-            //     {
-            //         "name": "upload_image",
-            //         "type": "json",
-            //         "value": {
-            //             "image": data.image_base64,
-            //             "image_type": "png",
-            //             "nama_folder": "image_guru"
-            //         }
-            //     },
-            //     {
-            //         "name": "x_academic_teachers",
-            //         "type": "json",
-            //         "value": {
-            //             "tbl_name": "x_academic_teachers",
-            //             "tbl_coloumn": {
-            //                 "academic_year_id": academicYear,
-            //                 "register_date": dateNow,
-            //                 "sk_number": data.sk_guru,
-            //                 "sk_date": dateNow,
-            //                 "status": data.status_guru,
-            //                 // "created_at": dateNow, // => done
-            //                 // "updated_at": dateNow // => done
-            //             }
-            //         }
-            //     }
-            // ]
-            "processDefinitionId": "insertdataguru:18:b6bbf8a6-eb91-11ec-9ea6-c6ec5d98c2df",
+            "processDefinitionId": "insertdataguru:1:25f2c862-2cc9-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -1140,6 +1024,7 @@ function DataGuruAdmin() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -1209,7 +1094,7 @@ function DataGuruAdmin() {
         console.log(data);
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "updateguru:3:fdd13d0d-f118-11ec-a658-66fc627bf211",
+            "processDefinitionId": "updateguru:1:7463f5f2-2cc9-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -1294,8 +1179,9 @@ function DataGuruAdmin() {
             ]
         }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }).then(function (response) {
             if (response.data.variables[5].value == 200) {
                 setIsViewEdit(false)
@@ -1330,7 +1216,7 @@ function DataGuruAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -1344,8 +1230,9 @@ function DataGuruAdmin() {
                     ]
                 }, {
                     headers: {
-                        "Content-Type": "application/json",
-                    }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                 }
                 ).then(function (response) {
                     console.log(response);

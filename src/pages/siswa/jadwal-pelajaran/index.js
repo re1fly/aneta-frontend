@@ -116,6 +116,7 @@ function JadwalPelajaranSiswa() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -128,7 +129,7 @@ function JadwalPelajaranSiswa() {
         })
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubfirst:1:20ca0e47-eb01-11ec-a658-66fc627bf211",
+            "processDefinitionId": "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -200,6 +201,7 @@ function JadwalPelajaranSiswa() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {

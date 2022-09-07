@@ -83,6 +83,7 @@ function JadwalPelajaranGuru() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {

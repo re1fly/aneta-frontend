@@ -27,7 +27,7 @@ function Register() {
         } else {
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": "authregister:1:13d973de-e956-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "authregister:1:987def29-2cc6-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -65,7 +65,8 @@ function Register() {
                     ]
                 }, {
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }).then(res => {
                     const responseRegister = res.data.variables[6].value;

@@ -65,7 +65,7 @@ function KirimPenilaian() {
     useEffect(() => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getkirimpenilaian:1:58c14dff-277a-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getkirimpenilaian:1:5b1232ce-2dab-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -337,7 +337,7 @@ function KirimPenilaian() {
         console.log(data)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getkirimpenilaiandetail:1:15ba37d7-1547-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getkirimpenilaiandetail:1:e4823951-2cd1-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -355,6 +355,7 @@ function KirimPenilaian() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 },
             }
         ).then(function (response) {
@@ -388,7 +389,7 @@ function KirimPenilaian() {
         axios
             .post(
                 BASE_URL, {
-                "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -408,8 +409,9 @@ function KirimPenilaian() {
             },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {

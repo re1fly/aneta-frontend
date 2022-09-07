@@ -104,7 +104,7 @@ export default function DataMataPelajaranAdmin() {
             });
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -194,7 +194,7 @@ export default function DataMataPelajaranAdmin() {
     useEffect(() => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+                "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -263,7 +263,7 @@ export default function DataMataPelajaranAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "datamatapelajaran:1:83110c70-22b9-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getdatamatapelajaran:1:f8832bab-2cfc-11ed-9f7a-3e427f6ada72",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -287,7 +287,7 @@ export default function DataMataPelajaranAdmin() {
         })
 
         axios.post(BASE_URL, {
-                "processDefinitionId": "getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211",
+                "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -330,6 +330,7 @@ export default function DataMataPelajaranAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -339,7 +340,7 @@ export default function DataMataPelajaranAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -708,7 +709,7 @@ export default function DataMataPelajaranAdmin() {
             //         }
             //     }
             // ]
-            "processDefinitionId": "4dbf4ce8-234d-11ed-ac5e-66fc627bf211",
+            "processDefinitionId": "insertdatakkmpelajaran:1:f8174d45-2d00-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -724,8 +725,9 @@ export default function DataMataPelajaranAdmin() {
             ]
         }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }).then(function (response) {
             // console.log("insert :", response);
             const valueRes = response.data.variables[2].value
@@ -790,7 +792,7 @@ export default function DataMataPelajaranAdmin() {
             //         }
             //     }
             // ]
-            "processDefinitionId": "4dbf4ce8-234d-11ed-ac5e-66fc627bf211",
+            "processDefinitionId": "insertdatakkmpelajaran:1:f8174d45-2d00-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -806,8 +808,9 @@ export default function DataMataPelajaranAdmin() {
             ]
         }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }).then(function (response) {
             const valueRes = response.data.variables[2].value
             const valueResObj = JSON.parse(valueRes)
@@ -843,7 +846,7 @@ export default function DataMataPelajaranAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                         "returnVariables": true,
                         "variables": [
                             {
@@ -860,8 +863,9 @@ export default function DataMataPelajaranAdmin() {
                         ]
                     }, {
                         headers: {
-                            "Content-Type": "application/json",
-                        }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                     }
                 ).then(function (response) {
                     console.log(response);

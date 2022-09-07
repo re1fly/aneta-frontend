@@ -23,7 +23,7 @@ function DataNilaiUjian() {
         axios
             .post(
                 BASE_URL, {
-                    "processDefinitionId": "getInputNilaiPTSdanPAS:1:dcf83ee3-0675-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "getInputNilaiPTSdanPAS:1:93ef96eb-2cd2-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -36,11 +36,11 @@ function DataNilaiUjian() {
                             }
                         }
                     ]
-                }
-                ,
+                },
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -111,7 +111,7 @@ function DataNilaiUjian() {
             axios
                 .post(
                     BASE_URL, {
-                        "processDefinitionId": "insertinputnilaiptsdanpas:1:65d1b3d4-0677-11ed-ac5e-66fc627bf211",
+                        "processDefinitionId": "insertinputnilaiptsdanpas:1:c0ddd117-2cd2-11ed-aacc-9a44706f3589",
                         "returnVariables": true,
                         "variables": [
                             {
@@ -126,6 +126,7 @@ function DataNilaiUjian() {
                     {
                         headers: {
                             "Content-Type": "application/json",
+                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
                         },
                     }
                 )

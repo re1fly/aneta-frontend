@@ -36,7 +36,7 @@ function InputDataDeskripsiNilai() {
         console.log(data)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getinputdeskripsi:1:11a7f7fc-14b5-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getinputdeskripsi:1:ebaee2fa-2cd0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -54,6 +54,7 @@ function InputDataDeskripsiNilai() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 },
             }
         ).then(function (response) {
@@ -158,7 +159,7 @@ function InputDataDeskripsiNilai() {
             axios
                 .post(
                     BASE_URL, {
-                    "processDefinitionId": "inputdatadeskripsi:3:4ab68e43-14b4-11ed-ac5e-66fc627bf211",
+                    "processDefinitionId": "inputdatadeskripsi:1:23efd358-2cd1-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -174,8 +175,9 @@ function InputDataDeskripsiNilai() {
                 },
                     {
                         headers: {
-                            "Content-Type": "application/json",
-                        },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                     }
                 )
                 .then(function (response) {

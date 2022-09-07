@@ -53,8 +53,9 @@ export default function InputNilaiEkskul() {
                 },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {

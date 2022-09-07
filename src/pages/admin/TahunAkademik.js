@@ -80,7 +80,7 @@ function TahunAkademikAdmin() {
     console.log('academic_year', academicYear)
 
     axios.post(BASE_URL, {
-      "processDefinitionId": "GlobalInsertRecord:7:7777c884-d588-11ec-a2ad-3a00788faff5",
+      "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
       "returnVariables": true,
       "variables": [
         {

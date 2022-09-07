@@ -60,7 +60,7 @@ export default function KompetensiAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -90,6 +90,7 @@ export default function KompetensiAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -103,7 +104,7 @@ export default function KompetensiAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "d2d89712-24df-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "8812bebe-2cf6-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -120,6 +121,7 @@ export default function KompetensiAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -136,7 +138,7 @@ export default function KompetensiAdmin() {
     }
     const _getKompetensi = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "getkompetensi:1:50edbf33-2521-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getkompetensidashboard:1:519c8d2c-2d93-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -180,7 +182,6 @@ export default function KompetensiAdmin() {
             setGetKompetensi([])
         }
     }, [selectedClass]);
-
 
 
     let [count, setCount] = useState(1);
@@ -625,7 +626,7 @@ export default function KompetensiAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "5177f66c-14ac-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "insertkompetensi:1:9abf6f02-2d94-11ed-9f7a-3e427f6ada72",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -650,6 +651,7 @@ export default function KompetensiAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -697,7 +699,7 @@ export default function KompetensiAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
+                        "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
                         "returnVariables": true,
                         "variables": [
                             {
@@ -712,6 +714,7 @@ export default function KompetensiAdmin() {
                     }, {
                         headers: {
                             "Content-Type": "application/json",
+                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
                         }
                     }
                 ).then(function (response) {

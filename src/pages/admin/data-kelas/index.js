@@ -41,6 +41,7 @@ export default function DataKelasAdmin() {
     const [isViewCreate, setIsViewCreate] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    console.log(selectedUser);
     const [refreshState, setRefreshState] = useState(false);
     const [fileList, setFileList] = useState([
         {
@@ -73,7 +74,7 @@ export default function DataKelasAdmin() {
 
     const _exportDataExcel = () => {
         axios.post(BASE_URL, {
-            "processDefinitionId": "exportclass:1:e851d04a-1c5f-11ed-ac5e-66fc627bf211",
+            "processDefinitionId": "exportclass:1:3bc4d840-2ccc-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -126,7 +127,7 @@ export default function DataKelasAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "importclass:2:f1cb6c0d-1ea9-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "importclass:1:9c245275-2ccc-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -143,6 +144,7 @@ export default function DataKelasAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -174,7 +176,7 @@ export default function DataKelasAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "importclass:2:f1cb6c0d-1ea9-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "importclass:1:9c245275-2ccc-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -191,6 +193,7 @@ export default function DataKelasAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -257,7 +260,7 @@ export default function DataKelasAdmin() {
 
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": getKeyGlobalJoin,
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -273,7 +276,8 @@ export default function DataKelasAdmin() {
                                     "x_academic_year.id as id_academic",
                                     "users.name",
                                     "x_academic_teachers.id as id_walikelas",
-                                    "users.institute_id"
+                                    "users.institute_id",
+                                    "r_class_type.id as id_tingkat"
                                 ],
                                 "paginate": 10,
                                 "join": [
@@ -336,6 +340,7 @@ export default function DataKelasAdmin() {
                 }, {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
                 }
             ).then(function (response) {
@@ -345,7 +350,7 @@ export default function DataKelasAdmin() {
             })
 
             axios.post(BASE_URL, {
-                    "processDefinitionId": ProcessId[0].proses_def_id,
+                    "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -393,6 +398,7 @@ export default function DataKelasAdmin() {
                 }, {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
                 }
             ).then(function (response) {
@@ -443,6 +449,7 @@ export default function DataKelasAdmin() {
                 }, {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
                 }
             ).then(function (response) {
@@ -451,7 +458,7 @@ export default function DataKelasAdmin() {
             })
 
             axios.post(BASE_URL, {
-                    "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -480,6 +487,7 @@ export default function DataKelasAdmin() {
                 }, {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
                 }
             ).then(function (response) {
@@ -702,7 +710,8 @@ export default function DataKelasAdmin() {
                 tahunAkademik: data.academic_year,
                 idTahunAkademik: data.id_academic,
                 waliKelas: data.name,
-                idWaliKelas: data.id_walikelas
+                idWaliKelas: data.id_walikelas,
+                idTingkat: data.id_tingkat
             }
         })
 
@@ -970,7 +979,7 @@ export default function DataKelasAdmin() {
         }
 
         axios.post(BASE_URL, {
-                "processDefinitionId": ProcessId[4].proses_def_id,
+                "processDefinitionId": "insertclass:1:ac0a260c-2db5-11ed-9f7a-3e427f6ada72",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1027,9 +1036,11 @@ export default function DataKelasAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
+            console.log(response);
             const resCode = response.data.variables[4].value
             if (resCode == 200) {
                 setIsViewCreate(false)
@@ -1057,8 +1068,9 @@ export default function DataKelasAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
+        console.log(data);
         axios.post(BASE_URL, {
-                "processDefinitionId": ProcessId[1].proses_def_id,
+                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1080,9 +1092,12 @@ export default function DataKelasAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+
                 }
             }
         ).then(function (response) {
+            console.log(response);
             const resCode = JSON.parse(response.data.variables[2].value)
             const statusCode = resCode.status;
             if (statusCode == 'success') {
@@ -1119,7 +1134,7 @@ export default function DataKelasAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                         "returnVariables": true,
                         "variables": [
                             {
@@ -1137,6 +1152,7 @@ export default function DataKelasAdmin() {
                     }, {
                         headers: {
                             "Content-Type": "application/json",
+                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
                         }
                     }
                 ).then(function (response) {
@@ -1211,6 +1227,7 @@ export default function DataKelasAdmin() {
                 selectWaliKelas={waliKelas.map((data) => (
                     <option value={data.id_user}>{data.name}</option>
                 ))}
+                idTingkatKelas={selectedUser.idTingkat}
                 selectTingkatKelas={tingkatKelas.map((data) => (
                     <option value={data.id}>{data.class_type}</option>
                 ))}
@@ -1233,6 +1250,7 @@ export default function DataKelasAdmin() {
                 selectWaliKelas={waliKelas.map((data) => (
                     <option value={data.id_user}>{data.name}</option>
                 ))}
+                idTingkatKelas={selectedUser.idTingkat}
                 selectTingkatKelas={tingkatKelas.map((data) => (
                     <option value={data.id}>{data.class_type}</option>
                 ))}

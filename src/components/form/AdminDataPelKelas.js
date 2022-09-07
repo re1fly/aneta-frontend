@@ -34,7 +34,7 @@ export const FormAdminDataPelKelas = (props) => {
                                                     name="tingkat_kelas"
                                                     required
                                                     id="subClass_datapelajaran"
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.isDisableForm}
                                                     onChange={props.onChangeTingkatKelas}
                                                     value={props.selectedTingkatKelas}
                                                 >
@@ -56,7 +56,7 @@ export const FormAdminDataPelKelas = (props) => {
                                                         aria-label="Default select example"
                                                         name="sub_kelas"
                                                         required
-                                                        disabled={props.isDisabled}
+                                                        disabled={props.isDisableForm}
                                                     >
                                                         <option value={props.idSubKelas} selected disabled hidden>
                                                             {props.namaSubKelas}
@@ -77,7 +77,7 @@ export const FormAdminDataPelKelas = (props) => {
                                                     aria-label="Default select example"
                                                     name="mata_pelajaran"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.isDisableForm}
                                                 >
                                                     <option value={props.idMapel} selected disabled hidden>
                                                         {props.namaMapel}

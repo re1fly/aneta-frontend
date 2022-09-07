@@ -16,34 +16,6 @@ const iconlList = [{
 function BerandaGuru() {
     const user = localStorage.getItem('user_name');
 
-    useEffect(() => {
-        axios.post('https://api.aneta.id/apiman-gateway/FlowableProvider/default/1.0?apikey=3af5be44-2840-4937-893e-e39b6f427db2', {
-                "processDefinitionId": "RestVesselVoyage:1:f90ae192-af10-11ec-8f61-3247e0fca94a",
-                "returnVariables": true,
-                "variables":
-                    [
-                        {
-                            "name": "url_koja",
-                            "value": "http://123.231.237.22/TPSOnlineServices/server.php?wsdl"
-                        },
-                        {
-                            "name": "username",
-                            "value": "LOGOL.GTL2"
-                        }
-                    ]
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        ).then(res => {
-            console.log(res)
-        }).catch(err => {
-            console.log('error: ', err);
-        });
-
-    }, []);
-
     return (
         <Fragment>
             <div className="main-wrapper">

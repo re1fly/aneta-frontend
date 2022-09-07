@@ -24,7 +24,7 @@ function ProfilSekolah() {
 
     useEffect(() => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubfirst:1:20ca0e47-eb01-11ec-a658-66fc627bf211",
+                "processDefinitionId": "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -86,6 +86,7 @@ function ProfilSekolah() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -138,7 +139,7 @@ function ProfilSekolah() {
         }
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -165,6 +166,7 @@ function ProfilSekolah() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {

@@ -13,7 +13,7 @@ export const FormKompetensi = (props) => {
 
     const _getAcademicYears = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
+                "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
                 "returnVariables": true,
                 "variables": [
                     {
@@ -55,6 +55,7 @@ export const FormKompetensi = (props) => {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -67,7 +68,7 @@ export const FormKompetensi = (props) => {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -96,8 +97,9 @@ export const FormKompetensi = (props) => {
                 },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {
@@ -117,7 +119,7 @@ export const FormKompetensi = (props) => {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "d2d89712-24df-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "8812bebe-2cf6-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -133,8 +135,9 @@ export const FormKompetensi = (props) => {
                 },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {

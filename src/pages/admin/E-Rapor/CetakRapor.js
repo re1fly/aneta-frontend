@@ -63,7 +63,7 @@ function CetakRapor() {
     useEffect(() => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -110,8 +110,9 @@ function CetakRapor() {
                 ]
             }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
@@ -120,7 +121,7 @@ function CetakRapor() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -164,7 +165,7 @@ function CetakRapor() {
         setRefreshState(true)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "geteraport:1:e554a53c-12df-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "geteraport:1:5806db8a-2ccf-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -196,7 +197,7 @@ function CetakRapor() {
     const getDataRapor = () => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "jsoneraport:1:a84a08c9-13a1-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "jsoneraport:1:e07834f5-2ccf-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {

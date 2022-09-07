@@ -33,7 +33,7 @@ function InputDataDeskripsiSikap() {
     useEffect(() => {
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -81,6 +81,7 @@ function InputDataDeskripsiSikap() {
                 }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
             ).then(function (response) {
@@ -92,7 +93,7 @@ function InputDataDeskripsiSikap() {
     const _getDataDeskripsiSikap = () => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "inputdeskripsisikapraport:1:6e4117f6-2cd1-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -136,7 +137,7 @@ function InputDataDeskripsiSikap() {
     // useEffect(() => {
     //     axios.post(BASE_URL,
     //         {
-    //             "processDefinitionId": "inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
+    //             "processDefinitionId": "inputdeskripsisikapraport:1:6e4117f6-2cd1-11ed-aacc-9a44706f3589",
     //             "returnVariables": true,
     //             "variables": [
     //                 {
@@ -243,7 +244,7 @@ function InputDataDeskripsiSikap() {
         axios
             .post(
                 BASE_URL, {
-                "processDefinitionId": "cb03c73a-148d-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "343656c9-2daa-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -259,8 +260,9 @@ function InputDataDeskripsiSikap() {
             },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {

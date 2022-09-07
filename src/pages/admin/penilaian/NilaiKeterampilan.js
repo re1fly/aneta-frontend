@@ -30,7 +30,7 @@ function NilaiKeterampilan() {
         BASE_URL,
         {
           processDefinitionId:
-            "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+            "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
           returnVariables: true,
           variables: [
             {
@@ -79,8 +79,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
         }
       )
       .then(function (response) {
@@ -130,8 +131,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
         }
       )
       .then(function (response) {
@@ -146,7 +148,7 @@ function NilaiKeterampilan() {
         BASE_URL,
         {
           processDefinitionId:
-            "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+            "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
           returnVariables: true,
           variables: [
             {
@@ -194,8 +196,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
         }
       )
       .then(function (response) {
@@ -258,7 +261,7 @@ function NilaiKeterampilan() {
       .post(
         BASE_URL,
         {
-          processDefinitionId: "5cb935c9-07da-11ed-ac5e-66fc627bf211",
+          processDefinitionId: "6f4cd0c4-2d97-11ed-aacc-9a44706f3589",
           returnVariables: true,
           variables: [
             {
@@ -270,8 +273,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
         }
       )
       .then(function (response) {

@@ -78,7 +78,7 @@ export default function ListTahunAkademik() {
         axios.post(BASE_URL,
             {
 
-                "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -109,7 +109,7 @@ export default function ListTahunAkademik() {
                         "value": paramsPage
                     }
                 ]
-            }
+            },
         ).then(function (response) {
             // console.log(response);
             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
@@ -552,7 +552,7 @@ export default function ListTahunAkademik() {
         const akademikInsert = `${data.tahun_akademik} / ${parseInt(data.tahun_akademik) + 1} `
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "GlobalInsertRecord:7:7777c884-d588-11ec-a2ad-3a00788faff5",
+            "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -614,7 +614,7 @@ export default function ListTahunAkademik() {
         const akademikInsert = `${data.tahun_akademik} / ${parseInt(data.tahun_akademik) + 1} `
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -644,6 +644,7 @@ export default function ListTahunAkademik() {
         }, {
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
         }).then(function (response) {
             const valueRes = response.data.variables[2].value
@@ -681,7 +682,7 @@ export default function ListTahunAkademik() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -696,6 +697,7 @@ export default function ListTahunAkademik() {
                 }, {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
                 }
                 ).then(function (response) {
@@ -724,7 +726,7 @@ export default function ListTahunAkademik() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                    "processDefinitionId": "academicyearchange:1:2c451389-0cbd-11ed-ac5e-66fc627bf211",
+                    "processDefinitionId": "academicyearchange:1:30bf0553-2cd3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -739,6 +741,7 @@ export default function ListTahunAkademik() {
                 }, {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
                 }
                 ).then(function (response) {

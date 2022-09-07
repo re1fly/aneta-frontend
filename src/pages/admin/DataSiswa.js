@@ -82,7 +82,7 @@ function DataSiswaAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -187,11 +187,13 @@ function DataSiswaAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                    },
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    }
                 }
             )
             .then(function (response) {
                 const siswa = JSON.parse(response.data.variables[3].value);
+                console.log(siswa.data.data);
                 setGetSiswa(siswa.data.data);
 
                 const pagination = siswa.data.links;
@@ -199,7 +201,7 @@ function DataSiswaAdmin() {
             });
 
         axios.post(BASE_URL, {
-                "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
+                "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
                 "returnVariables": true,
                 "variables": [
                     {
@@ -241,6 +243,7 @@ function DataSiswaAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -253,7 +256,7 @@ function DataSiswaAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -261,7 +264,7 @@ function DataSiswaAdmin() {
                             "type": "json",
                             "value": {
                                 "tbl_induk": "x_academic_class",
-                                "select" : [
+                                "select": [
                                     "x_academic_class.id",
                                     "r_class_type.class_type as class",
                                     "x_academic_class.sub_class"
@@ -281,7 +284,7 @@ function DataSiswaAdmin() {
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
                                         "operator": "="
-                                    },{
+                                    }, {
                                         "tbl_coloumn": "x_academic_class",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
@@ -304,6 +307,7 @@ function DataSiswaAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -437,7 +441,7 @@ function DataSiswaAdmin() {
 
     const _onSearch = (value) => {
         const processDef =
-            "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df";
+            "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589";
         const variableSearch = {
             "name": "global_join_where_sub",
             "type": "json",
@@ -853,25 +857,25 @@ function DataSiswaAdmin() {
                                 academicNow={academic}
                                 id="filter_academic_data_siswa"
                                 getYear={(e) => {
-                                const {  options, selectedIndex } = e.target;
-                                const year =(options[selectedIndex].text)
-                                setAcademic(e.target.value)
-                                notification.info({
-                                    message: "Tahun Akademik",
-                                    description: 'Memilih Data Akademik tahun ' + year,
-                                    placement: 'top'
-                                })
-                            }}
-                                            selectYear={academicYears.map((data) => {
-                                                    return (
-                                                        <>
-                                                            <option value={data.id_academic}>
-                                                                {data.academic_year} Semester {data.semester}
-                                                            </option>
-                                                        </>
-                                                    )
-                                                }
-                                            )}/>
+                                    const {options, selectedIndex} = e.target;
+                                    const year = (options[selectedIndex].text)
+                                    setAcademic(e.target.value)
+                                    notification.info({
+                                        message: "Tahun Akademik",
+                                        description: 'Memilih Data Akademik tahun ' + year,
+                                        placement: 'top'
+                                    })
+                                }}
+                                selectYear={academicYears.map((data) => {
+                                        return (
+                                            <>
+                                                <option value={data.id_academic}>
+                                                    {data.academic_year} Semester {data.semester}
+                                                </option>
+                                            </>
+                                        )
+                                    }
+                                )}/>
                             {/* <Dropdown overlay={_filterMenu}>
                                 <a className="ant-dropdown-link mr-4 font-bold"
                                    onClick={e => e.preventDefault()}>
@@ -956,15 +960,15 @@ function DataSiswaAdmin() {
         console.log(data)
         axios
             .post(
-                BASE_URL,{
-                    "processDefinitionId": "createsiswa:7:563dcf0d-2910-11ed-9ea6-c6ec5d98c2df",
+                BASE_URL, {
+                    "processDefinitionId": "createsiswa:2:48922d77-2d01-11ed-9f7a-3e427f6ada72",
                     "returnVariables": true,
                     "variables": [
                         {
                             "name": "siswa",
                             "type": "json",
                             "value": {
-                                "status_siswa" : 1,
+                                "status_siswa": 1,
                                 "institute_id": institute,
                                 "image_siswa": data.image_siswa,
                                 "image_type_siswa": "jpg",
@@ -1058,6 +1062,7 @@ function DataSiswaAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -1066,14 +1071,14 @@ function DataSiswaAdmin() {
                 const res = JSON.parse(response.data.variables[2].value)
                 const messageError = res.errors
                 console.log('error', messageError)
-                if(res.code == 200){
+                if (res.status == 200) {
                     setIsViewSiswa(true);
                     notification.success({
                         message: "Sukses",
                         description: "Siswa berhasil ditambahkan.",
                         placement: "top",
                     });
-                }else if(res.code == 422){
+                } else if (res.code == 422) {
                     setErrorMessage(messageError)
                     errorMessage.map(text => {
                         notification.error({
@@ -1096,7 +1101,7 @@ function DataSiswaAdmin() {
             if (el.name !== "") data[el.name] = el.value;
         }
         axios.post(BASE_URL, {
-                "processDefinitionId": "updatesiswa:5:d14ae5af-ec53-11ec-a658-66fc627bf211",
+                "processDefinitionId": "updatesiswa:1:b13e4f20-2cca-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1180,6 +1185,7 @@ function DataSiswaAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -1217,7 +1223,7 @@ function DataSiswaAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                         "returnVariables": true,
                         "variables": [
                             {
@@ -1234,8 +1240,9 @@ function DataSiswaAdmin() {
                         ]
                     }, {
                         headers: {
-                            "Content-Type": "application/json",
-                        }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                     }
                 ).then(function (response) {
                     setRefreshState(true);

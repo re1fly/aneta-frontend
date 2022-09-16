@@ -13493,7 +13493,7 @@ strong,
   .main-content .middle-sidebar-header {
     padding: 10px 15px 10px 15px;
     height: auto;
-    position: fixed;
+    /* position: fixed; */
     top: env(safe-area-inset-top);
     left: 0;
     right: 0;

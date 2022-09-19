@@ -14,6 +14,17 @@ function Login() {
 
     const _handleLogin = (e) => {
         e.preventDefault()
+        axios.post('https://ikhlas-travel.site/ikhlas/wp-login.php', {
+            "log": email,
+            "pwd": password
+        },
+        {
+            "Access-Control-Allow-Origin" : "*"
+        }).then(
+        res => {
+            console.log('response login wp: ',res)
+        }
+    ).catch(err => console.log(err))
         axios.post(BASE_URL, {
             "processDefinitionId": "login:1:75aee969-2cc5-11ed-aacc-9a44706f3589",
             "returnVariables": true,

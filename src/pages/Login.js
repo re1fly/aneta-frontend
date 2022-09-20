@@ -14,7 +14,7 @@ function Login() {
 
     const _handleLogin = (e) => {
         e.preventDefault()
-        axios.post('https://ikhlas-travel.site/ikhlas/wp-login.php', {
+        axios.post('https://lms.aneta.id/wp-login.php', {
             "log": email,
             "pwd": password
         },

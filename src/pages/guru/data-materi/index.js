@@ -28,20 +28,18 @@ import {
     VideoCameraOutlined
 } from "@ant-design/icons";
 
+import { NavLink } from 'react-router-dom';
+
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
-import Filter from '../../../components/Filter';
-
 
 function GuruDataMateri() {
     const [grid, setGrid] = useState(false);
     const [isViewMateri, setIsViewMateri] = useState(true);
-
-    const { Option } = Select;
 
     const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
@@ -50,22 +48,6 @@ function GuruDataMateri() {
     const handleChange = (value) => {
         console.log(`selected ${value}`);
     };
-
-    const _filterMenu = (
-        <Menu onClick={_onSelectMenu}>
-            <Menu.Item key="1">1st filter</Menu.Item>
-            <Menu.Item key="2">2nd filter</Menu.Item>
-            <Menu.Item key="3">3rd filter</Menu.Item>
-        </Menu>
-    );
-
-    const _sortMenu = (
-        <Menu onClick={_onSelectMenu}>
-            <Menu.Item key="1">1st sort</Menu.Item>
-            <Menu.Item key="2">2nd sort</Menu.Item>
-            <Menu.Item key="3">3rd sort</Menu.Item>
-        </Menu>
-    );
 
     const columns = [
         {
@@ -77,11 +59,6 @@ function GuruDataMateri() {
         {
             title: 'Nama Materi',
             dataIndex: 'namaMateri',
-            // specify the condition of filtering result
-            // here is that finding the name started with `value`
-            // onFilter: (value, record) => record.namaMateri.indexOf(value) === 0,
-            // sorter: (a, b) => a.namaMateri.length - b.namaMateri.length,
-            // sortDirections: ['descend'],
         },
         {
             title: 'Tingkat Kelas',
@@ -190,7 +167,6 @@ function GuruDataMateri() {
                                 onClick={() => setIsViewMateri(false)}>
                                 Tambah Data
                             </Button>
-                            {/* <Filter title1="Nama Materi" title2="KI/KD" /> */}
                             {/* <Dropdown overlay={_filterMenu}>
                                         <a className="ant-dropdown-link mr-4 font-bold"
                                            onClick={e => e.preventDefault()}>
@@ -290,6 +266,7 @@ function GuruDataMateri() {
                 console.log('Dropped files', e.dataTransfer.files);
             },
         };
+
         return (
             <div className="container px-3 py-4">
                 <div className="row">
@@ -365,18 +342,32 @@ function GuruDataMateri() {
                                                         <option value="" selected disabled>
                                                             Pilih Materi
                                                         </option>
-                                                        {/* {getGuru.map((data, i) => {
-                                                            return (
-                                                                <option value={data.id_guru} selected key={i}>
-                                                                    {data.name}
-                                                                </option>
-                                                            )
-                                                        })} */}
+
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div className="col-lg-6 mb-3">
+                                                <div className="mt-4">
+                                                    <NavLink
+                                                        activeClassName="active"
+                                                        to="/guru-create-materi"
+                                                        data-tab="archived"
+                                                        className="nav-content-bttn open-font"
+                                                    >
+                                                        <button
+                                                            onClick=""
+                                                            className="bg-tumbler border-0 text-center text-black font-xsss fw-600 p-3 w-100 rounded-lg d-inline-block"
+                                                            type=""
+                                                        >
+                                                            Create Materi
+                                                        </button>
+                                                    </NavLink>
+
+                                                </div>
+                                            </div>
+
+                                            {/* <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Jenis Materi
@@ -398,11 +389,11 @@ function GuruDataMateri() {
                                                         </option>
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
 
                                         <div className="row">
-                                            <div className="col-lg-12 mb-3">
+                                            {/* <div className="col-lg-12 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Sumber Video
@@ -416,6 +407,21 @@ function GuruDataMateri() {
                                                             Max. file size 50MB
                                                         </p>
                                                     </Dragger>
+                                                </div>
+                                            </div> */}
+
+                                            <div className="col-lg-12 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Embed Materi
+                                                    </label>
+                                                    <textarea
+                                                        className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                        rows="3"
+                                                        placeholder=""
+                                                        name="keterangan"
+                                                        required
+                                                    ></textarea>
                                                 </div>
                                             </div>
 
@@ -435,7 +441,7 @@ function GuruDataMateri() {
                                             </div>
                                         </div>
 
-                                        <div className="row">
+                                        {/* <div className="row">
                                             <div className="col-lg-12 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
@@ -446,6 +452,13 @@ function GuruDataMateri() {
                                                         data=""
                                                         row="20px"
                                                         as="textarea"
+                                                        config={
+                                                            {
+                                                                ckfinder:{
+                                                                    uploadUrl:" https://3ab2-125-164-17-135.ap.ngrok.io/image-upload"
+                                                                }
+                                                            }
+                                                        }
                                                         onReady={(editor) => {
                                                         }}
                                                         onChange={(event, editor) => {
@@ -461,15 +474,15 @@ function GuruDataMateri() {
                                                     />
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
-                                        <div className="row">
+                                        {/* <div className="row">
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
                                                     <label className="mont-font fw-600 font-xsss">
                                                         Kompetensi
                                                     </label>
-                                                    {/* <select
+                                                    <select
                                                         className="form-control"
                                                         aria-label="Default select example"
                                                         name="kompetensi"
@@ -478,7 +491,7 @@ function GuruDataMateri() {
                                                         <option value="" selected disabled>
                                                             Pilih Kompetensi
                                                         </option>
-                                                    </select> */}
+                                                    </select> 
                                                     <Select
                                                         // className="form-control"
                                                         mode="multiple"
@@ -507,7 +520,7 @@ function GuruDataMateri() {
                                                     </Select>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         <div className="row">
                                             <div className="col-lg-12">

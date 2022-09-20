@@ -33,7 +33,7 @@ function DataIntervalPredikat() {
 
     const getDataInterval = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "c6097444-fb4b-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "dedcd8f3-2d8c-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -53,6 +53,7 @@ function DataIntervalPredikat() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -69,7 +70,7 @@ function DataIntervalPredikat() {
     }
     const sinkronisasiData = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "8f1df157-fce4-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "819397e7-2d8f-11ed-9f7a-3e427f6ada72",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -83,6 +84,7 @@ function DataIntervalPredikat() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -136,8 +138,9 @@ function DataIntervalPredikat() {
                         ]
                     }, {
                         headers: {
-                            "Content-Type": "application/json",
-                        }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                     }
                 ).then(function (response) {
                     const res = JSON.parse(response.data.variables[2].value)
@@ -165,6 +168,83 @@ function DataIntervalPredikat() {
         })
 
     }
+    const editInterval = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+
+        axios.post(BASE_URL, {
+                "processDefinitionId": "e2e8ced4-2d8d-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "id_matpel": selectedData.id,
+                            "konten": [
+                                {
+                                    "min": data.nilai_a_min,
+                                    "max": data.nilai_a_max,
+                                    "predikat": "A",
+                                    "id_predikat": 1
+                                },
+                                {
+                                    "min": data.nilai_b_min,
+                                    "max": data.nilai_b_max,
+                                    "predikat": "B",
+                                    "id_predikat": 2
+                                },
+                                {
+                                    "min": data.nilai_c_min,
+                                    "max": data.nilai_c_max,
+                                    "predikat": "C",
+                                    "id_predikat": 3
+                                },
+                                {
+                                    "min": data.nilai_d_min,
+                                    "max": data.nilai_d_max,
+                                    "predikat": "D",
+                                    "id_predikat": 4
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const res = JSON.parse(response.data.variables[2].value)
+            const resCode = res.code
+
+            if (resCode === true) {
+                setIsViewEdit(false);
+                getDataInterval()
+                notification.success({
+                    message: "Sukses",
+                    description: res.message,
+                    placement: 'top',
+                    className: 'text-capitalize'
+                })
+            } else {
+                notification.error({
+                    message: "Gagal",
+                    description: res.message,
+                    placement: 'top',
+                    className: 'text-capitalize'
+                })
+            }
+        }).catch(error => {
+            alert(error)
+        });
+
+    };
 
 
     useEffect(() => {
@@ -530,82 +610,7 @@ function DataIntervalPredikat() {
         )
     }
 
-    const editInterval = (e) => {
-        e.preventDefault();
-        const data = {};
-        for (const el of e.target.elements) {
-            if (el.name !== "") data[el.name] = el.value;
-        }
 
-        axios.post(BASE_URL, {
-                "processDefinitionId": "4381de04-fce4-11ec-ac5e-66fc627bf211",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "get_data",
-                        "type": "json",
-                        "value": {
-                            "id_matpel": selectedData.id,
-                            "konten": [
-                                {
-                                    "min": data.nilai_a_min,
-                                    "max": data.nilai_a_max,
-                                    "predikat": "A",
-                                    "id_predikat": 1
-                                },
-                                {
-                                    "min": data.nilai_b_min,
-                                    "max": data.nilai_b_max,
-                                    "predikat": "B",
-                                    "id_predikat": 2
-                                },
-                                {
-                                    "min": data.nilai_c_min,
-                                    "max": data.nilai_c_max,
-                                    "predikat": "C",
-                                    "id_predikat": 3
-                                },
-                                {
-                                    "min": data.nilai_d_min,
-                                    "max": data.nilai_d_max,
-                                    "predikat": "D",
-                                    "id_predikat": 4
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            }
-        ).then(function (response) {
-            const res = JSON.parse(response.data.variables[2].value)
-            const resCode = res.code
-
-            if (resCode === true) {
-                setIsViewEdit(false);
-                getDataInterval()
-                notification.success({
-                    message: "Sukses",
-                    description: res.message,
-                    placement: 'top',
-                    className: 'text-capitalize'
-                })
-            } else {
-                notification.error({
-                    message: "Gagal",
-                    description: res.message,
-                    placement: 'top',
-                    className: 'text-capitalize'
-                })
-            }
-        }).catch(error => {
-            alert(error)
-        });
-
-    };
 
     return (
         <Fragment>

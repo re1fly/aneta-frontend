@@ -18,7 +18,6 @@ function InputDataDeskripsiSikap() {
     const [getKelas, setGetKelas] = useState([]);
     const [selectClass, setSelectClass] = useState([]);
     const [deskripsiSikap, setDeskripsiSikap] = useState([])
-    console.log(deskripsiSikap.length);
     // console.log(JSON.stringify(deskripsiSikap, null, 2));
     const [refreshState, setRefreshState] = useState(false);
 
@@ -32,15 +31,9 @@ function InputDataDeskripsiSikap() {
     }, [])
 
     useEffect(() => {
-        if (ProcessId.length != 0) {
-            setRefreshState(false)
-
-            getKeyGlobalJoin = ProcessId.find(item => item.key === "globaljoinsubwhereget");
-            getKeyGlobalJoin = getKeyGlobalJoin?.proses_def_id
-
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": getKeyGlobalJoin,
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -48,60 +41,35 @@ function InputDataDeskripsiSikap() {
                             "type": "json",
                             "value": {
                                 "tbl_induk": "x_academic_class",
-                                "select": ["x_academic_class.id as id_class",
-                                    "x_academic_class.class",
-                                    "x_academic_class.sub_class",
-                                    "x_academic_class.class_location",
-                                    "x_academic_year.academic_year",
-                                    "x_academic_year.id as id_academic",
-                                    "users.name",
-                                    "x_academic_teachers.id as id_walikelas",
-                                    "users.institute_id"
+                                "select": [
+                                    "x_academic_class.id",
+                                    "r_class_type.class_type as class",
+                                    "x_academic_class.sub_class"
                                 ],
-                                "paginate": 1000,
+                                "paginate": false,
                                 "join": [
                                     {
-                                        "tbl_join": "x_academic_teachers",
+                                        "tbl_join": "r_class_type",
                                         "refkey": "id",
                                         "tbl_join2": "x_academic_class",
-                                        "foregenkey": "calss_advisor_id"
-
-                                    }, {
-                                        "tbl_join": "users",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_teachers",
-                                        "foregenkey": "user_id"
-                                    }, {
-                                        "tbl_join": "x_academic_year",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "academic_year_id"
+                                        "foregenkey": "class"
                                     }
                                 ],
                                 "where": [
                                     {
-                                        "tbl_coloumn": "users",
-                                        "tbl_field": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "="
-                                    },
-                                    {
                                         "tbl_coloumn": "x_academic_class",
                                         "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
+                                        "operator": "="
+                                    }, {
                                         "tbl_coloumn": "x_academic_class",
                                         "tbl_field": "deleted_at",
                                         "tbl_value": "",
-                                        "operator": "=",
-                                        "kondisi": "where"
+                                        "operator": "="
                                     }
                                 ],
-                                "order_coloumn": "x_academic_class.updated_at",
-                                "order_by": "desc"
+                                "order_coloumn": "x_academic_class.id",
+                                "order_by": "asc"
                             }
                         },
                         {
@@ -113,19 +81,19 @@ function InputDataDeskripsiSikap() {
                 }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
             ).then(function (response) {
                 const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-                setGetKelas(dataRes?.data?.data);
+                setGetKelas(dataRes?.data);
             })
-        }
-    }, [ProcessId, refreshState, academic])
+    }, [academic])
 
     const _getDataDeskripsiSikap = () => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "inputdeskripsisikapraport:1:6e4117f6-2cd1-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -169,7 +137,7 @@ function InputDataDeskripsiSikap() {
     // useEffect(() => {
     //     axios.post(BASE_URL,
     //         {
-    //             "processDefinitionId": "inputdeskripsisikapraport:1:2a35f330-146e-11ed-ac5e-66fc627bf211",
+    //             "processDefinitionId": "inputdeskripsisikapraport:1:6e4117f6-2cd1-11ed-aacc-9a44706f3589",
     //             "returnVariables": true,
     //             "variables": [
     //                 {
@@ -276,7 +244,7 @@ function InputDataDeskripsiSikap() {
         axios
             .post(
                 BASE_URL, {
-                "processDefinitionId": "cb03c73a-148d-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "343656c9-2daa-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -292,8 +260,9 @@ function InputDataDeskripsiSikap() {
             },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {
@@ -345,7 +314,7 @@ function InputDataDeskripsiSikap() {
                                                 {getKelas.map((data, i) => {
                                                     return (
                                                         <>
-                                                            <option value={data.id_class}>
+                                                            <option value={data.id}>
                                                                 {`${data.class} / ${data.sub_class}`}
                                                             </option>
                                                         </>

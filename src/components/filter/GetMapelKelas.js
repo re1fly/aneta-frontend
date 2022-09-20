@@ -15,48 +15,62 @@ export const GetMapelKelas = (props) => {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_get_where",
+                            "name": "global_join_where_sub",
                             "type": "json",
                             "value": {
-                                "tbl_name": "x_academic_class",
-                                "pagination": false,
-                                "total_result": 2,
-                                "order_coloumn": "x_academic_class.class",
-                                "order_by": "asc",
-                                "data": [
+                                "tbl_induk": "x_academic_class",
+                                "select" : [
+                                    "x_academic_class.id",
+                                    "r_class_type.class_type as class",
+                                    "x_academic_class.sub_class"
+                                ],
+                                "paginate": false,
+                                "join": [
                                     {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "academic_year_id",
+                                        "tbl_join": "r_class_type",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "class"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "academic_year_id",
                                         "tbl_value": academic,
                                         "operator": "="
-                                    },
-                                    {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "deleted_at",
+                                    },{
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "deleted_at",
                                         "tbl_value": "",
                                         "operator": "="
                                     }
                                 ],
-                                "tbl_coloumn": [
-                                    "*"
-                                ]
+                                "order_coloumn": "x_academic_class.id",
+                                "order_by": "asc"
                             }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
                         }
                     ]
                 },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {
-                const dataKelas = JSON.parse(response.data.variables[2].value);
-                setDataClass(dataKelas);
+                const dataKelas = JSON.parse(response.data.variables[3].value);
+                setDataClass(dataKelas.data);
             })
     }
     const _getDataMapel = () => {
@@ -64,7 +78,7 @@ export const GetMapelKelas = (props) => {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -73,7 +87,7 @@ export const GetMapelKelas = (props) => {
                             "value": {
                                 "tbl_induk": "x_academic_subject_master",
                                 "select" : [
-                                    "x_academic_subjects.id as id_subject",
+                                    "x_academic_subjects.academic_subjects_master_id as id_subject",
                                     "x_academic_subject_master.nama_mata"
                                 ],
                                 "paginate": 1000,
@@ -109,8 +123,7 @@ export const GetMapelKelas = (props) => {
                                         "tbl_value": "",
                                         "operator": "=",
                                         "kondisi" : "where"
-                                    },
-                                    {
+                                    },{
                                         "tbl_coloumn": "x_academic_subjects",
                                         "tbl_field": "course_grade_id",
                                         "tbl_value": "",
@@ -131,8 +144,9 @@ export const GetMapelKelas = (props) => {
                 },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {

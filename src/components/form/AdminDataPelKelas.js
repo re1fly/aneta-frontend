@@ -24,17 +24,19 @@ export const FormAdminDataPelKelas = (props) => {
                                     method="POST"
                                 >
                                     <div className="row">
-                                        <div className="col-lg-6 mb-3">
+                                        <div className="col-lg-3 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Kelas / Sub Kelas
+                                                   Tingkat Kelas
                                                 </label>
                                                 <select
                                                     className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kelas_sub"
+                                                    name="tingkat_kelas"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    id="subClass_datapelajaran"
+                                                    disabled={props.isDisableForm}
+                                                    onChange={props.onChangeTingkatKelas}
+                                                    value={props.selectedTingkatKelas}
                                                 >
                                                     <option value={props.idKelas} selected disabled hidden>
                                                         {props.namaKelas}
@@ -43,6 +45,27 @@ export const FormAdminDataPelKelas = (props) => {
                                                 </select>
                                             </div>
                                         </div>
+
+                                            <div className="col-lg-3 mb-3">
+                                                <div className="form-group">
+                                                    <label className="mont-font fw-600 font-xsss">
+                                                        Sub Kelas
+                                                    </label>
+                                                    <select
+                                                        className="form-control"
+                                                        aria-label="Default select example"
+                                                        name="sub_kelas"
+                                                        required
+                                                        disabled={props.isDisableForm}
+                                                    >
+                                                        <option value={props.idSubKelas} selected disabled hidden>
+                                                            {props.namaSubKelas}
+                                                        </option>
+                                                        {props.selectSubKelas}
+                                                        {props.allSubClass}
+                                                    </select>
+                                                </div>
+                                            </div>
 
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
@@ -54,7 +77,7 @@ export const FormAdminDataPelKelas = (props) => {
                                                     aria-label="Default select example"
                                                     name="mata_pelajaran"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.isDisableForm}
                                                 >
                                                     <option value={props.idMapel} selected disabled hidden>
                                                         {props.namaMapel}
@@ -69,19 +92,23 @@ export const FormAdminDataPelKelas = (props) => {
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
-                                                    Tahun Akademik / Semester
+                                                    Tahun Akademik - Semester
                                                 </label>
                                                 <select
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="thn_akademik"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    // disabled={props.isDisabled}
+                                                    disabled
                                                 >
+                                                    {/*<option value={props.idThAkademik} selected disabled hidden>*/}
+                                                    {/*    {props.thAkademik} / Semester {props.semester}*/}
+                                                    {/*</option>*/}
+                                                    {/*{props.selectThAkademik}*/}
                                                     <option value={props.idThAkademik} selected disabled hidden>
-                                                        {props.thAkademik} / Semester {props.semester}
+                                                        {props.selectThAkademik}
                                                     </option>
-                                                    {props.selectThAkademik}
                                                 </select>
                                             </div>
                                         </div>
@@ -94,7 +121,7 @@ export const FormAdminDataPelKelas = (props) => {
                                                 <select
                                                     className="form-control"
                                                     aria-label="Default select example"
-                                                    name="status_guru"
+                                                    name="status"
                                                     required
                                                     disabled={props.isDisabled}
                                                 >

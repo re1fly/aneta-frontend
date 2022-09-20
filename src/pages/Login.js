@@ -14,8 +14,19 @@ function Login() {
 
     const _handleLogin = (e) => {
         e.preventDefault()
+        axios.post('https://lms.aneta.id/wp-login.php', {
+            "log": email,
+            "pwd": password
+        },
+        {
+            "Access-Control-Allow-Origin" : "*"
+        }).then(
+        res => {
+            console.log('response login wp: ',res)
+        }
+    ).catch(err => console.log(err))
         axios.post(BASE_URL, {
-            "processDefinitionId": "login:2:15730599-becf-11ec-8be5-8a5605738a79",
+            "processDefinitionId": "login:1:75aee969-2cc5-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -30,8 +41,8 @@ function Login() {
         }, {
             headers: {
                 // 'X-API-Key' : 'e59ec059-5c65-48bf-847c-43c94d874f49',
-                'Authorization': 'Basic YWRtaW46TWFuYWczciE=',
-                'Content-Type': 'application/json',
+                "Authorization": "Basic YWRtaW46TWFuYWczciE=",
+                "Content-Type": "application/json",
             },
         }).then(res => {
             const getData = res.data.variables[3].value

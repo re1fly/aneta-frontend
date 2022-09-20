@@ -22,7 +22,7 @@ import {
     MenuOutlined,
     EditOutlined,
     DeleteOutlined,
-    EllipsisOutlined
+    EllipsisOutlined, RollbackOutlined
 } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
 
@@ -52,6 +52,7 @@ export default function KompetensiAdmin() {
     const [getKelas, setGetKelas] = useState([]);
     const [getkompetensiInsert, setGetKompetensiInsert] = useState([]); // => Harus nya kompetensi (4)
     const [selectedClass, setSelectedClass] = useState(null)
+    const [selectedMapel, setSelectedMapel] = useState(null)
     const [dataMapel, setDataMapel] = useState(null);
 
     const _getDataKelas = () => {
@@ -59,29 +60,23 @@ export default function KompetensiAdmin() {
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
                             "name": "global_get_where",
                             "type": "json",
                             "value": {
-                                "tbl_name": "x_academic_class",
+                                "tbl_name": "r_class_type",
                                 "pagination": false,
                                 "total_result": 2,
-                                "order_coloumn": "x_academic_class.class",
+                                "order_coloumn": "r_class_type.id",
                                 "order_by": "asc",
                                 "data": [
                                     {
                                         "kondisi": "where",
-                                        "tbl_coloumn": "academic_year_id",
-                                        "tbl_value": academicYear,
-                                        "operator": "="
-                                    },
-                                    {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "deleted_at",
-                                        "tbl_value": "",
+                                        "tbl_coloumn": "institute_id",
+                                        "tbl_value": institute,
                                         "operator": "="
                                     }
                                 ],
@@ -95,6 +90,7 @@ export default function KompetensiAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
@@ -103,170 +99,56 @@ export default function KompetensiAdmin() {
                 setGetKelas(data);
             })
     }
-    const _getDataMapel = (e) => {
+    const _getDataMapel = () => {
         axios
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "8812bebe-2cf6-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
-                            "name": "global_join_where_sub",
+                            "name": "get_data",
                             "type": "json",
                             "value": {
-                                "tbl_induk": "x_academic_subject_master",
-                                "select": [
-                                    "x_academic_subjects.id as id_subject",
-                                    "x_academic_subject_master.nama_mata"
-                                ],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_academic_year",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_subject_master",
-                                        "foregenkey": "academic_year_id"
-                                    }, {
-                                        "tbl_join": "x_academic_subjects",
-                                        "refkey": "academic_subjects_master_id",
-                                        "tbl_join2": "x_academic_subject_master",
-                                        "foregenkey": "id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_academic_subjects",
-                                        "tbl_field": "academic_year_id",
-                                        "tbl_value": academicYear,
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_subjects",
-                                        "tbl_field": "course_grade_id",
-                                        "tbl_value": e.target.value,
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_subject_master",
-                                        "tbl_field": "deleted_at",
-                                        "tbl_value": "",
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_subjects",
-                                        "tbl_field": "course_grade_id",
-                                        "tbl_value": "",
-                                        "operator": "!=",
-                                        "kondisi": "where"
-                                    }
-                                ],
-                                "order_coloumn": "x_academic_subject_master.nama_mata",
-                                "order_by": "desc"
+                                "id_academic": academicYear,
+                                "paginate": false,
+                                "tingkat": selectedClass
                             }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
                         }
                     ]
                 },
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
             .then(function (response) {
-                const dataMapelApi = JSON.parse(response.data.variables[3].value);
-                const getMapel = dataMapelApi?.data?.data
-                setDataMapel(getMapel);
+                const dataMapelApi = JSON.parse(response.data.variables[2].value);
+                const getMapel = dataMapelApi?.data
+                if (dataMapelApi.code == true) {
+                    setDataMapel(getMapel);
+
+                } else {
+                    setDataMapel(null)
+                }
             })
     }
-    const _getKompetensi = (e) => {
+    const _getKompetensi = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getkompetensidashboard:1:519c8d2c-2d93-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_join_where_sub",
+                        "name": "get_data",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_competence",
-                            "select" : ["competence_aspect",
-                                "r_competence_aspect.id as id_aspect",
-                                "x_academic_class.class",
-                                "x_academic_class.sub_class",
-                                "x_academic_year.academic_year",
-                                "x_competence_detail.code",
-                                "competence_desc",
-                                "competance_target",
-                                "nama_mata",
-                                "x_academic_subjects.id as id_matpel",
-                                "x_competence_detail.status",
-                                "x_academic_year.semester",
-                                "x_competence_detail.id as id_detail_comp"
-                            ],
-                            "paginate": 10,
-                            "join": [
-                                {
-                                    "tbl_join": "x_competence_detail",
-                                    "refkey": "competence_id",
-                                    "tbl_join2": "x_competence",
-                                    "foregenkey": "id"
-                                },
-                                {
-                                    "tbl_join": "r_competence_aspect",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_competence_detail",
-                                    "foregenkey": "competence_aspect_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_year",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_competence",
-                                    "foregenkey": "academic_year_id"
-                                },{
-                                    "tbl_join": "x_academic_subjects",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_competence",
-                                    "foregenkey": "academic_courses_id"
-                                },{
-                                    "tbl_join": "x_academic_subject_master",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects",
-                                    "foregenkey": "academic_subjects_master_id"
-                                },{
-                                    "tbl_join": "x_academic_class",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_competence",
-                                    "foregenkey": "class"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_competence",
-                                    "tbl_field": "academic_courses_id",
-                                    "tbl_value": e.target.value,
-                                    "operator": "="
-                                },{
-                                    "tbl_coloumn": "x_competence",
-                                    "tbl_field": "academic_year_id",
-                                    "tbl_value": academicYear,
-                                    "operator": "="
-                                },{
-                                    "tbl_coloumn": "x_competence",
-                                    "tbl_field": "class",
-                                    "tbl_value": selectedClass,
-                                    "operator": "="
-                                }
-                            ],
-                            "order_coloumn": "x_competence_detail.competence_aspect_id",
-                            "order_by": "asc"
+                            "id_academic": academicYear,
+                            "id_tingkat": selectedClass,
+                            "id_matpel": selectedMapel,
+                            "pagination": 10
                         }
                     },
                     {
@@ -287,9 +169,19 @@ export default function KompetensiAdmin() {
     }, []);
 
     useEffect(() => {
-        setGetKompetensi([])
+        _getDataMapel()
     }, [selectedClass]);
 
+    useEffect(() => {
+        _getKompetensi()
+    }, [selectedMapel, setIsViewKompetensi]);
+
+    useEffect(() => {
+        setSelectedMapel(null)
+        if (selectedMapel == null) {
+            setGetKompetensi([])
+        }
+    }, [selectedClass]);
 
 
     let [count, setCount] = useState(1);
@@ -400,7 +292,7 @@ export default function KompetensiAdmin() {
                 // align: "center"
             },
             {
-                title: 'Kelas',
+                title: 'Tingkat Kelas',
                 dataIndex: 'kelas',
                 defaultSortOrder: 'descend',
                 align: "center"
@@ -472,12 +364,11 @@ export default function KompetensiAdmin() {
         ];
 
         const channelList = getKompetensi?.map((data, index) => {
-            console.log('channellist', data)
             return {
                 no: index + 1,
                 idKompetensi: data.id_detail_comp,
                 namaKompetensi: data.competence_aspect,
-                kelas: `${data.class} - ${data.sub_class}`,
+                kelas: data.class,
                 semester: `${data.academic_year} Semester ${data.semester}`,
                 kode: data.code,
                 kompetensiDasar: data.competence_desc,
@@ -663,46 +554,54 @@ export default function KompetensiAdmin() {
                                             {/*        )*/}
                                             {/*    })}*/}
                                             {/*</select>*/}
-                                            <div className="col-lg-6 mb-3">
+                                            <div className="col-lg-5 mb-3">
                                                 <div className="form-group">
                                                     <select
                                                         className="form-control"
                                                         id="id_class_comp"
                                                         name="id_class_comp"
                                                         key="id_class_comp"
-                                                        onChange={(e) => {
-                                                            _getDataMapel(e)
-                                                            setSelectedClass(e.target.value)
-                                                        }}
-                                                        value={selectedClass?.id}
+                                                        onChange={(e) => setSelectedClass(e.target.value)}
+                                                        value={selectedClass}
                                                     >
                                                         <option value="" selected disabled>
                                                             Pilih Kelas
                                                         </option>
                                                         {getKelas.map((data) => {
-                                                            return(
-                                                            <option value={data.id}>{data.class} / {data.sub_class}</option>
-                                                        )})}
+                                                            return (
+                                                                <option value={data.id}>{data.class_type}</option>
+                                                            )
+                                                        })}
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div className="col-lg-6 mb-3">
+                                            <div className="col-lg-5 mb-3">
                                                 <div className="form-group">
                                                     <select
                                                         className="form-control"
                                                         id="id_mapel_comp"
                                                         key="id_mapel_comp"
                                                         name="id_mapel_comp"
-                                                        onChange={(e) => _getKompetensi(e)}
+                                                        onChange={(e) => setSelectedMapel(e.target.value)}
+                                                        value={selectedMapel}
                                                     >
                                                         <option value="" selected disabled>
                                                             Pilih Mata Pelajaran
                                                         </option>
                                                         {dataMapel == null ? null : dataMapel?.map((data) => (
-                                                            <option value={data.id_subject}>{data.nama_mata}</option>
+                                                            <option value={data.id}>{data.nama_mata}</option>
                                                         ))}
                                                     </select>
                                                 </div>
+                                            </div>
+                                            <div className="col-lg-2 mb-3">
+                                                <Button className="mt-2" type="primary" shape="round"
+                                                        onClick={() => {
+                                                            setSelectedClass(null)
+                                                            setSelectedMapel(null)
+                                                        }}>
+                                                    Reset
+                                                </Button>
                                             </div>
                                         </div>
                                     </Card>
@@ -722,13 +621,12 @@ export default function KompetensiAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        console.log(data);
 
         axios
             .post(
                 BASE_URL,
                 {
-                    "processDefinitionId": "5177f66c-14ac-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "insertkompetensi:1:9abf6f02-2d94-11ed-9f7a-3e427f6ada72",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -753,21 +651,22 @@ export default function KompetensiAdmin() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
             .then(function (response) {
                 const resData = JSON.parse(response.data.variables[2].value);
 
-                console.log(response)
-                if(resData.code == true){
+                if (resData.code == true) {
+                    _getKompetensi()
                     setIsViewKompetensi(true)
                     notification.success({
                         message: "Sukses",
                         description: "Kompetensi berhasil ditambahkan.",
                         placement: "top",
                     });
-                }else {
+                } else {
                     notification.error({
                         message: "Error",
                         description: "Kompetensi gagal ditambahkan.",
@@ -784,7 +683,6 @@ export default function KompetensiAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        console.log(data)
 
     }
 
@@ -801,23 +699,24 @@ export default function KompetensiAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_delete",
-                            "type": "json",
-                            "value": {
-                                "tbl_name": "x_competence_detail",
-                                "id": record.idKompetensi
+                        "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
+                        "returnVariables": true,
+                        "variables": [
+                            {
+                                "name": "global_delete",
+                                "type": "json",
+                                "value": {
+                                    "tbl_name": "x_competence_detail",
+                                    "id": record.idKompetensi
+                                }
                             }
+                        ]
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
                         }
-                    ]
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
                     }
-                }
                 ).then(function (response) {
                     Swal.fire(
                         'Data telah terhapus!',

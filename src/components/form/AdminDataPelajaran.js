@@ -80,6 +80,19 @@ export const FormAdminPelajaran = (props) => {
                                         </div>
                                     </div>
 
+                                    <div className="">
+                                        <div className="">
+                                            <input
+                                                type="hidden"
+                                                name='nama_pelajaranhidden'
+                                                className="form-control"
+                                                defaultValue={props.namaPelajaran}
+                                                required
+                                                disabled={props.isDisabled}
+                                            />
+                                        </div>
+                                    </div>
+
                                     <div className="row">
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">

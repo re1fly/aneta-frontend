@@ -11,7 +11,7 @@ import {
     Space,
     Menu,
     Dropdown,
-    message, notification,
+    message, notification, Tag,
 } from "antd";
 import {
     AppstoreOutlined,
@@ -51,8 +51,12 @@ function DataPelajaranKelas() {
     const defaultAcademic = localStorage.getItem('academic_year');
     const [academic, setAcademic] = useState(defaultAcademic);
     const [year, setYear] = useState(localStorage.getItem('year'));
+    const semester = localStorage.getItem('semester')
     const [academicYears, setAcademicYears] = useState([]);
     const [selectedClass, setSelectedClass] = useState("");
+    const [tingkatKelas, setTingkatKelas] = useState([]);
+    const [selectedTingkatKelas, setSelectedTingkatKelas] = useState(null);
+    const [subClass, setSubClass] = useState([]);
 
     const dispatch = useDispatch();
     const searchRedux = useSelector((state) => state.search);
@@ -61,7 +65,7 @@ function DataPelajaranKelas() {
     const _getDataPelajaran = () => {
         const allClass = selectedClass === "" ? "!=" : "=";
         axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -75,12 +79,12 @@ function DataPelajaranKelas() {
                                 "x_academic_subject_master.id as id_subjects_master",
                                 "x_academic_subject_master.nama_mata",
                                 "x_academic_subject_master.code",
-                                "x_academic_class.class",
+                                "r_class_type.class_type as tingkat_kelas",
+                                "x_academic_class.sub_class",
                                 "x_academic_class.id as id_class",
                                 "x_academic_year.academic_year",
                                 "x_academic_year.id as id_academic",
-                                "x_academic_year.semester",
-                                "x_academic_class.sub_class"
+                                "x_academic_year.semester"
                             ],
                             "paginate": 10,
                             "join": [
@@ -101,6 +105,12 @@ function DataPelajaranKelas() {
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_subjects",
                                     "foregenkey": "academic_subjects_master_id"
+                                },
+                                {
+                                    "tbl_join": "r_class_type",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_subject_master",
+                                    "foregenkey": "tingkat"
                                 }
                             ],
                             "where": [
@@ -136,6 +146,7 @@ function DataPelajaranKelas() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -150,7 +161,7 @@ function DataPelajaranKelas() {
 
     const _getAcademicYears = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
+                "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
                 "returnVariables": true,
                 "variables": [
                     {
@@ -192,6 +203,7 @@ function DataPelajaranKelas() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -201,61 +213,67 @@ function DataPelajaranKelas() {
     }
 
     const _selectKelas = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "global_join_where_sub",
-                        "type": "json",
-                        "value": {
-                            "tbl_induk": "x_academic_class",
-                            "select": ["x_academic_class.id as id_class",
-                                "x_academic_class.class",
-                                "x_academic_class.sub_class"
-                            ],
-                            "paginate": 100000,
-                            "join": [
-                                {
-                                    "tbl_join": "x_academic_year",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_class",
-                                    "foregenkey": "academic_year_id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_academic_year",
-                                    "tbl_field": "institute_id",
-                                    "tbl_value": institute,
-                                    "operator": "=",
-                                    "kondisi": "where"
-                                }, {
-                                    "tbl_coloumn": "x_academic_class",
-                                    "tbl_field": "deleted_at",
-                                    "tbl_value": "",
-                                    "operator": "=",
-                                    "kondisi": "where"
-                                }
-                            ],
-                            "order_coloumn": "x_academic_class.updated_at",
-                            "order_by": "desc"
+        axios
+            .post(
+                BASE_URL,
+                {
+                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_class",
+                                "select": [
+                                    "x_academic_class.id",
+                                    "r_class_type.class_type as class",
+                                    "x_academic_class.sub_class"
+                                ],
+                                "paginate": false,
+                                "join": [
+                                    {
+                                        "tbl_join": "r_class_type",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_class",
+                                        "foregenkey": "class"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "academic_year_id",
+                                        "tbl_value": academic,
+                                        "operator": "="
+                                    }, {
+                                        "tbl_coloumn": "x_academic_class",
+                                        "tbl_field": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "="
+                                    }
+                                ],
+                                "order_coloumn": "x_academic_class.id",
+                                "order_by": "asc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
                         }
-                    },
-                    {
-                        "name": "page",
-                        "type": "string",
-                        "value": "1"
-                    }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
+                    ]
                 }
-            }
-        ).then(function (response) {
+
+                ,
+                {
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
+                }
+            ).then(function (response) {
             const resData = JSON.parse(response.data.variables[3].value)
-            const dataKelas = resData.data.data;
+            const dataKelas = resData.data;
 
             setDataKelas(dataKelas)
 
@@ -264,43 +282,15 @@ function DataPelajaranKelas() {
 
     const _selectMapel = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getdatamatapelajaran:2:51e2a256-2d89-11ed-9f7a-3e427f6ada72",
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_join_where_sub",
+                        "name": "get_data",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_academic_subject_master",
-                            "select": ["x_academic_subject_master.id as id_subject_master",
-                                "x_academic_subject_master.nama_mata"
-                            ],
-                            "paginate": 1000,
-                            "join": [
-                                {
-                                    "tbl_join": "x_academic_year",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subject_master",
-                                    "foregenkey": "academic_year_id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_academic_year",
-                                    "tbl_field": "institute_id",
-                                    "tbl_value": institute,
-                                    "operator": "=",
-                                    "kondisi": "where"
-                                }, {
-                                    "tbl_coloumn": "x_academic_subject_master",
-                                    "tbl_field": "deleted_at",
-                                    "tbl_value": "",
-                                    "operator": "=",
-                                    "kondisi": "where"
-                                }
-                            ],
-                            "order_coloumn": "x_academic_subject_master.nama_mata",
-                            "order_by": "desc"
+                            "id_academic": academic,
+                            "paginate": false
                         }
                     },
                     {
@@ -312,11 +302,13 @@ function DataPelajaranKelas() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[3].value)
-            const dataMapel = resData.data.data;
+            const dataMapel = resData.data;
+            console.log(resData)
 
             setDataMapel(dataMapel)
 
@@ -325,7 +317,7 @@ function DataPelajaranKelas() {
 
     const _selectTahunAkademik = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -361,6 +353,7 @@ function DataPelajaranKelas() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -370,16 +363,121 @@ function DataPelajaranKelas() {
         })
     }
 
+    const _selectTingkatKelas = () => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_get_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "r_class_type",
+                            "pagination": false,
+                            "total_result": 2,
+                            "order_coloumn": "r_class_type.id",
+                            "order_by": "asc",
+                            "data": [
+                                {
+                                    "kondisi": "where",
+                                    "tbl_coloumn": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ],
+                            "tbl_coloumn": [
+                                "*"
+                            ]
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const resTingkatKelas = JSON.parse(response.data.variables[2].value);
+            setTingkatKelas(resTingkatKelas)
+        })
+    }
+
+    const _getSubClass = () => {
+        axios.post(BASE_URL, {
+                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where_sub",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_class",
+                            "select" : ["x_academic_class.id as id_kelas",
+                                "x_academic_class.sub_class"
+                            ],
+                            "paginate": false,
+                            "join": [
+                                {
+                                    "tbl_join": "r_class_type",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_class",
+                                    "foregenkey": "class"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "="
+                                },{
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "academic_year_id",
+                                    "tbl_value": academic,
+                                    "operator": "="
+                                },{
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "class",
+                                    "tbl_value": selectedTingkatKelas,
+                                    "operator": "="
+                                }
+                            ],
+                            "order_coloumn": "x_academic_class.id",
+                            "order_by": "asc"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data?.variables[3]?.value);
+            setSubClass(resData.data)
+        })
+    }
+
+    useEffect(() => {
+        _getAcademicYears()
+    }, []);
+
     useEffect(() => {
         _getDataPelajaran()
-        _getAcademicYears()
         _selectKelas()
+        _selectTingkatKelas()
     }, [paramsPage, academic, selectedClass, isViewDataPelajaranKelas])
 
     useEffect(() => {
         _selectMapel()
         _selectTahunAkademik()
-        console.log(dataTahunAkademik)
     }, [!isViewDataPelajaranKelas])
 
     useEffect(() => {
@@ -388,6 +486,11 @@ function DataPelajaranKelas() {
             setBtnPagination(DataSearch?.data?.links);
         }
     }, [DataSearch]);
+
+    useEffect(() => {
+        _getSubClass()
+    }, [selectedTingkatKelas]);
+
 
     const _onSelectMenu = ({key}) => {
         message.info(`Click on item ${key}`);
@@ -401,7 +504,7 @@ function DataPelajaranKelas() {
     );
 
     const _onSearch = (value) => {
-        const processDef = "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df";
+        const processDef = "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589";
         const variableSearch = {
             "name": "global_join_where_sub",
             "type": "json",
@@ -418,7 +521,9 @@ function DataPelajaranKelas() {
                     "x_academic_class.id as id_class",
                     "x_academic_year.academic_year",
                     "x_academic_year.id as id_academic",
-                    "x_academic_year.semester"
+                    "x_academic_year.semester",
+                    "x_academic_class.sub_class",
+                    "r_class_type.class_type as tingkat_kelas"
                 ],
                 "join": [
                     {
@@ -438,6 +543,12 @@ function DataPelajaranKelas() {
                         "refkey": "id",
                         "tbl_join2": "x_academic_subjects",
                         "foregenkey": "academic_subjects_master_id"
+                    },
+                    {
+                        "tbl_join": "r_class_type",
+                        "refkey": "id",
+                        "tbl_join2": "x_academic_class",
+                        "foregenkey": "class"
                     }
                 ],
                 "kondisi": [
@@ -499,7 +610,6 @@ function DataPelajaranKelas() {
 
     const data =
         dataPelajaran.map((data, index) => {
-            console.log(data)
             return {
                 no: index + 1,
                 id: data.id_subjects,
@@ -507,7 +617,7 @@ function DataPelajaranKelas() {
                 mataPelajaran: data.nama_mata,
                 kode: data.code,
                 idKelas: data.id_class,
-                kelas: data.class,
+                kelas: data.tingkat_kelas,
                 subKelas: data.sub_class,
                 idTahunAkademik: data.id_academic,
                 tahunAkademik: data.academic_year,
@@ -523,7 +633,7 @@ function DataPelajaranKelas() {
                 dataIndex: "no",
             },
             {
-                title: "Kelas",
+                title: "Tingkat Kelas",
                 dataIndex: "kelas",
                 align: "center",
             },
@@ -550,6 +660,18 @@ function DataPelajaranKelas() {
                 title: "Semester",
                 dataIndex: "semester",
                 align: "center",
+            },
+            {
+                title: "Status",
+                dataIndex: "status",
+                align: "center",
+                render: (status) => (
+                    <>
+                        <Tag style={{borderRadius: "15px"}} color={status ? "green" : "red"} key={status}>
+                            {status ? "Aktif" : "Nonaktif"}
+                        </Tag>
+                    </>
+                ),
             },
             {
                 title: "Aksi",
@@ -612,7 +734,7 @@ function DataPelajaranKelas() {
                 imageUrl: "user.png",
                 title: data.nama_mata,
                 tag3: data.code,
-                kelas: data.class,
+                kelas: data.tingkat_kelas,
                 tahunAkademik: data.academic_year,
                 semester: data.semester,
                 status: data.aktiv
@@ -826,6 +948,7 @@ function DataPelajaranKelas() {
                             nameInput="select_kelas_datpel"
                             id="filter_data_pel_kelas"
                             classNow=""
+                            selectedClass={selectedClass}
                             getClass={(e) => {
                                 const {options, selectedIndex} = e.target;
                                 setSelectedClass(e.target.value)
@@ -839,7 +962,7 @@ function DataPelajaranKelas() {
                             selectClass={dataKelas.map((data) => {
                                     return (
                                         <>
-                                            <option value={data.id_class}>
+                                            <option value={data.id}>
                                                 {data.class} / {data.sub_class}
                                             </option>
                                         </>
@@ -885,68 +1008,51 @@ function DataPelajaranKelas() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
+        console.log(data)
         axios.post(BASE_URL, {
-                "processDefinitionId": "GlobalInsertRecord:7:7777c884-d588-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": "insertdatapelajarankelas:1:0391e3af-2d8b-11ed-9f7a-3e427f6ada72",
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_Insert",
+                        "name": "get_data",
                         "type": "json",
                         "value": {
-                            "tbl_name": "x_academic_subjectsModel",
-                            "tbl_coloumn": {
-                                "academic_year_id": data.thn_akademik,
-                                "course_grade_id": data.kelas_sub,
-                                "academic_subjects_master_id": data.mata_pelajaran,
-                                "aktiv": data.status_guru
-                            }
+                            "matpel": data.mata_pelajaran,
+                            "id_academic": data.thn_akademik,
+                            "id_tingkat": data.tingkat_kelas,
+                            "id_kelas": data.sub_kelas,
+                            "status": data.status
+
                         }
                     }
                 ]
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
-            setIsViewCreate(false)
-            setIsViewDataPelajaranKelas(true)
-            notification.success({
-                message: "Sukses",
-                description: 'Data Pelajaran Kelas berhasil ditambahkan',
-                placement: 'top'
-            })
+            const resData = JSON.parse(response.data?.variables[2]?.value);
+            const resCode = resData.code
+            if (resCode == 200) {
+                setIsViewCreate(false)
+                setIsViewDataPelajaranKelas(true)
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Pelajaran Kelas berhasil ditambahkan',
+                    placement: 'top'
+                })
+            }else{
+                notification.error({
+                    message: "Error",
+                    description: 'Data Pelajaran Kelas Gagal ditambahkan',
+                    placement: 'top'
+                })
+            }
+
         })
     }
-
-    const FormCreate = () => {
-        return (
-            <FormAdminDataPelKelas
-                isViewTable={() => setIsViewDataPelajaranKelas(true)}
-                title="Tambah"
-                idKelas=""
-                namaKelas="Pilih Kelas"
-                selectKelas={dataKelas.map((data) => (
-                    <option value={data.id_class}>{data.class} / {data.sub_class}</option>
-                ))}
-                idMapel=""
-                namaMapel="Pilih Mata Pelajaran"
-                selectMapel={dataMapel.map((data) => (
-                    <option value={data.id_subject_master}>{data.nama_mata}</option>
-                ))}
-                idThAkademik=""
-                thAkademik="Pilih Tahun Akademik"
-                selectThAkademik={dataTahunAkademik.map((data) => (
-                    <option value={data.id_academic_year}>{data.academic_year} / Semester {data.semester}</option>
-                ))}
-                status="Pilih Status"
-                valStatus=""
-                isDisabled={false}
-                submit={createData}
-            />
-        );
-    };
-
     const editData = (e) => {
         e.preventDefault();
         const data = {};
@@ -954,8 +1060,9 @@ function DataPelajaranKelas() {
             if (el.name !== "") data[el.name] = el.value;
         }
         console.log(data)
+        console.log(selectedUser.id)
         axios.post(BASE_URL, {
-                "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -965,10 +1072,7 @@ function DataPelajaranKelas() {
                             "tbl_name": "x_academic_subjectsModel",
                             "id": selectedUser.id,
                             "tbl_coloumn": {
-                                "academic_year_id": data.thn_akademik,
-                                "course_grade_id": data.kelas_sub,
-                                "academic_subjects_master_id": data.mata_pelajaran,
-                                "aktiv": data.status_guru,
+                                "aktiv": data.status,
                                 "is_edit": true
                             }
                         }
@@ -977,6 +1081,7 @@ function DataPelajaranKelas() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -990,7 +1095,6 @@ function DataPelajaranKelas() {
             })
         })
     }
-
     const deleteData = (record) => {
         Swal.fire({
             title: 'Apakah anda yakin menghapus data?',
@@ -1004,7 +1108,7 @@ function DataPelajaranKelas() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                         "returnVariables": true,
                         "variables": [
                             {
@@ -1022,8 +1126,9 @@ function DataPelajaranKelas() {
                         ]
                     }, {
                         headers: {
-                            "Content-Type": "application/json",
-                        }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                     }
                 ).then(function (response) {
                     _getDataPelajaran()
@@ -1034,31 +1139,75 @@ function DataPelajaranKelas() {
         })
     }
 
+    const FormCreate = () => {
+        return (
+            <FormAdminDataPelKelas
+                isViewTable={() => setIsViewDataPelajaranKelas(true)}
+                title="Tambah"
+                idKelas=""
+                namaKelas="Pilih Kelas"
+                selectKelas={tingkatKelas.map((data) => (
+                    <option value={data.id}>{data.class_type}</option>
+                ))}
+                selectedTingkatKelas={selectedTingkatKelas}
+                idMapel=""
+                namaMapel="Pilih Mata Pelajaran"
+                selectMapel={dataMapel.map((data) => (
+                    <option value={data.nama_mata}>{data.nama_mata}</option>
+                ))
+                }
+                selectSubKelas={subClass == [] ?  null : subClass.map((data) => (
+                    <option value={data.id_kelas}>{data.sub_class}</option>
+                ))}
+                allSubClass={subClass.length != 0 ? <option value="all">Semua Sub Kelas</option> : null}
+                namaSubKelas="Pilih Sub Kelas"
+                idSubKelas=""
+                // thAkademik="Pilih Tahun Akademik"
+                // selectThAkademik={dataTahunAkademik.map((data) => (
+                //     <option value={data.id_academic_year}>{data.academic_year} / Semester {data.semester}</option>
+                // ))}
+                idThAkademik={defaultAcademic}
+                selectThAkademik={`${year} - ${semester}`}
+                status="Pilih Status"
+                onChangeTingkatKelas={(e) => setSelectedTingkatKelas(e.target.value)}
+                valStatus=""
+                isDisabled={false}
+                submit={createData}
+                isDisableForm={false}
+            />
+        );
+    };
+
     const FormEdit = () => {
         return (
             <FormAdminDataPelKelas
                 isViewTable={() => setIsViewDataPelajaranKelas(true)}
                 title="Edit"
                 idKelas={selectedUser.idKelas}
-                namaKelas={`${selectedUser.kelas} / ${selectedUser.subKelas}`}
-                selectKelas={dataKelas.map((data) => (
-                    <option value={data.id_class}>{data.class} / {data.sub_class}</option>
+                namaKelas={`${selectedUser.kelas}`}
+                selectKelas={tingkatKelas.map((data) => (
+                    <option value={data.id}>{data.class_type}</option>
                 ))}
                 idMapel={selectedUser.idMataPelajaran}
                 namaMapel={selectedUser.mataPelajaran}
                 selectMapel={dataMapel.map((data) => (
-                    <option value={data.id_subject_master}>{data.nama_mata}</option>
+                    <option value={data.nama_mata}>{data.nama_mata}</option>
                 ))}
-                idThAkademik={selectedUser.idTahunAkademik}
-                thAkademik={selectedUser.tahunAkademik}
-                semester={selectedUser.semester}
-                selectThAkademik={dataTahunAkademik.map((data) => (
-                    <option value={data.id_academic_year}>{data.academic_year} / Semester {data.semester}</option>
-                ))}
+                // idThAkademik={selectedUser.idTahunAkademik}
+                // thAkademik={selectedUser.tahunAkademik}
+                // semester={selectedUser.semester}
+                // selectThAkademik={dataTahunAkademik.map((data) => (
+                //     <option value={data.id_academic_year}>{data.academic_year} / Semester {data.semester}</option>
+                // ))}
+                idThAkademik={academic}
+                selectThAkademik={`${year} / ${semester}`}
                 isDisabled={false}
                 status={selectedUser.status == true ? "Aktif" : "Nonaktif"}
                 valStatus={selectedUser.status}
+                idSubKelas={selectedUser.subKelas}
+                namaSubKelas={selectedUser.subKelas}
                 submit={editData}
+                isDisableForm={true}
             />
         );
     };
@@ -1071,8 +1220,13 @@ function DataPelajaranKelas() {
                 namaKelas={`${selectedUser.kelas} / ${selectedUser.subKelas}`}
                 idMapel={selectedUser.idMataPelajaran}
                 namaMapel={selectedUser.mataPelajaran}
-                idThAkademik={selectedUser.idTahunAkademik}
-                thAkademik={selectedUser.tahunAkademik}
+                idSubKelas={selectedUser.subKelas}
+                namaSubKelas={selectedUser.subKelas}
+                // idThAkademik={selectedUser.idTahunAkademik}
+                // thAkademik={selectedUser.tahunAkademik}
+                isDisableForm={true}
+                idThAkademik={academic}
+                selectThAkademik={`${year} / ${semester}`}
                 status={selectedUser.status == true ? "Aktif" : "Nonaktif"}
                 valStatus={selectedUser.status}
                 isDisabled={true}

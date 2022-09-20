@@ -31,27 +31,10 @@ export const FormAdminKelas = (props) => {
                                                     required
                                                     disabled={props.isDisabled}
                                                 >
-                                                    <option value={props.namaKelas} selected disabled hidden>
+                                                    <option value={props.idTingkatKelas} selected disabled hidden>
                                                         {props.namaKelas}
                                                     </option>
-                                                    <option value="Kelas 1">
-                                                        Kelas 1
-                                                    </option>
-                                                    <option value="Kelas 2">
-                                                        Kelas 2
-                                                    </option>
-                                                    <option value="Kelas 3">
-                                                        Kelas 3
-                                                    </option>
-                                                    <option value="Kelas 4">
-                                                        Kelas 4
-                                                    </option>
-                                                    <option value="Kelas 5">
-                                                        Kelas 5
-                                                    </option>
-                                                    <option value="Kelas 6">
-                                                        Kelas 6
-                                                    </option>
+                                                    {props.selectTingkatKelas}
                                                 </select>
                                             </div>
                                         </div>

@@ -24,6 +24,7 @@ export default function DataMateriDetail() {
         )
     }
 
+
     const TimetableRenderer = () => {
         return (
             <>

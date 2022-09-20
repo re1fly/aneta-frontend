@@ -78,7 +78,7 @@ function BerandaAdmin() {
             setVisible(false);
             //getacademic
             axios.post(BASE_URL, {
-                    "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -112,8 +112,9 @@ function BerandaAdmin() {
                     ]
                 }, {
                     headers: {
-                        "Content-Type": "application/json",
-                    }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                 }
             ).then(function (response) {
                 const resData = response.data.variables[2].value;
@@ -143,7 +144,7 @@ function BerandaAdmin() {
 
     useEffect(() => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "dashboardadmin:4:928e027e-f076-11ec-a658-66fc627bf211",
+                "processDefinitionId": "dashboardadmin:1:0c104413-2cc7-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -199,11 +200,13 @@ function BerandaAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
 
             const resData = response.data.variables;
+            console.log(resData)
             let jumlahSiswa = resData.find(item => item.name === "count_siswa");
             jumlahSiswa = jumlahSiswa.value
 
@@ -225,7 +228,7 @@ function BerandaAdmin() {
     const getDataNpsn = () => {
         const npsn = document.querySelector('input[name="npsn_institute"]').value
         axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoinfirst:1:e973019e-00cc-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getwherenojoinfirst:1:84d5c713-2cc7-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -257,6 +260,7 @@ function BerandaAdmin() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -417,7 +421,7 @@ function BerandaAdmin() {
         console.log(data)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "createinstitute:9:597cfe71-e864-11ec-a658-66fc627bf211",
+                "processDefinitionId": "createinstitute:1:f9d54117-2cc7-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -528,19 +532,20 @@ function BerandaAdmin() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 },
             }
         )
             .then(function (response) {
                 const message = response.data.variables[8].value;
                 console.log(response)
-                if (response.data.variables[7].value == 422) {
+                if (response.data.variables[6].value == 422) {
                     notification.error({
                         message: "Error",
                         description: "Harap isi semua data dan pastikan NPSN belum pernah terdaftar",
                         placement: 'top'
                     })
-                } else if (response.data.variables[7].value == 200) {
+                } else if (response.data.variables[6].value == 200) {
                     localStorage.setItem('institute', response.data.variables[10].value)
                     setVisible(false)
                     window.location.reload();
@@ -558,7 +563,7 @@ function BerandaAdmin() {
 
         const handleOnSearch = (string, results) => {
             axios.post(BASE_URL, {
-                    "processDefinitionId": "getwherenojoinfirst:1:e973019e-00cc-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "getwherenojoinfirst:1:84d5c713-2cc7-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -589,8 +594,9 @@ function BerandaAdmin() {
                     ]
                 }, {
                     headers: {
-                        "Content-Type": "application/json",
-                    }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                 }
             ).then(function (response) {
                 const resData = JSON.parse(response.data.variables[2].value);

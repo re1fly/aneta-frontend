@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react';
 import Adminfooter from "../../components/Adminfooter";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
-import Filter from '../../components/Filter';
 import {
     Dropdown,
     Menu,
@@ -14,6 +13,7 @@ import {
     Tag,
     Space,
     notification,
+    Modal,
 } from "antd";
 import {
     AppstoreOutlined,
@@ -22,12 +22,9 @@ import {
     EditOutlined,
     EllipsisOutlined,
     MenuOutlined,
-    PlusOutlined,
     EyeOutlined
 } from "@ant-design/icons";
 import Search from "antd/es/input/Search";
-import ImgCrop from "antd-img-crop";
-import Upload from "antd/es/upload/Upload";
 import axios from "axios";
 import { BASE_URL } from "../../api/Url";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,11 +32,13 @@ import { getProcessId, searchGlobal } from "../../redux/Action";
 import { FormAdminGuru } from '../../components/form/AdminGuru';
 import Swal from "sweetalert2";
 
-import { dateNow } from "../../components/misc/date"; // 
-import { FilterAcademic } from "../../components/FilterAcademic"; // 
+import { dateNow } from "../../components/misc/date";
+import { FilterAcademic } from "../../components/FilterAcademic";
+// import { useDataGuru } from '../../components/function/useDataGuru'; ==> component
 
 
 function DataGuruAdmin() {
+    // const {getGuru, getListGuru, setGetGuru} = useDataGuru(); ==> component
     const [grid, setGrid] = useState(false);
     const [isViewGuru, setIsViewGuru] = useState(true);
     const [isViewEdit, setIsViewEdit] = useState(false);
@@ -51,17 +50,13 @@ function DataGuruAdmin() {
     const institute = localStorage.getItem('institute');
     const academicYear = localStorage.getItem('academic_year')
 
-    const [academic, setAcademic] = useState(academicYear); //
-    const [academicYears, setAcademicYears] = useState([]); // 
+    const [academic, setAcademic] = useState(academicYear);
+    const [academicYears, setAcademicYears] = useState([]);
 
     const [getGuru, setGetGuru] = useState([]);
-    console.log(JSON.stringify(getGuru, null, 2));
+    // console.log(JSON.stringify(getGuru, null, 2));
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
-
-    const [handleImage, setHandleImage] = useState('')
-    const [_Img, setIMG] = useState('');
-    const [_ImgBase64, setIMGBase64] = useState('');
 
     const dispatch = useDispatch();
     const searchRedux = useSelector(state => state.search);
@@ -69,39 +64,6 @@ function DataGuruAdmin() {
 
     const getProcess = useSelector(state => state.processId);
     let ProcessId = getProcess.DataProcess;
-
-    const getBase64 = (img, callback) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result));
-        reader.readAsDataURL(img);
-    };
-
-    function toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            var reader = new FileReader();
-            reader.onloadend = function () {
-                callback(reader.result);
-            }
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    }
-
-    const onChangeImage = (info) => {
-        if (info.file.status === 'done') {
-            getBase64(info.file.originFileObj, (url) => {
-                setIMG(url);
-                toDataURL(url, function (dataUrl) {
-                    setIMGBase64(dataUrl);
-                    setHandleImage(dataUrl);
-                    console.log('RESULT:', dataUrl)
-                })
-            });
-        }
-    };
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -212,7 +174,7 @@ function DataGuruAdmin() {
 
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -314,7 +276,7 @@ function DataGuruAdmin() {
         getListGuru()
 
         axios.post(BASE_URL, {
-            "processDefinitionId": 'getdatajoinwhere:2:d2aed4a7-dff4-11ec-a658-66fc627bf211',
+            "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
             "returnVariables": true,
             "variables": [
                 {
@@ -355,8 +317,9 @@ function DataGuruAdmin() {
             ]
         }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }
         ).then(function (response) {
             const academics = JSON.parse(response?.data?.variables[3]?.value);
@@ -365,13 +328,190 @@ function DataGuruAdmin() {
 
     }, [academic, paramsPage, isViewGuru, refreshState])
 
+    const _exportDataExcel = () => {
+        axios.post(BASE_URL, {
+            "processDefinitionId": "exportguru:1:902728ed-2cc8-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "get_data",
+                    "type": "json",
+                    "value": {
+                        "academic_year_id": academic
+                    }
+                }
+            ]
+        }).then(response => {
+            const resData = JSON.parse(response.data.variables[2].value)
+            const dataExcel = resData.data
+            const byteCharacters = atob(dataExcel);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'DataGuru.xlsx'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        })
+    }
+
+    const convertBase64 = (uploaded) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(uploaded);
+
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error)
+            }
+        })
+    }
+
+    const _changeExcelFormat = async (e) => {
+        let uploaded = e.target.files[0];
+        const base64 = await convertBase64(uploaded);
+        const getLinkUrl = base64.split(',')[1]
+        console.log(getLinkUrl);
+
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "importguru:1:d1f6b158-2cc8-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "file_base64": getLinkUrl,
+                            "file_type": "xlsx",
+                            "type": "update_create",
+                            "institute_id": institute
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+        }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.data
+            if (resCode == "success") {
+                setRefreshState(true);
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Guru berhasil di Import',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
+                    placement: 'top'
+                })
+            }
+        })
+
+    }
+
+    const _changeExcelFormatNew = async (e) => {
+        let uploaded = e.target.files[0];
+        const base64 = await convertBase64(uploaded);
+        const getLinkUrl = base64.split(',')[1]
+        // console.log(getLinkUrl);
+
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "importguru:1:d1f6b158-2cc8-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "file_base64": getLinkUrl,
+                            "file_type": "xlsx",
+                            "type": "clear",
+                            "institute_id": institute
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+        }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.data
+            if (resCode == "success") {
+                setRefreshState(true);
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Guru berhasil di Import',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
+                    placement: 'top'
+                })
+            }
+        })
+
+    }
+
+    const _modalImportNew = () => {
+        Modal.warning({
+            title: 'Jika anda memilih fitur ini, maka semua data guru akan di replace dengan data excel yang anda impor.',
+            width: '800px',
+            content: (
+                <div>
+                    {/*<p>Klik Button dibawah ini untuk mengimpor data :</p>*/}
+                    <label id='label_import_new' htmlFor="file_excel_kelas_baru"
+                        className="bg-dark border-0 text-center text-white ant-btn-round mr-4 mt-3"
+                        style={{ padding: '4px 16px', cursor: 'pointer' }}>
+                        Upload File Disini
+                    </label>
+                    <input
+                        onChange={_changeExcelFormatNew}
+                        name="new_excel_initiator"
+                        className="w100"
+                        type="file"
+                        id="file_excel_kelas_baru"
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        style={{ display: "none" }}
+                    />
+                </div>
+            ),
+            okText: 'Batal',
+            okType: 'danger'
+        });
+
+    }
+
     const CardDataGuru = () => {
         const channelList = getGuru.map((guru, index) => {
-            const dataSk = guru.sk_date
-            const tahunAktifGuru = dataSk.substring(0, 4)
+            const dataSk = guru?.sk_date
+            const tahunAktifGuru = dataSk?.substring(0, 4)
 
             return {
-                imageUrl: 'user.png',
+                imageUrl: guru.imageUrl,
                 namaGuru: guru.name,
                 nomorSk: guru.sk_number,
                 tahunAktif: tahunAktifGuru,
@@ -382,6 +522,8 @@ function DataGuruAdmin() {
                 status: guru.is_active
             }
         })
+
+        console.log(channelList);
 
         return (
             <div className="middle-sidebar-left">
@@ -398,17 +540,12 @@ function DataGuruAdmin() {
                                     overlay={_Account}>
                                     <EllipsisOutlined />
                                 </Dropdown>
-
-                                <a
-                                    href="/default-channel"
-                                    className="btn-round-xxxl rounded-lg bg-lightblue ml-auto mr-auto"
-                                >
-                                    <img
-                                        src={`assets/images/${value.imageUrl}`}
-                                        alt="icon"
-                                        className="p-1 w-100"
-                                    />
-                                </a>
+                                <img
+                                    src={value.imageUrl}
+                                    alt="icon"
+                                    className="p-1"
+                                    style={{ width: "70px", height: "70px" }}
+                                />
                                 <h4 className="fw-700 font-xs mt-3 mb-3">{value.namaGuru}</h4>
                                 <div className="clearfix"></div>
                                 {value.tag1 ? (
@@ -556,7 +693,7 @@ function DataGuruAdmin() {
 
             return {
                 no: index + 1,
-                imageUrl: 'user.png',
+                imageUrl: `http://10.1.6.109/storage/${guru.image}`,
                 id: guru.id_guru,
                 user_id: guru.user_id,
                 id_profile: guru.id,
@@ -641,7 +778,31 @@ function DataGuruAdmin() {
                                 onClick={viewCreateGuru}>
                                 Tambah Data
                             </Button>
-                            {/* <Filter title1="Nama" title2="Tahun Aktif" /> */}
+                            <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={() => _exportDataExcel()}>
+                                Export Data
+                            </Button>
+                            <label for="file_excel_kelas"
+                                className="bg-dark border-0 text-center text-white ant-btn-round mr-4"
+                                style={{ padding: '4px 16px', cursor: 'pointer' }}>
+                                Import Data
+                            </label>
+                            <input
+                                onChange={_changeExcelFormat}
+                                name="excel_initiator"
+                                className="w100"
+                                type="file"
+                                id="file_excel_kelas"
+                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                style={{ display: "none" }}
+                            />
+                            <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={_modalImportNew}>
+                                Import Data Baru
+                            </Button>
+
                             <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
                                 selectYear={academicYears.map((data) => {
                                     return (
@@ -676,246 +837,6 @@ function DataGuruAdmin() {
         )
     }
 
-    const TambahGuru = () => {
-        return (
-            <div className="container px-3 py-4">
-                <div className="row">
-                    <div className="col-lg-12">
-                        <div className="middle-wrap">
-                            <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
-                                <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewGuru(true)}
-                                        className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
-                                    <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                        Tambah Data Guru
-                                    </h4>
-                                </div>
-                                <div className="card-body p-lg-5 p-4 w-100 border-0">
-                                    <form id="teacher_form"
-                                        onSubmit={createGuru}
-                                        method="POST">
-                                        <div class="row">
-                                            <div className="col-lg-12 mb-5">
-                                                <div className="d-flex justify-content-center">
-                                                    <Card className="bg-lightblue" style={{ width: 157 }}>
-                                                        <ImgCrop rotate>
-                                                            <Upload
-                                                                name="image_siswa"
-                                                                listType="picture-card"
-                                                                className="avatar-uploader"
-                                                                showUploadList={false}
-                                                                // action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                                                onChange={onChangeImage}
-                                                            // onPreview={onPreview}
-                                                            >
-                                                                {_Img ? (
-                                                                    <img
-                                                                        src={_Img}
-                                                                        alt="avatar"
-                                                                        style={{
-                                                                            width: '100%',
-                                                                        }}
-
-                                                                    />
-                                                                ) : (
-                                                                    <PlusOutlined />
-                                                                )}
-                                                            </Upload>
-                                                        </ImgCrop>
-                                                    </Card>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Nama
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name='nama_guru'
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Nomor HP
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name='nomortelefon_guru'
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Email
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name='email_guru'
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Tanggal Lahir
-                                                    </label>
-                                                    <input
-                                                        type="date"
-                                                        className="form-control"
-                                                        name='tanggallahir_guru'
-                                                        defaultValue="11/11/1111"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Provinsi
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name="state_guru"
-                                                        defaultValue="11"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kota / Kabupaten
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name="kota_guru"
-                                                        defaultValue="1101"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kecamatan
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name="kecamatan_guru"
-                                                        defaultValue="1101010"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kelurahan
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        name="kelurahan_guru"
-                                                        defaultValue="1101010001"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-lg-12 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Status
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="status_guru"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Status Guru
-                                                        </option>
-                                                        <option value="PNS">
-                                                            PNS
-                                                        </option>
-                                                        <option value="HONORER">
-                                                            HONORER
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-lg-12 mb-3">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Alamat
-                                                </label>
-                                                <textarea
-                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
-                                                    rows="5"
-                                                    placeholder="Isi alamat detail anda..."
-                                                    name="alamat_guru"
-                                                    required
-                                                ></textarea>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-lg-12">
-                                                <button
-                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    type="submit"
-                                                >
-                                                    Simpan
-                                                </button>
-                                                <a
-                                                    onClick={() => setIsViewGuru(true)}
-                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                >
-                                                    Batal
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
     const createGuru = (e) => {
         e.preventDefault();
         const data = {};
@@ -926,7 +847,7 @@ function DataGuruAdmin() {
         console.log(data);
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "insertdataguru:18:b6bbf8a6-eb91-11ec-9ea6-c6ec5d98c2df",
+            "processDefinitionId": "insertdataguru:1:25f2c862-2cc9-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -952,11 +873,18 @@ function DataGuruAdmin() {
                             "user_academic_year_id": "required",
                             "user_register_date": "required",
                             "status": "required",
-                            // "sk_number": "required",
                             "created_at": "required",
                             "updated_at": "required",
-                            "institute_id": "required"
-
+                            "institute_id": "required",
+                            "employment_status": "required",
+                            "religion": "required",
+                            "tmt_appointment": "required",
+                            "agency_appointment": "required",
+                            "source_of_salary": "required",
+                            "mother_name": "required",
+                            "profession_husband_or_wife": "required",
+                            "citizenship": "required",
+                            "nik": "required"
                         },
                         "user_email": data.email_guru,
                         "user_name": data.nama_guru,
@@ -971,21 +899,29 @@ function DataGuruAdmin() {
                         "user_district_id": data.kecamatan_guru,
                         "user_sub_discrict_id": data.kelurahan_guru,
                         "user_address": data.alamat_guru,
-                        "user_image": "data:image/jpeg;base64,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",
+                        "user_image": data.image_base64,
                         "user_image_type": "string",
                         "user_academic_year_id": academicYear,
                         "user_register_date": dateNow,
                         "status": data.status_guru,
-                        // "sk_number": data.sk_guru,
                         "created_at": dateNow,
                         "updated_at": dateNow,
                         "institute_id": institute,
+                        "employment_status": data.status_kepegawaian,
+                        "religion": data.agama,
+                        "tmt_appointment": data.tmt_pengangkatan,
+                        "agency_appointment": data.lembaga_pengangkatan,
+                        "source_of_salary": data.sumber_gaji,
+                        "mother_name": data.nama_ibu,
+                        "profession_husband_or_wife": data.pekerjaan_pasangan,
+                        "citizenship": data.kewarganegaraan,
+                        "nik": data.nik
                     }
                 },
                 {
                     "name": "user_email",
                     "type": "string",
-                    "value": data.email_guru,
+                    "value": ""
                 },
                 {
                     "name": "users",
@@ -998,7 +934,7 @@ function DataGuruAdmin() {
                             "user_role_id": 2,
                             "institute_id": institute,
                             "email_verified_at": dateNow,
-                            "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
+                            "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6"
                         }
                     }
                 },
@@ -1015,7 +951,48 @@ function DataGuruAdmin() {
                             "city_id": data.kota_guru,
                             "district_id": data.kecamatan_guru,
                             "sub_discrict_id": data.kelurahan_guru,
-                            "address": data.alamat_guru
+                            "address": data.alamat_guru,
+                            "nuptk": data.nuptk,
+                            "nip": data.nip,
+                            "gender": data.jenis_kelamin,
+                            "employment_status": data.status_kepegawaian,
+                            "religion": data.agama,
+                            "phone": data.nomortelefon2_guru,
+                            "village_name": data.nama_dusun,
+                            "rt": data.rt,
+                            "rw": data.rw,
+                            "postal_code": data.kode_pos,
+                            "additional_task": data.tugas_tambahan,
+                            "sk_cpns": data.sk_cpns,
+                            "date_cpns": data.tanggal_cpns,
+                            "sk_appointment": data.sk_pengangkatan,
+                            "tmt_appointment": data.tmt_pengangkatan,
+                            "agency_appointment": data.lembaga_pengangkatan,
+                            "group_rank": data.pangkat_golongan,
+                            "source_of_salary": data.sumber_gaji,
+                            "mother_name": data.nama_ibu,
+                            "marital_status": data.status_perkawinan,
+                            "name_husband_or_wife": data.nama_pasangan,
+                            "nip_husband_or_wife": data.nip_pasangan,
+                            "profession_husband_or_wife": data.pekerjaan_pasangan,
+                            "tmt_pns": data.tmt_pns,
+                            "already_licensed_principal": data.lisensi_kepsek,
+                            "ever_working_training": data.diklat_kepegawaian,
+                            "braille_skill": data.lkeahian_braille,
+                            "sign_language_skill": data.bahasa_isyarat,
+                            "npwp": data.npwp,
+                            "name_of_the_taxpayer": data.nama_wajibpajak,
+                            "citizenship": data.kewarganegaraan,
+                            "nik": data.nik,
+                            "no_kk": data.no_kk,
+                            "bank": data.bank,
+                            "no_rek": data.no_rekening,
+                            "account_name": data.nama_rekening,
+                            "karpeg": data.kerpeg,
+                            "karis": data.karis_karsu,
+                            "latitude": data.lintang,
+                            "longitude": data.bujur,
+                            "nuks": data.nuks
                         }
                     }
                 },
@@ -1023,7 +1000,7 @@ function DataGuruAdmin() {
                     "name": "upload_image",
                     "type": "json",
                     "value": {
-                        "image": "data:image/jpeg;base64,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",
+                        "image": data.image_base64,
                         "image_type": "png",
                         "nama_folder": "image_guru"
                     }
@@ -1038,42 +1015,31 @@ function DataGuruAdmin() {
                             "register_date": dateNow,
                             "sk_number": data.sk_guru,
                             "sk_date": dateNow,
-                            "status": data.status_guru,
-                            // "created_at": dateNow, // => done
-                            // "updated_at": dateNow // => done
+                            "status": data.status_guru
                         }
                     }
                 }
             ]
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }
-        ).then(function (response) {
-            if (response.data.variables[8].value == 200) {
-                if (response.data.variables[10].value == 404) {
-                    setIsViewCreate(false)
-                    setIsViewGuru(true)
-                    notification.success({
-                        message: 'Sukses',
-                        description: 'Guru berhasil ditambahkan.',
-                        placement: 'top'
-                    });
-                } else if (response.data.variables[10].value == 200) {
-                    notification.error({
-                        message: 'Error',
-                        description: 'Email sudah terdaftar, mohon masukkan email lain.',
-                        placement: 'top'
-                    });
-                } else {
-                    notification.error({
-                        message: 'error',
-                        description: 'Email sudah terdaftar, mohon masukan email lain.',
-                        placement: "top"
-                    });
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-                // pageLoad()
+            }
+        ).then(function (response) {
+            console.log("Insert :", response);
+            const valueRes = response.data.variables[20].value;
+            const valueResObj = JSON.parse(valueRes);
+            console.log(valueResObj);
+            if (valueResObj.status == "success") {
+                setIsViewCreate(false)
+                setIsViewGuru(true)
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Guru berhasil ditambahkan.',
+                    placement: 'top'
+                });
             } else {
                 notification.error({
                     message: 'Error',
@@ -1081,10 +1047,40 @@ function DataGuruAdmin() {
                     placement: 'top'
                 });
             }
-            console.log(response)
-        }).catch(error => {
-            alert('Email Telah di gunakan, silahkan gunakan email lain.')
-        });
+                // if (response.data.variables[8].value == 200) {
+                //     if (response.data.variables[10].value == 404) {
+                //         setIsViewCreate(false)
+                //         setIsViewGuru(true)
+                //         notification.success({
+                //             message: 'Sukses',
+                //             description: 'Guru berhasil ditambahkan.',
+                //             placement: 'top'
+                //         });
+                //     } else if (response.data.variables[10].value == 200) {
+                //         notification.error({
+                //             message: 'Error',
+                //             description: 'Email sudah terdaftar, mohon masukkan email lain.',
+                //             placement: 'top'
+                //         });
+                //     } else {
+                //         notification.error({
+                //             message: 'error',
+                //             description: 'Email sudah terdaftar, mohon masukan email lain.',
+                //             placement: "top"
+                //         });
+                //     }
+                //     // pageLoad()
+                // } else {
+                //     notification.error({
+                //         message: 'Error',
+                //         description: 'Harap isi semua field',
+                //         placement: 'top'
+                //     });
+                // }
+                // console.log(response)
+            }).catch(error => {
+                // alert('Email Telah di gunakan, silahkan gunakan email lain.')
+            });
     };
 
     const editGuru = (e) => {
@@ -1094,10 +1090,11 @@ function DataGuruAdmin() {
             if (el.name !== "") data[el.name] = el.value;
         }
         const dateNow = new Date().toLocaleString()
-        console.log(data)
+        console.log(data.image_base64)
+        console.log(data);
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "updateguru:3:fdd13d0d-f118-11ec-a658-66fc627bf211",
+            "processDefinitionId": "updateguru:1:7463f5f2-2cc9-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -1130,7 +1127,7 @@ function DataGuruAdmin() {
                         "user_district_id": data.kecamatan_guru,
                         "user_sub_discrict_id": data.kecamatan_guru,
                         "user_address": data.alamat_guru,
-                        "user_image": "jpg",
+                        "user_image": data.image_base64,
                         "user_image_type": "string",
                         "sk_number": data.sk_guru,
                         "status": data.status_guru,
@@ -1182,8 +1179,9 @@ function DataGuruAdmin() {
             ]
         }, {
             headers: {
-                "Content-Type": "application/json",
-            }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
         }).then(function (response) {
             if (response.data.variables[5].value == 200) {
                 setIsViewEdit(false)
@@ -1218,7 +1216,7 @@ function DataGuruAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalDeleteRecord:3:cc4aec62-d58d-11ec-a2ad-3a00788faff5",
+                    "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -1232,8 +1230,9 @@ function DataGuruAdmin() {
                     ]
                 }, {
                     headers: {
-                        "Content-Type": "application/json",
-                    }
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
                 }
                 ).then(function (response) {
                     console.log(response);
@@ -1292,6 +1291,7 @@ function DataGuruAdmin() {
                 setView={() => setIsViewGuru(true)}
                 title="Edit Guru"
                 submit={editGuru}
+                imageUrl={selectedUser.imageUrl}
                 namaGuru={selectedUser.namaGuru}
                 nomorHp={selectedUser.nomorHp}
                 email={selectedUser.email}
@@ -1321,6 +1321,7 @@ function DataGuruAdmin() {
                 setView={() => setIsViewGuru(true)}
                 title="View Guru"
                 submit={createGuru}
+                imageUrl={selectedUser.imageUrl}
                 namaGuru={selectedUser.namaGuru}
                 nomorHp={selectedUser.nomorHp}
                 email={selectedUser.email}
@@ -1351,7 +1352,6 @@ function DataGuruAdmin() {
                 <Navheader />
                 <div className="main-content">
                     <Appheader />
-                    {/* {isViewGuru ? <ViewGuru /> : <TambahGuru />} */}
                     {
                         isViewGuru ?
                             <ViewGuru /> :

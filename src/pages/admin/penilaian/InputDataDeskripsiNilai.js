@@ -16,10 +16,8 @@ function InputDataDeskripsiNilai() {
     const institute = localStorage.getItem('institute');
     const academic = localStorage.getItem('academic_year');
 
-    const [getKelas, setGetKelas] = useState([]);
-    const [selectClass, setSelectClass] = useState([]);
     const [deskripsiNilai, setDeskripsiNilai] = useState(null)
-    // console.log(JSON.stringify(deskripsiNilai, null, 2));
+    console.log(JSON.stringify(deskripsiNilai, null, 2));
 
     function onChange(value) {
         console.log(`selected ${value}`);
@@ -38,7 +36,7 @@ function InputDataDeskripsiNilai() {
         console.log(data)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getinputdeskripsi:1:11a7f7fc-14b5-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getinputdeskripsi:1:ebaee2fa-2cd0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -56,6 +54,7 @@ function InputDataDeskripsiNilai() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 },
             }
         ).then(function (response) {
@@ -90,9 +89,9 @@ function InputDataDeskripsiNilai() {
         const deskripsiKeterampilan = formData.getAll('deskripsi_keterampilan');
         const nilaiPengetahuan = formData.getAll('nilai_pengetahuan')
         const nilaiKeterampilan = formData.getAll('nilai_keterampilan')
-        console.log(nilaiKeterampilan);
 
         const allDeskripsi = [];
+        console.log(allDeskripsi);
         const Pengetahuan = [];
         const Keterampilan = [];
 
@@ -160,7 +159,7 @@ function InputDataDeskripsiNilai() {
             axios
                 .post(
                     BASE_URL, {
-                    "processDefinitionId": "inputdatadeskripsi:3:4ab68e43-14b4-11ed-ac5e-66fc627bf211",
+                    "processDefinitionId": "inputdatadeskripsi:1:23efd358-2cd1-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -176,15 +175,16 @@ function InputDataDeskripsiNilai() {
                 },
                     {
                         headers: {
-                            "Content-Type": "application/json",
-                        },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                     }
                 )
                 .then(function (response) {
                     const dataRes = JSON.parse(response.data.variables[2].value);
-                    console.log(dataRes);
+                    // console.log(dataRes);
                     const resCode = dataRes.code;
-                    console.log(resCode);
+                    // console.log(resCode);
                     if (resCode === true) {
                         notification.success({
                             message: "Sukses",

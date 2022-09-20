@@ -10,6 +10,7 @@ export const FilterAllClass = (props) => {
                 id={props.id}
                 key={props.id}
                 defaultValue={props.classNow}
+                value={props.selectedClass}
             >
                 <option value="" selected disabled hidden>
                     Filter Kelas

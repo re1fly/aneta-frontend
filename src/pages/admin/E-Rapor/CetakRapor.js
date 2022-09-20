@@ -61,134 +61,103 @@ function CetakRapor() {
     }, [])
 
     useEffect(() => {
-        if (ProcessId.length != 0) {
-            setRefreshState(false)
-
-            getKeyGlobalJoin = ProcessId.find(item => item.key === "globaljoinsubwhereget");
-            getKeyGlobalJoin = getKeyGlobalJoin.proses_def_id
-
-            axios.post(BASE_URL,
-                {
-                    "processDefinitionId": getKeyGlobalJoin,
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_join_where_sub",
-                            "type": "json",
-                            "value": {
-                                "tbl_induk": "x_academic_class",
-                                "select": ["x_academic_class.id as id_class",
-                                    "x_academic_class.class",
-                                    "x_academic_class.sub_class",
-                                    "x_academic_class.class_location",
-                                    "x_academic_year.academic_year",
-                                    "x_academic_year.id as id_academic",
-                                    "users.name",
-                                    "x_academic_teachers.id as id_walikelas",
-                                    "users.institute_id"
-                                ],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_academic_teachers",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "calss_advisor_id"
-
-                                    }, {
-                                        "tbl_join": "users",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_teachers",
-                                        "foregenkey": "user_id"
-                                    }, {
-                                        "tbl_join": "x_academic_year",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "academic_year_id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "users",
-                                        "tbl_field": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "="
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_class",
-                                        "tbl_field": "academic_year_id",
-                                        "tbl_value": academic,
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_class",
-                                        "tbl_field": "deleted_at",
-                                        "tbl_value": "",
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    }
-                                ],
-                                "order_coloumn": "x_academic_class.updated_at",
-                                "order_by": "desc"
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where_sub",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_class",
+                            "select": [
+                                "x_academic_class.id",
+                                "r_class_type.class_type as class",
+                                "x_academic_class.sub_class"
+                            ],
+                            "paginate": false,
+                            "join": [
+                                {
+                                    "tbl_join": "r_class_type",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_class",
+                                    "foregenkey": "class"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "academic_year_id",
+                                    "tbl_value": academic,
+                                    "operator": "="
+                                }, {
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "="
+                                }
+                            ],
+                            "order_coloumn": "x_academic_class.id",
+                            "order_by": "asc"
                         }
-                    ]
-                }, {
-                headers: {
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
+                    }
+                ]
+            }, {
+            headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-            }
-            ).then(function (response) {
-                const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-                setGetKelas(dataRes?.data?.data);
-            })
-
-            axios.post(BASE_URL,
-                {
-                    "processDefinitionId": "getwherenojoin:3:075dfdd3-f813-11ec-ac5e-66fc627bf211",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_get_where",
-                            "type": "json",
-                            "value": {
-                                "tbl_name": "x_academic_year",
-                                "pagination": true,
-                                "total_result": 10,
-                                "order_coloumn": "x_academic_year.is_active",
-                                "order_by": "desc",
-                                "data": [
-                                    {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "="
-                                    }
-                                ],
-                                "tbl_coloumn": [
-                                    "*"
-                                ]
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
-                        }
-                    ]
-                }
-            ).then(function (response) {
-                // console.log(response);
-                const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
-                setGetTahunAkademik(tahunAkademik?.data)
-            })
         }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            setGetKelas(dataRes?.data);
+        })
+
+        axios.post(BASE_URL,
+            {
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_get_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "x_academic_year",
+                            "pagination": true,
+                            "total_result": 10,
+                            "order_coloumn": "x_academic_year.is_active",
+                            "order_by": "desc",
+                            "data": [
+                                {
+                                    "kondisi": "where",
+                                    "tbl_coloumn": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ],
+                            "tbl_coloumn": [
+                                "*"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
+                    }
+                ]
+            }
+        ).then(function (response) {
+            // console.log(response);
+            const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
+            setGetTahunAkademik(tahunAkademik?.data)
+        })
     }, [ProcessId, refreshState, academic])
 
     const handleDataErapor = () => {
@@ -196,7 +165,7 @@ function CetakRapor() {
         setRefreshState(true)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "geteraport:1:e554a53c-12df-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "geteraport:1:5806db8a-2ccf-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -228,7 +197,7 @@ function CetakRapor() {
     const getDataRapor = () => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "jsoneraport:1:a84a08c9-13a1-11ed-ac5e-66fc627bf211",
+                "processDefinitionId": "jsoneraport:1:e07834f5-2ccf-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -289,7 +258,7 @@ function CetakRapor() {
                     dataIndex: 'raporTengahSemester',
                     defaultSortOrder: 'ascend',
                     render: (record) => {
-                        return(
+                        return (
                             <Button className="rounded-xl" >
                                 <i className="feather-printer mr-2"></i>Cetak PDF
                             </Button>
@@ -310,12 +279,12 @@ function CetakRapor() {
                     dataIndex: 'raporAkhirSemester',
                     defaultSortOrder: 'ascend',
                     render: (text, record) => {
-                        return(
+                        return (
                             <Button className="rounded-xl" onClick={() => {
                                 console.log(record);
                                 setModalVisible(true);
                                 setSelectedUser(record);
-                                } } >
+                            }} >
                                 <i className="feather-printer mr-2"></i>Cetak PDF
                             </Button>
                         )
@@ -343,7 +312,7 @@ function CetakRapor() {
             no: index + 1,
             id: data.id_user,
             namaSiswa: data.name,
-            kelas: data.class,
+            kelas: `${data.class} / ${data.sub_class}`,
             // raporTengahSemester:
             //     <Button className="rounded-xl" >
             //         <i className="feather-printer mr-2"></i>Cetak PDF
@@ -382,7 +351,7 @@ function CetakRapor() {
                                             {getKelas.map((data, i) => {
                                                 return (
                                                     <>
-                                                        <option value={data.id_class}>
+                                                        <option value={data.id}>
                                                             {`${data.class} / ${data.sub_class}`}
                                                         </option>
                                                     </>
@@ -453,9 +422,9 @@ function CetakRapor() {
                                         dataIndex="raporAkhirSemester"
                                         key="raporAkhirSemester" />
                                 </ColumnGroup> */}
-                                {/* <ColumnGroup title="Tanggal Cetak Terakhir" align='center'> */}
-                                    {/* <Column title="11 Juni 2022, 16.00" */}
-                                    {/* <Column
+                            {/* <ColumnGroup title="Tanggal Cetak Terakhir" align='center'> */}
+                            {/* <Column title="11 Juni 2022, 16.00" */}
+                            {/* <Column
                                         align='center'
                                         dataIndex="tanggalCetak"
                                         key="tanggalCetak" />

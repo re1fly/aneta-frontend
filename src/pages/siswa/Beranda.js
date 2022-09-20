@@ -18,7 +18,6 @@ function BerandaSiswa() {
     const academicId = localStorage.getItem('academic_id')
 
     const [getJadwalPelajaran, setGetJadwalPelajaran] = useState([]);
-    // console.log(getJadwalPelajaran);
 
     const GetRealTimeDate = () => {
         const [dt, setDt] = useState(new Date().toLocaleString());
@@ -67,15 +66,13 @@ function BerandaSiswa() {
     const [todayData, setTodayData] = useState([]);
 
     const checkTodayData = () => {
-        getJadwalPelajaran.map((item) => {
+        getJadwalPelajaran?.map((item) => {
             if(item?.hari === today){
                 setTodayData(item?.data)
             }
         })
     }
     
-    // console.log('DATA detail ==', JSON.stringify(todayData, null, 2));
-
     useEffect(() => {
         axios.post(BASE_URL, {
             "processDefinitionId": "e81e093e-028d-11ed-ac5e-66fc627bf211",
@@ -94,6 +91,7 @@ function BerandaSiswa() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -140,6 +138,7 @@ function BerandaSiswa() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
@@ -156,44 +155,6 @@ function BerandaSiswa() {
         checkTodayData()
     }, [getJadwalPelajaran])
 
-    const channelList = [
-        {
-            code: 'TM01',
-            time: '07.00 - 08.30',
-            title: 'TEMATIK 1',
-            name: 'Ibu Sri Wahyuni S.pd',
-            tag1: 'Materi',
-            tag2: 'Tugas Harian',
-            tag3: '',
-        },
-        {
-            code: 'TM02',
-            time: '08.30 - 10.00',
-            title: 'TEMATIK 2',
-            name: 'Ibu Wasilatul M S.pd',
-            tag1: 'Materi',
-            tag2: 'Quiz',
-            tag3: '',
-        },
-        {
-            code: 'TM03',
-            time: '10.30 - 12.00',
-            title: 'Tematik 3',
-            name: 'Bapak Soekamti S.pd',
-            tag1: 'Matrei',
-            tag2: 'Praktek',
-            tag3: '',
-        },
-        {
-            code: 'TM04',
-            time: '12.30 - 14.00',
-            title: 'TEMATIK 4',
-            name: 'Bapak Johnny Deep S.pd',
-            tag1: 'Materi',
-            tag2: 'Tugas Harian',
-            tag3: '',
-        },
-    ];
 
     const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);

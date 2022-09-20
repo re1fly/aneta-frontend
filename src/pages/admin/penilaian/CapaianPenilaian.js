@@ -16,7 +16,7 @@ function CapaianPenilaian() {
 
     const _getDataCapaian = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "Getcapaianpenilaian:1:09b33e3c-fdc1-11ec-ac5e-66fc627bf211",
+                "processDefinitionId": "Getcapaianpenilaian:1:a7504ac2-2cd0-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -31,12 +31,14 @@ function CapaianPenilaian() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
             const data = resData.data
             setDataCapaian(data)
+            console.log(data)
 
         }).catch(error => {
             alert(error)
@@ -44,7 +46,7 @@ function CapaianPenilaian() {
     }
     const _selectKelas = () => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -79,6 +81,7 @@ function CapaianPenilaian() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {

@@ -24,7 +24,7 @@ function DataNilaiSpiritual() {
         axios
             .post(
                 BASE_URL, {
-                    "processDefinitionId": "2ca19c54-0809-11ed-ac5e-66fc627bf211",
+                    "processDefinitionId": "d045f5cb-2d9b-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -42,8 +42,9 @@ function DataNilaiSpiritual() {
                 ,
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {
@@ -96,7 +97,7 @@ function DataNilaiSpiritual() {
         axios
             .post(
                 BASE_URL, {
-                    "processDefinitionId": "29cab8dc-080a-11ed-9ea6-c6ec5d98c2df",
+                    "processDefinitionId": "f1c7fe98-2d9b-11ed-9f7a-3e427f6ada72",
                     "returnVariables": true,
                     "variables": [
                         {
@@ -112,11 +113,11 @@ function DataNilaiSpiritual() {
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     },
                 }
             )
             .then(function (response) {
-                console.log(response)
                 const dataRes = JSON.parse(response.data.variables[2].value);
                 const resCode = dataRes.code;
 

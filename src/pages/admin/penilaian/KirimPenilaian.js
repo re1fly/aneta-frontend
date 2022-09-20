@@ -21,11 +21,11 @@ import { DataNotFound } from "../../../components/misc/DataNotFound";
 function KirimPenilaian() {
 
     const [getKirimPenilaian, setGetKirimPenilaian] = useState([]);
+    console.log(getKirimPenilaian);
     const [dataKirimNilai, setDataKirimNilai] = useState(null);
     const idHeader = dataKirimNilai?.id_header
 
-    console.log(JSON.stringify(dataKirimNilai, null, 2));
-
+    // console.log(JSON.stringify(dataKirimNilai, null, 2));
 
     const [grid, setGrid] = useState(false);
     const [isViewKirimPenilaian, setIsViewKirimPenilaian] = useState(true);
@@ -65,84 +65,17 @@ function KirimPenilaian() {
     useEffect(() => {
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "globaljoinsubwhereget:1:f0387a49-eaeb-11ec-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getkirimpenilaian:1:5b1232ce-2dab-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_join_where_sub",
+                        "name": "get_data",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_assessment_header",
-                            "select": [
-                                "x_academic_class.class",
-                                "x_academic_class.sub_class",
-                                "x_academic_subject_master.nama_mata",
-                                "users.name",
-                                "x_academic_year.academic_year",
-                                "x_academic_year.semester",
-                                "x_assessment_header.status",
-                                "x_assessment_header.send_date",
-                                "x_assessment_header.id"
-                            ],
-                            "paginate": 10,
-                            "join": [
-                                {
-                                    "tbl_join": "x_academic_class",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "class_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subjects",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "subjects_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subject_master",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects",
-                                    "foregenkey": "academic_subjects_master_id"
-                                },
-
-                                {
-                                    "tbl_join": "x_academic_year",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_assessment_header",
-                                    "foregenkey": "academic_year_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subjects_schedule",
-                                    "refkey": "academic_subjects_id",
-                                    "tbl_join2": "x_academic_subjects",
-                                    "foregenkey": "id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_teachers",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule",
-                                    "foregenkey": "teachers_id"
-                                }, {
-                                    "tbl_join": "users",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_teachers",
-                                    "foregenkey": "user_id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_assessment_header",
-                                    "tbl_field": "academic_year_id",
-                                    "tbl_value": academicYear,
-                                    "operator": "="
-                                },
-
-                            ],
-                            "order_coloumn": "x_assessment_header.updated_at",
-                            "order_by": "desc"
+                            "id_academic": academicYear,
+                            "result": 10
                         }
-                    },
-                    {
+                    }, {
                         "name": "page",
                         "type": "string",
                         "value": "1"
@@ -150,6 +83,7 @@ function KirimPenilaian() {
                 ]
             }
         ).then(function (response) {
+            // console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value)
             setGetKirimPenilaian(dataRes?.data?.data)
         })
@@ -195,11 +129,11 @@ function KirimPenilaian() {
                 dataIndex: 'tanggalProses',
                 defaultSortOrder: 'descend',
             },
-            // {
-            //     title: 'Dibuat oleh',
-            //     dataIndex: 'dibuatOleh',
-            //     defaultSortOrder: 'descend',
-            // },
+            {
+                title: 'Dibuat oleh',
+                dataIndex: 'dibuatOleh',
+                defaultSortOrder: 'descend',
+            },
             {
                 title: 'Aksi',
                 dataIndex: 'aksi',
@@ -216,13 +150,13 @@ function KirimPenilaian() {
         const data = getKirimPenilaian.map((data, index) => {
             return {
                 no: index + 1,
-                kelas: `${data.class} / ${data.sub_class}`,
-                mataPelajaran: data.nama_mata,
-                pendidik: data.name,
-                ta_smt: `${data.academic_year} / ${data.semester}`,
-                status: data.status,
+                kelas: `${data.kelas} / ${data.sub_kelas}`,
+                mataPelajaran: data.matapelajaran,
+                pendidik: data.pendidik,
+                ta_smt: `${data.tahun_akademik} / ${data.semester}`,
+                status: data.status.charAt(0).toUpperCase() + data.status.slice(1),
                 tanggalProses: data.send_date,
-                // dibuatOleh: ''
+                dibuatOleh: data.created_by,
             }
         })
 
@@ -238,25 +172,11 @@ function KirimPenilaian() {
     }
 
     const CardKirimPenilaian = () => {
-        // // const channelList = [
-        //     {
-        //         // imageUrl: 'user.png',
-        //         title: 'Penjaskes',
-        //         tag1: 'Kelas 2A',
-        //         tag2: '2020 / Ganjil',
-        //     },
-        //     {
-        //         // imageUrl: 'user.png',
-        //         title: 'Penjaskes',
-        //         tag2: '2020 / Ganjil',
-        //         tag1: 'Kelas 2A',
-        //     },
-        // ];
 
         const channelList = getKirimPenilaian.map((data, index) => {
             return {
                 no: index + 1,
-                tag1: `${data.class} / ${data.sub_class}`,
+                tag1: `${data.class_type} / ${data.sub_class}`,
                 mataPelajaran: data.nama_mata,
                 pendidik: data.name,
                 tag2: `${data.academic_year} / ${data.semester}`,
@@ -290,7 +210,7 @@ function KirimPenilaian() {
                                     className="p-1 w-100"
                                 />
                             </a> */}
-                            <h4 className="fw-700 font-xs mt-5">{channelList.mataPelajaran}</h4>
+                            <h4 className="fw-700 font-xs mt-5">{value.mataPelajaran}</h4>
                             <div className="clearfix"></div>
                             {value.tag1 ? (
                                 <span
@@ -323,7 +243,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Pendidik</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {channelList.pendidik}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.pendidik}</p>
                                     </div>
                                 </div>
 
@@ -332,7 +252,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Status</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {channelList.status}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.status.charAt(0).toUpperCase() + value.status.slice(1)}</p>
                                     </div>
                                 </div>
 
@@ -341,7 +261,7 @@ function KirimPenilaian() {
                                         <p className="font-xssss float-left lh-1">Tanggal Proses</p>
                                     </div>
                                     <div className="">
-                                        <p className="font-xssss float-left lh-1">: {channelList.tanggalProses}</p>
+                                        <p className="font-xssss float-left lh-1">: {value.tanggalProses.split(' ')[0]}</p>
                                     </div>
                                 </div>
                             </div>
@@ -417,7 +337,7 @@ function KirimPenilaian() {
         console.log(data)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "getkirimpenilaiandetail:1:15ba37d7-1547-11ed-9ea6-c6ec5d98c2df",
+                "processDefinitionId": "getkirimpenilaiandetail:1:e4823951-2cd1-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -425,8 +345,8 @@ function KirimPenilaian() {
                         "type": "json",
                         "value": {
                             "id_academic": academicYear,
-                            "id_class": data.id_class_filter, // 86
-                            "id_matpel":  data.id_mapel_filter //225 220
+                            "id_class": data.id_class_filter,
+                            "id_matpel": data.id_mapel_filter
                         }
                     }
                 ]
@@ -435,13 +355,16 @@ function KirimPenilaian() {
             {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 },
             }
         ).then(function (response) {
+            console.log(response);
             const dataRes = JSON.parse(response.data.variables[2].value);
+            console.log(dataRes);
             const dataKirim = dataRes.data
             const rsCode = dataRes.code
-            
+
 
             if (rsCode === true) {
                 setDataKirimNilai(dataKirim);
@@ -466,7 +389,7 @@ function KirimPenilaian() {
         axios
             .post(
                 BASE_URL, {
-                "processDefinitionId": "GlobalUpdateRecord:2:d08b0e52-d595-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
                 "returnVariables": true,
                 "variables": [
                     {
@@ -486,8 +409,9 @@ function KirimPenilaian() {
             },
                 {
                     headers: {
-                        "Content-Type": "application/json",
-                    },
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
                 }
             )
             .then(function (response) {
@@ -585,11 +509,11 @@ function KirimPenilaian() {
         const data = [
             {
                 key: "1",
-                nilaiKkm: dataKirimNilai?.interval_predikat?.data[0]?.min,
+                nilaiKkm: dataKirimNilai?.interval_predikat?.data[0]?.kkm,
                 predikat1: `${dataKirimNilai?.interval_predikat?.data[0]?.name} : Sangat Baik`,
                 predikat2: `${dataKirimNilai?.interval_predikat?.data[1]?.name} : Baik`,
                 predikat3: `${dataKirimNilai?.interval_predikat?.data[2]?.name} : Cukup`,
-                predikat4: `${dataKirimNilai?.interval_predikat?.data[1]?.name} : Kurang`,
+                predikat4: `${dataKirimNilai?.interval_predikat?.data[3]?.name} : Kurang`,
             },
             {
                 key: "2",
@@ -624,48 +548,6 @@ function KirimPenilaian() {
             })
             return tmp;
         }
-
-        const data_sampel = [
-            {
-                key: '1',
-                no: '1',
-                namaSiswa: 'Boy Jati Asmara',
-                kelas: '1A',
-                kkm: '75',
-                nilaiPengetahuan: '65',
-                predikatPengetahuan: 'D',
-                nilaiKeterampilan: '80',
-                predikatKeterampilan: 'C',
-                predikatSpiritual: 'Baik',
-                predikatSosial: 'Baik',
-            },
-            {
-                key: '2',
-                no: '2',
-                namaSiswa: 'Rochy Putiary',
-                kelas: '1A',
-                kkm: '75',
-                nilaiPengetahuan: '87',
-                predikatPengetahuan: 'B',
-                nilaiKeterampilan: '97',
-                predikatKeterampilan: 'A',
-                predikatSpiritual: 'Sangat Baik',
-                predikatSosial: 'Baik',
-            },
-            {
-                key: '3',
-                no: '3',
-                namaSiswa: 'Yaris Riyadi',
-                kelas: '1A',
-                kkm: '75',
-                nilaiPengetahuan: '100',
-                predikatPengetahuan: 'A',
-                nilaiKeterampilan: '91',
-                predikatKeterampilan: 'A',
-                predikatSpiritual: 'Baik',
-                predikatSosial: 'Baik',
-            },
-        ];
 
         return (
             <div className="container px-3 py-4">

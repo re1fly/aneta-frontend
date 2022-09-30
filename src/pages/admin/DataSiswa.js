@@ -34,7 +34,6 @@ import Search from "antd/es/input/Search";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
 import axios from "axios";
-import {BASE_URL} from "../../api/Url";
 import pagination from "../../components/Pagination";
 import Filter from "../../components/Filter";
 import {useDispatch, useSelector} from "react-redux";
@@ -44,6 +43,13 @@ import {DataFormSiswaCreate} from "../../components/form/AdminSiswaCreate";
 import Swal from "sweetalert2";
 import {dateNow} from "../../components/misc/date";
 import {FilterAcademic} from "../../components/FilterAcademic";
+import {
+    create_siswa,
+    global_data_join_where,
+    global_join_sub_where_get, global_update,
+    update_siswa,
+    url_by_institute
+} from "../../api/reference";
 
 function DataSiswaAdmin() {
     const [grid, setGrid] = useState(false);
@@ -80,9 +86,9 @@ function DataSiswaAdmin() {
         setRefreshState(false)
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -200,8 +206,8 @@ function DataSiswaAdmin() {
                 setBtnPagination(pagination);
             });
 
-        axios.post(BASE_URL, {
-                "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_data_join_where,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -254,9 +260,9 @@ function DataSiswaAdmin() {
 
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -324,46 +330,6 @@ function DataSiswaAdmin() {
             setBtnPagination(DataSearch?.data?.links);
         }
     }, [DataSearch]);
-
-    // useEffect(()=> {
-    //     axios.post(BASE_URL, {
-    //             "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
-    //             "returnVariables": true,
-    //             "variables": [
-    //                 {
-    //                     "name": "global_get_where",
-    //                     "type": "json",
-    //                     "value": {
-    //                         "tbl_name": "x_academic_class",
-    //                         "pagination": false,
-    //                         "total_result": 2,
-    //                         "order_coloumn": "x_academic_class.class",
-    //                         "order_by": "asc",
-    //                         "data": [
-    //                             {
-    //                                 "kondisi": "where",
-    //                                 "tbl_coloumn": "academic_year_id",
-    //                                 "tbl_value": academic,
-    //                                 "operator": "="
-    //                             }
-    //                         ],
-    //                         "tbl_coloumn": [
-    //                             "*"
-    //                         ]
-    //                     }
-    //                 }
-    //             ]
-    //         }, {
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             }
-    //         }
-    //     ).then(function (response) {
-    //         const resClass = response.data.variables[2].value;
-    //         setDataClass(resClass)
-    //     });
-    // }, [academic])
-
 
     const onChange = ({fileList: newFileList}) => {
         setFileList(newFileList);
@@ -960,8 +926,8 @@ function DataSiswaAdmin() {
         console.log(data)
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "createsiswa:2:48922d77-2d01-11ed-9f7a-3e427f6ada72",
+                url_by_institute, {
+                    "processDefinitionId": create_siswa,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -1100,8 +1066,8 @@ function DataSiswaAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        axios.post(BASE_URL, {
-                "processDefinitionId": "updatesiswa:1:b13e4f20-2cca-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": update_siswa,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1222,8 +1188,8 @@ function DataSiswaAdmin() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": global_update,
                         "returnVariables": true,
                         "variables": [
                             {

@@ -32,9 +32,14 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
 import Filter from "../../../components/Filter";
-import {BASE_URL} from "../../../api/Url";
 import {FormKompetensi} from "../../../components/form/Adminkompetensi";
 import Swal from "sweetalert2";
+import {
+    get_data_pelajaran_by_tingkat,
+    get_kompetensi_dashboard,
+    get_where_no_join, global_delete_record, insert_kompetensi,
+    url_by_institute
+} from "../../../api/reference";
 
 export default function KompetensiAdmin() {
     const [grid, setGrid] = useState(false)
@@ -58,9 +63,9 @@ export default function KompetensiAdmin() {
     const _getDataKelas = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": get_where_no_join,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -102,9 +107,9 @@ export default function KompetensiAdmin() {
     const _getDataMapel = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "8812bebe-2cf6-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": get_data_pelajaran_by_tingkat,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -137,8 +142,8 @@ export default function KompetensiAdmin() {
             })
     }
     const _getKompetensi = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getkompetensidashboard:1:519c8d2c-2d93-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_kompetensi_dashboard,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -233,9 +238,9 @@ export default function KompetensiAdmin() {
 
 
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -624,9 +629,9 @@ export default function KompetensiAdmin() {
 
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "insertkompetensi:1:9abf6f02-2d94-11ed-9f7a-3e427f6ada72",
+                    "processDefinitionId": insert_kompetensi,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -698,8 +703,8 @@ export default function KompetensiAdmin() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": global_delete_record,
                         "returnVariables": true,
                         "variables": [
                             {

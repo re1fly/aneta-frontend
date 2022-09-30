@@ -11,17 +11,17 @@ import {
     MenuOutlined,
     EyeOutlined,
     EllipsisOutlined,
-    PicCenterOutlined
+    SearchOutlined
 } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
-import { BASE_URL } from "../../../api/Url";
 import { dateNow } from "../../../components/misc/date";
 import { DataNotFound } from "../../../components/misc/DataNotFound";
+import {get_kirim_penilaian, get_kirim_penilaian_detail, global_update, url_by_institute} from "../../../api/reference";
 
 function KirimPenilaian() {
 
     const [getKirimPenilaian, setGetKirimPenilaian] = useState([]);
-    console.log(getKirimPenilaian);
+    const [btnPagination, setBtnPagination] = useState([]);
     const [dataKirimNilai, setDataKirimNilai] = useState(null);
     const idHeader = dataKirimNilai?.id_header
 
@@ -47,25 +47,55 @@ function KirimPenilaian() {
         </Menu>
     );
 
-    const _onSearch = value => console.log(value);
-
-    function onChange(value) {
-        console.log(`selected ${value}`);
-    }
-
-    function onSearch(val) {
-        console.log('search:', val);
-    }
-
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
     }
 
+    const _onSearch = (value) => {
+        if (value == "") {
+            window.location.reload();
+        } else {
+            notification.info({
+                message: "Search",
+                description: "Mencari data : " + value,
+                duration: 1,
+                icon: <SearchOutlined />,
+            });
+            axios.post(url_by_institute,
+                {
+                    "processDefinitionId": "carikirimpenilaian:2:dfc470a1-4069-11ed-8f22-927b5be84510",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_data",
+                            "type": "json",
+                            "value": {
+                                "id_academic": academicYear,
+                                "cari": value
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                }
+            ).then(function (response) {
+                const dataRes = JSON.parse(response?.data?.variables[3]?.value)
+                console.log(dataRes.data);
+                setGetKirimPenilaian(dataRes?.data)
+                const pagination = dataRes?.links;
+                setBtnPagination(pagination)
+            })
+        }
+    }
+
     // kirim penilaian tampilan depan
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getkirimpenilaian:1:5b1232ce-2dab-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_kirim_penilaian,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -86,6 +116,7 @@ function KirimPenilaian() {
             // console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value)
             setGetKirimPenilaian(dataRes?.data?.data)
+            // setBtnPagination(dataRes?.data?.links)
         })
 
     }, [academicYear])
@@ -335,9 +366,9 @@ function KirimPenilaian() {
             if (el.name !== "") data[el.name] = el.value;
         }
         console.log(data)
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getkirimpenilaiandetail:1:e4823951-2cd1-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_kirim_penilaian_detail,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -388,8 +419,8 @@ function KirimPenilaian() {
     const onSubmit = (e) => {
         axios
             .post(
-                BASE_URL, {
-                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                "processDefinitionId": global_update,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -409,9 +440,9 @@ function KirimPenilaian() {
             },
                 {
                     headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                },
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
                 }
             )
             .then(function (response) {

@@ -16,7 +16,6 @@ import {
 import {Link, useHistory} from 'react-router-dom';
 import axios from "axios";
 import Search from "antd/es/input/Search";
-import {BASE_URL} from "../../../api/Url";
 import Adminfooter from '../../../components/Adminfooter';
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
@@ -24,6 +23,7 @@ import {useDispatch} from "react-redux";
 import {GetIdClass} from "../../../redux/Action";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
+import {global_join_sub_where_get, url_by_institute} from "../../../api/reference";
 
 export default function JadwalPelajaranAdminSubKelas() {
     const [grid, setGrid] = useState(false)
@@ -38,9 +38,9 @@ export default function JadwalPelajaranAdminSubKelas() {
     const idClass1 = params.id
 
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {

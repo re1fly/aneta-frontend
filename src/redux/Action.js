@@ -2,6 +2,7 @@ import {notification} from "antd";
 import axios from "axios";
 import {SearchOutlined} from "@ant-design/icons";
 import {BASE_URL} from "../api/Url";
+import {get_data_global, get_where_no_join, url_by_institute} from "../api/reference";
 
 export const searchGlobal =
     (value, paramsPage, processDef, variablesSearch) => (dispatch) => {
@@ -46,10 +47,10 @@ export const searchGlobal =
 export const getProcessId = (keyProcess) => (dispatch) => {
     axios
         .post(
-            BASE_URL,
+            url_by_institute,
             {
                 processDefinitionId:
-                    "getdefinisionid:1:a062e2db-2cd3-11ed-aacc-9a44706f3589",
+                    "getdefinisionid:2:682df39f-3fac-11ed-8f22-927b5be84510",
                 returnVariables: true,
                 variables: [
                     {
@@ -64,11 +65,11 @@ export const getProcessId = (keyProcess) => (dispatch) => {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         )
         .then((response) => {
+            console.log(response)
             const data = JSON.parse(response?.data?.variables[2]?.value);
             const getValue = data?.data;
             dispatch({type: "GET_PROCESSID", value: getValue});
@@ -77,9 +78,8 @@ export const getProcessId = (keyProcess) => (dispatch) => {
 
 export const GetProvinsi = () => (dispatch) => {
     axios
-        .post(BASE_URL, {
-            processDefinitionId:
-                "getdataglobal:2:1080b9fd-2cce-11ed-aacc-9a44706f3589",
+        .post(url_by_institute, {
+            processDefinitionId: get_data_global,
             returnVariables: true,
             variables: [
                 {
@@ -108,9 +108,8 @@ export const GetProvinsi = () => (dispatch) => {
 
 export const GetCity = (id_provinsi) => (dispatch) => {
     axios
-        .post(BASE_URL, {
-            processDefinitionId:
-                "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        .post(url_by_institute, {
+            processDefinitionId: get_where_no_join,
             returnVariables: true,
             variables: [
                 {
@@ -147,9 +146,8 @@ export const GetCity = (id_provinsi) => (dispatch) => {
 
 export const GetKecamatan = (id_city) => (dispatch) => {
     axios
-        .post(BASE_URL, {
-            processDefinitionId:
-                "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        .post(url_by_institute, {
+            processDefinitionId: get_where_no_join,
             returnVariables: true,
             variables: [
                 {
@@ -186,9 +184,8 @@ export const GetKecamatan = (id_city) => (dispatch) => {
 
 export const GetKelurahan = (id_kecamatan) => (dispatch) => {
     axios
-        .post(BASE_URL, {
-            processDefinitionId:
-                "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        .post(url_by_institute, {
+            processDefinitionId: get_where_no_join,
             returnVariables: true,
             variables: [
                 {

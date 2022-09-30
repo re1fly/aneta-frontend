@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {BASE_URL} from "../api/Url";
@@ -12,21 +12,102 @@ function Login() {
     let router = useHistory();
     const loadingIcon = <LoadingOutlined style={{fontSize: 25, color: 'white'}} spin/>;
 
+    const _getALlProcDef = () => {
+        axios.post(BASE_URL, {
+            "processDefinitionId": "getdataglobal:2:1080b9fd-2cce-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_getdata",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "referensi_flowable",
+                        "tbl_coloumn": [
+                            "*"
+                        ],
+                        "order_coloumn": "id",
+                        "order_by": "asc",
+                        "pagination": false,
+                        "total_result": 2
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(res => {
+            const dataRes = JSON.parse(res?.data?.variables[2]?.value);
+            const allProcDef = dataRes.data
+            allProcDef.map(data => {
+                sessionStorage.setItem(data.key, data.proses_def_id)
+            })
+            console.log(allProcDef)
+        })
+    }
+    const _getApiKey = (valueInstitute) => {
+        axios.post(BASE_URL, {
+            "processDefinitionId": "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where_sub_first",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "ref_api_key",
+
+                        "join": [
+                            {
+                                "tbl_join": "m_institutes",
+                                "refkey": "id",
+                                "tbl_join2": "ref_api_key",
+                                "foregenkey": "institute_id"
+                            }
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "ref_api_key",
+                                "tbl_field": "institute_id",
+                                "tbl_value": valueInstitute,
+                                "operator": "="
+                            }
+                        ]
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(res => {
+            const response = JSON.parse(res?.data?.variables[2]?.value);
+            const dataRes = response.data
+            localStorage.setItem('url', dataRes.endpoint)
+            localStorage.setItem('school', dataRes.name)
+        })
+    }
+
+
+    useEffect(() => {
+        _getALlProcDef()
+    }, []);
+
+
     const _handleLogin = (e) => {
         e.preventDefault()
-        axios.post('https://lms.aneta.id/wp-login.php', {
-            "log": email,
-            "pwd": password
-        },
-        {
-            "Access-Control-Allow-Origin" : "*"
-        }).then(
-        res => {
-            console.log('response login wp: ',res)
-        }
-    ).catch(err => console.log(err))
+        // axios.post('https://lms.aneta.id/wp-login.php', {
+        //         "log": email,
+        //         "pwd": password
+        //     },
+        //     {
+        //         "Access-Control-Allow-Credentials": "*",
+        //     }).then(
+        //     res => {
+        //         console.log(res)
+        //     }
+        // )
         axios.post(BASE_URL, {
-            "processDefinitionId": "login:1:75aee969-2cc5-11ed-aacc-9a44706f3589",
+            "processDefinitionId": "login:2:24c7ee2f-3ed2-11ed-b328-e21411de0f19",
             "returnVariables": true,
             "variables": [
                 {
@@ -53,7 +134,8 @@ function Login() {
                 localStorage.setItem('token', dataLogin.token)
                 localStorage.setItem('user_id', dataLogin.user.id)
                 localStorage.setItem('institute', dataLogin.user.institute_id)
-                // localStorage.setItem('institute', 'null')
+
+                _getApiKey(localStorage.getItem('institute'))
 
                 if (dataLogin.user.user_role_id === 1) {
                     localStorage.setItem('role', 'admin')
@@ -78,6 +160,7 @@ function Login() {
         })
 
     };
+
 
     return (
         <Fragment>

@@ -1,6 +1,4 @@
 import axios from "axios";
-import { BASE_URL } from "../../../api/Url";
-
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
@@ -9,6 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProcessId } from "../../../redux/Action";
 import { PageHeader, notification, Select, Card, Row, Table, Input } from "antd"
 import { DataNotFound } from "../../../components/misc/DataNotFound";
+import {
+    global_join_sub_where_get,
+    input_deskripsi_sikap_raport,
+    insert_input_deskripsi_raport,
+    url_by_institute
+} from "../../../api/reference";
 
 function InputDataDeskripsiSikap() {
     const userId = localStorage.getItem("user_id");
@@ -31,9 +35,9 @@ function InputDataDeskripsiSikap() {
     }, [])
 
     useEffect(() => {
-            axios.post(BASE_URL,
+            axios.post(url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -91,9 +95,9 @@ function InputDataDeskripsiSikap() {
     }, [academic])
 
     const _getDataDeskripsiSikap = () => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "inputdeskripsisikapraport:1:6e4117f6-2cd1-11ed-aacc-9a44706f3589",
+                "processDefinitionId": input_deskripsi_sikap_raport,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -243,8 +247,8 @@ function InputDataDeskripsiSikap() {
 
         axios
             .post(
-                BASE_URL, {
-                "processDefinitionId": "343656c9-2daa-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                "processDefinitionId": insert_input_deskripsi_raport,
                 "returnVariables": true,
                 "variables": [
                     {

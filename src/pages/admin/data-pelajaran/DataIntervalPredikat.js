@@ -16,10 +16,15 @@ import Search from "antd/lib/input/Search";
 
 import Filter from "../../../components/Filter";
 import axios from "axios";
-import {BASE_URL} from "../../../api/Url";
 import Swal from "sweetalert2";
 import {FormAdminKelas} from "../../../components/form/AdminKelas";
 import {FormAdminDataInterval} from "../../../components/form/AdminDataInterval";
+import {
+    delete_interval_predikat,
+    get_data_interval_predikat,
+    sinkronisasi_interval, update_interval_predikat,
+    url_by_institute
+} from "../../../api/reference";
 
 function DataIntervalPredikat() {
     const [grid, setGrid] = useState(false);
@@ -32,8 +37,8 @@ function DataIntervalPredikat() {
 
 
     const getDataInterval = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "dedcd8f3-2d8c-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_data_interval_predikat,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -69,8 +74,8 @@ function DataIntervalPredikat() {
         });
     }
     const sinkronisasiData = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "819397e7-2d8f-11ed-9f7a-3e427f6ada72",
+        axios.post(url_by_institute, {
+                "processDefinitionId": sinkronisasi_interval,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -124,8 +129,8 @@ function DataIntervalPredikat() {
             confirmButtonText: 'Hapus'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "380b3aa5-fc3c-11ec-9ea6-c6ec5d98c2df",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": delete_interval_predikat,
                         "returnVariables": true,
                         "variables": [
                             {
@@ -175,8 +180,8 @@ function DataIntervalPredikat() {
             if (el.name !== "") data[el.name] = el.value;
         }
 
-        axios.post(BASE_URL, {
-                "processDefinitionId": "e2e8ced4-2d8d-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": update_interval_predikat,
                 "returnVariables": true,
                 "variables": [
                     {

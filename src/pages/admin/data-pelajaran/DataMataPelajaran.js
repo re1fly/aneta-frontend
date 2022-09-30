@@ -1,8 +1,7 @@
-import React, {Fragment, useState, useEffect} from "react"
+import React, { Fragment, useState, useEffect } from "react"
 import axios from "axios";
-import {BASE_URL} from "../../../api/Url";
-import {useDispatch, useSelector} from "react-redux";
-import {getProcessId, searchGlobal} from "../../../redux/Action";
+import { useDispatch, useSelector } from "react-redux";
+import { getProcessId, searchGlobal } from "../../../redux/Action";
 import {
     Menu,
     Card,
@@ -34,11 +33,17 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
 import Filter from "../../../components/Filter";
-import {FormAdminPelajaran} from "../../../components/form/AdminDataPelajaran";
+import { FormAdminPelajaran } from "../../../components/form/AdminDataPelajaran";
 import Swal from "sweetalert2";
-import {dateNow} from "../../../components/misc/date";
-import {pageLoad} from "../../../components/misc/loadPage";
-import {FilterAcademic} from "../../../components/FilterAcademic";
+import { dateNow } from "../../../components/misc/date";
+import { pageLoad } from "../../../components/misc/loadPage";
+import { FilterAcademic } from "../../../components/FilterAcademic";
+import {
+    cari_data_mata_pelajaran, data_mata_pelajaran_insert, delete_mata_pelajaran,
+    get_data_global,
+    get_data_mata_pelajaran, global_data_join_where, update_mata_pelajaran,
+    url_by_institute
+} from "../../../api/reference";
 
 export default function DataMataPelajaranAdmin() {
     const [grid, setGrid] = useState(false)
@@ -102,7 +107,7 @@ export default function DataMataPelajaranAdmin() {
         console.log('params', pagination, filters, sorter, extra);
     }
 
-    const _onSelectMenu = ({key}) => {
+    const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
     };
 
@@ -128,11 +133,11 @@ export default function DataMataPelajaranAdmin() {
                 message: "Search",
                 description: "Mencari data : " + value,
                 duration: 1,
-                icon: <SearchOutlined/>,
+                icon: <SearchOutlined />,
             });
-            axios.post(BASE_URL,
+            axios.post(url_by_institute,
                 {
-                    "processDefinitionId": "caridatamatapelajaran:1:e2e6ba84-2d87-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": cari_data_mata_pelajaran,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -140,7 +145,7 @@ export default function DataMataPelajaranAdmin() {
                             "type": "json",
                             "value": {
                                 "id_academic": academic,
-                                "paginate": 100,
+                                "paginate": 10,
                                 "cari": value
                             }
                         },
@@ -162,9 +167,9 @@ export default function DataMataPelajaranAdmin() {
 
     const getListPelajaran = () => {
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getdatamatapelajaran:2:51e2a256-2d89-11ed-9f7a-3e427f6ada72",
+                "processDefinitionId": get_data_mata_pelajaran,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -185,8 +190,8 @@ export default function DataMataPelajaranAdmin() {
         ).then(function (response) {
             const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
             setGetPelajaran(pelajaran?.data?.data)
-            console.log(pelajaran);
             const pagination = pelajaran?.data?.links;
+            console.log(pagination);
             setBtnPagination(pagination)
         })
     }
@@ -195,9 +200,9 @@ export default function DataMataPelajaranAdmin() {
 
         getListPelajaran()
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getdataglobal:2:1080b9fd-2cce-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_data_global,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -221,53 +226,53 @@ export default function DataMataPelajaranAdmin() {
             setGetKelompokBelajar(dataRes?.data?.data)
         })
 
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "global_join_where",
-                        "type": "json",
-                        "value": {
-                            "tbl_induk": "x_academic_year",
-                            "select": [
-                                "x_academic_year.id as id_academic",
-                                "x_academic_year.academic_year",
-                                "m_institutes.id",
-                                "x_academic_year.semester"
-                            ],
-                            "paginate": 10,
-                            "join": [
-                                {
-                                    "tbl_join": "m_institutes",
-                                    "foregenkey": "institute_id",
-                                    "refkey": "id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_academic_year",
-                                    "tbl_field": "institute_id",
-                                    "tbl_value": institute,
-                                    "operator": "="
-                                }
-                            ],
-                            "order_coloumn": "x_academic_year.academic_year",
-                            "order_by": "asc"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "type": "string",
-                        "value": "1"
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_data_join_where,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_academic_year",
+                        "select": [
+                            "x_academic_year.id as id_academic",
+                            "x_academic_year.academic_year",
+                            "m_institutes.id",
+                            "x_academic_year.semester"
+                        ],
+                        "paginate": 1000,
+                        "join": [
+                            {
+                                "tbl_join": "m_institutes",
+                                "foregenkey": "institute_id",
+                                "refkey": "id"
+                            }
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_academic_year",
+                                "tbl_field": "institute_id",
+                                "tbl_value": institute,
+                                "operator": "="
+                            }
+                        ],
+                        "order_coloumn": "x_academic_year.academic_year",
+                        "order_by": "asc"
                     }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
+                {
+                    "name": "page",
+                    "type": "string",
+                    "value": "1"
                 }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
             const academics = JSON.parse(response?.data?.variables[3]?.value);
             setAcademicYears(academics?.data?.data);
@@ -296,12 +301,12 @@ export default function DataMataPelajaranAdmin() {
                         <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                             <div
                                 className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
-                <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                  {value.status == true ? 'Nonaktif' : 'Aktif'}
-                </span>
+                                <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                    {value.status == true ? 'Nonaktif' : 'Aktif'}
+                                </span>
                                 <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
-                                          overlay={_Account}>
-                                    <EllipsisOutlined/>
+                                    overlay={_Account}>
+                                    <EllipsisOutlined />
                                 </Dropdown>
                                 {/* <a
               href=""
@@ -324,24 +329,24 @@ export default function DataMataPelajaranAdmin() {
                                 {value.kode ? (
                                     <span
                                         className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
-                    {value.kode}
-                  </span>
+                                        {value.kode}
+                                    </span>
                                 ) : (
                                     ''
                                 )}
                                 {value.tag2 ? (
                                     <span
                                         className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 bg-lightblue d-inline-block text-grey-800 mb-1 mr-1">
-                    {value.tag2}
-                  </span>
+                                        {value.tag2}
+                                    </span>
                                 ) : (
                                     ''
                                 )}
                                 {value.tag3 ? (
                                     <span
                                         className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-info d-inline-block text-info mb-1">
-                    {value.tag3}
-                  </span>
+                                        {value.tag3}
+                                    </span>
                                 ) : (
                                     ''
                                 )}
@@ -467,7 +472,7 @@ export default function DataMataPelajaranAdmin() {
                         {status.map((status) => {
                             let color = status == 'true' ? "green" : "red";
                             return (
-                                <Tag style={{borderRadius: "15px"}} color={color} key={status}>
+                                <Tag style={{ borderRadius: "15px" }} color={color} key={status}>
                                     {status == 'true' ? "Aktif" : "Nonaktif"}
                                 </Tag>
                             );
@@ -481,9 +486,9 @@ export default function DataMataPelajaranAdmin() {
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined style={{color: "black"}} onClick={() => viewDetailPelajaran(record)}/>
-                        <EditOutlined style={{color: "blue"}} onClick={() => viewEditPelajaran(record)}/>
-                        <DeleteOutlined style={{color: 'red'}} onClick={() => deletePelajaran(record)}/>
+                        <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailPelajaran(record)} />
+                        <EditOutlined style={{ color: "blue" }} onClick={() => viewEditPelajaran(record)} />
+                        <DeleteOutlined style={{ color: 'red' }} onClick={() => deletePelajaran(record)} />
                     </Space>
                 ),
             },
@@ -492,12 +497,12 @@ export default function DataMataPelajaranAdmin() {
         return (
             <>
                 <Table className=""
-                       columns={columns}
-                       dataSource={channelList}
-                       onChange={onChangeTable}
-                       pagination={false}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={channelList}
+                    onChange={onChangeTable}
+                    pagination={false}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
                 <div className='text-center mt-4'>
                     {btnPagination.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
@@ -541,70 +546,38 @@ export default function DataMataPelajaranAdmin() {
                             <div className="row">
                                 <div className="col-lg-8 col-md-6 my-2">
                                     <Button className="mr-4" type="primary" shape="round" size='middle'
-                                            onClick={viewCreatePelajaran}>
+                                        onClick={viewCreatePelajaran}>
                                         Tambah Data
                                     </Button>
                                     {/* <Filter title1="Mata Pelajaran" title2="Kelas" /> */}
                                     <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
-                                                    selectYear={academicYears.map((data) => {
-                                                            return (
-                                                                <>
-                                                                    <option value={data.id_academic}>
-                                                                        {data.academic_year} Semester {data.semester}
-                                                                    </option>
-                                                                </>
-                                                            )
-                                                        }
-                                                    )}/>
-                                    {/* <Dropdown overlay={_filterMenu}>
-                    <a className="ant-dropdown-link mr-4 font-bold"
-                    onClick={e => e.preventDefault()}>
-                      Filter by <DownOutlined/>
-                    </a>
-                  </Dropdown>
-                  <Dropdown overlay={_sortMenu}>
-                    <a className="ant-dropdown-link font-bold"
-                    onClick={e => e.preventDefault()}>
-                      Sort by <DownOutlined/>
-                    </a>
-                  </Dropdown> */}
+                                        selectYear={academicYears.map((data) => {
+                                            return (
+                                                <>
+                                                    <option value={data.id_academic}>
+                                                        {data.academic_year} Semester {data.semester}
+                                                    </option>
+                                                </>
+                                            )
+                                        }
+                                        )} />
                                 </div>
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                            onSearch={_onSearch} style={{width: '80%'}}/>
+                                        onSearch={_onSearch} style={{ width: '80%' }} />
                                     {grid == false ?
                                         <a>
-                                            <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
-                                                              onClick={() => setGrid(true)}/>
+                                            <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
+                                                onClick={() => setGrid(true)} />
                                         </a> :
                                         <a>
-                                            <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
-                                                          onClick={() => setGrid(false)}/>
+                                            <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
+                                                onClick={() => setGrid(false)} />
                                         </a>}
                                 </div>
                             </div>
                         </Card>
-                        {/* <div className="d-flex">
-              <div className="mt-1">
-                <h5 className="fw-600 mb-1">
-                  Tahun Akademik
-                </h5>
-                <input
-                type="text"
-                className="form-control w-100"
-                />
-              </div>
-              <div className="mt-1 ml-3">
-                <h5 className="fw-600 mb-1">
-                  Kelas
-                </h5>
-                <input
-                type="text"
-                className="form-control w-100 mb-3"
-                />
-              </div>
-            </div> */}
-                        {grid ? <CardDataPelajaran/> : <TabelDataPelajaran/>}
+                        {grid ? <CardDataPelajaran /> : <TabelDataPelajaran />}
                     </div>
                 </div>
             </div>
@@ -620,19 +593,19 @@ export default function DataMataPelajaranAdmin() {
                             <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                                 <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
                                     <i onClick={() => setIsViewPelajaran(true)}
-                                       className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
+                                        className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                                         Tambah Pelajaran
                                     </h4>
                                 </div>
                                 <div className="card-body p-lg-5 p-4 w-100 border-0 ">
                                     <form id="teacher_form"
-                                          onSubmit={createPelajaran}
-                                          method="POST">
+                                        onSubmit={createPelajaran}
+                                        method="POST">
                                         <div className="row justify-content-center">
                                             <div className="col-lg-4 text-center">
                                                 <figure className="avatar mr-auto mb-4 mt-2 w100">
-                                                    <Card style={{width: 200}}>
+                                                    <Card style={{ width: 200 }}>
                                                         <ImgCrop rotate>
                                                             <Upload
                                                                 name="image_siswa"
@@ -640,9 +613,9 @@ export default function DataMataPelajaranAdmin() {
                                                                 className="avatar-uploader"
                                                                 showUploadList={false}
                                                                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                                                // onPreview={onPreview}
+                                                            // onPreview={onPreview}
                                                             >
-                                                                <PlusOutlined/>
+                                                                <PlusOutlined />
                                                             </Upload>
                                                         </ImgCrop>
                                                     </Card>
@@ -769,11 +742,11 @@ export default function DataMataPelajaranAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        // const dateNow = new Date().toLocaleString()
+        const dateNow = new Date().toLocaleString()
         console.log(data)
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "datamatapelajaraninsert1:1:e299531a-2d86-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": data_mata_pelajaran_insert,
             "returnVariables": true,
             "variables": [
                 {
@@ -807,6 +780,7 @@ export default function DataMataPelajaranAdmin() {
                             "urut_lapor": data.noUrut_rapor,
                             "status": data.status,
                             "kel_id": data.kelompok,
+                            "updated_at": dateNow,
                         }
                     }
                 },
@@ -863,46 +837,8 @@ export default function DataMataPelajaranAdmin() {
         console.log(data)
         // console.log(selectedUser.idKelompok);
 
-        axios.post(BASE_URL, {
-            // "processDefinitionId": "bc121392-fb41-11ec-ac5e-66fc627bf211",
-            // "returnVariables": true,
-            // "variables": [
-            //   {
-            //     "name": "validasi",
-            //     "type": "json",
-            //     "value": {
-            //       "data": {
-            //         "code": "required",
-            //         "nama_mata": "required",
-            //         "urut_lapor": "required",
-            //         "kel_id": "required",
-            //         "status": "required",
-            //       },
-            //       "code": data.kode_pelajaran,
-            //       "nama_mata": data.nama_pelajaran,
-            //       "urut_lapor": data.noUrut_rapor,
-            //       "kel_id": data.kelompok,
-            //       "status": data.status,
-            //     }
-            //   },
-            //   {
-            //     "name": "x_academic_subject_master",
-            //     "type": "json",
-            //     "value": {
-            //       "tbl_name": "x_academic_subject_master",
-            //       "id": selectedUser.idPelajaran,
-            //       "tbl_coloumn": {
-            //         "academic_year_id": academicYear,
-            //         "status": data.status,
-            //         "code": data.kode_pelajaran,
-            //         "nama_mata": data.nama_pelajaran,
-            //         "urut_lapor": data.noUrut_rapor,
-            //         "kel_id": data.kelompok,
-            //       }
-            //     }
-            //   }
-            // ]
-            "processDefinitionId": "updatematapelajaran:1:e2f20d91-2cff-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": update_mata_pelajaran,
             "returnVariables": true,
             "variables": [
                 {
@@ -959,40 +895,25 @@ export default function DataMataPelajaranAdmin() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        // "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
-                        // "returnVariables": true,
-                        // "variables": [
-                        //   {
-                        //     "name": "global_updatedata",
-                        //     "type": "json",
-                        //     "value": {
-                        //       "tbl_name": "x_academic_subject_master",
-                        //       "id": record.idPelajaran,
-                        //       "tbl_coloumn": {
-                        //         "deleted_at": dateNow
-                        //       }
-                        //     }
-                        //   }
-                        // ]
-                        "processDefinitionId": "deletematapelajaran:1:4cebaef7-2cff-11ed-aacc-9a44706f3589",
-                        "returnVariables": true,
-                        "variables": [
-                            {
-                                "name": "get_data",
-                                "type": "json",
-                                "value": {
-                                    "nama_matpel": record.namaPelajaran,
-                                    "academic_year_id": academic
-                                }
+                axios.post(url_by_institute, {
+                    "processDefinitionId": delete_mata_pelajaran,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_data",
+                            "type": "json",
+                            "value": {
+                                "nama_matpel": record.namaPelajaran,
+                                "academic_year_id": academic
                             }
-                        ]
-                    }, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
                         }
+                    ]
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
+                }
                 ).then(function (response) {
                     console.log(response);
                     setRefreshState(true);
@@ -1090,22 +1011,22 @@ export default function DataMataPelajaranAdmin() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader/>
+                <Navheader />
                 <div className="main-content">
-                    <Appheader/>
+                    <Appheader />
                     {/* {isViewPelajaran ? <ViewPelajaran /> : <TambahPelajaran />} */}
                     {
                         isViewPelajaran ?
-                            <ViewPelajaran/> :
+                            <ViewPelajaran /> :
                             isViewCreate ?
-                                <FormCreate/> :
+                                <FormCreate /> :
                                 isViewEdit ?
-                                    <FormEdit/> :
+                                    <FormEdit /> :
                                     isViewDetail ?
-                                        <FormDetail/> :
-                                        <ViewPelajaran/>
+                                        <FormDetail /> :
+                                        <ViewPelajaran />
                     }
-                    <Adminfooter/>
+                    <Adminfooter />
                 </div>
             </div>
         </Fragment>

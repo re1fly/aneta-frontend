@@ -34,10 +34,16 @@ import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
 import {pageLoad} from "../../../components/misc/loadPage";
 import axios from "axios";
-import {BASE_URL} from "../../../api/Url";
 import Swal from "sweetalert2";
 import {FormAdminJadwalPelajaran} from "../../../components/form/AdminJadwalPelajaran";
 import {useParams} from "react-router-dom";
+import {
+    global_delete_record,
+    global_insert,
+    global_join_sub_where_get,
+    global_update,
+    url_by_institute
+} from "../../../api/reference";
 
 export default function JadwalPelajaranAdminDetail() {
     const [grid, setGrid] = useState(false);
@@ -91,9 +97,9 @@ export default function JadwalPelajaranAdminDetail() {
 
     const getListJadwalPelajaran = () => {
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -207,9 +213,9 @@ export default function JadwalPelajaranAdminDetail() {
 
         getListJadwalPelajaran()
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -278,9 +284,9 @@ export default function JadwalPelajaranAdminDetail() {
             setGetMataPelajaran(mataPelajaran)
         })
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1159,9 +1165,9 @@ export default function JadwalPelajaranAdminDetail() {
         const dateNow = new Date().toLocaleString()
         console.log(data);
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_insert,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1220,8 +1226,8 @@ export default function JadwalPelajaranAdminDetail() {
         }
         console.log(data)
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_update,
             "returnVariables": true,
             "variables": [
                 {
@@ -1298,8 +1304,8 @@ export default function JadwalPelajaranAdminDetail() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": global_delete_record,
                         "returnVariables": true,
                         "variables": [
                             {

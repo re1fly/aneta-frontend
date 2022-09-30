@@ -27,12 +27,18 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Filter from '../../../components/Filter';
 import axios from "axios";
-import {BASE_URL} from "../../../api/Url";
-import {getProcessId, searchGlobal} from "../../../redux/Action";
+import {searchGlobal} from "../../../redux/Action";
 import {useDispatch, useSelector} from "react-redux";
 import {FormAdminKelas} from "../../../components/form/AdminKelas";
 import Swal from "sweetalert2";
 import {FilterAcademic} from "../../../components/FilterAcademic";
+import {
+    export_class, get_where_no_join,
+    global_data_join_where,
+    global_join_sub_where_get, global_update,
+    import_class, insert_class,
+    url_by_institute
+} from "../../../api/reference";
 
 export default function DataKelasAdmin() {
     const [grid, setGrid] = useState(false);
@@ -67,14 +73,10 @@ export default function DataKelasAdmin() {
     const searchRedux = useSelector(state => state.search);
     const DataSearch = searchRedux.DataSearch;
 
-    const getProcess = useSelector(state => state.processId);
-    let ProcessId = getProcess.DataProcess;
-
-    let getKeyGlobalJoin;
 
     const _exportDataExcel = () => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "exportclass:1:3bc4d840-2ccc-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": export_class,
             "returnVariables": true,
             "variables": [
                 {
@@ -125,9 +127,9 @@ export default function DataKelasAdmin() {
         const base64 = await convertBase64(uploaded);
         const getLinkUrl = base64.split(',')[1]
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "importclass:1:9c245275-2ccc-11ed-aacc-9a44706f3589",
+                "processDefinitionId": import_class,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -174,9 +176,9 @@ export default function DataKelasAdmin() {
         const base64 = await convertBase64(uploaded);
         const getLinkUrl = base64.split(',')[1]
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "importclass:1:9c245275-2ccc-11ed-aacc-9a44706f3589",
+                "processDefinitionId": import_class,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -246,258 +248,246 @@ export default function DataKelasAdmin() {
 
     }
 
-
     useEffect(() => {
-        dispatch(getProcessId(["globaljoinsubwhereget", "insertclass", "getdatajoinwhere", "globaljoinsubfirst", "GlobalUpdateRecord"]))
-    }, [])
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": global_join_sub_where_get,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where_sub",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_class",
+                            "select": ["x_academic_class.id as id_class",
+                                "r_class_type.class_type as class",
+                                "x_academic_class.sub_class",
+                                "x_academic_class.class_location",
+                                "x_academic_year.academic_year",
+                                "x_academic_year.id as id_academic",
+                                "users.name",
+                                "x_academic_teachers.id as id_walikelas",
+                                "users.institute_id",
+                                "r_class_type.id as id_tingkat"
+                            ],
+                            "paginate": 10,
+                            "join": [
+                                {
+                                    "tbl_join": "x_academic_teachers",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_class",
+                                    "foregenkey": "calss_advisor_id"
 
-    useEffect(() => {
-        if (ProcessId.length != 0) {
-            setRefreshState(false)
-
-            getKeyGlobalJoin = ProcessId.find(item => item.key === "globaljoinsubwhereget");
-            getKeyGlobalJoin = getKeyGlobalJoin.proses_def_id
-
-            axios.post(BASE_URL,
-                {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_join_where_sub",
-                            "type": "json",
-                            "value": {
-                                "tbl_induk": "x_academic_class",
-                                "select": ["x_academic_class.id as id_class",
-                                    "r_class_type.class_type as class",
-                                    "x_academic_class.sub_class",
-                                    "x_academic_class.class_location",
-                                    "x_academic_year.academic_year",
-                                    "x_academic_year.id as id_academic",
-                                    "users.name",
-                                    "x_academic_teachers.id as id_walikelas",
-                                    "users.institute_id",
-                                    "r_class_type.id as id_tingkat"
-                                ],
-                                "paginate": 10,
-                                "join": [
-                                    {
-                                        "tbl_join": "x_academic_teachers",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "calss_advisor_id"
-
-                                    }, {
-                                        "tbl_join": "users",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_teachers",
-                                        "foregenkey": "user_id"
-                                    }, {
-                                        "tbl_join": "x_academic_year",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "academic_year_id"
-                                    },
-                                    {
-                                        "tbl_join": "r_class_type",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_class",
-                                        "foregenkey": "class"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "users",
-                                        "tbl_field": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "="
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_class",
-                                        "tbl_field": "academic_year_id",
-                                        "tbl_value": academic,
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_class",
-                                        "tbl_field": "deleted_at",
-                                        "tbl_value": "",
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    }
-                                ],
-                                "order_coloumn": "x_academic_class.updated_at",
-                                "order_by": "desc"
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": paramsPage
+                                }, {
+                                    "tbl_join": "users",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_teachers",
+                                    "foregenkey": "user_id"
+                                }, {
+                                    "tbl_join": "x_academic_year",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_class",
+                                    "foregenkey": "academic_year_id"
+                                },
+                                {
+                                    "tbl_join": "r_class_type",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_class",
+                                    "foregenkey": "class"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "users",
+                                    "tbl_field": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "academic_year_id",
+                                    "tbl_value": academic,
+                                    "operator": "=",
+                                    "kondisi": "where"
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_class",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "=",
+                                    "kondisi": "where"
+                                }
+                            ],
+                            "order_coloumn": "x_academic_class.updated_at",
+                            "order_by": "desc"
                         }
-                    ]
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": paramsPage
                     }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-            ).then(function (response) {
-                const dataRes = JSON.parse(response.data.variables[3].value);
-                setGetKelas(dataRes.data.data);
-                setBtnPagination(dataRes.data.links);
-            })
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response.data.variables[3].value);
+            setGetKelas(dataRes.data.data);
+            setBtnPagination(dataRes.data.links);
+        })
 
-            axios.post(BASE_URL, {
-                    "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_join_where",
-                            "type": "json",
-                            "value": {
-                                "tbl_induk": "x_academic_teachers",
-                                "select": ["x_academic_teachers.id as id_user",
-                                    "users.name"],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "users",
-                                        "foregenkey": "user_id",
-                                        "refkey": "id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "users",
-                                        "tbl_field": "user_role_id",
-                                        "tbl_value": "2",
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    },
-                                    {
-                                        "tbl_coloumn": "users",
-                                        "tbl_field": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "=",
-                                        "kondisi": "where"
-                                    }
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_data_join_where,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_teachers",
+                            "select": ["x_academic_teachers.id as id_user",
+                                "users.name"],
+                            "paginate": 1000,
+                            "join": [
+                                {
+                                    "tbl_join": "users",
+                                    "foregenkey": "user_id",
+                                    "refkey": "id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "users",
+                                    "tbl_field": "user_role_id",
+                                    "tbl_value": "2",
+                                    "operator": "=",
+                                    "kondisi": "where"
+                                },
+                                {
+                                    "tbl_coloumn": "users",
+                                    "tbl_field": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "=",
+                                    "kondisi": "where"
+                                }
 
-                                ],
-                                "order_coloumn": "users.name",
-                                "order_by": "asc"
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
+                            ],
+                            "order_coloumn": "users.name",
+                            "order_by": "asc"
                         }
-                    ]
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
                     }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-            ).then(function (response) {
-                const dataRes = JSON.parse(response.data.variables[3].value);
-                setWalikelas(dataRes.data.data);
-            })
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response.data.variables[3].value);
+            setWalikelas(dataRes.data.data);
+        })
 
-            axios.post(BASE_URL, {
-                    "processDefinitionId": ProcessId[0].proses_def_id,
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_join_where",
-                            "type": "json",
-                            "value": {
-                                "tbl_induk": "x_academic_year",
-                                "select": [
-                                    "x_academic_year.id as id_academic",
-                                    "x_academic_year.academic_year",
-                                    "m_institutes.id", "x_academic_year.semester"
-                                ],
-                                "paginate": 1000,
-                                "join": [
-                                    {
-                                        "tbl_join": "m_institutes",
-                                        "foregenkey": "institute_id",
-                                        "refkey": "id"
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_academic_year",
-                                        "tbl_field": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "="
-                                    }
-                                ],
-                                "order_coloumn": "x_academic_year.academic_year",
-                                "order_by": "asc"
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": "1"
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_data_join_where,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_join_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_induk": "x_academic_year",
+                            "select": [
+                                "x_academic_year.id as id_academic",
+                                "x_academic_year.academic_year",
+                                "m_institutes.id", "x_academic_year.semester"
+                            ],
+                            "paginate": 1000,
+                            "join": [
+                                {
+                                    "tbl_join": "m_institutes",
+                                    "foregenkey": "institute_id",
+                                    "refkey": "id"
+                                }
+                            ],
+                            "where": [
+                                {
+                                    "tbl_coloumn": "x_academic_year",
+                                    "tbl_field": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ],
+                            "order_coloumn": "x_academic_year.academic_year",
+                            "order_by": "asc"
                         }
-                    ]
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "value": "1"
                     }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-            ).then(function (response) {
-                const academics = JSON.parse(response.data.variables[3].value);
-                setAcademicYears(academics.data.data);
-            })
+            }
+        ).then(function (response) {
+            const academics = JSON.parse(response.data.variables[3].value);
+            setAcademicYears(academics.data.data);
+        })
 
-            axios.post(BASE_URL, {
-                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_get_where",
-                            "type": "json",
-                            "value": {
-                                "tbl_name": "r_class_type",
-                                "pagination": false,
-                                "total_result": 2,
-                                "order_coloumn": "r_class_type.id",
-                                "order_by": "asc",
-                                "data": [
-                                    {
-                                        "kondisi": "where",
-                                        "tbl_coloumn": "institute_id",
-                                        "tbl_value": institute,
-                                        "operator": "="
-                                    }
-                                ],
-                                "tbl_coloumn": [
-                                    "*"
-                                ]
-                            }
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_where_no_join,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_get_where",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "r_class_type",
+                            "pagination": false,
+                            "total_result": 2,
+                            "order_coloumn": "r_class_type.id",
+                            "order_by": "asc",
+                            "data": [
+                                {
+                                    "kondisi": "where",
+                                    "tbl_coloumn": "institute_id",
+                                    "tbl_value": institute,
+                                    "operator": "="
+                                }
+                            ],
+                            "tbl_coloumn": [
+                                "*"
+                            ]
                         }
-                    ]
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-            ).then(function (response) {
-                const resTingkatKelas = JSON.parse(response.data.variables[2].value);
-                setTingkatKelas(resTingkatKelas)
-            })
+            }
+        ).then(function (response) {
+            const resTingkatKelas = JSON.parse(response.data.variables[2].value);
+            setTingkatKelas(resTingkatKelas)
+        })
 
-        }
 
-    }, [paramsPage, ProcessId, isViewKelas, refreshState, academic])
+    }, [paramsPage, isViewKelas, refreshState, academic])
 
 
     useEffect(() => {
@@ -555,7 +545,7 @@ export default function DataKelasAdmin() {
     );
 
     const _onSearch = (value) => {
-        const processDef = ProcessId[3].proses_def_id;
+        const processDef = global_join_sub_where_get;
         const variableSearch = {
             "name": "global_join_where_sub",
             "type": "json",
@@ -978,8 +968,8 @@ export default function DataKelasAdmin() {
             if (el.name !== "") data[el.name] = el.value;
         }
 
-        axios.post(BASE_URL, {
-                "processDefinitionId": "insertclass:1:ac0a260c-2db5-11ed-9f7a-3e427f6ada72",
+        axios.post(url_by_institute, {
+                "processDefinitionId":  insert_class,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1040,7 +1030,6 @@ export default function DataKelasAdmin() {
                 }
             }
         ).then(function (response) {
-            console.log(response);
             const resCode = response.data.variables[4].value
             if (resCode == 200) {
                 setIsViewCreate(false)
@@ -1068,9 +1057,8 @@ export default function DataKelasAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        console.log(data);
-        axios.post(BASE_URL, {
-                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_update,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1133,8 +1121,8 @@ export default function DataKelasAdmin() {
             confirmButtonText: 'Hapus'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": global_update,
                         "returnVariables": true,
                         "variables": [
                             {

@@ -75,7 +75,7 @@ function BerandaSiswa() {
     
     useEffect(() => {
         axios.post(BASE_URL, {
-            "processDefinitionId": "e81e093e-028d-11ed-ac5e-66fc627bf211",
+            "processDefinitionId": "108f9a5e-3aed-11ed-8c53-66682e31e826",
             "returnVariables": true,
             "variables": [
                 {
@@ -83,7 +83,7 @@ function BerandaSiswa() {
                     "type": "json",
                     "value": {
                         "user_id": userId,
-                        "academic_id": academicId
+                        "academic_id": 91
                     }
                 }
             ]
@@ -95,14 +95,12 @@ function BerandaSiswa() {
                 }
             }
         ).then(function (response) {
-            // console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes.data);
             setGetJadwalPelajaran(dataRes?.data);
         })
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+            "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
             "returnVariables": true,
             "variables": [
                 {
@@ -144,12 +142,11 @@ function BerandaSiswa() {
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const data = dataRes[0]
-            console.log(data);
             if ( academicId == null ) {
                 localStorage.setItem('academic_id', data.id)
             }
         })
-    }, [userId]);
+    }, [userId, institute]);
 
     useEffect(() => {
         checkTodayData()

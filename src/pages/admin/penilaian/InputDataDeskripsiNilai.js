@@ -1,6 +1,4 @@
 import axios from "axios";
-import { BASE_URL } from "../../../api/Url";
-
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
@@ -10,6 +8,7 @@ import { getProcessId } from "../../../redux/Action";
 import { PageHeader, notification, Select, Card, Row, Table, Input } from "antd"
 import { GetMapelKelas } from "../../../components/filter/GetMapelKelas";
 import { DataNotFound } from "../../../components/misc/DataNotFound";
+import {get_input_deskripsi, input_data_deskripsi, url_by_institute} from "../../../api/reference";
 
 function InputDataDeskripsiNilai() {
     const userId = localStorage.getItem("user_id");
@@ -34,9 +33,9 @@ function InputDataDeskripsiNilai() {
             if (el.name !== "") data[el.name] = el.value;
         }
         console.log(data)
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getinputdeskripsi:1:ebaee2fa-2cd0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_input_deskripsi,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -158,8 +157,8 @@ function InputDataDeskripsiNilai() {
         if (checkDataFunc()) {
             axios
                 .post(
-                    BASE_URL, {
-                    "processDefinitionId": "inputdatadeskripsi:1:23efd358-2cd1-11ed-aacc-9a44706f3589",
+                    url_by_institute, {
+                    "processDefinitionId": input_data_deskripsi,
                     "returnVariables": true,
                     "variables": [
                         {

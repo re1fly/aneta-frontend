@@ -33,20 +33,30 @@ function JadwalPelajaranSiswa() {
     const [grid, setGrid] = useState(false);
     const [calendar, setCalendar] = useState(true);
     const [getJadwalPelajaran, setGetJadwalPelajaran] = useState([]);
-    const [dataSenin1, setDataSenin1] = useState([])
-    const [dataSelasa1, setDataSelasa1] = useState([])
+    const [dataSenin1, setDataSenin1] = useState([]);
+    const [dataSelasa1, setDataSelasa1] = useState([]);
+    const [dataRabu1, setDataRabu1] = useState([]);
+    const [dataKamis1, setDataKamis1] = useState([]);
+    const [dataJumat1, setDataJumat1] = useState([]);
+    const [dataSabtu1, setDataSabtu1] = useState([]);
+
     const [getKelasSiswa, setGetKelas] = useState([]);
 
     const userName = localStorage.getItem('user_name');
     const userId = localStorage.getItem('user_id')
     const academicYear = localStorage.getItem('academic_id')
 
-    const kelas = `${getKelasSiswa[0]?.class} ${"/"} ${getKelasSiswa[0]?.sub_class}`
-    console.log(kelas);
+    const kelas = `${getKelasSiswa[0]?.class_type} ${"/"} ${getKelasSiswa[0]?.sub_class}`
+    const dataKelas = getKelasSiswa?.map((data, index) => {
+        const kelas = `${data?.class_type} ${"/"} ${data?.sub_class}`
+        return {
+            kelas: kelas,
+        }
+    })
 
     const dataMapper = (dailyData) => {
         let pelajaran = []
-        dailyData.map(function(data, index) {
+        dailyData.map(function (data, index) {
             pelajaran.push({
                 hari: data?.hari,
                 kelas: kelas,
@@ -60,11 +70,19 @@ function JadwalPelajaranSiswa() {
 
     const setDailyData = () => {
         getJadwalPelajaran.filter((data) => {
-            if(data.hari === "senin") {
+            if (data.hari === "senin") {
                 setDataSenin1(dataMapper(data.data))
             } else if (data.hari === "selasa") {
                 setDataSelasa1(dataMapper(data.data))
-            } 
+            } else if (data.hari === "rabu") {
+                setDataRabu1(dataMapper(data.data))
+            } else if (data.hari === "kamis") {
+                setDataKamis1(dataMapper(data.data))
+            } else if (data.hari === "jumat") {
+                setDataJumat1(dataMapper(data.data))
+            } else if (data.hari === "sabtu") {
+                setDataSabtu1(dataMapper(data.data))
+            }
         })
     }
 
@@ -96,11 +114,11 @@ function JadwalPelajaranSiswa() {
 
     useEffect(() => {
         setDailyData()
-    },[getJadwalPelajaran])
+    }, [getJadwalPelajaran])
 
     useEffect(() => {
         axios.post(BASE_URL, {
-            "processDefinitionId": "e81e093e-028d-11ed-ac5e-66fc627bf211",
+            "processDefinitionId": "108f9a5e-3aed-11ed-8c53-66682e31e826",
             "returnVariables": true,
             "variables": [
                 {
@@ -108,7 +126,7 @@ function JadwalPelajaranSiswa() {
                     "type": "json",
                     "value": {
                         "user_id": userId,
-                        "academic_id": academicYear
+                        "academic_id": 91
                     }
                 }
             ]
@@ -121,15 +139,14 @@ function JadwalPelajaranSiswa() {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes);
-            if(dataRes.code == true){
+            // console.log(dataRes);
+            if (dataRes.code == true) {
                 setGetJadwalPelajaran(dataRes?.data);
             }
-            
         })
 
         axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
+            "processDefinitionId": "globaljoinsubfirst:1:d225c704-3aeb-11ed-8c53-66682e31e826",
             "returnVariables": true,
             "variables": [
                 {
@@ -137,14 +154,7 @@ function JadwalPelajaranSiswa() {
                     "type": "json",
                     "value": {
                         "tbl_induk": "x_academic_students",
-                        "select": [
-                            "m_user_profile.nisn",
-                            "users.name",
-                            "x_academic_class.class",
-                            "x_academic_year.semester",
-                            "x_academic_year.academic_year",
-                            "x_academic_class.sub_class"
-                        ],
+                        "select": ["m_user_profile.nisn", "users.name", "x_academic_class.class", "x_academic_year.semester", "x_academic_year.academic_year", "x_academic_class.sub_class", "r_class_type.class_type"],
                         "join": [
                             {
                                 "tbl_join": "users",
@@ -173,6 +183,11 @@ function JadwalPelajaranSiswa() {
                                 "refkey": "institute_id",
                                 "tbl_join2": "m_institutes",
                                 "foregenkey": "id"
+                            }, {
+                                "tbl_join": "r_class_type",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_class",
+                                "foregenkey": "class"
                             }
                         ],
 
@@ -243,66 +258,67 @@ function JadwalPelajaranSiswa() {
         ];
 
         // const kelas = `${getKelasSiswa[0]?.class} ${"/"} ${getKelasSiswa[0]?.sub_class}`
+        // console.log(kelas);
 
-        const dataSenin = senin[0]?.data?.map((data, index) => {
-            return {
-                hari: data?.hari,
-                kelas: kelas,
-                namaPelajaran: data?.mata_pelarajan,
-                namaPengajar: data?.nama_guru,
-                waktu: data?.jam_mulai,
-            }
-        })
+        // const dataSenin = senin[0]?.data?.map((data, index) => {
+        //     return {
+        //         hari: data?.hari,
+        //         kelas: kelas,
+        //         namaPelajaran: data?.mata_pelarajan,
+        //         namaPengajar: data?.nama_guru,
+        //         waktu: data?.jam_mulai,
+        //     }
+        // })
 
-        const dataSelasa = selasa[0]?.data?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
+        // const dataSelasa = selasa[0]?.data?.map((data, index) => {
+        //     return {
+        //         hari: data.hari,
+        //         kelas: kelas,
+        //         namaPelajaran: data.mata_pelarajan,
+        //         namaPengajar: data.nama_guru,
+        //         waktu: data.jam_mulai,
+        //     }
+        // })
 
-        const dataRabu = rabu[0]?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
+        // const dataRabu = rabu[0]?.map((data, index) => {
+        //     return {
+        //         hari: data.hari,
+        //         kelas: kelas,
+        //         namaPelajaran: data.mata_pelarajan,
+        //         namaPengajar: data.nama_guru,
+        //         waktu: data.jam_mulai,
+        //     }
+        // })
 
-        const dataKamis = kamis[0]?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
+        // const dataKamis = kamis[0]?.map((data, index) => {
+        //     return {
+        //         hari: data.hari,
+        //         kelas: kelas,
+        //         namaPelajaran: data.mata_pelarajan,
+        //         namaPengajar: data.nama_guru,
+        //         waktu: data.jam_mulai,
+        //     }
+        // })
 
-        const dataJumat = jumat[0]?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
+        // const dataJumat = jumat[0]?.map((data, index) => {
+        //     return {
+        //         hari: data.hari,
+        //         kelas: kelas,
+        //         namaPelajaran: data.mata_pelarajan,
+        //         namaPengajar: data.nama_guru,
+        //         waktu: data.jam_mulai,
+        //     }
+        // })
 
-        const dataSabtu = sabtu[0]?.map((data, index) => {
-            return {
-                hari: data.hari,
-                kelas: kelas,
-                namaPelajaran: data.mata_pelarajan,
-                namaPengajar: data.nama_guru,
-                waktu: data.jam_mulai,
-            }
-        })
+        // const dataSabtu = sabtu[0]?.map((data, index) => {
+        //     return {
+        //         hari: data.hari,
+        //         kelas: kelas,
+        //         namaPelajaran: data.mata_pelarajan,
+        //         namaPengajar: data.nama_guru,
+        //         waktu: data.jam_mulai,
+        //     }
+        // })
 
         function onChangeTable(pagination, filters, sorter, extra) {
             console.log('params', pagination, filters, sorter, extra);
@@ -344,7 +360,7 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataRabu}
+                    dataSource={dataRabu1}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
@@ -357,7 +373,7 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataKamis}
+                    dataSource={dataKamis1}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
@@ -370,7 +386,7 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataJumat}
+                    dataSource={dataJumat1}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"
@@ -383,7 +399,7 @@ function JadwalPelajaranSiswa() {
                 </div>
                 <Table className=""
                     columns={columns}
-                    dataSource={dataJumat}
+                    dataSource={dataSabtu1}
                     onChange={onChangeTable}
                     pagination={{ position: ['none'] }}
                     rowClassName="bg-greylight text-grey-900"

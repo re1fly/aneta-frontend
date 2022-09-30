@@ -5,8 +5,8 @@ import React, {Fragment, useEffect, useState} from "react";
 import {notification, PageHeader, Space, Table, Tag} from "antd";
 import {DeleteOutlined, EditOutlined, EyeOutlined} from "@ant-design/icons";
 import axios from "axios";
-import {BASE_URL} from "../../../api/Url";
 import {FilterAllClass} from "../../../components/FilterKelas";
+import {get_capaian_penilaian, get_where_no_join, url_by_institute} from "../../../api/reference";
 
 function CapaianPenilaian() {
     const [dataCapaian, setDataCapaian] = useState([])
@@ -15,8 +15,8 @@ function CapaianPenilaian() {
     const defaultAcademic = localStorage.getItem('academic_year');
 
     const _getDataCapaian = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "Getcapaianpenilaian:1:a7504ac2-2cd0-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_capaian_penilaian,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -45,8 +45,8 @@ function CapaianPenilaian() {
         });
     }
     const _selectKelas = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {

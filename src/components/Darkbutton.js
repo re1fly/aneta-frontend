@@ -40,7 +40,7 @@ const DarkMode = () => {
         }`}
         onClick={(e) => switchTheme(e)}
       >
-        <i className={`feather-moon`}></i>
+        <i className={`feather-moon text-current font-xl`}></i>
       </span>
     </li>
   );

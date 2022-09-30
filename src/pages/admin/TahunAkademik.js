@@ -6,9 +6,7 @@ import Appheader from "../../components/Appheader";
 import Navheader from "../../components/Navheader"
 import Adminfooter from "../../components/Adminfooter";
 import axios from "axios";
-import { BASE_URL } from "../../api/Url";
-
-
+import {get_where_no_join, global_insert, url_by_institute} from "../../api/reference";
 
 function TahunAkademikAdmin() {
   const [isViewTahunAkademik, setIsViewTahunAkademik] = useState(true);
@@ -25,9 +23,9 @@ function TahunAkademikAdmin() {
   const user = localStorage.getItem('user_id')
 
   useEffect(() => {
-    axios.post(BASE_URL,
+    axios.post(url_by_institute,
       {
-        processDefinitionId: "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+        processDefinitionId: get_where_no_join,
         returnVariables: true,
         variables: [
           {
@@ -79,8 +77,8 @@ function TahunAkademikAdmin() {
     console.log('institute', institute)
     console.log('academic_year', academicYear)
 
-    axios.post(BASE_URL, {
-      "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
+    axios.post(url_by_institute, {
+      "processDefinitionId": global_insert,
       "returnVariables": true,
       "variables": [
         {

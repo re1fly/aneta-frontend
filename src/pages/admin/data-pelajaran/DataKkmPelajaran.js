@@ -1,6 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react"
 import axios from "axios";
-import { BASE_URL } from "../../../api/Url";
 import { useDispatch, useSelector } from "react-redux";
 import { getProcessId, searchGlobal } from "../../../redux/Action";
 import {
@@ -39,6 +38,12 @@ import Swal from "sweetalert2";
 import { dateNow } from "../../../components/misc/date";
 import { pageLoad } from "../../../components/misc/loadPage";
 import { FilterAcademic } from "../../../components/FilterAcademic";
+import {
+    get_data_mata_pelajaran, get_where_no_join,
+    global_data_join_where,
+    global_join_sub_where_get, global_update, insert_data_kkm_pelajaran,
+    url_by_institute
+} from "../../../api/reference";
 
 export default function DataMataPelajaranAdmin() {
     const [grid, setGrid] = useState(false)
@@ -102,9 +107,9 @@ export default function DataMataPelajaranAdmin() {
                 duration: 1,
                 icon: <SearchOutlined />,
             });
-            axios.post(BASE_URL,
+            axios.post(url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -192,9 +197,9 @@ export default function DataMataPelajaranAdmin() {
     }, [])
 
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_data_join_where,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -261,9 +266,9 @@ export default function DataMataPelajaranAdmin() {
             setBtnPagination(pagination)
         })
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getdatamatapelajaran:1:f8832bab-2cfc-11ed-9f7a-3e427f6ada72",
+                "processDefinitionId": get_data_mata_pelajaran,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -286,8 +291,8 @@ export default function DataMataPelajaranAdmin() {
             setGetPelajaran(pelajaran?.data?.data)
         })
 
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_data_join_where,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -338,9 +343,9 @@ export default function DataMataPelajaranAdmin() {
             setAcademicYears(academics?.data?.data);
         })
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -680,36 +685,8 @@ export default function DataMataPelajaranAdmin() {
         }
         console.log(data)
 
-        axios.post(BASE_URL, {
-            // "processDefinitionId": "updatekkm:1:f009fa63-fa0c-11ec-9ea6-c6ec5d98c2df",
-            // "returnVariables": true,
-            // "variables": [
-            //     {
-            //         "name": "validasi",
-            //         "type": "json",
-            //         "value": {
-            //             "data": {
-            //                 "tingkat": "required",
-            //                 "kkm": "required"
-            //             },
-            //             "tingkat": data.tingkat_kelas,
-            //             "kkm": data.nilai_kkm
-            //         }
-            //     },
-            //     {
-            //         "name": "x_academic_subject_master",
-            //         "type": "json",
-            //         "value": {
-            //             "tbl_name": "x_academic_subject_master",
-            //             "id": data.mata_pelajaran,
-            //             "tbl_coloumn": {
-            //                 "tingkat": data.tingkat_kelas,
-            //                 "kkm": data.nilai_kkm
-            //             }
-            //         }
-            //     }
-            // ]
-            "processDefinitionId": "insertdatakkmpelajaran:1:f8174d45-2d00-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": insert_data_kkm_pelajaran,
             "returnVariables": true,
             "variables": [
                 {
@@ -758,41 +735,9 @@ export default function DataMataPelajaranAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        console.log(data)
-        console.log(selectedUser.idKelompok);
 
-        axios.post(BASE_URL, {
-
-            // "processDefinitionId": "updatekkm:2:9e5b7dcc-01c3-11ed-ac5e-66fc627bf211",
-            // "returnVariables": true,
-            // "variables": [
-            //     {
-            //         "name": "validasi",
-            //         "type": "json",
-            //         "value": {
-            //             "data": {
-            //                 "tingkat": "required",
-            //                 "kkm": "required"
-            //             },
-            //             "tingkat": data.tingkat_kelas,
-            //             "kkm": data.nilai_kkm
-            //         }
-            //     },
-            //     {
-            //         "name": "x_academic_subject_master",
-            //         "type": "json",
-            //         "value": {
-            //             "tbl_name": "x_academic_subject_master",
-            //             "id": selectedUser.idPelajaran,
-            //             "tbl_coloumn": {
-            //                 "tingkat": data.tingkat_kelas,
-            //                 "kkm": data.nilai_kkm,
-            //                 "is_edit": true
-            //             }
-            //         }
-            //     }
-            // ]
-            "processDefinitionId": "insertdatakkmpelajaran:1:f8174d45-2d00-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": insert_data_kkm_pelajaran,
             "returnVariables": true,
             "variables": [
                 {
@@ -845,8 +790,8 @@ export default function DataMataPelajaranAdmin() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": global_update,
                         "returnVariables": true,
                         "variables": [
                             {

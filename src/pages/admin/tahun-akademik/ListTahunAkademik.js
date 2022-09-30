@@ -1,6 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react"
 import axios from "axios";
-import { BASE_URL } from "../../../api/Url";
 import {
     Menu,
     Card,
@@ -21,18 +20,26 @@ import {
     DeleteOutlined,
     EyeOutlined,
     EllipsisOutlined,
-    PoweroffOutlined
+    PoweroffOutlined,
+    SearchOutlined
 } from "@ant-design/icons";
 
 import Search from "antd/es/input/Search";
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
-import Filter from "../../../components/Filter";
 import { FormAdminTahunAkademik } from "../../../components/form/AdminTahunAkademik";
 import Swal from "sweetalert2";
 import { pageLoad } from "../../../components/misc/loadPage";
 import { dateNow } from "../../../components/misc/date";
+import {
+    academic_year_change,
+    get_where_no_join, global_delete_record,
+    global_insert,
+    global_join_sub_where_get,
+    global_update,
+    url_by_institute
+} from "../../../api/reference";
 
 export default function ListTahunAkademik() {
     const [grid, setGrid] = useState(false)
@@ -43,7 +50,6 @@ export default function ListTahunAkademik() {
     const [selectedUser, setSelectedUser] = useState(null);
 
     const [getTahunAkademik, setGetTahunAkademik] = useState([])
-    // console.log(getTahunAkademik);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
@@ -71,14 +77,84 @@ export default function ListTahunAkademik() {
         </Menu>
     );
 
-    const _onSearch = (value) => { }
+    const _onSearch = (value) => {
+        if (value == "") {
+            window.location.reload();
+        } else {
+            notification.info({
+                message: "Search",
+                description: "Mencari data : " + value,
+                duration: 1,
+                icon: <SearchOutlined />,
+            });
+            axios.post(url_by_institute,
+                {
+                    "processDefinitionId": global_join_sub_where_get,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_year",
+                                "paginate": 10,
+                                "join": [
+                                    {
+                                        "tbl_join": "m_institutes",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_year",
+                                        "foregenkey": "institute_id"
+                                    }
+                                ],
+                                "kondisi": [
+                                    {
+                                        "keterangan": "where",
+                                        "kolom": "x_academic_year.institute_id",
+                                        "value": institute
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_academic_year",
+                                        "tbl_field": "academic_year",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_year",
+                                        "tbl_field": "semester",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    }
+
+                                ],
+                                "order_coloumn": "x_academic_year.id",
+                                "order_by": "asc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": paramsPage
+                        }
+                    ]
+                }
+            ).then(function (response) {
+                // console.log(response);
+                const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
+                // console.log(tahunAkademik.data.data);
+                setGetTahunAkademik(tahunAkademik?.data?.data)
+                setBtnPagination(tahunAkademik?.data?.links)
+            })
+        }
+    }
 
     // Get Tahun Akademik
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
 
-                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -111,13 +187,11 @@ export default function ListTahunAkademik() {
                 ]
             },
         ).then(function (response) {
-            // console.log(response);
             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
-            console.log(tahunAkademik);
             setGetTahunAkademik(tahunAkademik?.data)
             setBtnPagination(tahunAkademik?.links)
         })
-    }, [])
+    }, [institute, paramsPage])
 
     const CardTahunAkademik = () => {
 
@@ -139,14 +213,22 @@ export default function ListTahunAkademik() {
                     {data_sampel.map((value, index) => (
                         <div className="col-xl-4 col-lg-6 col-md-6" /*key={index}*/>
                             <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
-                                <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                {value.tahunAkademikAktif == "T" ?
+                                    <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                        Aktif
+                                    </span> :
+                                    <span className="badge badge-danger rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                        Tidak Aktif
+                                    </span>}
+                                {/* <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
                                     {value.tahunAkademikAktif == "T" ? 'Aktif' : 'Tidak Aktif'}
-                                </span>
+                                </span> */}
                                 <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
                                     overlay={_Account}>
                                     <EllipsisOutlined />
                                 </Dropdown>
-                                <h4 className="fw-700 font-xs mt-5">Tahun Akademik {value.tahunAkademik}</h4>
+                                <h4 className="fw-700 font-xs mt-5">Tahun Akademik</h4>
+                                <h4 className="fw-700 font-xs">{value.tahunAkademik}</h4>
                                 <div className="clearfix"></div>
                                 {value.semester ? (
                                     <span
@@ -287,8 +369,8 @@ export default function ListTahunAkademik() {
                     rowClassName="bg-greylight text-grey-900"
                     scroll={{ X: 400 }}
                 />
-               <div className='text-center mt-4'>
-                    {btnPagination?.map((dataBtn) => {
+                <div className='text-center mt-4'>
+                    {btnPagination.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
                         const label = labelBtn
                             .replace(/(&laquo\;)/g, "")
@@ -333,7 +415,6 @@ export default function ListTahunAkademik() {
                                         onClick={viewCreateAkademik}>
                                         Tambah Data
                                     </Button>
-                                    <Filter title1="Mata Pelajaran" title2="Kelas" />
                                 </div>
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
@@ -551,8 +632,8 @@ export default function ListTahunAkademik() {
         console.log(data)
         const akademikInsert = `${data.tahun_akademik} / ${parseInt(data.tahun_akademik) + 1} `
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_insert,
             "returnVariables": true,
             "variables": [
                 {
@@ -613,8 +694,8 @@ export default function ListTahunAkademik() {
         console.log(data)
         const akademikInsert = `${data.tahun_akademik} / ${parseInt(data.tahun_akademik) + 1} `
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_update,
             "returnVariables": true,
             "variables": [
                 {
@@ -681,8 +762,8 @@ export default function ListTahunAkademik() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                    "processDefinitionId": global_delete_record,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -725,8 +806,8 @@ export default function ListTahunAkademik() {
             confirmButtonText: 'Ya',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                    "processDefinitionId": "academicyearchange:1:30bf0553-2cd3-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                    "processDefinitionId": academic_year_change,
                     "returnVariables": true,
                     "variables": [
                         {

@@ -6,8 +6,8 @@ import {Link} from "react-router-dom";
 import {Badge, Descriptions, notification, PageHeader, Space, Table, Tag} from "antd";
 import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 import axios from "axios";
-import {BASE_URL} from "../../../../api/Url";
 import {DataNotFound} from "../../../../components/misc/DataNotFound";
+import {global_join_sub_where_get, perencanaan_penilaian, url_by_institute} from "../../../../api/reference";
 
 function RencanaBobot() {
     const academic = localStorage.getItem("academic_year");
@@ -20,9 +20,9 @@ function RencanaBobot() {
     const _checkDataMapel = (e) => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "perencanaanpenilaan:2:dbe63791-2d98-11ed-9f7a-3e427f6ada72",
+                    "processDefinitionId": perencanaan_penilaian,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -56,9 +56,9 @@ function RencanaBobot() {
     const _getDataMapel = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -139,9 +139,9 @@ function RencanaBobot() {
     const _getDataKelas = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -219,9 +219,9 @@ function RencanaBobot() {
 
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "perencanaanpenilaan:2:dbe63791-2d98-11ed-9f7a-3e427f6ada72",
+                    "processDefinitionId": perencanaan_penilaian,
                     "returnVariables": true,
                     "variables": [
                         {

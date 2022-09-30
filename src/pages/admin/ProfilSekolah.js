@@ -7,7 +7,7 @@ import ImgCrop from "antd-img-crop";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
 import axios from "axios";
-import {BASE_URL} from "../../api/Url";
+import {global_join_sub_first, global_update, url_by_institute} from "../../api/reference";
 
 function ProfilSekolah() {
     const [fileList, setFileList] = useState([
@@ -23,8 +23,8 @@ function ProfilSekolah() {
     const [yearSekolah, setYearSekolah] = useState(dataSekolah.year_of_found)
 
     useEffect(() => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_join_sub_first,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -137,9 +137,9 @@ function ProfilSekolah() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_update,
                 "returnVariables": true,
                 "variables": [
                     {

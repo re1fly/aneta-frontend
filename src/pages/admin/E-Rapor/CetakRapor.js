@@ -1,7 +1,6 @@
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
-import { BASE_URL } from "../../../api/Url";
 import React, { Fragment, useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -9,6 +8,13 @@ import { PageHeader, Select, Card, Row, Table, Input, Button, Modal } from "antd
 import { getProcessId } from "../../../redux/Action";
 import ERapor from "../../../components/pdf/ERapor";
 import { useReactToPrint } from "react-to-print"
+import {
+    get_eraport,
+    get_where_no_join,
+    global_join_sub_where_get,
+    json_eraport,
+    url_by_institute
+} from "../../../api/reference";
 
 
 function CetakRapor() {
@@ -61,9 +67,9 @@ function CetakRapor() {
     }, [])
 
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -119,9 +125,9 @@ function CetakRapor() {
             setGetKelas(dataRes?.data);
         })
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -163,9 +169,9 @@ function CetakRapor() {
     const handleDataErapor = () => {
         console.log(selectAcademic, selectClass);
         setRefreshState(true)
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "geteraport:1:5806db8a-2ccf-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_eraport,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -195,9 +201,9 @@ function CetakRapor() {
     }
 
     const getDataRapor = () => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "jsoneraport:1:e07834f5-2ccf-11ed-aacc-9a44706f3589",
+                "processDefinitionId": json_eraport,
                 "returnVariables": true,
                 "variables": [
                     {

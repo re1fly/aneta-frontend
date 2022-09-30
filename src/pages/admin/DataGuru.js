@@ -22,11 +22,11 @@ import {
     EditOutlined,
     EllipsisOutlined,
     MenuOutlined,
-    EyeOutlined
+    EyeOutlined,
+    SearchOutlined
 } from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import axios from "axios";
-import { BASE_URL } from "../../api/Url";
 import { useDispatch, useSelector } from "react-redux";
 import { getProcessId, searchGlobal } from "../../redux/Action";
 import { FormAdminGuru } from '../../components/form/AdminGuru';
@@ -34,6 +34,13 @@ import Swal from "sweetalert2";
 
 import { dateNow } from "../../components/misc/date";
 import { FilterAcademic } from "../../components/FilterAcademic";
+import {
+    export_guru,
+    global_data_join_where, global_delete_record,
+    global_join_sub_where_get,
+    import_guru, insert_guru, update_guru,
+    url_by_institute
+} from "../../api/reference";
 // import { useDataGuru } from '../../components/function/useDataGuru'; ==> component
 
 
@@ -104,77 +111,100 @@ function DataGuruAdmin() {
     }, [DataSearch])
 
     const _onSearch = (value) => {
-        const processDef = ProcessId[0].proses_def_id;
-        const variableSearch = {
-            "name": "global_join_where",
-            "type": "json",
-            "value": {
-                "tbl_induk": "x_academic_teachers",
-                "paginate": 10,
-                "join": [
-                    {
-                        "tbl_join": "x_academic_year",
-                        "foregenkey": "academic_year_id",
-                        "refkey": "id"
-                    },
-                    {
-                        "tbl_join": "users",
-                        "foregenkey": "user_id",
-                        "refkey": "id"
-                    },
-                    {
-                        "tbl_join": "m_user_profile",
-                        "foregenkey": "user_id",
-                        "refkey": "user_id"
-                    }
-                ],
-                "where": [
-                    {
-                        "tbl_coloumn": "users",
-                        "tbl_field": "name",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_teachers",
-                        "tbl_field": "sk_number",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_teachers",
-                        "tbl_field": "status",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    },
-                    {
-                        "tbl_coloumn": "x_academic_year",
-                        "tbl_field": "academic_year",
-                        "tbl_value": value,
-                        "operator": "ILIKE"
-                    }
-                ],
-                "kondisi": {
-                    "keterangan": "where",
-                    "kolom": "x_academic_teachers.academic_year_id",
-                    "value": academicYear
-                },
-                "order_coloumn": "users.name",
-                "order_by": "asc"
-            }
+        if (value == "") {
+            window.location.reload();
+        } else {
+            notification.info({
+                message: "Search",
+                description: "Mencari data : " + value,
+                duration: 1,
+                icon: <SearchOutlined />,
+            });
+            axios.post(url_by_institute,
+                {
+                    "processDefinitionId": global_data_join_where,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_teachers",
+                                "paginate": 10,
+                                "join": [
+                                    {
+                                        "tbl_join": "x_academic_year",
+                                        "foregenkey": "academic_year_id",
+                                        "refkey": "id"
+                                    },
+                                    {
+                                        "tbl_join": "users",
+                                        "foregenkey": "user_id",
+                                        "refkey": "id"
+                                    },
+                                    {
+                                        "tbl_join": "m_user_profile",
+                                        "foregenkey": "user_id",
+                                        "refkey": "user_id"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "users",
+                                        "tbl_field": "name",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_teachers",
+                                        "tbl_field": "sk_number",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_teachers",
+                                        "tbl_field": "status",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    },
+                                    {
+                                        "tbl_coloumn": "x_academic_year",
+                                        "tbl_field": "academic_year",
+                                        "tbl_value": value,
+                                        "operator": "ILIKE"
+                                    }
+                                ],
+                                "kondisi": {
+                                    "keterangan": "where",
+                                    "kolom": "x_academic_teachers.academic_year_id",
+                                    "value": academicYear
+                                },
+                                "order_coloumn": "users.name",
+                                "order_by": "asc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                }
+            ).then(function (response) {
+                const guru = JSON.parse(response?.data?.variables[3]?.value)
+                setGetGuru(guru?.data?.data)
+                const pagination = guru?.data?.links;
+                setBtnPagination(pagination)
+            })
         }
-        dispatch(searchGlobal(value, paramsPage, processDef, variableSearch))
     }
 
-    useEffect(() => {
-        dispatch(getProcessId(["globaljoinsubwhereget", "getdatajoinwhere"]))
-    }, [])
 
     const getListGuru = () => {
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -275,8 +305,8 @@ function DataGuruAdmin() {
 
         getListGuru()
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_data_join_where,
             "returnVariables": true,
             "variables": [
                 {
@@ -317,9 +347,9 @@ function DataGuruAdmin() {
             ]
         }, {
             headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
         }
         ).then(function (response) {
             const academics = JSON.parse(response?.data?.variables[3]?.value);
@@ -329,8 +359,8 @@ function DataGuruAdmin() {
     }, [academic, paramsPage, isViewGuru, refreshState])
 
     const _exportDataExcel = () => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "exportguru:1:902728ed-2cc8-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": export_guru,
             "returnVariables": true,
             "variables": [
                 {
@@ -382,9 +412,9 @@ function DataGuruAdmin() {
         const getLinkUrl = base64.split(',')[1]
         console.log(getLinkUrl);
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "importguru:1:d1f6b158-2cc8-11ed-aacc-9a44706f3589",
+                "processDefinitionId": import_guru,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -400,9 +430,9 @@ function DataGuruAdmin() {
                 ]
             }, {
             headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
         }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
@@ -432,9 +462,9 @@ function DataGuruAdmin() {
         const getLinkUrl = base64.split(',')[1]
         // console.log(getLinkUrl);
 
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "importguru:1:d1f6b158-2cc8-11ed-aacc-9a44706f3589",
+                "processDefinitionId": import_guru,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -450,9 +480,9 @@ function DataGuruAdmin() {
                 ]
             }, {
             headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
         }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
@@ -846,8 +876,8 @@ function DataGuruAdmin() {
         // const dateNow = new Date().toLocaleString()
         console.log(data);
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "insertdataguru:1:25f2c862-2cc9-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": insert_guru,
             "returnVariables": true,
             "variables": [
                 {
@@ -1047,40 +1077,40 @@ function DataGuruAdmin() {
                     placement: 'top'
                 });
             }
-                // if (response.data.variables[8].value == 200) {
-                //     if (response.data.variables[10].value == 404) {
-                //         setIsViewCreate(false)
-                //         setIsViewGuru(true)
-                //         notification.success({
-                //             message: 'Sukses',
-                //             description: 'Guru berhasil ditambahkan.',
-                //             placement: 'top'
-                //         });
-                //     } else if (response.data.variables[10].value == 200) {
-                //         notification.error({
-                //             message: 'Error',
-                //             description: 'Email sudah terdaftar, mohon masukkan email lain.',
-                //             placement: 'top'
-                //         });
-                //     } else {
-                //         notification.error({
-                //             message: 'error',
-                //             description: 'Email sudah terdaftar, mohon masukan email lain.',
-                //             placement: "top"
-                //         });
-                //     }
-                //     // pageLoad()
-                // } else {
-                //     notification.error({
-                //         message: 'Error',
-                //         description: 'Harap isi semua field',
-                //         placement: 'top'
-                //     });
-                // }
-                // console.log(response)
-            }).catch(error => {
-                // alert('Email Telah di gunakan, silahkan gunakan email lain.')
-            });
+            // if (response.data.variables[8].value == 200) {
+            //     if (response.data.variables[10].value == 404) {
+            //         setIsViewCreate(false)
+            //         setIsViewGuru(true)
+            //         notification.success({
+            //             message: 'Sukses',
+            //             description: 'Guru berhasil ditambahkan.',
+            //             placement: 'top'
+            //         });
+            //     } else if (response.data.variables[10].value == 200) {
+            //         notification.error({
+            //             message: 'Error',
+            //             description: 'Email sudah terdaftar, mohon masukkan email lain.',
+            //             placement: 'top'
+            //         });
+            //     } else {
+            //         notification.error({
+            //             message: 'error',
+            //             description: 'Email sudah terdaftar, mohon masukan email lain.',
+            //             placement: "top"
+            //         });
+            //     }
+            //     // pageLoad()
+            // } else {
+            //     notification.error({
+            //         message: 'Error',
+            //         description: 'Harap isi semua field',
+            //         placement: 'top'
+            //     });
+            // }
+            // console.log(response)
+        }).catch(error => {
+            // alert('Email Telah di gunakan, silahkan gunakan email lain.')
+        });
     };
 
     const editGuru = (e) => {
@@ -1093,8 +1123,8 @@ function DataGuruAdmin() {
         console.log(data.image_base64)
         console.log(data);
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "updateguru:1:7463f5f2-2cc9-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": update_guru,
             "returnVariables": true,
             "variables": [
                 {
@@ -1179,9 +1209,9 @@ function DataGuruAdmin() {
             ]
         }, {
             headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
         }).then(function (response) {
             if (response.data.variables[5].value == 200) {
                 setIsViewEdit(false)
@@ -1215,8 +1245,8 @@ function DataGuruAdmin() {
             confirmButtonText: 'Hapus',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                    "processDefinitionId": "GlobalDeleteRecord:1:caa1240f-2cc9-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                    "processDefinitionId": global_delete_record,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -1230,9 +1260,9 @@ function DataGuruAdmin() {
                     ]
                 }, {
                     headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    }
                 }
                 ).then(function (response) {
                     console.log(response);

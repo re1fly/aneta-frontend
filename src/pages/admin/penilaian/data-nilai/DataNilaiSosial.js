@@ -5,9 +5,9 @@ import React, {Fragment, useEffect, useState} from "react";
 import {notification, PageHeader} from "antd";
 import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 import axios from "axios";
-import {BASE_URL} from "../../../../api/Url";
 import "../../../../style/custom.css";
 import {DataNotFound} from "../../../../components/misc/DataNotFound";
+import {get_data_kompetens_nilai_spiritual, input_nilai_spiritual, url_by_institute} from "../../../../api/reference";
 
 function DataNilaiSosial() {
     const academic = localStorage.getItem("academic_year");
@@ -23,8 +23,8 @@ function DataNilaiSosial() {
         }
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "d045f5cb-2d9b-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                    "processDefinitionId": get_data_kompetens_nilai_spiritual,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -96,8 +96,8 @@ function DataNilaiSosial() {
 
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "f1c7fe98-2d9b-11ed-9f7a-3e427f6ada72",
+                url_by_institute, {
+                    "processDefinitionId": input_nilai_spiritual,
                     "returnVariables": true,
                     "variables": [
                         {

@@ -6,7 +6,12 @@ import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
 import {PageHeader, Card, Row, Select, Table, Tag} from "antd";
 import {CheckCircleOutlined, CloseCircleOutlined} from "@ant-design/icons";
-import {BASE_URL} from "../../../api/Url";
+import {
+    eraport_status_penilaian,
+    get_where_no_join,
+    global_join_sub_where_get,
+    url_by_institute
+} from "../../../api/reference";
 
 function StatusPenilaian() {
     const [statusPenilaian, setStatusPenilaian] = useState([]);
@@ -25,9 +30,9 @@ function StatusPenilaian() {
     const {Column, ColumnGroup} = Table;
 
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -84,8 +89,8 @@ function StatusPenilaian() {
         })
 
         axios
-            .post(BASE_URL, {
-                processDefinitionId: "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+            .post(url_by_institute, {
+                processDefinitionId: get_where_no_join,
                 returnVariables: true,
                 variables: [
                     {
@@ -125,9 +130,8 @@ function StatusPenilaian() {
         console.log(selectAcademic, selectClass);
         setRefreshState(true);
         axios
-            .post(BASE_URL, {
-                processDefinitionId:
-                    "eraportstatuspenilaian:1:25e35b7a-2cd0-11ed-aacc-9a44706f3589",
+            .post(url_by_institute, {
+                processDefinitionId: eraport_status_penilaian,
                 returnVariables: true,
                 variables: [
                     {

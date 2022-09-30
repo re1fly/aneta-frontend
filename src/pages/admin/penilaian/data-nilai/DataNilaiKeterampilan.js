@@ -8,6 +8,7 @@ import axios from "axios";
 import {BASE_URL} from "../../../../api/Url";
 import "../../../../style/custom.css";
 import {DataNotFound} from "../../../../components/misc/DataNotFound";
+import {get_data_input_penilaian, insert_input_data_nilai, url_by_institute} from "../../../../api/reference";
 
 function DataNilaiKeterampilan() {
     const academic = localStorage.getItem("academic_year");
@@ -22,8 +23,8 @@ function DataNilaiKeterampilan() {
         }
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "getdatainputpenilaian:1:cd9b3e46-2d9a-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                    "processDefinitionId": get_data_input_penilaian,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -95,8 +96,8 @@ function DataNilaiKeterampilan() {
 
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "insertinputdatanilai:1:56c8e397-2d9b-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                    "processDefinitionId": insert_input_data_nilai,
                     "returnVariables": true,
                     "variables": [
                         {

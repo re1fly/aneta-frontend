@@ -58,8 +58,10 @@ export default function TugasiSiswa() {
                         >
                             Tugas Harian
                         </Link>
-                        <h4 className="mt-5 mb-4 strong text-lg">1.1 Buatlah gambar yang berkenaan dengan materi sebelumnya. Lalu upload tugas anda dibawah sini.</h4>
-                        <Dragger {...props} style={{height:"80%"}} className="mt-12">
+                        {/* <h4 className="mt-5 mb-4 strong text-lg">1.1 Buatlah gambar yang berkenaan dengan materi sebelumnya. Lalu upload tugas anda dibawah sini.</h4> */}
+                        <h4 className="mt-5 mb-4 strong text-lg">1.1 Jawablah Pertanyan-pertanyaan berikut dengan benar.</h4>
+                        <iframe src="http://localhost/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=2" width="1150" height="300" frameborder="0" allowfullscreen="allowfullscreen" title="Soal Pejumlahan"></iframe><script src="http://localhost/wordpress/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charset="UTF-8"></script>
+                        {/* <Dragger {...props} style={{height:"80%"}} className="mt-12">
                             <p className="ant-upload-drag-icon">
                                 <InboxOutlined />
                             </p>
@@ -67,8 +69,8 @@ export default function TugasiSiswa() {
                             <p className="ant-upload-hint">
                                 Ukuran file tidak boleh melebihi 20MB dan berformat PDF, JPG, PNG, DOCS
                             </p>
-                        </Dragger>
-                        <div className='items-center mt-3'>
+                        </Dragger> */}
+                        {/* <div className='items-center mt-3'>
                             <Link
                                 to="/account-information"
                                 className="bg-current ml-2 mb-2 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
@@ -81,7 +83,7 @@ export default function TugasiSiswa() {
                                 >
                                 Kembali
                             </Link>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
               </div>

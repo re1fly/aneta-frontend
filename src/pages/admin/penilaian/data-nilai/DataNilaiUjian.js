@@ -5,9 +5,9 @@ import React, {Fragment, useState} from "react";
 import {Link} from "react-router-dom";
 import {Badge, Descriptions, notification, PageHeader, Space, Table, Tag} from "antd";
 import axios from "axios";
-import {BASE_URL} from "../../../../api/Url";
 import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 import {DataNotFound} from "../../../../components/misc/DataNotFound";
+import {get_input_nilai_pts_dan_pas, insert_input_nilai_pts_dan_pas, url_by_institute} from "../../../../api/reference";
 
 function DataNilaiUjian() {
     const academic = localStorage.getItem("academic_year");
@@ -22,8 +22,8 @@ function DataNilaiUjian() {
         }
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "getInputNilaiPTSdanPAS:1:93ef96eb-2cd2-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                    "processDefinitionId": get_input_nilai_pts_dan_pas,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -110,8 +110,8 @@ function DataNilaiUjian() {
         } else {
             axios
                 .post(
-                    BASE_URL, {
-                        "processDefinitionId": "insertinputnilaiptsdanpas:1:c0ddd117-2cd2-11ed-aacc-9a44706f3589",
+                    url_by_institute, {
+                        "processDefinitionId": insert_input_nilai_pts_dan_pas,
                         "returnVariables": true,
                         "variables": [
                             {

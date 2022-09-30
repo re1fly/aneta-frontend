@@ -26,13 +26,18 @@ import Search from "antd/lib/input/Search";
 import Filter from "../../../components/Filter";
 import {FormAdminDataPelKelas} from "../../../components/form/AdminDataPelKelas";
 import axios from "axios";
-import {BASE_URL} from "../../../api/Url";
 import {FilterAcademic} from "../../../components/FilterAcademic";
 import {FilterAllClass} from "../../../components/FilterKelas";
 import {searchGlobal} from "../../../redux/Action";
 import {useDispatch, useSelector} from "react-redux";
 import {dateNow} from "../../../components/misc/date";
 import Swal from "sweetalert2";
+import {
+    get_data_mata_pelajaran, get_where_no_join,
+    global_data_join_where,
+    global_join_sub_where_get, global_update, insert_data_pelajaran_kelas,
+    url_by_institute
+} from "../../../api/reference";
 
 function DataPelajaranKelas() {
     const [grid, setGrid] = useState(false);
@@ -64,8 +69,8 @@ function DataPelajaranKelas() {
 
     const _getDataPelajaran = () => {
         const allClass = selectedClass === "" ? "!=" : "=";
-        axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -160,8 +165,8 @@ function DataPelajaranKelas() {
     }
 
     const _getAcademicYears = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": 'getdatajoinwhere:1:5718bdea-2cc2-11ed-aacc-9a44706f3589',
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_data_join_where,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -215,9 +220,9 @@ function DataPelajaranKelas() {
     const _selectKelas = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -281,8 +286,8 @@ function DataPelajaranKelas() {
     }
 
     const _selectMapel = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getdatamatapelajaran:2:51e2a256-2d89-11ed-9f7a-3e427f6ada72",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_data_mata_pelajaran,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -316,8 +321,8 @@ function DataPelajaranKelas() {
     }
 
     const _selectTahunAkademik = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -364,8 +369,8 @@ function DataPelajaranKelas() {
     }
 
     const _selectTingkatKelas = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -404,8 +409,8 @@ function DataPelajaranKelas() {
     }
 
     const _getSubClass = () => {
-        axios.post(BASE_URL, {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1009,8 +1014,8 @@ function DataPelajaranKelas() {
             if (el.name !== "") data[el.name] = el.value;
         }
         console.log(data)
-        axios.post(BASE_URL, {
-                "processDefinitionId": "insertdatapelajarankelas:1:0391e3af-2d8b-11ed-9f7a-3e427f6ada72",
+        axios.post(url_by_institute, {
+                "processDefinitionId": insert_data_pelajaran_kelas,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1061,8 +1066,8 @@ function DataPelajaranKelas() {
         }
         console.log(data)
         console.log(selectedUser.id)
-        axios.post(BASE_URL, {
-                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+                "processDefinitionId": global_update,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -1107,8 +1112,8 @@ function DataPelajaranKelas() {
             confirmButtonText: 'Hapus'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post(BASE_URL, {
-                        "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                axios.post(url_by_institute, {
+                        "processDefinitionId": global_update,
                         "returnVariables": true,
                         "variables": [
                             {

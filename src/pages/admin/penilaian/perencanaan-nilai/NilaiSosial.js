@@ -5,8 +5,12 @@ import React, {Fragment, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {Badge, Descriptions, notification, PageHeader, Space, Table, Tag} from "antd";
 import axios from "axios";
-import {BASE_URL} from "../../../../api/Url";
 import {DataNotFound} from "../../../../components/misc/DataNotFound";
+import {
+    get_kompetensi_dasar_sikap_social,
+    global_join_sub_where_get, insert_perencanaan_penilaian,
+    url_by_institute
+} from "../../../../api/reference";
 
 
 function NilaiSosial() {
@@ -21,9 +25,9 @@ function NilaiSosial() {
     const _getDataMapel = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -103,9 +107,9 @@ function NilaiSosial() {
     const _getDataKelas = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -166,9 +170,9 @@ function NilaiSosial() {
     const _getCompetency = (e) => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "42a917b3-2d98-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": get_kompetensi_dasar_sikap_social,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -241,8 +245,8 @@ function NilaiSosial() {
 
         axios
             .post(
-                BASE_URL, {
-                    "processDefinitionId": "6f4cd0c4-2d97-11ed-aacc-9a44706f3589",
+                url_by_institute, {
+                    "processDefinitionId": insert_perencanaan_penilaian,
                     "returnVariables": true,
                     "variables": [
                         {

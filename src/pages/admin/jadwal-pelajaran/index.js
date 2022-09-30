@@ -20,6 +20,7 @@ import {BASE_URL} from "../../../api/Url";
 import Adminfooter from '../../../components/Adminfooter';
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
+import {get_jadwal_pelajaran_awal, url_by_institute} from "../../../api/reference";
 
 export default function JadwalPelajaranAdmin() {
     const [grid, setGrid] = useState(false)
@@ -30,9 +31,9 @@ export default function JadwalPelajaranAdmin() {
     const _onSearch = value => console.log(value);
 
     useEffect(() => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "getjadwalpelajaranawal:1:acf919db-2d90-11ed-aacc-9a44706f3589",
+                "processDefinitionId": get_jadwal_pelajaran_awal,
                 "returnVariables": true,
                 "variables": [
                     {

@@ -8,8 +8,8 @@ import Appheader from "../../components/Appheader";
 import { InboxOutlined } from "@ant-design/icons";
 
 import axios from "axios";
-import { BASE_URL } from "../../api/Url";
 import { dateNow } from "../../components/misc/date";
+import {get_where_no_join, jadwal_pelajaran_on_going, url_by_institute} from "../../api/reference";
 
 function BerandaSiswa() {
     const user = localStorage.getItem('user_name');
@@ -74,8 +74,8 @@ function BerandaSiswa() {
     }
     
     useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "e81e093e-028d-11ed-ac5e-66fc627bf211",
+        axios.post(url_by_institute, {
+            "processDefinitionId": jadwal_pelajaran_on_going,
             "returnVariables": true,
             "variables": [
                 {
@@ -83,7 +83,7 @@ function BerandaSiswa() {
                     "type": "json",
                     "value": {
                         "user_id": userId,
-                        "academic_id": academicId
+                        "academic_id": 91
                     }
                 }
             ]
@@ -95,14 +95,13 @@ function BerandaSiswa() {
                 }
             }
         ).then(function (response) {
-            // console.log(response);
+            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes.data);
             setGetJadwalPelajaran(dataRes?.data);
         })
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+        axios.post(url_by_institute, {
+            "processDefinitionId": get_where_no_join,
             "returnVariables": true,
             "variables": [
                 {
@@ -144,12 +143,11 @@ function BerandaSiswa() {
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const data = dataRes[0]
-            console.log(data);
             if ( academicId == null ) {
                 localStorage.setItem('academic_id', data.id)
             }
         })
-    }, [userId]);
+    }, [userId, institute]);
 
     useEffect(() => {
         checkTodayData()

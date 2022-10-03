@@ -5,7 +5,12 @@ import React, { Fragment, useEffect, useState } from "react";
 import { notification, PageHeader } from "antd";
 import "../../../../style/custom.css";
 import axios from "axios";
-import { BASE_URL } from "../../../../api/Url";
+import {
+  get_where_no_join,
+  global_join_sub_where_get,
+  insert_perencanaan_penilaian,
+  url_by_institute,
+} from "../../../api/reference";
 
 function NilaiKeterampilan() {
   const academic = localStorage.getItem("academic_year");
@@ -27,10 +32,9 @@ function NilaiKeterampilan() {
   const _getDataMapel = () => {
     axios
       .post(
-        BASE_URL,
+        url_by_institute,
         {
-          processDefinitionId:
-            "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+          processDefinitionId: global_join_sub_where_get,
           returnVariables: true,
           variables: [
             {
@@ -79,9 +83,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                },
+            "Content-Type": "application/json",
+            Authorization: "Basic YWRtaW46TWFuYWczciE=",
+          },
         }
       )
       .then(function (response) {
@@ -95,10 +99,9 @@ function NilaiKeterampilan() {
   const _getDataKelas = () => {
     axios
       .post(
-        BASE_URL,
+        url_by_institute,
         {
-          processDefinitionId:
-            "getwherenojoin:2:8b42da08-dfed-11ec-a2ad-3a00788faff5",
+          processDefinitionId: get_where_no_join,
           returnVariables: true,
           variables: [
             {
@@ -131,9 +134,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                },
+            "Content-Type": "application/json",
+            Authorization: "Basic YWRtaW46TWFuYWczciE=",
+          },
         }
       )
       .then(function (response) {
@@ -145,10 +148,9 @@ function NilaiKeterampilan() {
   const _getCompetency = (e) => {
     axios
       .post(
-        BASE_URL,
+        url_by_institute,
         {
-          processDefinitionId:
-            "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+          processDefinitionId: global_join_sub_where_get,
           returnVariables: true,
           variables: [
             {
@@ -196,9 +198,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                },
+            "Content-Type": "application/json",
+            Authorization: "Basic YWRtaW46TWFuYWczciE=",
+          },
         }
       )
       .then(function (response) {
@@ -259,9 +261,9 @@ function NilaiKeterampilan() {
 
     axios
       .post(
-        BASE_URL,
+        url_by_institute,
         {
-          processDefinitionId: "6f4cd0c4-2d97-11ed-aacc-9a44706f3589",
+          processDefinitionId: insert_perencanaan_penilaian,
           returnVariables: true,
           variables: [
             {
@@ -273,9 +275,9 @@ function NilaiKeterampilan() {
         },
         {
           headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                },
+            "Content-Type": "application/json",
+            Authorization: "Basic YWRtaW46TWFuYWczciE=",
+          },
         }
       )
       .then(function (response) {

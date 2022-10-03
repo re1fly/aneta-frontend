@@ -30,6 +30,7 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 
 import { BASE_URL } from "../../../api/Url";
+import {url_by_institute} from "../../../api/reference";
 
 function JadwalPelajaranGuru() {
     const [grid, setGrid] = useState(false);

@@ -275,11 +275,6 @@ class Root extends Component {
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/guru-data-materi-detail`}
-              component={DataMateriDetail}
-            />
-            <Route
-              exact
               path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran`}
               component={JadwalPelajaranGuru}
             />

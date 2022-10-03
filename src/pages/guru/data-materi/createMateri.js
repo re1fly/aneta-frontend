@@ -52,19 +52,14 @@ function GuruCreateMateri() {
             {/* <Appheader /> */}
             <GuruTopnav />
             {/* <iframe src="http://www.google.com/search?igu=1" width="100%" height="1000px"></iframe> */}
-            {/* <iframe
+            <iframe
               src="http://localhost/h5p/wp-admin/admin.php?page=h5p"
               width="100%"
               height="1000px"
-            ></iframe> */}
+            ></iframe>
             {/* <iframe src="https://ikhlas-travel.site/ikhlas/sample-page/" width="100%" height="1000px"></iframe> */}
             {/* <iframe src="https://project-aneta.vercel.app/" width="100%" height="1000px"></iframe> */}
-            <iframe
-              src="https://lms.aneta.id/dashboard"
-              width="100%"
-              height="1000px"
-              title="Create Materi"
-            ></iframe>
+            {/* <iframe src="https://lms.aneta.id/dashboard" width="100%" height="1000px" title="Create Materi"></iframe> */}
           </div>
         </div>
       </div>

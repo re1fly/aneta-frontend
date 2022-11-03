@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react"
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { getProcessId, searchGlobal } from "../../../redux/Action";
+import { searchGlobal } from "../../../redux/Action";
 import {
     Menu,
     Card,
@@ -71,9 +71,6 @@ export default function DataMataPelajaranAdmin() {
     const dispatch = useDispatch();
     const searchRedux = useSelector(state => state.search);
     const DataSearch = searchRedux.DataSearch;
-
-    const getProcess = useSelector(state => state.processId);
-    let ProcessId = getProcess.DataProcess;
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -191,10 +188,6 @@ export default function DataMataPelajaranAdmin() {
             })
         }
     }
-
-    useEffect(() => {
-        dispatch(getProcessId(["getdatajoinwhere"]))
-    }, [])
 
     useEffect(() => {
         axios.post(url_by_institute,

@@ -42,9 +42,9 @@ function InputDataDeskripsiNilai() {
                         "name": "get_data",
                         "type": "json",
                         "value": {
-                            "id_class": data.id_class_filter, // 86 untuk test data.id_class_filter
+                            "id_class": data.id_class_filter,
                             "id_academic": academic,
-                            "id_matpel": data.id_mapel_filter // 219 untuk test data.id_mapel_filter
+                            "id_matpel": data.id_mapel_filter
                         }
                     }
                 ]
@@ -206,7 +206,6 @@ function InputDataDeskripsiNilai() {
                 placement: 'top'
             })
         }
-
     }
 
 

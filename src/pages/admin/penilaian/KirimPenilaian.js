@@ -16,7 +16,13 @@ import {
 import Search from "antd/lib/input/Search";
 import { dateNow } from "../../../components/misc/date";
 import { DataNotFound } from "../../../components/misc/DataNotFound";
-import {get_kirim_penilaian, get_kirim_penilaian_detail, global_update, url_by_institute} from "../../../api/reference";
+import {
+    cari_kirim_penilaian,
+    get_kirim_penilaian,
+    get_kirim_penilaian_detail,
+    global_update,
+    url_by_institute
+} from "../../../api/reference";
 
 function KirimPenilaian() {
 
@@ -63,7 +69,7 @@ function KirimPenilaian() {
             });
             axios.post(url_by_institute,
                 {
-                    "processDefinitionId": "carikirimpenilaian:2:dfc470a1-4069-11ed-8f22-927b5be84510",
+                    "processDefinitionId": cari_kirim_penilaian,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -592,17 +598,24 @@ function KirimPenilaian() {
                     <DataNotFound />
                     :
                     <>
-                        <div className="mt-4 bg-grey">
-                            <p className="font-xssss strong text-black pl-4 mb-0">Tabel Interval Predikat - {dataKirimNilai?.interval_predikat?.nama_matpel}</p>
-                        </div>
-                        <Table className="mt-0 py-8"
-                            columns={columns}
-                            dataSource={data}
-                            onChange={onChangeTable}
-                            pagination={false}
-                            rowClassName="bg-greylight text-grey-900"
-                            scroll={{ x: 400 }}
-                            bordered />
+                        {dataKirimNilai.interval_predikat == null ?
+                            <div className="mt-4 bg-grey">
+                                <p className="font-xssss strong text-black pl-4 mb-0">Data Interval Predikat kosong</p>
+                            </div> :
+                            <>
+                                <div className="mt-4 bg-grey">
+                                    <p className="font-xssss strong text-black pl-4 mb-0">Tabel Interval Predikat - {dataKirimNilai?.interval_predikat?.nama_matpel}</p>
+                                </div>
+                                <Table className="mt-0 py-8"
+                                    columns={columns}
+                                    dataSource={data}
+                                    onChange={onChangeTable}
+                                    pagination={false}
+                                    rowClassName="bg-greylight text-grey-900"
+                                    scroll={{ x: 400 }}
+                                    bordered />
+                            </>
+                        }
 
                         <Table
                             dataSource={data_sampel1()}

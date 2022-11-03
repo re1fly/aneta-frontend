@@ -77,83 +77,83 @@ export default function ListTahunAkademik() {
         </Menu>
     );
 
-    const _onSearch = (value) => {
-        if (value == "") {
-            window.location.reload();
-        } else {
-            notification.info({
-                message: "Search",
-                description: "Mencari data : " + value,
-                duration: 1,
-                icon: <SearchOutlined />,
-            });
-            axios.post(url_by_institute,
-                {
-                    "processDefinitionId": global_join_sub_where_get,
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "global_join_where_sub",
-                            "type": "json",
-                            "value": {
-                                "tbl_induk": "x_academic_year",
-                                "paginate": 10,
-                                "join": [
-                                    {
-                                        "tbl_join": "m_institutes",
-                                        "refkey": "id",
-                                        "tbl_join2": "x_academic_year",
-                                        "foregenkey": "institute_id"
-                                    }
-                                ],
-                                "kondisi": [
-                                    {
-                                        "keterangan": "where",
-                                        "kolom": "x_academic_year.institute_id",
-                                        "value": institute
-                                    }
-                                ],
-                                "where": [
-                                    {
-                                        "tbl_coloumn": "x_academic_year",
-                                        "tbl_field": "academic_year",
-                                        "tbl_value": value,
-                                        "operator": "ILIKE"
-                                    },
-                                    {
-                                        "tbl_coloumn": "x_academic_year",
-                                        "tbl_field": "semester",
-                                        "tbl_value": value,
-                                        "operator": "ILIKE"
-                                    }
+    // const _onSearch = (value) => {
+    //     if (value == "") {
+    //         window.location.reload();
+    //     } else {
+    //         notification.info({
+    //             message: "Search",
+    //             description: "Mencari data : " + value,
+    //             duration: 1,
+    //             icon: <SearchOutlined />,
+    //         });
+    //         axios.post(url_by_institute,
+    //             {
+    //                 "processDefinitionId": global_join_sub_where_get,
+    //                 "returnVariables": true,
+    //                 "variables": [
+    //                     {
+    //                         "name": "global_join_where_sub",
+    //                         "type": "json",
+    //                         "value": {
+    //                             "tbl_induk": "x_academic_year",
+    //                             "paginate": 10,
+    //                             "join": [
+    //                                 {
+    //                                     "tbl_join": "m_institutes",
+    //                                     "refkey": "id",
+    //                                     "tbl_join2": "x_academic_year",
+    //                                     "foregenkey": "institute_id"
+    //                                 }
+    //                             ],
+    //                             "kondisi": [
+    //                                 {
+    //                                     "keterangan": "where",
+    //                                     "kolom": "x_academic_year.institute_id",
+    //                                     "value": institute
+    //                                 }
+    //                             ],
+    //                             "where": [
+    //                                 {
+    //                                     "tbl_coloumn": "x_academic_year",
+    //                                     "tbl_field": "academic_year",
+    //                                     "tbl_value": value,
+    //                                     "operator": "ILIKE"
+    //                                 },
+    //                                 {
+    //                                     "tbl_coloumn": "x_academic_year",
+    //                                     "tbl_field": "semester",
+    //                                     "tbl_value": value,
+    //                                     "operator": "ILIKE"
+    //                                 }
 
-                                ],
-                                "order_coloumn": "x_academic_year.id",
-                                "order_by": "asc"
-                            }
-                        },
-                        {
-                            "name": "page",
-                            "type": "string",
-                            "value": paramsPage
-                        }
-                    ]
-                }
-            ).then(function (response) {
-                // console.log(response);
-                const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
-                // console.log(tahunAkademik.data.data);
-                setGetTahunAkademik(tahunAkademik?.data?.data)
-                setBtnPagination(tahunAkademik?.data?.links)
-            })
-        }
-    }
+    //                             ],
+    //                             "order_coloumn": "x_academic_year.id",
+    //                             "order_by": "asc"
+    //                         }
+    //                     },
+    //                     {
+    //                         "name": "page",
+    //                         "type": "string",
+    //                         "value": paramsPage
+    //                     }
+    //                 ]
+    //             }
+    //         ).then(function (response) {
+    //             // console.log(response);
+    //             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
+    //             // console.log(tahunAkademik.data.data);
+    //             setGetTahunAkademik(tahunAkademik?.data?.data)
+    //             setBtnPagination(tahunAkademik?.data?.links)
+    //         })
+    //     }
+    // }
 
     // Get Tahun Akademik
+    
     useEffect(() => {
         axios.post(url_by_institute,
             {
-
                 "processDefinitionId": get_where_no_join,
                 "returnVariables": true,
                 "variables": [
@@ -210,7 +210,7 @@ export default function ListTahunAkademik() {
         return (
             <>
                 <div className="row">
-                    {data_sampel.map((value, index) => (
+                    {data_sampel?.map((value, index) => (
                         <div className="col-xl-4 col-lg-6 col-md-6" /*key={index}*/>
                             <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
                                 {value.tahunAkademikAktif == "T" ?
@@ -370,7 +370,7 @@ export default function ListTahunAkademik() {
                     scroll={{ X: 400 }}
                 />
                 <div className='text-center mt-4'>
-                    {btnPagination.map((dataBtn) => {
+                    {btnPagination?.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
                         const label = labelBtn
                             .replace(/(&laquo\;)/g, "")
@@ -418,7 +418,8 @@ export default function ListTahunAkademik() {
                                 </div>
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                        onSearch={_onSearch} style={{ width: '80%' }} />
+                                        // onSearch={_onSearch} 
+                                        style={{ width: '80%' }} />
                                     {grid == false ?
                                         <a>
                                             <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}

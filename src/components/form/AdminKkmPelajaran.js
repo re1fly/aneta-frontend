@@ -109,7 +109,7 @@ export const FormKkmPelajaran = (props) => {
                                                     Nilai KKM
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='nilai_kkm'
                                                     className="form-control"
                                                     defaultValue={props.nilaiKkm}

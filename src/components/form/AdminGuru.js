@@ -115,7 +115,7 @@ export const FormAdminGuru = (props) => {
                                                     NIP
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='nip'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -205,10 +205,10 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Status Kepegawaian
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={'guru honorer sekolah'}>
                                                         Guru Honorer Sekolah
                                                     </option>
-                                                    <option value="2">
+                                                    <option value={'gty/pty'}>
                                                         GTY/PTY
                                                     </option>
                                                 </select>
@@ -230,13 +230,13 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Jenis PTK
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={'guru mapel'}>
                                                         Guru Mapel
                                                     </option>
-                                                    <option value="2">
+                                                    <option value={'guru kelas'}>
                                                         Guru Kelas
                                                     </option>
-                                                    <option value="3">
+                                                    <option value={'guru pendamping khusus'}>
                                                         Guru Pendamping Khusus
                                                     </option>
                                                 </select>
@@ -266,7 +266,7 @@ export const FormAdminGuru = (props) => {
                                                     Email <RequiredTooltip />
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="email"
                                                     name='email_guru'
                                                     className="form-control"
                                                     defaultValue={props.email}
@@ -284,7 +284,7 @@ export const FormAdminGuru = (props) => {
                                                     Nomor HP <RequiredTooltip />
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='nomortelefon_guru'
                                                     className="form-control"
                                                     defaultValue={props.nomorHp}
@@ -300,7 +300,7 @@ export const FormAdminGuru = (props) => {
                                                     Nomor Telepon
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='nomortelefon2_guru'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -532,7 +532,7 @@ export const FormAdminGuru = (props) => {
                                                     RT
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='rt'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -547,7 +547,7 @@ export const FormAdminGuru = (props) => {
                                                     RW
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='rw'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -562,7 +562,7 @@ export const FormAdminGuru = (props) => {
                                                     Kode Pos
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='kode_pos'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -758,13 +758,13 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Status Perkawinan
                                                     </option>
-                                                    <option value="1">
+                                                    <option value="kawin">
                                                         Kawin
                                                     </option>
-                                                    <option value="2">
+                                                    <option value="belum kawin">
                                                         Belum Kawin
                                                     </option>
-                                                    <option value="3">
+                                                    <option value="janda / duda">
                                                         Janda / Duda
                                                     </option>
                                                 </select>
@@ -856,10 +856,10 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Lisensi
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Ya
                                                     </option>
-                                                    <option value="2">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -881,10 +881,10 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Diklat Kepegawaian
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Ya
                                                     </option>
-                                                    <option value="2">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -908,10 +908,10 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Keahlian Braille
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Ya
                                                     </option>
-                                                    <option value="2">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -933,10 +933,10 @@ export const FormAdminGuru = (props) => {
                                                     <option value='' selected disabled>
                                                         Pilih Keahlian Bahasa Isyarat
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Ya
                                                     </option>
-                                                    <option value="2">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -951,7 +951,7 @@ export const FormAdminGuru = (props) => {
                                                     NPWP
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='npwp'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -1001,7 +1001,7 @@ export const FormAdminGuru = (props) => {
                                                     NIK <RequiredTooltip />
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='nik'
                                                     className="form-control"
                                                     // defaultValue={props.nomorHp}
@@ -1017,7 +1017,7 @@ export const FormAdminGuru = (props) => {
                                                     No Kartu Keluarga
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='no_kk'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}
@@ -1051,7 +1051,7 @@ export const FormAdminGuru = (props) => {
                                                     No Rekening Bank
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='no_rekening'
                                                     className="form-control"
                                                 // defaultValue={props.nomorHp}

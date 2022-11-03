@@ -120,7 +120,7 @@ export const FormAdminPelajaran = (props) => {
                                                     No Urut Rapor
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name='noUrut_rapor'
                                                     className="form-control"
                                                     defaultValue={props.noUrutRapor}
@@ -134,7 +134,7 @@ export const FormAdminPelajaran = (props) => {
                                     <div className="row">
 
 
-                                        <div className="col-lg-12 mb-3">
+                                        <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Status
@@ -157,6 +157,22 @@ export const FormAdminPelajaran = (props) => {
                                                         Tidak Aktif
                                                     </option>
                                                 </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Jumlah Pertemuan
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name='jumlah_pertemuan'
+                                                    className="form-control"
+                                                    defaultValue={props.jumlahPertemuan}
+                                                    required
+                                                    disabled={props.isDisabled}
+                                                />
                                             </div>
                                         </div>
 

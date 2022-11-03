@@ -13,6 +13,7 @@ import {BASE_URL} from "../../api/Url";
 import {Link} from "react-router-dom";
 import {RequiredTooltip} from "../../components/misc/RequiredTooltip";
 import {ReactSearchAutocomplete} from "react-search-autocomplete";
+import {create_institute, dashboard_admin} from "../../api/reference";
 
 const lineChart = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',],
@@ -144,7 +145,7 @@ function BerandaAdmin() {
 
     useEffect(() => {
         axios.post(BASE_URL, {
-                "processDefinitionId": "dashboardadmin:1:0c104413-2cc7-11ed-aacc-9a44706f3589",
+                "processDefinitionId": dashboard_admin,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -421,7 +422,7 @@ function BerandaAdmin() {
         console.log(data)
         axios.post(BASE_URL,
             {
-                "processDefinitionId": "createinstitute:1:f9d54117-2cc7-11ed-aacc-9a44706f3589",
+                "processDefinitionId": create_institute,
                 "returnVariables": true,
                 "variables": [
                     {

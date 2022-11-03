@@ -47,7 +47,6 @@ export default function DataKelasAdmin() {
     const [isViewCreate, setIsViewCreate] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    console.log(selectedUser);
     const [refreshState, setRefreshState] = useState(false);
     const [fileList, setFileList] = useState([
         {
@@ -895,11 +894,11 @@ export default function DataKelasAdmin() {
                                     {/*    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"*/}
                                     {/*    style={{display: "none"}}*/}
                                     {/*/>*/}
-                                    <Button className="mr-4" style={{backgroundColor: '#5e7082', color: 'white'}}
+                                    {/* <Button className="mr-4" style={{backgroundColor: '#5e7082', color: 'white'}}
                                             shape="round" size='middle'
                                             onClick={_modalImportNew}>
                                         Import Data Baru
-                                    </Button>
+                                    </Button> */}
 
 
                                     <FilterAcademic

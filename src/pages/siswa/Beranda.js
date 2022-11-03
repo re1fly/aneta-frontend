@@ -8,8 +8,8 @@ import Appheader from "../../components/Appheader";
 import { InboxOutlined } from "@ant-design/icons";
 
 import axios from "axios";
-import { BASE_URL } from "../../api/Url";
 import { dateNow } from "../../components/misc/date";
+import {get_where_no_join, jadwal_pelajaran_on_going, url_by_institute} from "../../api/reference";
 
 function BerandaSiswa() {
     const user = localStorage.getItem('user_name');
@@ -74,8 +74,8 @@ function BerandaSiswa() {
     }
     
     useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "108f9a5e-3aed-11ed-8c53-66682e31e826",
+        axios.post(url_by_institute, {
+            "processDefinitionId": jadwal_pelajaran_on_going,
             "returnVariables": true,
             "variables": [
                 {
@@ -83,7 +83,7 @@ function BerandaSiswa() {
                     "type": "json",
                     "value": {
                         "user_id": userId,
-                        "academic_id": 91
+                        "academic_id": academicId
                     }
                 }
             ]
@@ -95,12 +95,13 @@ function BerandaSiswa() {
                 }
             }
         ).then(function (response) {
+            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetJadwalPelajaran(dataRes?.data);
         })
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": get_where_no_join,
             "returnVariables": true,
             "variables": [
                 {

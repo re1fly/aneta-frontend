@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import Adminfooter from "../../../components/Adminfooter";
 import {
     Button,
@@ -9,15 +9,10 @@ import {
     message,
     notification,
     PageHeader,
-    Progress,
     Row,
     Space,
     Table,
-    Tag,
-    Upload,
-    Select
 } from "antd";
-import Link from "react-router-dom/es/Link";
 import {
     AppstoreOutlined,
     DeleteOutlined,
@@ -25,29 +20,281 @@ import {
     EditOutlined,
     MenuOutlined,
     EyeOutlined,
-    VideoCameraOutlined
 } from "@ant-design/icons";
+import {
+    url_by_institute,
+    role_guru_create_materi,
+    get_where_no_join,
+    role_guru_get_matpel,
+    global_join_sub_where_get
+} from '../../../api/reference';
 
-import { NavLink } from 'react-router-dom';
-
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
+import axios from 'axios';
 import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
+import { FormCreateMateri } from '../../../components/form/GuruCreateMateri';
+import { pageLoad } from '../../../components/misc/loadPage';
 
 function GuruDataMateri() {
     const [grid, setGrid] = useState(false);
+    const [dataMateri, setDataMateri] = useState([])
     const [isViewMateri, setIsViewMateri] = useState(true);
+    const [isViewEdit, setIsViewEdit] = useState(false);
+    const [isViewCreate, setIsViewCreate] = useState(false);
+    const [isViewDetail, setIsViewDetail] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [refreshState, setRefreshState] = useState(false);
 
-    const _onSelectMenu = ({ key }) => {
-        message.info(`Click on item ${key}`);
-    };
+    const [getKelas, setGetKelas] = useState(null);
+    const [dataMapel, setDataMapel] = useState(null);
+    const [selectedClass, setSelectedClass] = useState(null);
+    console.log(selectedClass);
+    const [selectedMapel, setSelectedMapel] = useState(null);
 
-    const handleChange = (value) => {
-        console.log(`selected ${value}`);
-    };
+    const [btnPagination, setBtnPagination] = useState([]);
+    const [paramsPage, setParamsPage] = useState("1");
+
+    const userId = localStorage.getItem('user_id');
+    const academic_year_id = localStorage.getItem('academic_year')
+    const institute = localStorage.getItem('institute')
+
+    const _getDataKelas = () => {
+        axios
+            .post(
+                url_by_institute,
+                {
+                    "processDefinitionId": "rolegurugetsubclass:1:cf6435fc-4a0b-11ed-8f22-927b5be84510",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "get_sub_kelas_guru",
+                            "type": "json",
+                            "value": {
+                                "user_id": userId
+                            }
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                }
+            )
+            .then(function (response) {
+                const data = JSON.parse(response.data.variables[2].value);
+                setGetKelas(data?.data);
+            })
+    }
+    const _getDataMapel = () => {
+        axios
+            .post(
+                url_by_institute,
+                {
+                    "processDefinitionId": "rolegurugetmatpel:1:0328ed1e-4a0c-11ed-8f22-927b5be84510",
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "update_jadwal_pelajaran",
+                            "type": "json",
+                            "value": {
+                                "user_id": userId,
+                                "id_class": selectedClass
+                            }
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataMapelApi = JSON.parse(response.data.variables[2].value);
+                const getMapel = dataMapelApi?.data
+                setDataMapel(getMapel);
+            })
+    }
+
+    useEffect(() => {
+
+        _getDataKelas()
+        _getDataMapel()
+
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_join_sub_where_get,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where_sub",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_academic_subjects_schedule_contents",
+                        "select": [
+                            "x_academic_subjects_schedule_contents.tittle",
+                            "r_class_type.class_type",
+                            "x_academic_subject_master.nama_mata",
+                            "x_academic_year.academic_year",
+                            "x_academic_subjects_schedule_contents.status"
+                        ],
+                        "paginate": 10,
+                        "join": [
+                            {
+                                "tbl_join": "r_class_type",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "class_type_id"
+                            },
+
+                            {
+                                "tbl_join": "x_academic_subject_master",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "subjects_master_id"
+                            },
+                            {
+                                "tbl_join": "x_academic_year",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "academic_year_id"
+                            }
+
+
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                "tbl_field": "subjects_content_type_id",
+                                "tbl_value": "1",
+                                "operator": "="
+                            },
+                            {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                "tbl_field": "deleted_at",
+                                "tbl_value": "",
+                                "operator": "="
+                            }, {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                "tbl_field": "created_by",
+                                "tbl_value": userId,
+                                "operator": "="
+                            }
+
+                        ],
+                        "order_coloumn": "x_academic_subjects_schedule_contents.updated_at",
+                        "order_by": "desc"
+                    }
+                },
+                {
+                    "name": "page",
+                    "type": "string",
+                    "value": paramsPage
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            setDataMateri(dataRes?.data?.data);
+            const pagination = dataRes?.data?.links;
+            setBtnPagination(pagination)
+        })
+
+    }, [userId, refreshState, paramsPage, selectedClass])
+
+    useEffect(() => {
+        axios.post(url_by_institute, {
+            "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where_sub",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_academic_subjects_schedule_contents",
+                        "select": [
+                            "x_academic_subjects_schedule_contents.tittle",
+                            "r_class_type.class_type",
+                            "x_academic_subject_master.nama_mata",
+                            "x_academic_year.academic_year",
+                            "x_academic_subjects_schedule_contents.status"
+                        ],
+                        "paginate": 10,
+                        "join": [
+                            {
+                                "tbl_join": "r_class_type",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "class_type_id"
+                            },
+
+                            {
+                                "tbl_join": "x_academic_subject_master",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "subjects_master_id"
+                            },
+                            {
+                                "tbl_join": "x_academic_year",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "academic_year_id"
+                            }
+
+
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                "tbl_field": "subjects_content_type_id",
+                                "tbl_value": "1",
+                                "operator": "="
+                            },
+                            {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                "tbl_field": "deleted_at",
+                                "tbl_value": "",
+                                "operator": "="
+                            }, {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                "tbl_field": "created_by",
+                                "tbl_value": userId,
+                                "operator": "="
+                            }
+
+                        ],
+                        "order_coloumn": "x_academic_subjects_schedule_contents.updated_at",
+                        "order_by": "desc"
+                    }
+                },
+                {
+                    "name": "page",
+                    "type": "string",
+                    "value": paramsPage
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            setDataMateri(dataRes?.data?.data);
+            const pagination = dataRes?.data?.links;
+            setBtnPagination(pagination)
+        })
+
+    }, [userId, refreshState, paramsPage])
 
     const columns = [
         {
@@ -76,11 +323,6 @@ function GuruDataMateri() {
             align: 'center',
         },
         {
-            title: 'Jenis Materi',
-            dataIndex: 'jenisMateri',
-            align: 'center',
-        },
-        {
             title: 'Status',
             dataIndex: 'status',
             align: 'center',
@@ -91,56 +333,27 @@ function GuruDataMateri() {
             responsive: ['sm'],
             render: (text, record) => (
                 <Space size="middle">
-                    <Link to="/guru-data-materi-detail">
+                    {/* <Link to="/guru-data-materi-detail">
                         <EyeOutlined style={{ color: "black" }} />
-                    </Link>
-                    <EditOutlined style={{ color: "blue" }} onClick={() => notification.open({
-                        message: 'Edit',
-                        description:
-                            'Edit materi bernama ' + record.namaMateri,
-                        duration: 2
-
-                    })} />
-                    <DeleteOutlined style={{ color: 'red' }} onClick={() => notification.open({
-                        message: 'Delete',
-                        description:
-                            'Hapus materi bernama ' + record.namaMateri,
-                        duration: 2
-                    })} />
+                    </Link> */}
+                    <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailMateri(record)} />
+                    <EditOutlined style={{ color: "blue" }} onClick={() => viewEditMateri(record)} />
+                    <DeleteOutlined style={{ color: 'red' }} />
                 </Space>
             ),
         },
     ];
 
-    const data = [
-        {
-            no: '01',
-            namaMateri: 'Bangun Datar',
-            tingkatKelas: '3',
-            ta_semester: '2021/2022/Genap',
-            mataPelajaran: 'Matematika',
-            jenisMateri: 'Teks',
-            status: 'Draf',
-        },
-        {
-            no: '02',
-            namaMateri: 'Puisi dan Syair',
-            tingkatKelas: '3',
-            ta_semester: '2021/2022/Genap',
-            mataPelajaran: 'Bahasa Indonesia',
-            jenisMateri: 'Video',
-            status: 'Selesai',
-        },
-        {
-            no: '03',
-            namaMateri: 'Regresi Linier',
-            tingkatKelas: '3',
-            ta_semester: '2021/2022/Genap',
-            mataPelajaran: 'Ilmu Pengetahuan Alam',
-            jenisMateri: 'Teks',
-            status: 'Draf',
-        },
-    ];
+    const data = dataMateri?.map((data, index) => {
+        return {
+            no: index + 1,
+            namaMateri: data.tittle,
+            tingkatKelas: data.class_type,
+            ta_semester: data.academic_year,
+            mataPelajaran: data.nama_mata,
+            status: data.status,
+        }
+    })
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -164,20 +377,9 @@ function GuruDataMateri() {
                     <Row>
                         <Col span={12}>
                             <Button className="mr-4" type="primary" shape="round" size='middle'
-                                onClick={() => setIsViewMateri(false)}>
+                                onClick={viewCreateMateri}>
                                 Tambah Data
                             </Button>
-                            {/* <Dropdown overlay={_filterMenu}>
-                                        <a className="ant-dropdown-link mr-4 font-bold"
-                                           onClick={e => e.preventDefault()}>
-                                            Filter by <DownOutlined/>
-                                        </a>
-                                    </Dropdown>
-                                    <Dropdown overlay={_sortMenu}>
-                                        <a className="ant-dropdown-link font-bold" onClick={e => e.preventDefault()}>
-                                            Sort by <DownOutlined/>
-                                        </a>
-                                    </Dropdown> */}
                         </Col>
                         <Col span={12}>
                             <div className="float-right">
@@ -204,13 +406,15 @@ function GuruDataMateri() {
                                 className="form-control"
                                 aria-label="Default"
                                 name="pilih_kelas"
+                                onChange={(e) => setSelectedClass(e.target.value)}
+                                value={selectedClass}
                             >
                                 <option value="" selected disabled>
                                     Pilih Kelas
                                 </option>
-                                {/* {dataKelas.map((data) => (
-                                        <option value={data.id_class}>{data.class}</option>
-                                    ))} */}
+                                {getKelas?.map((data) => (
+                                    <option value={data.id}>{data.class_type} - {data.sub_class}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -221,13 +425,15 @@ function GuruDataMateri() {
                                 className="form-control"
                                 aria-label="Default"
                                 name="pilih_mataPelajaran"
+                                onChange={(e) => setSelectedMapel(e.target.value)}
+                                value={selectedMapel}
                             >
                                 <option value="" selected disabled>
                                     Pilih Mata Pelajaran
                                 </option>
-                                {/* {dataKelas.map((data) => (
-                                        <option value={data.id_class}>{data.class}</option>
-                                    ))} */}
+                                {dataMapel == null ? null : dataMapel?.map((data) => (
+                                    <option value={data.id}>{data.nama_mata}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -237,323 +443,170 @@ function GuruDataMateri() {
                     columns={columns}
                     dataSource={data}
                     onChange={onChangeTable}
-                    pagination={{ position: ['bottomCenter'] }}
+                    pagination={false}
                     rowClassName="bg-greylight text-grey-900" />
+                <div className='text-center mt-4'>
+                    {btnPagination?.map((dataBtn) => {
+                        const labelBtn = dataBtn.label;
+                        const label = labelBtn
+                            .replace(/(&laquo\;)/g, "")
+                            .replace(/(&raquo\;)/g, "");
+                        let linkUrl = dataBtn.url;
+
+                        if (linkUrl != null) {
+                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                        }
+
+                        return (
+                            <Button
+                                className="btn btn-primary mr-2 font-xssss fw-600"
+                                disabled={linkUrl == null ? true : false}
+                                onClick={() => {
+                                    setParamsPage(linkUrl);
+                                }}
+                            >
+                                {label}
+                            </Button>
+                        );
+                    })}
+                </div>
                 <Adminfooter />
             </div>
         )
     }
 
-    const TambahMateri = () => {
-        const { Dragger } = Upload;
+    const CreateMateri = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        // const dateNow = new Date().toLocaleString()
+        console.log(data);
+        const iFrame = data.embed_materi
+        const id = iFrame?.split('id=')[1]
+        const id_content_wp = id?.split('" width=')[0]
+        console.log(id_content_wp);
 
-        const props = {
-            name: 'file',
-            multiple: true,
-            action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-            onChange(info) {
-                const { status } = info.file;
-                if (status !== 'uploading') {
-                    console.log(info.file, info.fileList);
+        axios.post(url_by_institute, {
+            "processDefinitionId": role_guru_create_materi,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "create_materi_matpel_guru",
+                    "type": "json",
+                    "value": {
+                        "subjects_content_type_id": 1,
+                        "user_id": userId,
+                        "id_tingkat": data.tingkat_kelas,
+                        "id_sub_kelas": data.sub_kelas,
+                        "id_matpel": data.mata_pelajaran,
+                        "nama_materi": data.nama_materi,
+                        "embed_materi": data.embed_materi,
+                        "id_content_wp": id_content_wp,
+                        "keterangan": data.keterangan,
+                        "id_kompetensi": data.kompetensi,
+                        "status": "publish",
+                        "academic_year_id": academic_year_id,
+                        "duration_day": 0,
+                        "duration_hourse": 0,
+                        "duration_minute": 0,
+                    },
                 }
-                if (status === 'done') {
-                    message.success(`${info.file.name} file uploaded successfully.`);
-                } else if (status === 'error') {
-                    message.error(`${info.file.name} file upload failed.`);
+            ]
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
-            },
-            onDrop(e) {
-                console.log('Dropped files', e.dataTransfer.files);
-            },
-        };
+            }
+        ).then(function (response) {
+            console.log("Insert :", response);
+            const valueRes = response.data.variables[2].value;
+            const valueResObj = JSON.parse(valueRes);
+            // console.log(valueResObj);
+            if (valueResObj.message == "success insert materi") {
+                setIsViewCreate(false)
+                setIsViewMateri(true)
+                setRefreshState(true)
+                pageLoad()
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Materi berhasil ditambahkan.',
+                    placement: 'top'
+                });
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                });
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
 
+    const viewCreateMateri = () => {
+        setIsViewCreate(true)
+        setIsViewMateri(false)
+        setIsViewEdit(false)
+        setIsViewDetail(false)
+    }
+
+    const viewEditMateri = (record) => {
+        setSelectedUser(record)
+        setIsViewEdit(true)
+        setIsViewCreate(false)
+        setIsViewMateri(false)
+        setIsViewDetail(false)
+    }
+
+    const viewDetailMateri = (record) => {
+        setSelectedUser(record)
+        setIsViewCreate(false)
+        setIsViewMateri(false)
+        setIsViewEdit(false)
+        setIsViewDetail(true)
+    }
+
+    const FormCreate = () => {
         return (
-            <div className="container px-3 py-4">
-                <div className="row">
-                    <div className="col-lg-12">
-                        <div className="middle">
-                            <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
-                                <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewMateri(true)} className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
-                                    <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                        Tambah Data Materi
-                                    </h4>
-                                </div>
-                                <div className="card-body p-lg-5 p-4 w-100 border-0 ">
-                                    <form id="mataPelajaran_form"
-                                        // onSubmit={createJadwalPelajaran}
-                                        method="POST">
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Mata Pelajaran
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="pilih_mata_pelajaran"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Mata Pelajaran
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Tingkat Kelas
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="Tingkat Kelas"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Tingkat Kelas
-                                                        </option>
-                                                        {/* {mataPelajaran.map((data, i) => {
-                                                            return (
-                                                                <option value={data.id_subjects} selected key={i}>
-                                                                    {data.nama_mata}
-                                                                </option>
-                                                            )
-                                                        })} */}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
+            <FormCreateMateri
+                form="Materi"
+                setView={() => setIsViewMateri(true)}
+                title="Tambah Data"
+                submit={CreateMateri}
+                isDisabled={false}
+            />
+        )
+    }
 
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Nama Materi
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="materi"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Materi
-                                                        </option>
+    const FormEdit = () => {
+        return (
+            <FormCreateMateri
+                form="materi"
+                setView={() => setIsViewMateri(true)}
+                title="Edit Data"
+                // submit={editGuru}
+                isDisabled={false}
+            />
+        )
+    }
 
-                                                    </select>
-                                                </div>
-                                            </div>
+    const FormDetail = () => {
+        return (
+            <FormCreateMateri
+                form="materi"
+                setView={() => setIsViewMateri(true)}
+                title="View Data"
+                // submit={createGuru}
+                isDisabled={true}
 
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="mt-4">
-                                                    <NavLink
-                                                        activeClassName="active"
-                                                        to="/guru-create-materi"
-                                                        data-tab="archived"
-                                                        className="nav-content-bttn open-font"
-                                                    >
-                                                        <button
-                                                            onClick=""
-                                                            className="bg-tumbler border-0 text-center text-black font-xsss fw-600 p-3 w-100 rounded-lg d-inline-block"
-                                                            type=""
-                                                        >
-                                                            Create Materi
-                                                        </button>
-                                                    </NavLink>
-
-                                                </div>
-                                            </div>
-
-                                            {/* <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Jenis Materi
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="materi"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Jenis Materi
-                                                        </option>
-                                                        <option value="">
-                                                            Text
-                                                        </option>
-                                                        <option value="">
-                                                            Video
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div> */}
-                                        </div>
-
-                                        <div className="row">
-                                            {/* <div className="col-lg-12 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Sumber Video
-                                                    </label>
-                                                    <Dragger {...props} style={{ height: "90%" }} className="mt-12">
-                                                        <p className="ant-upload-drag-icon">
-                                                            <VideoCameraOutlined />
-                                                        </p>
-                                                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                                        <p className="ant-upload-hint">
-                                                            Max. file size 50MB
-                                                        </p>
-                                                    </Dragger>
-                                                </div>
-                                            </div> */}
-
-                                            <div className="col-lg-12 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Embed Materi
-                                                    </label>
-                                                    <textarea
-                                                        className="form-control mb-0 p-3 bg-greylight lh-16"
-                                                        rows="3"
-                                                        placeholder=""
-                                                        name="keterangan"
-                                                        required
-                                                    ></textarea>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-12 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Keterangan
-                                                    </label>
-                                                    <textarea
-                                                        className="form-control mb-0 p-3 bg-greylight lh-16"
-                                                        rows="5"
-                                                        placeholder="Isi Keterangan..."
-                                                        name="keterangan"
-                                                        required
-                                                    ></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* <div className="row">
-                                            <div className="col-lg-12 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Isi Materi
-                                                    </label>
-                                                    <CKEditor
-                                                        editor={ClassicEditor}
-                                                        data=""
-                                                        row="20px"
-                                                        as="textarea"
-                                                        config={
-                                                            {
-                                                                ckfinder:{
-                                                                    uploadUrl:" https://3ab2-125-164-17-135.ap.ngrok.io/image-upload"
-                                                                }
-                                                            }
-                                                        }
-                                                        onReady={(editor) => {
-                                                        }}
-                                                        onChange={(event, editor) => {
-                                                            const data = editor.getData();
-                                                            console.log({ event, editor, data });
-                                                        }}
-                                                        onBlur={(event, editor) => {
-                                                            console.log("Blur.", editor);
-                                                        }}
-                                                        onFocus={(event, editor) => {
-                                                            console.log("Focus.", editor);
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div> */}
-
-                                        {/* <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Kompetensi
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="kompetensi"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Kompetensi
-                                                        </option>
-                                                    </select> 
-                                                    <Select
-                                                        // className="form-control"
-                                                        mode="multiple"
-                                                        style={{
-                                                            width: '100%',
-                                                        }}
-                                                        placeholder="Pilih Kompetensi"
-                                                        onChange={handleChange}
-                                                        optionLabelProp="label"
-                                                    >
-                                                        <Option value="Kompetensi 1">
-                                                            Kompetensi 1
-                                                        </Option>
-                                                        <Option value="Kompetensi 2">
-                                                            Kompetensi 2
-                                                        </Option>
-                                                        <Option value="Kompetensi 3">
-                                                            Kompetensi 3
-                                                        </Option>
-                                                        <Option value="Kompetensi 4">
-                                                            Kompetensi 4
-                                                        </Option>
-                                                        <Option value="Kompetensi 5">
-                                                            Kompetensi 5
-                                                        </Option>
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                        </div> */}
-
-                                        <div className="row">
-                                            <div className="col-lg-12">
-                                                <button
-                                                    className="bg-tumblr border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    type="submit"
-                                                >
-                                                    Draft
-                                                </button>
-                                                <button
-                                                    className="ml-2 bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    type="submit"
-                                                >
-                                                    Simpan
-                                                </button>
-                                                <button
-                                                    onClick={() => setIsViewMateri(true)}
-
-                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block border-none"
-                                                >
-                                                    Batal
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
+            />
+        )
+    }
 
     return (
         <Fragment>
@@ -561,7 +614,18 @@ function GuruDataMateri() {
                 <Navheader />
                 <div className="main-content">
                     <Appheader />
-                    {isViewMateri ? <ViewMateri /> : <TambahMateri />}
+                    {
+                        isViewMateri ?
+                            <ViewMateri /> :
+                            isViewCreate ?
+                                <FormCreate /> :
+                                isViewEdit ?
+                                    <FormEdit /> :
+                                    isViewDetail ?
+                                        <FormDetail /> :
+                                        <ViewMateri />
+                    }
+                    {/* {isViewMateri ? <ViewMateri /> : <TambahMateri />} */}
                 </div>
             </div>
         </Fragment>

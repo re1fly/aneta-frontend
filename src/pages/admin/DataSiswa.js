@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import Adminfooter from "../../components/Adminfooter";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
@@ -36,13 +36,13 @@ import Upload from "antd/es/upload/Upload";
 import axios from "axios";
 import pagination from "../../components/Pagination";
 import Filter from "../../components/Filter";
-import {useDispatch, useSelector} from "react-redux";
-import {searchGlobal} from "../../redux/Action";
-import {FormAdminSiswa} from "../../components/form/AdminSiswa";
-import {DataFormSiswaCreate} from "../../components/form/AdminSiswaCreate";
+import { useDispatch, useSelector } from "react-redux";
+import { searchGlobal } from "../../redux/Action";
+import { FormAdminSiswa } from "../../components/form/AdminSiswa";
+import { DataFormSiswaCreate } from "../../components/form/AdminSiswaCreate";
 import Swal from "sweetalert2";
-import {dateNow} from "../../components/misc/date";
-import {FilterAcademic} from "../../components/FilterAcademic";
+import { dateNow } from "../../components/misc/date";
+import { FilterAcademic } from "../../components/FilterAcademic";
 import {
     create_siswa,
     global_data_join_where,
@@ -199,59 +199,58 @@ function DataSiswaAdmin() {
             )
             .then(function (response) {
                 const siswa = JSON.parse(response.data.variables[3].value);
-                console.log(siswa.data.data);
                 setGetSiswa(siswa.data.data);
-
+                // console.log(siswa.data.data);
                 const pagination = siswa.data.links;
                 setBtnPagination(pagination);
             });
 
         axios.post(url_by_institute, {
-                "processDefinitionId": global_data_join_where,
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "global_join_where",
-                        "type": "json",
-                        "value": {
-                            "tbl_induk": "x_academic_year",
-                            "select": [
-                                "x_academic_year.id as id_academic",
-                                "x_academic_year.academic_year",
-                                "m_institutes.id", "x_academic_year.semester"
-                            ],
-                            "paginate": 1000,
-                            "join": [
-                                {
-                                    "tbl_join": "m_institutes",
-                                    "foregenkey": "institute_id",
-                                    "refkey": "id"
-                                }
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_academic_year",
-                                    "tbl_field": "institute_id",
-                                    "tbl_value": institute,
-                                    "operator": "="
-                                }
-                            ],
-                            "order_coloumn": "x_academic_year.academic_year",
-                            "order_by": "asc"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "type": "string",
-                        "value": "1"
+            "processDefinitionId": global_data_join_where,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_academic_year",
+                        "select": [
+                            "x_academic_year.id as id_academic",
+                            "x_academic_year.academic_year",
+                            "m_institutes.id", "x_academic_year.semester"
+                        ],
+                        "paginate": 1000,
+                        "join": [
+                            {
+                                "tbl_join": "m_institutes",
+                                "foregenkey": "institute_id",
+                                "refkey": "id"
+                            }
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_academic_year",
+                                "tbl_field": "institute_id",
+                                "tbl_value": institute,
+                                "operator": "="
+                            }
+                        ],
+                        "order_coloumn": "x_academic_year.academic_year",
+                        "order_by": "asc"
                     }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
+                {
+                    "name": "page",
+                    "type": "string",
+                    "value": "1"
                 }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
             const academics = JSON.parse(response.data.variables[3].value);
             setAcademicYears(academics.data.data);
@@ -318,7 +317,6 @@ function DataSiswaAdmin() {
                 }
             )
             .then(function (response) {
-                console.log(response)
                 const dataClass = JSON.parse(response.data.variables[3].value);
                 setDataClass(dataClass.data);
             })
@@ -331,7 +329,156 @@ function DataSiswaAdmin() {
         }
     }, [DataSearch]);
 
-    const onChange = ({fileList: newFileList}) => {
+    const _exportDataExcel = () => {
+        axios.post(url_by_institute, {
+            "processDefinitionId": "siswaexport:1:be7a477f-5900-11ed-8f22-927b5be84510",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+
+                        "academic_year_id": academic
+                    }
+                }
+            ]
+        }).then(response => {
+            console.log(response);
+            const resData = JSON.parse(response.data.variables[2].value)
+            const dataExcel = resData.data
+            const byteCharacters = atob(dataExcel);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'DataSiswa.xlsx'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        })
+    }
+
+    const convertBase64 = (uploaded) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(uploaded);
+
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error)
+            }
+        })
+    }
+
+    const _changeExcelFormat = async (e) => {
+        let uploaded = e.target.files[0];
+        const base64 = await convertBase64(uploaded);
+        const getLinkUrl = base64.split(',')[1]
+        // console.log(getLinkUrl);
+
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": "siswaimport:1:1dff88c4-5913-11ed-8f22-927b5be84510",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "file_base64": getLinkUrl,
+                            "file_type": "xlsx"
+
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.data
+            if (resCode == "success") {
+                setRefreshState(true);
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Siswa berhasil di Import',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal menambahkan data siswa, mohon cek kembali file excel anda.',
+                    placement: 'top'
+                })
+            }
+        })
+
+    }
+
+    const _changeExcelFormatNew = async (e) => {
+        let uploaded = e.target.files[0];
+        const base64 = await convertBase64(uploaded);
+        const getLinkUrl = base64.split(',')[1]
+        // console.log(getLinkUrl);
+
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": '',
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "get_data",
+                        "type": "json",
+                        "value": {
+                            "file_base64": getLinkUrl,
+                            "file_type": "xlsx",
+                            "type": "clear",
+                            "institute_id": institute
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }
+        ).then(function (response) {
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.data
+            if (resCode == "success") {
+                setRefreshState(true);
+                notification.success({
+                    message: "Sukses",
+                    description: 'Data Guru berhasil di Import',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
+                    placement: 'top'
+                })
+            }
+        })
+
+    }
+
+    const onChange = ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
 
@@ -350,7 +497,7 @@ function DataSiswaAdmin() {
         imgWindow.document.write(image.outerHTML);
     };
 
-    const _onSelectMenu = ({key}) => {
+    const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
     };
 
@@ -400,7 +547,7 @@ function DataSiswaAdmin() {
     const formatResult = (item) => {
         return (
             <>
-                <span style={{display: "block", textAlign: "left"}}>{item.name}</span>
+                <span style={{ display: "block", textAlign: "left" }}>{item.name}</span>
             </>
         );
     };
@@ -576,7 +723,7 @@ function DataSiswaAdmin() {
                     {status.map((status) => {
                         let color = status.length > 5 ? "red" : "green";
                         return (
-                            <Tag style={{borderRadius: "15px"}} color={color} key={status}>
+                            <Tag style={{ borderRadius: "15px" }} color={color} key={status}>
                                 {status ? "Aktif" : "Nonaktif"}
                             </Tag>
                         );
@@ -601,10 +748,10 @@ function DataSiswaAdmin() {
             responsive: ["sm"],
             render: (text, record) => (
                 <Space size="middle">
-                    <EyeOutlined style={{color: "black"}} onClick={() => viewDetailSiswa(record)}/>
-                    <EditOutlined style={{color: "blue"}} onClick={() => viewEditSiswa(record)}/>
+                    <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailSiswa(record)} />
+                    <EditOutlined style={{ color: "blue" }} onClick={() => viewEditSiswa(record)} />
                     <DeleteOutlined
-                        style={{color: "red"}}
+                        style={{ color: "red" }}
                         onClick={() => deleteSiswa(record)}
                     />
                 </Space>
@@ -659,21 +806,20 @@ function DataSiswaAdmin() {
         console.log("params", pagination, filters, sorter, extra);
     }
 
-
     const CardDataSiswa = () => (
         <div className="middle-sidebar-left mt-3">
             <div className="row">
                 {channelList.map((value, index) => (
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                         <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-4 border-0 text-center">
-              <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                Aktif
-              </span>
+                            <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                Aktif
+                            </span>
                             <Dropdown
                                 className="position-absolute right-0 mr-4 top-0 mt-3"
                                 overlay={_Account}
                             >
-                                <EllipsisOutlined/>
+                                <EllipsisOutlined />
                             </Dropdown>
 
                             <a
@@ -691,24 +837,24 @@ function DataSiswaAdmin() {
                             {value.tag1 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
-                  {value.tag1}
-                </span>
+                                    {value.tag1}
+                                </span>
                             ) : (
                                 ""
                             )}
                             {value.tag2 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 bg-lightblue d-inline-block text-grey-800 mb-1 mr-1">
-                  {value.tag2}
-                </span>
+                                    {value.tag2}
+                                </span>
                             ) : (
                                 ""
                             )}
                             {value.tag3 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-info d-inline-block text-info mb-1">
-                  {value.tag3}
-                </span>
+                                    {value.tag3}
+                                </span>
                             ) : (
                                 ""
                             )}
@@ -764,7 +910,7 @@ function DataSiswaAdmin() {
                 onChange={onChangeTable}
                 pagination={false}
                 rowClassName="bg-greylight text-grey-900"
-                scroll={{x: 400}}
+                scroll={{ x: 400 }}
             />
             <div className="text-center mt-4">
                 {btnPagination.map((dataBtn) => {
@@ -819,11 +965,35 @@ function DataSiswaAdmin() {
                             >
                                 Tambah Data
                             </Button>
+                            <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={() => _exportDataExcel()}>
+                                Export Data
+                            </Button>
+                            <label for="file_excel_kelas"
+                                className="bg-dark border-0 text-center text-white ant-btn-round mr-4"
+                                style={{ padding: '4px 16px', cursor: 'pointer' }}>
+                                Import Data
+                            </label>
+                            <input
+                                onChange={_changeExcelFormat}
+                                name="excel_initiator"
+                                className="w100"
+                                type="file"
+                                id="file_excel_kelas"
+                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                style={{ display: "none" }}
+                            />
+                            {/* <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={_modalImportNew}>
+                                Import Data Baru
+                            </Button> */}
                             <FilterAcademic
                                 academicNow={academic}
                                 id="filter_academic_data_siswa"
                                 getYear={(e) => {
-                                    const {options, selectedIndex} = e.target;
+                                    const { options, selectedIndex } = e.target;
                                     const year = (options[selectedIndex].text)
                                     setAcademic(e.target.value)
                                     notification.info({
@@ -833,15 +1003,15 @@ function DataSiswaAdmin() {
                                     })
                                 }}
                                 selectYear={academicYears.map((data) => {
-                                        return (
-                                            <>
-                                                <option value={data.id_academic}>
-                                                    {data.academic_year} Semester {data.semester}
-                                                </option>
-                                            </>
-                                        )
-                                    }
-                                )}/>
+                                    return (
+                                        <>
+                                            <option value={data.id_academic}>
+                                                {data.academic_year} Semester {data.semester}
+                                            </option>
+                                        </>
+                                    )
+                                }
+                                )} />
                             {/* <Dropdown overlay={_filterMenu}>
                                 <a className="ant-dropdown-link mr-4 font-bold"
                                    onClick={e => e.preventDefault()}>
@@ -864,19 +1034,19 @@ function DataSiswaAdmin() {
                                 placeholder="Cari kata kunci"
                                 allowClear
                                 onSearch={_onSearch}
-                                style={{width: "80%"}}
+                                style={{ width: "80%" }}
                             />
                             {grid == false ? (
                                 <a>
                                     <AppstoreOutlined
-                                        style={{fontSize: "2em", lineHeight: 1}}
+                                        style={{ fontSize: "2em", lineHeight: 1 }}
                                         onClick={() => setGrid(true)}
                                     />
                                 </a>
                             ) : (
                                 <a>
                                     <MenuOutlined
-                                        style={{fontSize: "2em", lineHeight: 1}}
+                                        style={{ fontSize: "2em", lineHeight: 1 }}
                                         onClick={() => setGrid(false)}
                                     />
                                 </a>
@@ -886,7 +1056,7 @@ function DataSiswaAdmin() {
                     </div>
                 </Card>
 
-                {grid ? <CardDataSiswa/> : <TableDataSiswa/>}
+                {grid ? <CardDataSiswa /> : <TableDataSiswa />}
             </div>
         );
     };
@@ -927,104 +1097,104 @@ function DataSiswaAdmin() {
         axios
             .post(
                 url_by_institute, {
-                    "processDefinitionId": create_siswa,
-                    "returnVariables": true,
-                    "variables": [
-                        {
-                            "name": "siswa",
-                            "type": "json",
-                            "value": {
-                                "status_siswa": 1,
-                                "institute_id": institute,
-                                "image_siswa": data.image_siswa,
-                                "image_type_siswa": "jpg",
-                                "academic_year_id": academicYear,
-                                "nisn_siswa": data.nisn_siswa,
-                                "nipd_siswa": data.nipd_siswa,
-                                "nama_siswa": data.nama_siswa,
-                                "kewarganegaraan_siswa": data.kewarganegaraan_siswa,
-                                "jk_siswa": data.jk_siswa,
-                                "nik_siswa": data.nik_siswa,
-                                "agama_siswa": data.agama_siswa,
-                                "tempatlahir_siswa": data.tempatlahir_siswa,
-                                "tanggallahir_siswa": data.tanggallahir_siswa,
-                                "noakta_siswa": data.noakta_siswa,
-                                "noanak_siswa": data.noanak_siswa,
-                                "jumlahsaudara_siswa": data.jumlahsaudara_siswa,
-                                "jarakrumah_siswa": data.jarakrumah_siswa,
-                                "lintang_siswa": data.lintang_siswa,
-                                "bujur_siswa": data.bujur_siswa,
-                                "tinggi_siswa": data.tinggi_siswa,
-                                "berat_siswa": data.berat_siswa,
-                                "lingkarkepala_siswa": data.lingkarkepala_siswa,
-                                "email_siswa": data.email_siswa,
-                                "hp_siswa": data.hp_siswa,
-                                "provinsi_siswa": data.provinsi_siswa,
-                                "kota_siswa": data.kota_siswa,
-                                "kecamatan_siswa": data.kecamatan_siswa,
-                                "kelurahan_siswa": data.kelurahan_siswa,
-                                "dusun_siswa": data.dusun_siswa,
-                                "rt_siswa": data.rt_siswa,
-                                "rw_siswa": data.rw_siswa,
-                                "kodepos_siswa": data.kodepos_siswa,
-                                "alamat_siswa": data.alamat_siswa,
-                                "jenistinggal_siswa": data.jenistinggal_siswa,
-                                "transportasi_siswa": data.transportasi_siswa,
-                                "skhun_siswa": data.skhun_siswa,
-                                "kps_siswa": data.kps_siswa,
-                                "nokps_siswa": data.nokps_siswa,
-                                "idclass_siswa": data.idclass_siswa,
-                                "nopersertaun_siswa": data.nopersertaun_siswa,
-                                "noseriijazah_siswa": data.noseriijazah_siswa,
-                                "kip_siswa": data.kip_siswa,
-                                "nokip_siswa": data.nokip_siswa,
-                                "namakip_siswa": data.namakip_siswa,
-                                "nokks_siswa": data.nokks_siswa,
-                                "sekolahasal_siswa": data.sekolahasal_siswa,
-                                "kebutuhankhusus_siswa": data.kebutuhankhusus_siswa,
-                                "nama_ayah": data.nama_ayah,
-                                "nik_ayah": data.nik_ayah,
-                                "pekerjaan_ayah": data.pekerjaan_ayah,
-                                "penghasilan_ayah": data.penghasilan_ayah,
-                                "tempatlahir_ayah": data.tempatlahir_ayah,
-                                "tahunlahir_ayah": data.tahunlahir_ayah,
-                                "email_ayah": data.email_ayah,
-                                "hp_ayah": data.hp_ayah,
-                                "provinsi_ayah": data.provinsi_ayah,
-                                "kota_ayah": data.kota_ayah,
-                                "kecamatan_ayah": data.kecamatan_ayah,
-                                "kelurahan_ayah": data.kelurahan_ayah,
-                                "alamat_ayah": data.alamat_ayah,
-                                "nama_ibu": data.nama_ibu,
-                                "nik_ibu": data.nik_ibu,
-                                "pekerjaan_ibu": data.pekerjaan_ibu,
-                                "penghasilan_ibu": data.penghasilan_ibu,
-                                "tempatlahir_ibu": data.tempatlahir_ibu,
-                                "tahunlahir_ibu": data.tahunlahir_ibu,
-                                "email_ibu": data.email_ibu,
-                                "hp_ibu": data.hp_ibu,
-                                "provinsi_ibu": data.provinsi_ibu,
-                                "kota_ibu": data.kota_ibu,
-                                "kecamatan_ibu": data.kecamatan_ibu,
-                                "kelurahan_ibu": data.kelurahan_ibu,
-                                "alamat_ibu": data.alamat_ibu,
-                                "nama_wali": data.nama_wali,
-                                "nik_wali": data.nik_wali,
-                                "pekerjaan_wali": data.pekerjaan_wali,
-                                "penghasilan_wali": data.penghasilan_wali,
-                                "tempatlahir_wali": data.tempatlahir_wali,
-                                "tahunlahir_wali": data.tahunlahir_wali,
-                                "email_wali": data.email_wali,
-                                "hp_wali": data.hp_wali,
-                                "provinsi_wali": data.provinsi_wali,
-                                "kota_wali": data.kota_wali,
-                                "kecamatan_wali": data.kecamatan_wali,
-                                "kelurahan_wali": data.kelurahan_wali,
-                                "alamat_wali": data.alamat_wali
-                            }
+                "processDefinitionId": create_siswa,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "siswa",
+                        "type": "json",
+                        "value": {
+                            "status_siswa": 1,
+                            "institute_id": institute,
+                            "image_siswa": data.image_siswa,
+                            "image_type_siswa": "jpg",
+                            "academic_year_id": academicYear,
+                            "nisn_siswa": data.nisn_siswa,
+                            "nipd_siswa": data.nipd_siswa,
+                            "nama_siswa": data.nama_siswa,
+                            "kewarganegaraan_siswa": data.kewarganegaraan_siswa,
+                            "jk_siswa": data.jk_siswa,
+                            "nik_siswa": data.nik_siswa,
+                            "agama_siswa": data.agama_siswa,
+                            "tempatlahir_siswa": data.tempatlahir_siswa,
+                            "tanggallahir_siswa": data.tanggallahir_siswa,
+                            "noakta_siswa": data.noakta_siswa,
+                            "noanak_siswa": data.noanak_siswa,
+                            "jumlahsaudara_siswa": data.jumlahsaudara_siswa,
+                            "jarakrumah_siswa": data.jarakrumah_siswa,
+                            "lintang_siswa": data.lintang_siswa,
+                            "bujur_siswa": data.bujur_siswa,
+                            "tinggi_siswa": data.tinggi_siswa,
+                            "berat_siswa": data.berat_siswa,
+                            "lingkarkepala_siswa": data.lingkarkepala_siswa,
+                            "email_siswa": data.email_siswa,
+                            "hp_siswa": data.hp_siswa,
+                            "provinsi_siswa": data.provinsi_siswa,
+                            "kota_siswa": data.kota_siswa,
+                            "kecamatan_siswa": data.kecamatan_siswa,
+                            "kelurahan_siswa": data.kelurahan_siswa,
+                            "dusun_siswa": data.dusun_siswa,
+                            "rt_siswa": data.rt_siswa,
+                            "rw_siswa": data.rw_siswa,
+                            "kodepos_siswa": data.kodepos_siswa,
+                            "alamat_siswa": data.alamat_siswa,
+                            "jenistinggal_siswa": data.jenistinggal_siswa,
+                            "transportasi_siswa": data.transportasi_siswa,
+                            "skhun_siswa": data.skhun_siswa,
+                            "kps_siswa": data.kps_siswa,
+                            "nokps_siswa": data.nokps_siswa,
+                            "idclass_siswa": data.idclass_siswa,
+                            "nopersertaun_siswa": data.nopersertaun_siswa,
+                            "noseriijazah_siswa": data.noseriijazah_siswa,
+                            "kip_siswa": data.kip_siswa,
+                            "nokip_siswa": data.nokip_siswa,
+                            "namakip_siswa": data.namakip_siswa,
+                            "nokks_siswa": data.nokks_siswa,
+                            "sekolahasal_siswa": data.sekolahasal_siswa,
+                            "kebutuhankhusus_siswa": data.kebutuhankhusus_siswa,
+                            "nama_ayah": data.nama_ayah,
+                            "nik_ayah": data.nik_ayah,
+                            "pekerjaan_ayah": data.pekerjaan_ayah,
+                            "penghasilan_ayah": data.penghasilan_ayah,
+                            "tempatlahir_ayah": data.tempatlahir_ayah,
+                            "tahunlahir_ayah": data.tahunlahir_ayah,
+                            "email_ayah": data.email_ayah,
+                            "hp_ayah": data.hp_ayah,
+                            "provinsi_ayah": data.provinsi_ayah,
+                            "kota_ayah": data.kota_ayah,
+                            "kecamatan_ayah": data.kecamatan_ayah,
+                            "kelurahan_ayah": data.kelurahan_ayah,
+                            "alamat_ayah": data.alamat_ayah,
+                            "nama_ibu": data.nama_ibu,
+                            "nik_ibu": data.nik_ibu,
+                            "pekerjaan_ibu": data.pekerjaan_ibu,
+                            "penghasilan_ibu": data.penghasilan_ibu,
+                            "tempatlahir_ibu": data.tempatlahir_ibu,
+                            "tahunlahir_ibu": data.tahunlahir_ibu,
+                            "email_ibu": data.email_ibu,
+                            "hp_ibu": data.hp_ibu,
+                            "provinsi_ibu": data.provinsi_ibu,
+                            "kota_ibu": data.kota_ibu,
+                            "kecamatan_ibu": data.kecamatan_ibu,
+                            "kelurahan_ibu": data.kelurahan_ibu,
+                            "alamat_ibu": data.alamat_ibu,
+                            "nama_wali": data.nama_wali,
+                            "nik_wali": data.nik_wali,
+                            "pekerjaan_wali": data.pekerjaan_wali,
+                            "penghasilan_wali": data.penghasilan_wali,
+                            "tempatlahir_wali": data.tempatlahir_wali,
+                            "tahunlahir_wali": data.tahunlahir_wali,
+                            "email_wali": data.email_wali,
+                            "hp_wali": data.hp_wali,
+                            "provinsi_wali": data.provinsi_wali,
+                            "kota_wali": data.kota_wali,
+                            "kecamatan_wali": data.kecamatan_wali,
+                            "kelurahan_wali": data.kelurahan_wali,
+                            "alamat_wali": data.alamat_wali
                         }
-                    ]
-                },
+                    }
+                ]
+            },
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -1067,93 +1237,93 @@ function DataSiswaAdmin() {
             if (el.name !== "") data[el.name] = el.value;
         }
         axios.post(url_by_institute, {
-                "processDefinitionId": update_siswa,
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "validasi",
-                        "type": "json",
-                        "value": {
-                            "data": {
-                                "user_name": "required",
-                                "user_nisn": "required",
-                                "user_place_of_birth": "required",
-                                "user_date_of_birth": "required",
-                                "user_mobile_phone": "required",
-                                "user_state_id": "required",
-                                "user_city_id": "required",
-                                "user_district_id": "required",
-                                "user_sub_discrict_id": "required",
-                                "user_address": "required",
-                                "user_class_id": "required",
-                                "id_user": "required",
-                                "id_user_profile": "required",
-                                "id_siswa": "required"
-                            },
-                            "user_name": data.nama_siswa,
-                            "user_nisn": data.nisn_siswa,
-                            "user_place_of_birth": data.tempatlahir_siswa,
-                            "user_date_of_birth": data.tanggallahir_siswa,
-                            "user_mobile_phone": data.hp_siswa,
-                            "user_state_id": data.provinsi_siswa,
-                            "user_city_id": data.kota_siswa,
-                            "user_district_id": data.kecamatan_siswa,
-                            "user_sub_discrict_id": data.kelurahan_siswa,
-                            "user_address": data.alamat_siswa,
-                            "user_class_id": data.idclass_siswa,
-                            "id_user": selectedUser.user_id,
-                            "id_user_profile": selectedUser.id_profile,
-                            "id_siswa": selectedUser.id
-                        }
-                    },
-                    {
-                        "name": "users",
-                        "type": "json",
-                        "value": {
-                            "tbl_name": "usersModel",
-                            "id": selectedUser.user_id,
-                            "tbl_coloumn": {
-                                "name": data.nama_siswa
-                            }
-                        }
-                    },
-                    {
-                        "name": "m_user_profile",
-                        "type": "json",
-                        "value": {
-                            "tbl_name": "m_user_profile",
-                            "id": selectedUser.id_profile,
-                            "tbl_coloumn": {
-                                "nisn": data.nisn_siswa,
-                                "place_of_birth": data.tempatlahir_siswa,
-                                "date_of_birth": data.tanggallahir_siswa,
-                                "mobile_phone": data.hp_siswa,
-                                "state_id": data.provinsi_siswa,
-                                "city_id": data.kota_siswa,
-                                "district_id": data.kecamatan_siswa,
-                                "sub_discrict_id": data.kelurahan_siswa,
-                                "address": data.alamat_siswa
-                            }
-                        }
-                    },
-                    {
-                        "name": "m_student",
-                        "type": "json",
-                        "value": {
-                            "tbl_name": "x_academic_students",
-                            "id": selectedUser.id,
-                            "tbl_coloumn": {
-                                "class_id": data.idclass_siswa,
-                            }
+            "processDefinitionId": update_siswa,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "validasi",
+                    "type": "json",
+                    "value": {
+                        "data": {
+                            "user_name": "required",
+                            "user_nisn": "required",
+                            "user_place_of_birth": "required",
+                            "user_date_of_birth": "required",
+                            "user_mobile_phone": "required",
+                            "user_state_id": "required",
+                            "user_city_id": "required",
+                            "user_district_id": "required",
+                            "user_sub_discrict_id": "required",
+                            "user_address": "required",
+                            "user_class_id": "required",
+                            "id_user": "required",
+                            "id_user_profile": "required",
+                            "id_siswa": "required"
+                        },
+                        "user_name": data.nama_siswa,
+                        "user_nisn": data.nisn_siswa,
+                        "user_place_of_birth": data.tempatlahir_siswa,
+                        "user_date_of_birth": data.tanggallahir_siswa,
+                        "user_mobile_phone": data.hp_siswa,
+                        "user_state_id": data.provinsi_siswa,
+                        "user_city_id": data.kota_siswa,
+                        "user_district_id": data.kecamatan_siswa,
+                        "user_sub_discrict_id": data.kelurahan_siswa,
+                        "user_address": data.alamat_siswa,
+                        "user_class_id": data.idclass_siswa,
+                        "id_user": selectedUser.user_id,
+                        "id_user_profile": selectedUser.id_profile,
+                        "id_siswa": selectedUser.id
+                    }
+                },
+                {
+                    "name": "users",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "usersModel",
+                        "id": selectedUser.user_id,
+                        "tbl_coloumn": {
+                            "name": data.nama_siswa
                         }
                     }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                },
+                {
+                    "name": "m_user_profile",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "m_user_profile",
+                        "id": selectedUser.id_profile,
+                        "tbl_coloumn": {
+                            "nisn": data.nisn_siswa,
+                            "place_of_birth": data.tempatlahir_siswa,
+                            "date_of_birth": data.tanggallahir_siswa,
+                            "mobile_phone": data.hp_siswa,
+                            "state_id": data.provinsi_siswa,
+                            "city_id": data.kota_siswa,
+                            "district_id": data.kecamatan_siswa,
+                            "sub_discrict_id": data.kelurahan_siswa,
+                            "address": data.alamat_siswa
+                        }
+                    }
+                },
+                {
+                    "name": "m_student",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "x_academic_students",
+                        "id": selectedUser.id,
+                        "tbl_coloumn": {
+                            "class_id": data.idclass_siswa,
+                        }
+                    }
                 }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
             const resCode = JSON.parse(response.data.variables[5].value)
             if (resCode == 200) {
@@ -1189,27 +1359,27 @@ function DataSiswaAdmin() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(url_by_institute, {
-                        "processDefinitionId": global_update,
-                        "returnVariables": true,
-                        "variables": [
-                            {
-                                "name": "global_updatedata",
-                                "type": "json",
-                                "value": {
-                                    "tbl_name": "x_academic_studentsModel",
-                                    "id": record.id,
-                                    "tbl_coloumn": {
-                                        "deleted_at": dateNow
-                                    }
+                    "processDefinitionId": global_update,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_updatedata",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_studentsModel",
+                                "id": record.id,
+                                "tbl_coloumn": {
+                                    "deleted_at": dateNow
                                 }
                             }
-                        ]
-                    }, {
-                        headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                        }
+                    ]
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
+                }
                 ).then(function (response) {
                     setRefreshState(true);
                     Swal.fire(
@@ -1316,21 +1486,21 @@ function DataSiswaAdmin() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader/>
+                <Navheader />
                 <div className="main-content">
-                    <Appheader/>
+                    <Appheader />
                     {/*{isViewSiswa ? <ViewSiswa /> : <DataFormSiswa />}*/}
                     {isViewSiswa ?
-                        <ViewSiswa/> :
+                        <ViewSiswa /> :
                         isViewCreate ?
-                            <FormCreate/> :
+                            <FormCreate /> :
                             isViewEdit ?
-                                <FormEdit/> :
+                                <FormEdit /> :
                                 isViewDetail ?
-                                    <FormDetail/> :
-                                    <ViewSiswa/>
+                                    <FormDetail /> :
+                                    <ViewSiswa />
                     }
-                    <Adminfooter/>
+                    <Adminfooter />
                 </div>
             </div>
         </Fragment>

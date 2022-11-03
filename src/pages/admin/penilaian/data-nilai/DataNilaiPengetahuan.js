@@ -188,7 +188,7 @@ function DataNilaiPengetahuan() {
                                                                     return(
                                                                     <td>
                                                                         <input
-                                                                            type="text"
+                                                                            type="number"
                                                                             className="form-control"
                                                                             key={index}
                                                                             name={`${value.id_student}_${item.serial}_${item.id}`}

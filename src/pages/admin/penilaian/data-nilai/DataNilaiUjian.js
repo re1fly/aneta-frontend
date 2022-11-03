@@ -197,7 +197,7 @@ function DataNilaiUjian() {
                                                             </th>
                                                             <td>
                                                                 <input
-                                                                    type="text"
+                                                                    type="number"
                                                                     className="form-control"
                                                                     name={`${value.id_student}_1`}
                                                                     placeholder="input nilai (contoh : 75)"
@@ -206,7 +206,7 @@ function DataNilaiUjian() {
                                                             </td>
                                                             <td>
                                                                 <input
-                                                                    type="text"
+                                                                    type="number"
                                                                     className="form-control"
                                                                     name={`${value.id_student}_2`}
                                                                     placeholder="input nilai (contoh : 75)"

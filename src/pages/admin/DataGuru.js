@@ -28,12 +28,12 @@ import {
 import Search from "antd/es/input/Search";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { getProcessId, searchGlobal } from "../../redux/Action";
 import { FormAdminGuru } from '../../components/form/AdminGuru';
 import Swal from "sweetalert2";
 
 import { dateNow } from "../../components/misc/date";
 import { FilterAcademic } from "../../components/FilterAcademic";
+import { pageLoad } from "../../components/misc/loadPage"
 import {
     export_guru,
     global_data_join_where, global_delete_record,
@@ -61,7 +61,7 @@ function DataGuruAdmin() {
     const [academicYears, setAcademicYears] = useState([]);
 
     const [getGuru, setGetGuru] = useState([]);
-    // console.log(JSON.stringify(getGuru, null, 2));
+    console.log(getGuru);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
@@ -282,8 +282,8 @@ function DataGuruAdmin() {
                                     "operator": "="
                                 }
                             ],
-                            "order_coloumn": "x_academic_teachers.updated_at", // =>
-                            "order_by": "desc" // => 
+                            "order_coloumn": "x_academic_teachers.updated_at",
+                            "order_by": "desc"
                         }
                     },
                     {
@@ -356,7 +356,7 @@ function DataGuruAdmin() {
             setAcademicYears(academics?.data?.data);
         })
 
-    }, [academic, paramsPage, isViewGuru, refreshState])
+    }, [academic, paramsPage, isViewGuru])
 
     const _exportDataExcel = () => {
         axios.post(url_by_institute, {
@@ -372,6 +372,7 @@ function DataGuruAdmin() {
                 }
             ]
         }).then(response => {
+            console.log(response);
             const resData = JSON.parse(response.data.variables[2].value)
             const dataExcel = resData.data
             const byteCharacters = atob(dataExcel);
@@ -410,7 +411,7 @@ function DataGuruAdmin() {
         let uploaded = e.target.files[0];
         const base64 = await convertBase64(uploaded);
         const getLinkUrl = base64.split(',')[1]
-        console.log(getLinkUrl);
+        // console.log(getLinkUrl);
 
         axios.post(url_by_institute,
             {
@@ -439,6 +440,7 @@ function DataGuruAdmin() {
             console.log(resData);
             const resCode = resData.data
             if (resCode == "success") {
+                pageLoad()
                 setRefreshState(true);
                 notification.success({
                     message: "Sukses",
@@ -541,7 +543,7 @@ function DataGuruAdmin() {
             const tahunAktifGuru = dataSk?.substring(0, 4)
 
             return {
-                imageUrl: guru.imageUrl,
+                imageUrl: `http://10.1.6.109/storage/${guru.image}`,
                 namaGuru: guru.name,
                 nomorSk: guru.sk_number,
                 tahunAktif: tahunAktifGuru,
@@ -553,7 +555,7 @@ function DataGuruAdmin() {
             }
         })
 
-        console.log(channelList);
+        // console.log(channelList);
 
         return (
             <div className="middle-sidebar-left">
@@ -827,11 +829,11 @@ function DataGuruAdmin() {
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                 style={{ display: "none" }}
                             />
-                            <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
+                            {/* <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
                                 shape="round" size='middle'
                                 onClick={_modalImportNew}>
                                 Import Data Baru
-                            </Button>
+                            </Button> */}
 
                             <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
                                 selectYear={academicYears.map((data) => {
@@ -914,7 +916,8 @@ function DataGuruAdmin() {
                             "mother_name": "required",
                             "profession_husband_or_wife": "required",
                             "citizenship": "required",
-                            "nik": "required"
+                            "nik": "required",
+                            "ptk_type": "required"
                         },
                         "user_email": data.email_guru,
                         "user_name": data.nama_guru,
@@ -945,7 +948,8 @@ function DataGuruAdmin() {
                         "mother_name": data.nama_ibu,
                         "profession_husband_or_wife": data.pekerjaan_pasangan,
                         "citizenship": data.kewarganegaraan,
-                        "nik": data.nik
+                        "nik": data.nik,
+                        "ptk_type": data.jenis_ptk,
                     }
                 },
                 {
@@ -1048,6 +1052,16 @@ function DataGuruAdmin() {
                             "status": data.status_guru
                         }
                     }
+                },
+                {
+                    "name": "users_wordpress",
+                    "type": "json",
+                    "value": {
+                        "username": data.email_guru,
+                        "email"   : data.email_guru,
+                        "password" : "password"
+                      
+                    }
                 }
             ]
         },
@@ -1059,7 +1073,7 @@ function DataGuruAdmin() {
             }
         ).then(function (response) {
             console.log("Insert :", response);
-            const valueRes = response.data.variables[20].value;
+            const valueRes = response.data.variables[19].value;
             const valueResObj = JSON.parse(valueRes);
             console.log(valueResObj);
             if (valueResObj.status == "success") {
@@ -1369,6 +1383,7 @@ function DataGuruAdmin() {
                 statusGuru={selectedUser.statusGuru[0]}
                 alamat={selectedUser.alamat}
                 isDisabled={true}
+                disabledTanggal={true}
                 disabledEmail={true}
                 location={"detail"}
 

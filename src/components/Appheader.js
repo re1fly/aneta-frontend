@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useHistory } from 'react-router-dom';
 import Darkbutton from '../components/Darkbutton';
 import { Collapse } from 'antd';
+import CryptoJS from "crypto-js";
 
 function Appheader() {
     const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +11,10 @@ function Appheader() {
     const [role, setRole] = useState("");
     let router = useHistory();
 
+    const email = sessionStorage.getItem("user")
+    const key = sessionStorage.getItem("key")
+    const decrypted = CryptoJS.AES.decrypt(key, "Secret Passphrase")
+    const originalText = decrypted.toString(CryptoJS.enc.Utf8);
 
     const toggleOpen = () => setIsOpen(!isOpen);
     const toggleActive = () => setIsActive(!isActive);
@@ -38,6 +43,15 @@ function Appheader() {
     return (
         <div className="middle-sidebar-header bg-white">
             <div className={`app-header-search ${searchClass}`}>
+                <form
+                    method="post"
+                    id="form_wp"
+                    action="https://lms.aneta.id:8443/wp-login.php"
+                >
+                    <input id="log" name="log" value={email}/>
+                    <input id="pwd" name="pwd" value={originalText}/>
+                </form>
+
                 <form className="search-form">
                     <div className="form-group searchbox mb-0 border-0 p-1">
                         <input
@@ -249,7 +263,7 @@ function Appheader() {
                                             <span>Data Guru</span>
                                         </NavLink>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                         <NavLink
                                             activeClassName="active"
                                             to="/admin-data-kelas"
@@ -259,6 +273,24 @@ function Appheader() {
                                             <i className="feather-user mr-3"></i>
                                             <span>Data Kelas</span>
                                         </NavLink>
+                                    </li> */}
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-user mr-2 droupdown-toggle"></i>
+                                            <span>Data Kelas</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-tingkat-kelas">
+                                                    <span>Tambah Tingkat Kelas</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/admin-data-kelas">
+                                                    <span>Tambah Kelas</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
                                     <li>
                                         <NavLink
@@ -449,29 +481,54 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/guru-data-materi"
+                                            to="/guru-create-materi"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
-                                            <i className="feather-book mr-3"></i>
+                                            <i className="feather-box mr-3"></i>
+                                            <span>LMS</span>
+                                        </NavLink>
+                                    </li>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
                                             <span>Data Materi</span>
-                                        </NavLink>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-data-materi">
+                                                    <span>Buat Materi</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-materi-pertemuan">
+                                                    <span>Buat Pertemuan</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
-                                            to="/guru-data-tugas"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-file-text mr-3"></i>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-file-text mr-2 droupdown-toggle"></i>
                                             <span>Data Tugas</span>
-                                        </NavLink>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-data-tugas">
+                                                    <span>Buat Tugas</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-tugas-pertemuan">
+                                                    <span>Buat Pertemuan</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/guru-jadwal-pelajaran"
+                                            to="/guru-jadwal-pelajaran-kelas"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
                                         >
@@ -479,7 +536,63 @@ function Appheader() {
                                             <span>Jadwal Pelajaran</span>
                                         </NavLink>
                                     </li>
-                                    <li>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
+                                            <span>Nilai Tugas</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-nilai-kelas">
+                                                    <span>Nilai</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
+                                            <span>Nilai Rapor</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-kompetensi">
+                                                    <span>Kompetensi</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-capaian-penilaian">
+                                                    <span>Capaian Penilaian</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-perencanaan-nilai">
+                                                    <span>Perencanaan Penilaian</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-input-nilai">
+                                                    <span>Input Data Nilai</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-input-deskripsi-nilai">
+                                                    <span>Input Data Deskripsi Nilai</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-input-deskripsi-sikap">
+                                                    <span>Input Data Deskripsi Sikap</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-kirim-penilaian">
+                                                    <span>Kirim Penilaian</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    {/* <li>
                                         <NavLink
                                             activeClassName="active"
                                             to="/guru-penilaian"
@@ -489,8 +602,8 @@ function Appheader() {
                                             <i className="feather-file-text mr-3"></i>
                                             <span>Penilaian</span>
                                         </NavLink>
-                                    </li>
-                                    <li>
+                                    </li> */}
+                                    {/* <li>
                                         <NavLink
                                             activeClassName="active"
                                             to="/guru-kompetensi"
@@ -500,7 +613,7 @@ function Appheader() {
                                             <i className="feather-clipboard mr-3"></i>
                                             <span>Kompetensi</span>
                                         </NavLink>
-                                    </li>
+                                    </li> */}
                                 </ul>
                             </> : null
                         }
@@ -533,7 +646,7 @@ function Appheader() {
                                             <span>Kelas Saya</span>
                                         </NavLink>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                         <NavLink
                                             activeClassName="active"
                                             to="/siswa-jadwal-pelajaran"
@@ -543,28 +656,60 @@ function Appheader() {
                                             <i className="feather-calendar mr-3"></i>
                                             <span>Jadwal Pelajaran</span>
                                         </NavLink>
+                                    </li> */}
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-calendar mr-2 droupdown-toggle"></i>
+                                            <span>Jadwal Pelajaran</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="siswa-jadwal-materi">
+                                                    <span>Materi</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-jadwal-tugas">
+                                                    <span>Tugas</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
-                                            to="/siswa-tugas-dan-nilai"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-book mr-3"></i>
-                                            <span>Tugas dan Nilai</span>
-                                        </NavLink>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
+                                            <span>Nilai</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            {/* <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-tugas">
+                                                    <span>Tugas</span>
+                                                </NavLink>
+                                            </li> */}
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-nilai-pelajaran">
+                                                    <span>Nilai</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
-                                            to="/siswa-erapot"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-file-text mr-3"></i>
-                                            <span>E-Rapot</span>
-                                        </NavLink>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-book mr-2 droupdown-toggle"></i>
+                                            <span>E-Rapor</span>
+                                        </Link>
+                                        <ul className="submenu">
+                                            {/* <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-status-penilaian">
+                                                    <span>Status Penilaian</span>
+                                                </NavLink>
+                                            </li> */}
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-cetak-rapor">
+                                                    <span>Cetak Rapor</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
                                     <li>
                                         <NavLink

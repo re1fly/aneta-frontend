@@ -5,7 +5,6 @@ import React, {Fragment, useEffect, useState} from "react";
 import {notification, PageHeader} from "antd";
 import {GetMapelKelas} from "../../../../components/filter/GetMapelKelas";
 import axios from "axios";
-import {BASE_URL} from "../../../../api/Url";
 import "../../../../style/custom.css";
 import {DataNotFound} from "../../../../components/misc/DataNotFound";
 import {get_data_input_penilaian, insert_input_data_nilai, url_by_institute} from "../../../../api/reference";
@@ -184,7 +183,7 @@ function DataNilaiKeterampilan() {
                                                                 jmlPenilaian.map((item, index) => (
                                                                     <td>
                                                                         <input
-                                                                            type="text"
+                                                                            type="number"
                                                                             className="form-control"
                                                                             name={`${value.id_student}_${item.serial}_${item.id}`}
                                                                             placeholder="input nilai (contoh : 90)"

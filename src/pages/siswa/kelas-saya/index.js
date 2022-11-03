@@ -3,7 +3,7 @@ import Adminfooter from '../../../components/Adminfooter';
 import axios from "axios";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
-import { BASE_URL } from "../../../api/Url";
+import {global_join_sub_first, url_by_institute} from "../../../api/reference";
 
 function KelasSiswa() {
     const [profileSiswa, setProfileSiswa] = useState([]);
@@ -15,8 +15,8 @@ function KelasSiswa() {
     const institute = localStorage.getItem('institute');
 
     useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubfirst:1:d225c704-3aeb-11ed-8c53-66682e31e826",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_join_sub_first,
             "returnVariables": true,
             "variables": [
                 {
@@ -96,8 +96,8 @@ function KelasSiswa() {
             setProfileSiswa([dataRes?.data]);
         })
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubfirst:1:d225c704-3aeb-11ed-8c53-66682e31e826",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_join_sub_first,
             "returnVariables": true,
             "variables": [
                 {

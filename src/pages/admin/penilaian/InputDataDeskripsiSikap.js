@@ -4,7 +4,6 @@ import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
 import React, { Fragment, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getProcessId } from "../../../redux/Action";
 import { PageHeader, notification, Select, Card, Row, Table, Input } from "antd"
 import { DataNotFound } from "../../../components/misc/DataNotFound";
 import {
@@ -24,15 +23,6 @@ function InputDataDeskripsiSikap() {
     const [deskripsiSikap, setDeskripsiSikap] = useState([])
     // console.log(JSON.stringify(deskripsiSikap, null, 2));
     const [refreshState, setRefreshState] = useState(false);
-
-    const dispatch = useDispatch();
-    const getProcess = useSelector(state => state.processId);
-    let ProcessId = getProcess.DataProcess;
-    let getKeyGlobalJoin;
-
-    useEffect(() => {
-        dispatch(getProcessId(["globaljoinsubwhereget"]))
-    }, [])
 
     useEffect(() => {
             axios.post(url_by_institute,

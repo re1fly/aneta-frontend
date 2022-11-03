@@ -35,11 +35,6 @@ function CetakRapor() {
     const institute = localStorage.getItem('institute');
     const academic = localStorage.getItem('academic_year');
 
-    const dispatch = useDispatch();
-    const getProcess = useSelector(state => state.processId);
-    let ProcessId = getProcess.DataProcess;
-    let getKeyGlobalJoin;
-
     let componentRef = useRef();
 
     const handlePrint = useReactToPrint({
@@ -61,10 +56,6 @@ function CetakRapor() {
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
     }
-
-    useEffect(() => {
-        dispatch(getProcessId(["globaljoinsubwhereget"]))
-    }, [])
 
     useEffect(() => {
         axios.post(url_by_institute,
@@ -164,7 +155,7 @@ function CetakRapor() {
             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
             setGetTahunAkademik(tahunAkademik?.data)
         })
-    }, [ProcessId, refreshState, academic])
+    }, [refreshState, academic])
 
     const handleDataErapor = () => {
         console.log(selectAcademic, selectClass);
@@ -242,7 +233,6 @@ function CetakRapor() {
         {
             title: 'Kelas',
             align: "center",
-
             children: [
                 {
                     title: 'Semua',
@@ -402,40 +392,6 @@ function CetakRapor() {
                             </div>
                         </div>
                         <div className="mt-4">
-                            {/* <Table
-                                dataSource={channelList}
-                                className="mt-4"
-                                align='center'
-                                pagination={false}
-                                bordered>
-                                <Column title="No" dataIndex="no" key="no" align='center' />
-                                <Column title="Nama Siswa" dataIndex="namaSiswa" key="namaSiswa" width="20%" />
-                                <ColumnGroup title="Kelas" align='center' >
-                                    <Column title="Semua"
-                                        align='center'
-                                        dataIndex="kelas"
-                                        key="kelas" />
-                                </ColumnGroup>
-                                <ColumnGroup title="Cetak Rapor Tengah Semester" align='center'>
-                                    <Column title={<Button className="rounded-xl"><i className="feather-printer mr-2" />Cetak Semua PDF</Button>}
-                                        align='center'
-                                        dataIndex="raporTengahSemester"
-                                        key="raporTengahSemester" />
-                                </ColumnGroup>
-                                <ColumnGroup title="Cetak Rapor Akhir Semester" align='center'>
-                                    <Column title={<Button className="rounded-xl"><i className="feather-printer mr-2" />Cetak Semua PDF</Button>}
-                                        align='center'
-                                        dataIndex="raporAkhirSemester"
-                                        key="raporAkhirSemester" />
-                                </ColumnGroup> */}
-                            {/* <ColumnGroup title="Tanggal Cetak Terakhir" align='center'> */}
-                            {/* <Column title="11 Juni 2022, 16.00" */}
-                            {/* <Column
-                                        align='center'
-                                        dataIndex="tanggalCetak"
-                                        key="tanggalCetak" />
-                                </ColumnGroup>
-                            </Table> */}
                             <Table className="py-8"
                                 columns={columns}
                                 dataSource={channelList}

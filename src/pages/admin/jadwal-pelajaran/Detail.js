@@ -1,4 +1,5 @@
-import React, {Component, Fragment, useEffect, useState} from "react"
+import React, { Component, Fragment, useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux";
 
 import {
     Menu,
@@ -32,18 +33,21 @@ import Search from "antd/es/input/Search";
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
-import {pageLoad} from "../../../components/misc/loadPage";
+import { pageLoad } from "../../../components/misc/loadPage";
 import axios from "axios";
 import Swal from "sweetalert2";
-import {FormAdminJadwalPelajaran} from "../../../components/form/AdminJadwalPelajaran";
-import {useParams} from "react-router-dom";
+import { FormAdminJadwalPelajaran } from "../../../components/form/AdminJadwalPelajaran";
+import { useHistory, useParams } from "react-router-dom";
 import {
     global_delete_record,
     global_insert,
     global_join_sub_where_get,
     global_update,
-    url_by_institute
+    url_by_institute,
+    insert_jadwal_pelajaran,
+    get_where_no_join
 } from "../../../api/reference";
+import { GetAllDate } from "../../../redux/Action";
 
 export default function JadwalPelajaranAdminDetail() {
     const [grid, setGrid] = useState(false);
@@ -54,12 +58,18 @@ export default function JadwalPelajaranAdminDetail() {
     const [isViewEdit, setIsViewEdit] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    console.log(selectedUser?.id);
     const [refreshState, setRefreshState] = useState(false)
 
     const [getJadwalPelajaran, setGetJadwalPelajaran] = useState()
+    console.log(getJadwalPelajaran);
     const [mataPelajaran, setGetMataPelajaran] = useState()
     const [getGuru, setGetGuru] = useState([]);
 
+    // const [getAllDate, setGetAllDate]  = useState();
+    const [tanggal, setTanggal] = useState([])
+
+    const dispatch = useDispatch();
     const academicYear = localStorage.getItem('academic_year')
 
     const senin = getJadwalPelajaran?.filter((data) => {
@@ -119,6 +129,8 @@ export default function JadwalPelajaranAdminDetail() {
                                 "x_academic_class.class",
                                 "x_academic_class.sub_class",
                                 "r_class_type.class_type",
+                                "x_academic_subject_master.jumlah_pertemuan",
+                                // "x_academic_subjects_schedule_date.date"
 
                             ],
                             "paginate": 10,
@@ -158,7 +170,13 @@ export default function JadwalPelajaranAdminDetail() {
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_class",
                                     "foregenkey": "class"
-                                }
+                                },
+                                // {
+                                //     "tbl_join": "x_academic_subjects_schedule_date",
+                                //     "refkey": "id_subjects_shedule",
+                                //     "tbl_join2": "x_academic_subjects_schedule",
+                                //     "foregenkey": "id"
+                                // }
                             ],
                             "where": [
                                 {
@@ -196,22 +214,50 @@ export default function JadwalPelajaranAdminDetail() {
                     }
                 ]
             }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
-            console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
             const pelajaran = dataRes?.data?.data
             setGetJadwalPelajaran(pelajaran);
         })
     }
 
+    const getListTanggal = async() => {
+        await axios.post(url_by_institute,
+            {
+                "processDefinitionId": "jadwalpelajarangetdate:1:bfa69392-501a-11ed-8f22-927b5be84510",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_schedule": "171"
+                        }
+
+                    }
+                ]
+            }
+
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            setTanggal(dataRes?.data)
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
+
     useEffect(() => {
 
+        dispatch(GetAllDate(selectedUser?.id))
+
         getListJadwalPelajaran()
+
+        getListTanggal()
 
         axios.post(url_by_institute,
             {
@@ -272,15 +318,15 @@ export default function JadwalPelajaranAdminDetail() {
                     }
                 ]
             }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
             // console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-            const mataPelajaran = dataRes.data.data
+            const mataPelajaran = dataRes?.data?.data
             setGetMataPelajaran(mataPelajaran)
         })
 
@@ -331,7 +377,8 @@ export default function JadwalPelajaranAdminDetail() {
             const guru = JSON.parse(response?.data?.variables[3]?.value)
             setGetGuru(guru?.data?.data)
         })
-    }, [academicYear, refreshState, , academicYear])
+        
+    }, [academicYear, refreshState, , academicYear, selectedUser])
 
     // data calendar
     const dataSenin = senin?.map((data, index) => {
@@ -491,10 +538,6 @@ export default function JadwalPelajaranAdminDetail() {
         }
     };
 
-    const detailCalendar = () => {
-
-    }
-
     const CalendarData = () => {
         const monthCellRender = (value) => {
             const num = getMonthData(value);
@@ -512,7 +555,7 @@ export default function JadwalPelajaranAdminDetail() {
                 <ul className="events">
                     {listData.map((item) => (
                         <li key={item.content}>
-                            <Badge status={item.type} text={item.content}/>
+                            <Badge status={item.type} text={item.content} />
                         </li>
                     ))}
                 </ul>
@@ -521,7 +564,7 @@ export default function JadwalPelajaranAdminDetail() {
 
         return <Calendar onSelect={(e) => {
             console.log(e)
-        }} dateCellRender={dateCellRender} monthCellRender={monthCellRender}/>;
+        }} dateCellRender={dateCellRender} monthCellRender={monthCellRender} />;
     };
 
     const TableJadwalPelajaran = () => {
@@ -537,6 +580,11 @@ export default function JadwalPelajaranAdminDetail() {
                 align: 'center',
             },
             {
+                title: 'Jumlah Pertemuan',
+                dataIndex: 'jumlahPertemuan',
+                align: 'center',
+            },
+            {
                 title: 'Mata Pelajaran',
                 dataIndex: 'namaPelajaran',
                 align: 'center',
@@ -546,11 +594,11 @@ export default function JadwalPelajaranAdminDetail() {
                 dataIndex: 'namaPengajar',
                 align: 'center',
             },
-            {
-                title: 'Waktu Mulai - Waktu Selesai',
-                dataIndex: 'waktu',
-                align: 'center'
-            },
+            // {
+            //     title: 'Waktu Mulai - Waktu Selesai',
+            //     dataIndex: 'waktu',
+            //     align: 'center'
+            // },
             {
                 title: 'Aksi',
                 key: 'action',
@@ -558,9 +606,9 @@ export default function JadwalPelajaranAdminDetail() {
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined style={{color: "black"}} onClick={() => viewDetailJadwal(record)}/>
-                        <EditOutlined style={{color: "blue"}} onClick={() => viewEditJadwal(record)}/>
-                        <DeleteOutlined style={{color: 'red'}} onClick={() => deleteJadwalPelajaran(record)}/>
+                        <EyeOutlined style={{ color: "black" }} onClick={() => viewDetailJadwal(record)} />
+                        <EditOutlined style={{ color: "blue" }} onClick={() => viewEditJadwal(record)} />
+                        <DeleteOutlined style={{ color: 'red' }} onClick={() => deleteJadwalPelajaran(record)} />
                     </Space>
                 ),
             },
@@ -572,6 +620,7 @@ export default function JadwalPelajaranAdminDetail() {
                 hari: data.hari,
                 kelas: data.class_type,
                 subKelas: data.sub_class,
+                jumlahPertemuan: data.jumlah_pertemuan,
                 idPelajaran: data.id_subjects,
                 namaPelajaran: data.nama_mata,
                 idPengajar: data.id_teacher,
@@ -588,6 +637,7 @@ export default function JadwalPelajaranAdminDetail() {
                 hari: data.hari,
                 kelas: data.class_type,
                 subKelas: data.sub_class,
+                jumlahPertemuan: data.jumlah_pertemuan,
                 idPelajaran: data.id_subjects,
                 namaPelajaran: data.nama_mata,
                 idPengajar: data.id_teacher,
@@ -604,6 +654,7 @@ export default function JadwalPelajaranAdminDetail() {
                 hari: data.hari,
                 kelas: data.class_type,
                 subKelas: data.sub_class,
+                jumlahPertemuan: data.jumlah_pertemuan,
                 idPelajaran: data.id_subjects,
                 namaPelajaran: data.nama_mata,
                 idPengajar: data.id_teacher,
@@ -620,6 +671,7 @@ export default function JadwalPelajaranAdminDetail() {
                 hari: data.hari,
                 kelas: data.class_type,
                 subKelas: data.sub_class,
+                jumlahPertemuan: data.jumlah_pertemuan,
                 idPelajaran: data.id_subjects,
                 namaPelajaran: data.nama_mata,
                 idPengajar: data.id_teacher,
@@ -636,6 +688,7 @@ export default function JadwalPelajaranAdminDetail() {
                 hari: data.hari,
                 kelas: data.class_type,
                 subKelas: data.sub_class,
+                jumlahPertemuan: data.jumlah_pertemuan,
                 idPelajaran: data.id_subjects,
                 namaPelajaran: data.nama_mata,
                 idPengajar: data.id_teacher,
@@ -652,6 +705,7 @@ export default function JadwalPelajaranAdminDetail() {
                 hari: data.hari,
                 kelas: data.class_type,
                 subKelas: data.sub_class,
+                jumlahPertemuan: data.jumlah_pertemuan,
                 idPelajaran: data.id_subjects,
                 namaPelajaran: data.nama_mata,
                 idPengajar: data.id_teacher,
@@ -674,12 +728,12 @@ export default function JadwalPelajaranAdminDetail() {
                     </div>
                 </div>
                 <Table className=""
-                       columns={columns}
-                       dataSource={dataSenin}
-                       onChange={onChangeTable}
-                       pagination={{position: ['none']}}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={dataSenin}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
 
                 <div className="mt-4">
                     <div className="bg-grey">
@@ -687,12 +741,12 @@ export default function JadwalPelajaranAdminDetail() {
                     </div>
                 </div>
                 <Table className=""
-                       columns={columns}
-                       dataSource={dataSelasa}
-                       onChange={onChangeTable}
-                       pagination={{position: ['none']}}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={dataSelasa}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
 
                 <div className="mt-4">
                     <div className="bg-grey">
@@ -700,12 +754,12 @@ export default function JadwalPelajaranAdminDetail() {
                     </div>
                 </div>
                 <Table className=""
-                       columns={columns}
-                       dataSource={dataRabu}
-                       onChange={onChangeTable}
-                       pagination={{position: ['none']}}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={dataRabu}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
 
                 <div className="mt-4">
                     <div className="bg-grey">
@@ -713,12 +767,12 @@ export default function JadwalPelajaranAdminDetail() {
                     </div>
                 </div>
                 <Table className=""
-                       columns={columns}
-                       dataSource={dataKamis}
-                       onChange={onChangeTable}
-                       pagination={{position: ['none']}}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={dataKamis}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
 
                 <div className="mt-4">
                     <div className="bg-grey">
@@ -726,12 +780,12 @@ export default function JadwalPelajaranAdminDetail() {
                     </div>
                 </div>
                 <Table className=""
-                       columns={columns}
-                       dataSource={dataJumat}
-                       onChange={onChangeTable}
-                       pagination={{position: ['none']}}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={dataJumat}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
 
                 <div className="mt-4">
                     <div className="bg-grey">
@@ -739,18 +793,18 @@ export default function JadwalPelajaranAdminDetail() {
                     </div>
                 </div>
                 <Table className=""
-                       columns={columns}
-                       dataSource={dataSabtu}
-                       onChange={onChangeTable}
-                       pagination={{position: ['none']}}
-                       rowClassName="bg-greylight text-grey-900"
-                       scroll={{x: 400}}/>
+                    columns={columns}
+                    dataSource={dataSabtu}
+                    onChange={onChangeTable}
+                    pagination={{ position: ['none'] }}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
             </>
         );
     };
 
     const CardJadwalPelajaran = () => {
-        const _onSelectMenu = ({key}) => {
+        const _onSelectMenu = ({ key }) => {
             message.info(`Click on item ${key}`);
         };
 
@@ -805,12 +859,12 @@ export default function JadwalPelajaranAdminDetail() {
                 {channelList.map((value, index) => (
                     <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                         <div className="card mb-4 d-block w-100 shadow-xss rounded-lg p-xxl-5 p-4 border-0 text-center">
-              <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
-                Aktif
-              </span>
+                            <span className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
+                                Aktif
+                            </span>
                             <Dropdown className='position-absolute right-0 mr-4 top-0 mt-3'
-                                      overlay={_Account}>
-                                <EllipsisOutlined/>
+                                overlay={_Account}>
+                                <EllipsisOutlined />
                             </Dropdown>
                             <a
                                 href=""
@@ -827,24 +881,24 @@ export default function JadwalPelajaranAdminDetail() {
                             {value.tag1 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
-                  {value.tag1}
-                </span>
+                                    {value.tag1}
+                                </span>
                             ) : (
                                 ''
                             )}
                             {value.tag2 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 bg-lightblue d-inline-block text-grey-800 mb-1 mr-1">
-                  {value.tag2}
-                </span>
+                                    {value.tag2}
+                                </span>
                             ) : (
                                 ''
                             )}
                             {value.tag3 ? (
                                 <span
                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-info d-inline-block text-info mb-1">
-                  {value.tag3}
-                </span>
+                                    {value.tag3}
+                                </span>
                             ) : (
                                 ''
                             )}
@@ -899,7 +953,7 @@ export default function JadwalPelajaranAdminDetail() {
                                 <div className="row">
                                     <div className="col-lg-8 col-md-6 my-2">
                                         <Button className="mr-4" type="primary" shape="round" size='middle'
-                                                onClick={viewCreateJadwal}>
+                                            onClick={viewCreateJadwal}>
                                             Tambah Data
                                         </Button>
                                         {/* <Filter title1="Mata Pelajaran" title2="Guru/Tenaga Pengajar" /> */}
@@ -918,21 +972,21 @@ export default function JadwalPelajaranAdminDetail() {
                                     </div>
                                     <div className="col-lg-4 col-md-6 my-2">
                                         <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                                onSearch={_onSearch} style={{width: '80%'}}/>
+                                            onSearch={_onSearch} style={{ width: '80%' }} />
                                         {grid == false ?
                                             <a>
-                                                <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
-                                                                  onClick={() => setGrid(true)}/>
+                                                <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
+                                                    onClick={() => setGrid(true)} />
                                             </a> :
                                             <a>
-                                                <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
-                                                              onClick={() => setGrid(false)}/>
+                                                <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
+                                                    onClick={() => setGrid(false)} />
                                             </a>}
                                     </div>
                                 </div>
                             </Card>
                         </div>
-                        <div className="row">
+                        {/* <div className="row">
                             <div className="col-lg-8 d-flex">
                                 <p className="font-weight-bolder ml-2 mt-2 mb-0 mr-3 mt-0">Pilih Hari</p>
                                 <div className="form-group">
@@ -967,189 +1021,17 @@ export default function JadwalPelajaranAdminDetail() {
                                 {calendar == false ?
                                     <h5 onClick={() => setCalendar(true)}
                                         className='align-items-center d-flex justify-content-end cursor-pointer'>
-                                        <TableOutlined style={{fontSize: '22px'}}/>
+                                        <TableOutlined style={{ fontSize: '22px' }} />
                                         <p className="font-weight-bolder ml-2 mb-0">Tampilkan Mode Tabel</p>
                                     </h5> :
                                     <h5 onClick={() => setCalendar(false)}
                                         className='align-items-center d-flex justify-content-end cursor-pointer'>
-                                        <CalendarOutlined style={{fontSize: '20px'}}/>
+                                        <CalendarOutlined style={{ fontSize: '20px' }} />
                                         <p className="font-weight-bolder ml-2 mb-0">Tampilkan Mode Kalender</p>
                                     </h5>}
                             </div>
-                        </div>
-                        {calendar ? <TableJadwalPelajaran/> : <CalendarData/>}
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const TambahPelajaran = () => {
-        return (
-            <div className="container px-3 py-4">
-                <div className="row">
-                    <div className="col-lg-12">
-                        <div className="middle-wrap">
-                            <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
-                                <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewPelajaran(true)}
-                                       className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
-                                    <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                        Tambah Jadwal Pelajaran
-                                    </h4>
-                                </div>
-                                <div className="card-body p-lg-5 p-4 w-100 border-0 ">
-                                    <form id="mataPelajaran_form"
-                                          onSubmit={createJadwalPelajaran}
-                                          method="POST">
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Hari
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="hari"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Hari
-                                                        </option>
-                                                        <option value="senin">
-                                                            Senin
-                                                        </option>
-                                                        <option value="selasa">
-                                                            Selasa
-                                                        </option>
-                                                        <option value="rabu">
-                                                            Rabu
-                                                        </option>
-                                                        <option value="kamis">
-                                                            Kamis
-                                                        </option>
-                                                        <option value="jumat">
-                                                            Jumat
-                                                        </option>
-                                                        <option value="sabtu">
-                                                            Sabtu
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Mata Pelajaran
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="mata_pelajaran"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Mata Pelajaran
-                                                        </option>
-                                                        {mataPelajaran.map((data, i) => {
-                                                            return (
-                                                                <option value={data.id_subjects} selected key={i}>
-                                                                    {data.nama_mata}
-                                                                </option>
-                                                            )
-                                                        })}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-12 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Guru/Tenaga Pengajar
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="guru"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Guru/Tenaga Pengajar
-                                                        </option>
-                                                        {getGuru.map((data, i) => {
-                                                            return (
-                                                                <option value={data.id_guru} selected key={i}>
-                                                                    {data.name}
-                                                                </option>
-                                                            )
-                                                        })}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Waktu Mulai
-                                                    </label>
-                                                    <TimePicker onChange={onChange}
-                                                                defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                                                name='waktu_mulai'
-                                                                className="form-control"
-                                                                required/>
-                                                    {/* <input
-                            type="text"
-                            name='waktu_mulai'
-                            className="form-control"
-                            required
-                          /> */}
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Waktu Selesai
-                                                    </label>
-                                                    <TimePicker onChange={onChange}
-                                                                defaultOpenValue={moment('00:00', 'HH:mm')}
-                                                                name='waktu_selesai'
-                                                                className="form-control"
-                                                                required/>
-                                                    {/* <input
-                            type="text"
-                            name='waktu_selesai'
-                            className="form-control"
-                            required
-                          /> */}
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-12">
-                                                <button
-                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    type="submit"
-                                                >
-                                                    Simpan
-                                                </button>
-                                                <button
-                                                    onClick={() => setIsViewPelajaran(true)}
-
-                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block border-none"
-                                                >
-                                                    Batal
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                        </div> */}
+                        {calendar ? <TableJadwalPelajaran /> : <CalendarData />}
                     </div>
                 </div>
             </div>
@@ -1162,44 +1044,42 @@ export default function JadwalPelajaranAdminDetail() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        const dateNow = new Date().toLocaleString()
-        console.log(data);
-
+        // console.log(data.tanggal.split(","));
+        console.log(data.tanggal);
         axios.post(url_by_institute,
             {
-                "processDefinitionId": global_insert,
+                "processDefinitionId": insert_jadwal_pelajaran,
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "global_Insert",
+                        "name": "insert_jadwal_pelajaran",
                         "type": "json",
                         "value": {
-                            "tbl_name": "x_academic_subjects_scheduleModel",
-                            "tbl_coloumn": {
-                                "academic_subjects_id": data.mata_pelajaran,
-                                "time_start": data.waktu_mulai,
-                                "time_end": data.waktu_selesai,
-                                "max_student": "",
-                                "teachers_id": data.guru,
-                                "hari": data.hari,
-                                "tempat_belajar": "" //
-                            }
+                            "academic_subjects_id": data.mata_pelajaran,
+                            "time_start": data.waktu_mulai,
+                            "time_end": data.waktu_selesai,
+                            "max_student": "0",
+                            "teachers_id": data.guru,
+                            "hari": data.hari,
+                            "tanggal": data.tanggal
+                            // "tempat_belajar": ""
                         }
                     }
                 ]
             }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
+            console.log(response);
             setRefreshState(true);
             // console.log(JSON.stringify(response.data.variables[2].value, null, 2));
             const valueRes = response.data.variables[2].value;
             const valueResObj = JSON.parse(valueRes);
-            // console.log(valueResObj.status)
-            if (valueResObj.status == 'success') {
+            console.log(valueResObj.data)
+            if (valueResObj.data == "Success insert") {
                 setIsViewCreate(false)
                 setIsViewPelajaran(true)
                 notification.success({
@@ -1234,16 +1114,14 @@ export default function JadwalPelajaranAdminDetail() {
                     "name": "global_updatedata",
                     "type": "json",
                     "value": {
-                        "tbl_name": "x_academic_subjects_scheduleModel",
                         "id": selectedUser.id,
-                        "tbl_coloumn": {
-                            "academic_subjects_id": data.mata_pelajaran,
-                            "time_start": data.waktu_mulai,
-                            "time_end": data.waktu_selesai,
-                            "max_student": "",
-                            "teachers_id": data.guru,
-                            "hari": data.hari
-                        }
+                        "academic_subjects_id": data.mata_pelajaran,
+                        "time_start": data.waktu_mulai,
+                        "time_end": data.waktu_selesai,
+                        "max_student": "0",
+                        "teachers_id": data.guru,
+                        "hari": data.hari,
+                        "tanggal": data.tanggal
                     }
                 }
             ]
@@ -1305,24 +1183,24 @@ export default function JadwalPelajaranAdminDetail() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.post(url_by_institute, {
-                        "processDefinitionId": global_delete_record,
-                        "returnVariables": true,
-                        "variables": [
-                            {
-                                "name": "global_delete",
-                                "type": "json",
-                                "value": {
-                                    "tbl_name": "x_academic_subjects_scheduleModel",
-                                    "id": record.id
-                                }
+                    "processDefinitionId": global_delete_record,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_delete",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_subjects_scheduleModel",
+                                "id": record.id
                             }
-                        ]
-                    }, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
                         }
+                    ]
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
                     }
+                }
                 ).then(function (response) {
                     console.log(response);
                     setRefreshState(true);
@@ -1342,6 +1220,12 @@ export default function JadwalPelajaranAdminDetail() {
         setIsViewPelajaran(false)
         setIsViewEdit(false)
         setIsViewDetail(false)
+    }
+
+    let history = useHistory();
+    const viewInsertJam = (record) => {
+        history.push('/admin-jadwal-pelajaran-jam')
+        setSelectedUser(record)
     }
 
     const viewEditJadwal = (record) => {
@@ -1373,18 +1257,20 @@ export default function JadwalPelajaranAdminDetail() {
                     <option value={data.id_guru}> {data.name}</option>
                 ))}
                 isDisabled={false}
+                disabledTanggal={false}
                 selectTimeStart={<TimePicker onChange={onChange}
-                                             defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                             name='waktu_mulai'
-                                             className="form-control"
-                                             required
+                    defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                    name='waktu_mulai'
+                    className="form-control"
+                    required
                 />}
                 selectTimeEnd={<TimePicker onChange={onChange}
-                                           defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                           name='waktu_selesai'
-                                           className="form-control"
-                                           required
+                    defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                    name='waktu_selesai'
+                    className="form-control"
+                    required
                 />}
+                tanggalPertemuan={false}
             />
         )
     }
@@ -1402,8 +1288,10 @@ export default function JadwalPelajaranAdminDetail() {
                     <option value={data.id_guru}> {data.name}</option>
                 ))}
                 isDisabled={false}
+                disabledTanggal={true}
                 hari={selectedUser.hari}
                 kelas={selectedUser.kelas}
+                id={selectedUser.id}
                 idPelajaran={selectedUser.idPelajaran}
                 namaPelajaran={selectedUser.namaPelajaran}
                 idPengajar={selectedUser.idPengajar}
@@ -1412,19 +1300,20 @@ export default function JadwalPelajaranAdminDetail() {
                 waktuSelesai={selectedUser.waktuSelesai}
                 waktu={selectedUser.waktu}
                 selectTimeStart={<TimePicker onChange={onChange}
-                                             defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                             name='waktu_mulai'
-                                             className="form-control"
-                                             required
-                                             defaultValue={moment(selectedUser.waktuMulai, 'HH:mm:ss')}
+                    defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                    name='waktu_mulai'
+                    className="form-control"
+                    required
+                    defaultValue={moment(selectedUser.waktuMulai, 'HH:mm:ss')}
                 />}
                 selectTimeEnd={<TimePicker onChange={onChange}
-                                           defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                           name='waktu_selesai'
-                                           className="form-control"
-                                           required
-                                           defaultValue={moment(selectedUser.waktuSelesai, 'HH:mm:ss')}
+                    defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                    name='waktu_selesai'
+                    className="form-control"
+                    required
+                    defaultValue={moment(selectedUser.waktuSelesai, 'HH:mm:ss')}
                 />}
+                tanggalPertemuan={true}
             />
         )
     }
@@ -1436,8 +1325,10 @@ export default function JadwalPelajaranAdminDetail() {
                 title="View Jadwal Pelajaran"
                 submit={createJadwalPelajaran}
                 isDisabled={true}
+                disabledTanggal={true}
                 hari={selectedUser.hari}
                 kelas={selectedUser.kelas}
+                id={selectedUser.id}
                 idPelajaran={selectedUser.idPelajaran}
                 namaPelajaran={selectedUser.namaPelajaran}
                 idPengajar={selectedUser.idPengajar}
@@ -1446,21 +1337,22 @@ export default function JadwalPelajaranAdminDetail() {
                 waktuSelesai={selectedUser.waktuSelesai}
                 waktu={selectedUser.waktu}
                 selectTimeStart={<TimePicker onChange={onChange}
-                                             defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                             name='waktu_mulai'
-                                             className="form-control"
-                                             required
-                                             defaultValue={moment(selectedUser.waktuMulai, 'HH:mm:ss')}
-                                             disabled={true}
+                    defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                    name='waktu_mulai'
+                    className="form-control"
+                    required
+                    defaultValue={moment(selectedUser.waktuMulai, 'HH:mm:ss')}
+                    disabled={true}
                 />}
                 selectTimeEnd={<TimePicker onChange={onChange}
-                                           defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                                           name='waktu_mulai'
-                                           className="form-control"
-                                           required
-                                           defaultValue={moment(selectedUser.waktuSelesai, 'HH:mm:ss')}
-                                           disabled={true}
+                    defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                    name='waktu_mulai'
+                    className="form-control"
+                    required
+                    defaultValue={moment(selectedUser.waktuSelesai, 'HH:mm:ss')}
+                    disabled={true}
                 />}
+                tanggalPertemuan={true}
             />
         )
     }
@@ -1468,22 +1360,22 @@ export default function JadwalPelajaranAdminDetail() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader/>
+                <Navheader />
                 <div className="main-content">
-                    <Appheader/>
+                    <Appheader />
                     {/* {isViewPelajaran ? <ViewPelajaran /> : <TambahPelajaran />} */}
                     {
                         isViewPelajaran ?
-                            <ViewPelajaran/> :
+                            <ViewPelajaran /> :
                             isViewCreate ?
-                                <FormCreate/> :
+                                <FormCreate /> :
                                 isViewEdit ?
-                                    <FormEdit/> :
+                                    <FormEdit /> :
                                     isViewDetail ?
-                                        <FormDetail/> :
-                                        <ViewPelajaran/>
+                                        <FormDetail /> :
+                                        <ViewPelajaran />
                     }
-                    <Adminfooter/>
+                    <Adminfooter />
                 </div>
             </div>
         </Fragment>

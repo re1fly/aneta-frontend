@@ -27,7 +27,7 @@ import axios from "axios";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 
-import { BASE_URL } from "../../../api/Url";
+import {global_join_sub_first, jadwal_pelajaran_on_going, url_by_institute} from "../../../api/reference";
 
 function JadwalPelajaranSiswa() {
     const [grid, setGrid] = useState(false);
@@ -117,8 +117,8 @@ function JadwalPelajaranSiswa() {
     }, [getJadwalPelajaran])
 
     useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "108f9a5e-3aed-11ed-8c53-66682e31e826",
+        axios.post(url_by_institute, {
+            "processDefinitionId": jadwal_pelajaran_on_going,
             "returnVariables": true,
             "variables": [
                 {
@@ -145,8 +145,8 @@ function JadwalPelajaranSiswa() {
             }
         })
 
-        axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubfirst:1:d225c704-3aeb-11ed-8c53-66682e31e826",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_join_sub_first,
             "returnVariables": true,
             "variables": [
                 {

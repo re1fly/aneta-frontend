@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { BASE_URL } from "../../api/Url";
+import {global_join_sub_where_get, url_by_institute} from "../../api/reference";
 
 
 export function useDataGuru() {
@@ -11,9 +11,9 @@ export function useDataGuru() {
     const academic = localStorage.getItem('academic_year')
 
     const getListGuru = () => {
-        axios.post(BASE_URL,
+        axios.post(url_by_institute,
             {
-                "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
                 "variables": [
                     {

@@ -27,7 +27,7 @@ function Register() {
         } else {
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": "authregister:2:fdcb13e4-3af0-11ed-8c53-66682e31e826",
+                    "processDefinitionId": "authregister:1:987def29-2cc6-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
                     "variables": [
                         {

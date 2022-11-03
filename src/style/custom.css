@@ -116,3 +116,10 @@
     margin-bottom: 15px;
 }
 
+.border-blue {
+    border: 1px rgb(45, 79, 232) dashed !important;
+}
+
+.bg-grey {
+    background-color: #dce0e0 !important;
+  }

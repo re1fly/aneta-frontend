@@ -16,7 +16,6 @@ import {
 import {Link, useHistory} from 'react-router-dom';
 import axios from "axios";
 import Search from "antd/es/input/Search";
-import {BASE_URL} from "../../../api/Url";
 import Adminfooter from '../../../components/Adminfooter';
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';

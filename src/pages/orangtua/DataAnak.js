@@ -26,7 +26,7 @@ import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
 import Filter from '../../components/Filter';
 
-import { BASE_URL } from "../../api/Url";
+import {global_join_sub_where_get, url_by_institute} from "../../api/reference";
 
 function DataAnakOrangtua() {
     const [grid, setGrid] = useState(true);
@@ -165,8 +165,8 @@ function DataAnakOrangtua() {
     }
 
     useEffect(() => {
-        axios.post(BASE_URL, {
-            "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+        axios.post(url_by_institute, {
+            "processDefinitionId": global_join_sub_where_get,
             "returnVariables": true,
             "variables": [
                 {

@@ -19,6 +19,34 @@ const processReduce = {
   DataClass: [],
 };
 
+const ClassMateriReducer = {
+  DataTingkatKelas: [],
+  DataSubKelas: [],
+  DataPelajaran: [],
+  DataKompetensi: [],
+}
+
+const PertemuanMateriReducer = {
+  DataMateri: [],
+  DataTanggal: [],
+  DataJam: [],
+  // IdJam: [],
+}
+
+const PertemuanTugasReducer = {
+  DataTugas: [],
+  DataTanggal: [],
+  DataJam: [],
+}
+
+const IdJamReducer = {
+  IdJam: [],
+}
+
+const AllDate = {
+  DateTime: [],
+}
+
 export const reducerSearch = (state = searchReduce, action) => {
   if (action.type === "SEARCH_GLOBAL") {
     return {
@@ -83,6 +111,125 @@ export const ReducerClass = (state = ClassReducer, action) => {
     return {
       ...state,
       SubClass: action.value,
+    };
+  }
+
+  return state;
+};
+
+export const ReducerClassMateri = (state = ClassMateriReducer, action) => {
+  if (action.type === "SET_TINGKATCLASS") {
+    return {
+      ...state,
+      DataTingkatKelas: action.value,
+    };
+  }
+
+  if (action.type === "SET_SUBCLASS") {
+    return {
+      ...state,
+      DataSubKelas: action.value,
+    };
+  }
+
+  if (action.type === "SET_PELAJARAN") {
+    return {
+      ...state,
+      DataPelajaran: action.value,
+    };
+  }
+
+  if (action.type === "SET_KOMPETENSI") {
+    return {
+      ...state,
+      DataKompetensi: action.value,
+    };
+  }
+
+  return state;
+};
+
+export const ReducerPertemuanMateri = (state = PertemuanMateriReducer, action) => {
+  if (action.type === "SET_MATERIPERTEMUAN") {
+    return {
+      ...state,
+      DataMateri: action.value,
+    };
+  }
+
+  if (action.type === "SET_MATERITANGGAL") {
+    return {
+      ...state,
+      DataTanggal: action.value,
+    };
+  }
+
+  if (action.type === "SET_MATERIJAM") {
+    return {
+      ...state,
+      DataJam: action.value,
+    };
+  }
+
+  // if (action.type === "SET_IDJAM") {
+  //   return {
+  //     ...state,
+  //     IdJam: action.value,
+  //   };
+  // }
+
+  return state;
+};
+
+export const ReducerPertemuanTugas = (state = PertemuanTugasReducer, action) => {
+  if (action.type === "SET_TUGASPERTEMUAN") {
+    return {
+      ...state,
+      DataTugas: action.value,
+    };
+  }
+
+  if (action.type === "SET_TUGASTANGGAL") {
+    return {
+      ...state,
+      DataTanggal: action.value,
+    };
+  }
+
+  if (action.type === "SET_TUGASJAM") {
+    return {
+      ...state,
+      DataJam: action.value,
+    };
+  }
+
+  // if (action.type === "SET_IDJAM") {
+  //   return {
+  //     ...state,
+  //     IdJam: action.value,
+  //   };
+  // }
+
+  return state;
+};
+
+export const ReducerIdjam = (state = IdJamReducer, action) => {
+
+  if (action.type === "SET_IDJAM") {
+    return {
+      ...state,
+      IdJam: action.value,
+    };
+  }
+
+  return state;
+};
+
+export const ReducerDateTime = (state = AllDate, action) => {
+  if (action.type === "SET_DATETIME") {
+    return {
+      ...state,
+      DateTime: action.value,
     };
   }
 

@@ -191,7 +191,6 @@ export default function DataMataPelajaranAdmin() {
             const pelajaran = JSON.parse(response?.data?.variables[3]?.value)
             setGetPelajaran(pelajaran?.data?.data)
             const pagination = pelajaran?.data?.links;
-            console.log(pagination);
             setBtnPagination(pagination)
         })
     }
@@ -423,6 +422,7 @@ export default function DataMataPelajaranAdmin() {
                 idKelompok: pelajaran.id_kelompok,
                 kelompok: capitalizeFirstLetter(pelajaran.kelompok),
                 noUrutRapor: pelajaran.urut_lapor,
+                jumlahPertemuan: pelajaran.jumlah_pertemuan,
                 kurikulum: pelajaran.max_student,
                 status: [JSON.stringify(pelajaran.status)],
             }
@@ -756,16 +756,17 @@ export default function DataMataPelajaranAdmin() {
                         "data": {
                             "code": "required",
                             "nama_mata": "required",
-
                             "urut_lapor": "required",
                             "kel_id": "required",
                             "status": "required",
+                            "jumlah_pertemuan": "required"
                         },
                         "code": data.kode_pelajaran,
                         "nama_mata": data.nama_pelajaran,
                         "urut_lapor": data.noUrut_rapor,
                         "kel_id": data.kelompok,
                         "status": data.status,
+                        "jumlah_pertemuan": data.jumlah_pertemuan
                     }
                 },
                 {
@@ -781,6 +782,7 @@ export default function DataMataPelajaranAdmin() {
                             "status": data.status,
                             "kel_id": data.kelompok,
                             "updated_at": dateNow,
+                            "jumlah_pertemuan": data.jumlah_pertemuan
                         }
                     }
                 },
@@ -851,7 +853,8 @@ export default function DataMataPelajaranAdmin() {
                         "code": data.kode_pelajaran,
                         "urut_lapor": data.noUrut_rapor,
                         "status": data.status,
-                        "kel_id": data.kelompok
+                        "kel_id": data.kelompok,
+                        "jumlah_pertemuan": data.jumlah_pertemuan
                     }
                 }
             ]
@@ -981,6 +984,7 @@ export default function DataMataPelajaranAdmin() {
                 idKelompok={selectedUser.idKelompok}
                 kelompok={selectedUser.kelompok}
                 noUrutRapor={selectedUser.noUrutRapor}
+                jumlahPertemuan={selectedUser.jumlahPertemuan}
                 kurikulum={selectedUser.kurikulum}
                 idStatus={idStatus}
                 status={status}
@@ -1001,6 +1005,7 @@ export default function DataMataPelajaranAdmin() {
                 idKelompok={selectedUser.idKelompok}
                 kelompok={selectedUser.kelompok}
                 noUrutRapor={selectedUser.noUrutRapor}
+                jumlahPertemuan={selectedUser.jumlahPertemuan}
                 kurikulum={selectedUser.kurikulum}
                 status={status}
                 isDisabled={true}

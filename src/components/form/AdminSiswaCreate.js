@@ -45,7 +45,7 @@ export const DataFormSiswaCreate = (props) => {
                                                     NISN <RequiredTooltip/>
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control"
                                                     name="nisn_siswa"
                                                     required
@@ -59,7 +59,7 @@ export const DataFormSiswaCreate = (props) => {
                                                     NIPD <RequiredTooltip/>
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control"
                                                     name="nipd_siswa"
                                                     required
@@ -542,10 +542,10 @@ export const DataFormSiswaCreate = (props) => {
                                                     <option value="" selected disabled>
                                                         Pilih Jenis KPS
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Iya
                                                     </option>
-                                                    <option value="0">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -623,10 +623,10 @@ export const DataFormSiswaCreate = (props) => {
                                                     <option value="" selected disabled>
                                                         Pilih Jenis
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Iya
                                                     </option>
-                                                    <option value="0">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -659,10 +659,10 @@ export const DataFormSiswaCreate = (props) => {
                                                     <option value="" selected disabled>
                                                         Pilih Jenis
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Iya
                                                     </option>
-                                                    <option value="0">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -700,11 +700,21 @@ export const DataFormSiswaCreate = (props) => {
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Kebutuhan Khusus
                                                 </label>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     className="form-control"
+                                                    aria-label="Default select example"
                                                     name="kebutuhankhusus_siswa"
-                                                />
+                                                >
+                                                    <option value="" selected disabled>
+                                                        Pilih Jenis
+                                                    </option>
+                                                    <option value={true}>
+                                                        Iya
+                                                    </option>
+                                                    <option value={false}>
+                                                        Tidak
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -781,7 +791,7 @@ const DataFormOrangtua = (props) => {
                             NIK
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control"
                             name="nik_ayah"
                         />
@@ -1014,7 +1024,7 @@ const DataFormOrangtua = (props) => {
                             NIK
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control"
                             name="nik_ibu"
                         />
@@ -1212,7 +1222,7 @@ const DataFormOrangtua = (props) => {
                             NIK
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control"
                             name="nik_wali"
                         />

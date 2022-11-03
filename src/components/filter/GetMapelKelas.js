@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import {BASE_URL} from "../../api/Url";
 import {ClassByAcademic} from "./ClassByAcademic";
 import {MapelByAcademic} from "./MapelByAcademic";
+import {global_join_sub_where_get, url_by_institute} from "../../api/reference";
 
 export const GetMapelKelas = (props) => {
     const academic = localStorage.getItem("academic_year");
@@ -13,9 +13,9 @@ export const GetMapelKelas = (props) => {
     const _getDataKelas = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -76,9 +76,9 @@ export const GetMapelKelas = (props) => {
     const _getDataMapel = () => {
         axios
             .post(
-                BASE_URL,
+                url_by_institute,
                 {
-                    "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_join_sub_where_get,
                     "returnVariables": true,
                     "variables": [
                         {

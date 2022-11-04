@@ -38,7 +38,7 @@ const SiswaPertemuanTugas = () => {
     const params = useParams()
     const idTugas = params.id
 
-    useEffect(() => {
+    const _getDataPertemuan = () => {
         axios.post(url_by_institute, {
                 "processDefinitionId": role_siswa_get_pertemuan,
                 "returnVariables": true,
@@ -65,15 +65,18 @@ const SiswaPertemuanTugas = () => {
                 }
             }
         ).then(function (response) {
-            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-            console.log(dataRes);
             setDataPertemuan(dataRes?.data);
             const pagination = dataRes?.data?.links;
             setBtnPagination(pagination)
         })
+    }
 
+    useEffect(() => {
+        _getDataPertemuan()
     }, [idTugas])
+
+    // setTimeout(_getDataPertemuan, 5000)
 
     let history = useHistory();
     const handleRouter = (id, record) => {
@@ -149,7 +152,7 @@ const SiswaPertemuanTugas = () => {
                 let color = statusSiswa == 0 ? "green" : statusSiswa == 1 ? "red" : "orange";
                 return (
                     <Tag style={{borderRadius: "15px"}} color={color} key={statusSiswa}>
-                        {statusSiswa == 0 ? "Tugas dapat dikerjakan" : statusSiswa == 1 ? "Tugas sedang dikerjakan" : "Tugas sudah dikerjakan"}
+                        {statusSiswa == 0 ? "Tugas belum dikerjakan" : statusSiswa == 1 ? "Tugas sedang dikerjakan" : "Tugas sudah dikerjakan"}
                     </Tag>
                 );
             }
@@ -162,12 +165,12 @@ const SiswaPertemuanTugas = () => {
             render: (text, record) => (
                 <Space size="middle">
                     {
-                        record.statusSiswa == 2 ?
+                        record.status == 2 ?
                             <Tooltip placement="top" title={textStatus} color={'green'}>
                                 <EyeOutlined onClick={() => {
                                     handleRouter(record.id, record)
                                 }} style={{color: "green"}}/>
-                            </Tooltip> : record.statusSiswa == 1 ?
+                            </Tooltip> : record.status == 1 ?
                                 <EyeOutlined onClick={() => {
                                     handleRouter(record.id, record)
                                 }} style={{color: "black"}}/> :

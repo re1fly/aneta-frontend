@@ -262,7 +262,7 @@ export default function TugasiSiswa() {
                                                     src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js"
                                                     charSet="UTF-8"></script>
                                             </div>
-                                            {selectedContent.statusSiswa == 1 ? <div className="text-center">
+                                            {selectedContent.statusSiswa == 1 && selectedContent.status == 1 ? <div className="text-center">
                                                 <button
                                                     className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 mt-2 w175 rounded-lg d-inline-block"
                                                     onClick={() => {

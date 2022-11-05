@@ -110,7 +110,7 @@ export default function TugasiSiswa() {
                         placement: 'topRight',
                         duration: 10
                     })
-                } else {
+                }else if(isFinished == true) {
                     notification.info({
                         message: "Informasi",
                         description: "Waktu mengerjakan tugas telah habis",
@@ -123,7 +123,7 @@ export default function TugasiSiswa() {
 
     useEffect(() => {
         _finishedTask()
-    }, [isFinished == true]);
+    }, [isFinished === true]);
 
     useEffect(() => {
         const unlisten = history.listen((location) => {
@@ -256,7 +256,7 @@ export default function TugasiSiswa() {
                                                     src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${selectedContent?.file_path}`}
                                                     width="1000" frameBorder="0"
                                                     allowFullScreen="allowfullscreen"
-                                                    style={{minHeight: '600px'}}
+                                                    style={{minHeight: '800px'}}
                                                     title="test soal multiple"></iframe>
                                                 <script
                                                     src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js"

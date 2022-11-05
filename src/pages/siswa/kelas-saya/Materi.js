@@ -112,7 +112,7 @@ export default function MateriSiswa() {
                                             {/* <h4 className="mt-5 strong text-lg">1.1 Bangun Ruang</h4> */}
                                             <iframe
                                                 src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${getContent?.file_path}`}
-                                                width="100%" style={{ minHeight: '600px' }} frameBorder="0"
+                                                width="100%" style={{ minHeight: '800px' }} frameBorder="0"
                                                 allowFullScreen="allowfullscreen" title="test soal multiple"></iframe>
                                             <script
                                                 src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js"

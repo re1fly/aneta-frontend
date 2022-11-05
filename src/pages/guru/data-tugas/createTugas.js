@@ -18,7 +18,7 @@ function GuruCreateTugas() {
                 <div className="main-content">
                     <Appheader />
                     {/* <iframe src="https://lms.aneta.id:8443/dashboard" width="100%" height="1000px"></iframe> */}
-                    <iframe src="http://localhost:8080/wordpress/wp-admin/admin.php?page=h5p" width="100%" style={{ minHeight: '600px' }}></iframe>
+                    <iframe src="http://localhost:8080/wordpress/wp-admin/admin.php?page=h5p" width="100%" style={{ minHeight: '800px' }}></iframe>
                     <Adminfooter />
                 </div>
             </div>

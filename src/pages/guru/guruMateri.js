@@ -99,7 +99,7 @@ export default function MateriGuru() {
                                                 title={`${getContent?.class_type}/${getContent?.sub_class} - ${getContent?.meeting_name} - ${getContent?.tittle}`}
                                             />
                                             {/* <h4 className="mt-5 strong text-lg">1.1 Bangun Ruang</h4> */}
-                                            <iframe src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${getContent?.file_path}`} width="958" style={{ minHeight: '600px' }} frameborder="0" allowfullscreen="allowfullscreen" title="test soal multiple"></iframe><script src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charset="UTF-8"></script>
+                                            <iframe src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${getContent?.file_path}`} width="958" style={{ minHeight: '800px' }} frameborder="0" allowfullscreen="allowfullscreen" title="test soal multiple"></iframe><script src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charset="UTF-8"></script>
 
                                             {/* download materi
                                             <div className="d-flex mt-2 mb-5">

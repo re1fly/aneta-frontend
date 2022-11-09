@@ -51,7 +51,6 @@ function Login() {
                 allProcDef.map((data) => {
                     sessionStorage.setItem(data.key, data.proses_def_id);
                 });
-                console.log(allProcDef);
             });
     };
 
@@ -100,48 +99,48 @@ function Login() {
                     sessionStorage.setItem("user", email)
                     sessionStorage.setItem("key", ciphertext)
 
-                    axios
-                        .post(
-                            BASE_URL,
-                            {
-                                processDefinitionId: global_join_sub_first,
-                                returnVariables: true,
-                                variables: [
-                                    {
-                                        name: "global_join_where_sub_first",
-                                        type: "json",
-                                        value: {
-                                            tbl_induk: "ref_api_key",
+                    axios.post(
+                        BASE_URL,
+                        {
+                            processDefinitionId: "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
+                            returnVariables: true,
+                            variables: [
+                                {
+                                    name: "global_join_where_sub_first",
+                                    type: "json",
+                                    value: {
+                                        tbl_induk: "ref_api_key",
 
-                                            join: [
-                                                {
-                                                    tbl_join: "m_institutes",
-                                                    refkey: "id",
-                                                    tbl_join2: "ref_api_key",
-                                                    foregenkey: "institute_id",
-                                                },
-                                            ],
-                                            where: [
-                                                {
-                                                    tbl_coloumn: "ref_api_key",
-                                                    tbl_field: "institute_id",
-                                                    tbl_value: dataLogin.user.institute_id,
-                                                    operator: "=",
-                                                },
-                                            ],
-                                        },
+                                        join: [
+                                            {
+                                                tbl_join: "m_institutes",
+                                                refkey: "id",
+                                                tbl_join2: "ref_api_key",
+                                                foregenkey: "institute_id",
+                                            },
+                                        ],
+                                        where: [
+                                            {
+                                                tbl_coloumn: "ref_api_key",
+                                                tbl_field: "institute_id",
+                                                tbl_value: dataLogin.user.institute_id,
+                                                operator: "=",
+                                            },
+                                        ],
                                     },
-                                ],
-                            },
-                            {
-                                headers: {
-                                    "Content-Type": "application/json",
                                 },
-                            }
-                        )
+                            ],
+                        },
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    )
                         .then((res) => {
                             const response = JSON.parse(res?.data?.variables[2]?.value);
                             const dataRes = response.data;
+                            console.log(res)
                             localStorage.setItem("url", dataRes.endpoint);
                             localStorage.setItem("school", dataRes.name);
 

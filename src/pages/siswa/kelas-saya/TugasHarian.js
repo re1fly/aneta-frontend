@@ -7,7 +7,12 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
 import axios from 'axios';
-import {global_join_sub_first, role_siswa_get_pertemuan, url_by_institute} from '../../../api/reference';
+import {
+    global_join_sub_first,
+    role_siswa_get_pertemuan,
+    role_siswa_update_status_tugas,
+    url_by_institute
+} from '../../../api/reference';
 import {InboxOutlined} from '@ant-design/icons';
 import {pageLoad} from '../../../components/misc/loadPage';
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
@@ -83,7 +88,7 @@ export default function TugasiSiswa() {
 
     const _finishedTask = () => {
         axios.post(url_by_institute, {
-            "processDefinitionId": "3b4cde3e-54f4-11ed-8f22-927b5be84510",
+            "processDefinitionId": role_siswa_update_status_tugas,
             "returnVariables": true,
             "variables": [
                 {

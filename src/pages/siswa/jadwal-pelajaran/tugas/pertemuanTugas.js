@@ -148,11 +148,11 @@ const SiswaPertemuanTugas = () => {
             title: 'Status',
             dataIndex: 'statusSiswa',
             align: 'center',
-            render: (statusSiswa) => {
+            render: (statusSiswa, record) => {
                 let color = statusSiswa == 0 ? "green" : statusSiswa == 1 ? "red" : "orange";
                 return (
                     <Tag style={{borderRadius: "15px"}} color={color} key={statusSiswa}>
-                        {statusSiswa == 0 ? "Tugas belum dikerjakan" : statusSiswa == 1 ? "Tugas sedang dikerjakan" : "Tugas sudah dikerjakan"}
+                        {record.status == 2 && record.statusSiswa == 1 ? "Waktu Telah Habis" :statusSiswa == 0 ? "Tugas belum dikerjakan" : statusSiswa == 1 ? "Tugas sedang dikerjakan" : "Tugas sudah dikerjakan"}
                     </Tag>
                 );
             }

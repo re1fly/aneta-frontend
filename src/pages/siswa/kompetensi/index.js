@@ -140,7 +140,7 @@ export default function KompetensiSiswa() {
                 columns={columns}
                 dataSource={channelList}
                 onChange={onChangeTable}
-                pagination={{ position: ['bottomCenter'] }}
+                pagination={false}
                 rowClassName="bg-greylight text-grey-900"
                 scroll={{ x: 400 }} />
         );

@@ -4,7 +4,7 @@ import axios from "axios";
 import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
 
-import {get_where_no_join, url_by_institute} from "../../api/reference";
+import { get_where_no_join, url_by_institute } from "../../api/reference";
 
 const iconlList = [{
     name: '7', count: 'Kelas', status: 'warning', icon: 'feather-hard-drive',
@@ -13,8 +13,6 @@ const iconlList = [{
 }, {
     name: '84', count: 'Siswa', status: 'info', icon: 'feather-award',
 }];
-
-
 
 function BerandaGuru() {
     const user = localStorage.getItem('user_name');
@@ -97,7 +95,7 @@ function BerandaGuru() {
                             </div>
                             <div className="col-lg-12 d-flex mb-4">
                                 <h2 className="text-grey-900 ml-1 font-md fw-700">Statistik Sekolah</h2>
-                                <select
+                                {/* <select
                                     className="form-select ml-auto float-right border-0 font-xssss fw-600 text-grey-700 bg-transparent"
                                     aria-label="Default select example"
                                 >
@@ -109,7 +107,7 @@ function BerandaGuru() {
                                     <option defaultValue="3">
                                         Sort by price : high to low
                                     </option>
-                                </select>
+                                </select> */}
                             </div>
                         </div>
 
@@ -160,7 +158,8 @@ function BerandaGuru() {
                     </div>
                 </div>
             </div>
-        </Fragment>);
+        </Fragment>
+    );
 }
 
 export default BerandaGuru;

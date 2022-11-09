@@ -1057,7 +1057,7 @@ function BerandaAdmin() {
                                     />
                                 </div>
                             </div>
-                            <div className="col-lg-12 d-flex mb-4">
+                            {/* <div className="col-lg-12 d-flex mb-4">
                                 <h2 className="text-grey-900 ml-1 font-md fw-700">Statistik Sekolah</h2>
                                 <select
                                     className="form-select ml-auto float-right border-0 font-xssss fw-600 text-grey-700 bg-transparent"
@@ -1072,7 +1072,7 @@ function BerandaAdmin() {
                                         Sort by price : high to low
                                     </option>
                                 </select>
-                            </div>
+                            </div> */}
                         </div>
 
 

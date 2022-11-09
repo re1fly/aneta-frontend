@@ -43,6 +43,7 @@ function GuruDataTugas() {
     const [isViewDetail, setIsViewDetail] = useState(false);
 
     const [selectedUser, setSelectedUser] = useState(null);
+    console.log(selectedUser);
     const [refreshState, setRefreshState] = useState(false);
 
     const [getKelas, setGetKelas] = useState(null);
@@ -124,64 +125,15 @@ function GuruDataTugas() {
         _getDataMapel();
 
         axios.post(url_by_institute, {
-            "processDefinitionId": global_join_sub_where_get,
+            "processDefinitionId": "rolegurugetmateri:1:23ca27b4-5e7c-11ed-bb6a-a2fb3d782380",
             "returnVariables": true,
             "variables": [
                 {
-                    "name": "global_join_where_sub",
+                    "name": "data",
                     "type": "json",
                     "value": {
-                        "tbl_induk": "x_academic_subjects_schedule_contents",
-                        "select": [
-                            "x_academic_subjects_schedule_contents.tittle",
-                            "r_class_type.class_type",
-                            "x_academic_subject_master.nama_mata",
-                            "x_academic_year.academic_year",
-                            "x_academic_subjects_schedule_contents.status"
-                        ],
-                        "paginate": 10,
-                        "join": [
-                            {
-                                "tbl_join": "r_class_type",
-                                "refkey": "id",
-                                "tbl_join2": "x_academic_subjects_schedule_contents",
-                                "foregenkey": "class_type_id"
-                            },
-                            {
-                                "tbl_join": "x_academic_subject_master",
-                                "refkey": "id",
-                                "tbl_join2": "x_academic_subjects_schedule_contents",
-                                "foregenkey": "subjects_master_id"
-                            },
-                            {
-                                "tbl_join": "x_academic_year",
-                                "refkey": "id",
-                                "tbl_join2": "x_academic_subjects_schedule_contents",
-                                "foregenkey": "academic_year_id"
-                            }
-                        ],
-                        "where": [
-                            {
-                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
-                                "tbl_field": "subjects_content_type_id",
-                                "tbl_value": "2",
-                                "operator": "="
-                            },
-                            {
-                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
-                                "tbl_field": "deleted_at",
-                                "tbl_value": "",
-                                "operator": "="
-                            },
-                            {
-                                "tbl_coloumn": "x_academic_subjects_schedule_contents",
-                                "tbl_field": "created_by",
-                                "tbl_value": userId,
-                                "operator": "="
-                            }
-                        ],
-                        "order_coloumn": "x_academic_subjects_schedule_contents.updated_at",
-                        "order_by": "desc"
+                        "id_subject_type": 2,
+                        "created_by": userId
                     }
                 },
                 {
@@ -197,8 +149,8 @@ function GuruDataTugas() {
             }
         }
         ).then(function (response) {
-            console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            console.log(dataRes.data.data);
             setDataTugas(dataRes?.data?.data);
             const pagination = dataRes?.data?.links;
             setBtnPagination(pagination)
@@ -257,11 +209,21 @@ function GuruDataTugas() {
     const data = dataTugas?.map((data, index) => {
         return {
             no: index + 1,
+            id: data.id,
             namaMateri: data.tittle,
-            tingkatKelas: data.class_type,
             ta_semester: data.academic_year,
-            mataPelajaran: data.nama_mata,
             status: data.status,
+            idPelajaran: data.id_mata,
+            mataPelajaran: data.nama_mata,
+            idTingkatKelas: data.id_tingkat,
+            tingkatKelas: data.tingkat_nama,
+            idSubKelas: data.id_sub_class,
+            subKelas: data.sub_class,
+            isUpload: data.is_upload,
+            embed: data.embed,
+            idContent: data.id_wp,
+            keterangan: data.keterangan,
+            kompetensi: '',
         }
     })
 
@@ -295,7 +257,7 @@ function GuruDataTugas() {
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
-                                {grid == false ?
+                                {/* {grid == false ?
                                     <a>
                                         <AppstoreOutlined style={{ fontSize: '30px' }}
                                             onClick={() => setGrid(true)} />
@@ -303,7 +265,7 @@ function GuruDataTugas() {
                                     <a>
                                         <MenuOutlined style={{ fontSize: '30px' }}
                                             onClick={() => setGrid(false)} />
-                                    </a>}
+                                    </a>} */}
                             </div>
                         </Col>
                     </Row>
@@ -391,9 +353,9 @@ function GuruDataTugas() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        // const dateNow = new Date().toLocaleString()
         console.log(data);
-        // console.log(data.is_upload);
+        const idKompetensi = data.kompetensi?.split(',')?.map(Number);
+        console.log(idKompetensi);
         const iFrame = data.embed_materi
         const id = iFrame?.split('id=')[1]
         const id_content_wp = id?.split('" width=')[0]
@@ -415,7 +377,7 @@ function GuruDataTugas() {
                         "embed_materi": data.embed_materi,
                         "id_content_wp": id_content_wp,
                         "keterangan": data.keterangan,
-                        "id_kompetensi": data.kompetensi,
+                        "id_kompetensi": idKompetensi,
                         "status": "publish",
                         "academic_year_id": academic_year_id,
                         "is_upload": data.is_upload
@@ -442,6 +404,66 @@ function GuruDataTugas() {
                 notification.success({
                     message: 'Sukses',
                     description: 'Tugas berhasil ditambahkan.',
+                    placement: 'top'
+                });
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                });
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    const EditTugas = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        // const dateNow = new Date().toLocaleString()
+        console.log(data);
+
+        axios.post(url_by_institute, {
+            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_updatedata",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "x_academic_subjects_schedule_contentsModel",
+                        "id": selectedUser.id,
+                        "tbl_coloumn": {
+                            "tittle": data.nama_materi,
+                            "desc": data.keterangan
+                        }
+                    }
+                }
+            ]
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            // console.log("Update :", response);
+            const valueRes = response.data.variables[2].value;
+            const valueResObj = JSON.parse(valueRes);
+            console.log(valueResObj);
+            if (valueResObj.message == "succes update data") {
+                setIsViewCreate(false)
+                setIsViewTugas(true)
+                setRefreshState(true)
+                // pageLoad()
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Tugas berhasil diupdate.',
                     placement: 'top'
                 });
             } else {
@@ -487,6 +509,7 @@ function GuruDataTugas() {
                 title="Tambah Data"
                 submit={CreateTugas}
                 isDisabled={false}
+                disabledButton={false}
             />
         )
     }
@@ -497,8 +520,25 @@ function GuruDataTugas() {
                 form="Tugas"
                 setView={() => setIsViewTugas(true)}
                 title="Edit Data"
-                // submit={editGuru}
-                isDisabled={false}
+                submit={EditTugas}
+                isDisabled={true}
+                titleDisabled={false}
+                descDisabled={false}
+                disabledButton={false}
+                id={selectedUser.id}
+                namaMateri={selectedUser.namaMateri}
+                idTingkatKelas={selectedUser.idTingkatKelas}
+                tingkatKelas={selectedUser.tingkatKelas}
+                idSubKelas={selectedUser.idSubKelas}
+                subKelas={selectedUser.subKelas}
+                idPelajaran={selectedUser.idPelajaran}
+                mataPelajaran={selectedUser.mataPelajaran}
+                embed={selectedUser.embed}
+                idContent={selectedUser.idContent}
+                isUpload={selectedUser.isUpload}
+                keterangan={selectedUser.keterangan}
+                idKompetensi={selectedUser.idKompetensi}
+                kompetensi={selectedUser.kompetensi}
             />
         )
     }
@@ -511,7 +551,23 @@ function GuruDataTugas() {
                 title="View Data"
                 // submit={createGuru}
                 isDisabled={true}
-
+                titleDisabled={true}
+                descDisabled={true}
+                disabledButton={false}
+                id={selectedUser.id}
+                namaMateri={selectedUser.namaMateri}
+                idTingkatKelas={selectedUser.idTingkatKelas}
+                tingkatKelas={selectedUser.tingkatKelas}
+                idSubKelas={selectedUser.idSubKelas}
+                subKelas={selectedUser.subKelas}
+                idPelajaran={selectedUser.idPelajaran}
+                mataPelajaran={selectedUser.mataPelajaran}
+                embed={selectedUser.embed}
+                idContent={selectedUser.idContent}
+                isUpload={selectedUser.isUpload}
+                keterangan={selectedUser.keterangan}
+                idKompetensi={selectedUser.idKompetensi}
+                kompetensi={selectedUser.kompetensi}
             />
         )
     }

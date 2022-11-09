@@ -178,35 +178,11 @@ const SiswaPertemuanMateri = () => {
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <Row>
                         <Col span={12}>
-                            {/* <Button className="mr-4" type="primary" shape="round" size='middle'
-                                onClick={viewCreatePertemuan}>
-                                Tambah Data
-                            </Button> */}
-                            {/* <Dropdown overlay={_filterMenu}>
-                                        <a className="ant-dropdown-link mr-4 font-bold"
-                                           onClick={e => e.preventDefault()}>
-                                            Filter by <DownOutlined/>
-                                        </a>
-                                    </Dropdown>
-                                    <Dropdown overlay={_sortMenu}>
-                                        <a className="ant-dropdown-link font-bold" onClick={e => e.preventDefault()}>
-                                            Sort by <DownOutlined/>
-                                        </a>
-                                    </Dropdown> */}
                         </Col>
                         <Col span={12}>
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                         onSearch={_onSearch} style={{width: 250, lineHeight: '20px'}}/>
-                                {grid == false ?
-                                    <a>
-                                        <AppstoreOutlined style={{fontSize: '30px'}}
-                                                          onClick={() => setGrid(true)}/>
-                                    </a> :
-                                    <a>
-                                        <MenuOutlined style={{fontSize: '30px'}}
-                                                      onClick={() => setGrid(false)}/>
-                                    </a>}
                             </div>
                         </Col>
                     </Row>

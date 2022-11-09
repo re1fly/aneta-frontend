@@ -85,9 +85,7 @@ function SiswaPenilaian() {
             align: 'center',
             render: (text, record) => (
                 <Space size="middle">
-                    <Link to="/guru-data-materi-detail">
-                        <EyeOutlined onClick={() => dataSiswa(record)} style={{ color: "black" }} />
-                    </Link>
+                    <EyeOutlined onClick={() => dataSiswa(record)} style={{ color: "black" }} />
                 </Space>
             ),
         },
@@ -205,15 +203,6 @@ function SiswaPenilaian() {
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
-                                {grid == false ?
-                                    <a>
-                                        <AppstoreOutlined style={{ fontSize: '30px' }}
-                                            onClick={() => setGrid(true)} />
-                                    </a> :
-                                    <a>
-                                        <MenuOutlined style={{ fontSize: '30px' }}
-                                            onClick={() => setGrid(false)} />
-                                    </a>}
                             </div>
                         </Col>
                     </Row>

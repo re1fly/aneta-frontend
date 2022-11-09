@@ -20,8 +20,9 @@ export const FormCreateMateri = (props) => {
     const [idSubKelas, setIdSubKelas] = useState('');
     const [idPelajaran, setIdPelajaran] = useState('');
     const [idKompetensi, setIdKompetensi] = useState('');
-    const [uploadTugas, setUploadTugas] = useState(null);
+    const [uploadTugas, setUploadTugas] = useState(false);
     console.log(uploadTugas);
+    const [idKom, setIdKom] = useState([]);
 
     const getClick = () => {
         let checkedValue = document.querySelector("input[type=checkbox]");
@@ -44,15 +45,15 @@ export const FormCreateMateri = (props) => {
 
     const { Option } = Select;
 
-    const handleChange = (value) => {
-        console.log(`selected ${value}`);
+    const handleChange = (id, e) => {
+        setIdKom(id)
     };
 
     // const iFrame = `<iframe src="http://localhost:8080/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=3" width="741" height="826" frameborder="0" allowfullscreen="allowfullscreen" title="Materi Matematika"></iframe><script src="http://localhost:8080/wordpress/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charset="UTF-8"></script>`
     // let id = iFrame?.split('id=')[1]
     // let id_content_wp = id?.split('" width=')[0]
 
-    let disabledButton = props.isDisabled;
+    let disabledButton = props.disabledButton;
     return (
         <div className="container px-3 py-4">
             <div className="row">
@@ -95,8 +96,8 @@ export const FormCreateMateri = (props) => {
                                                         setIdTingkatKelas(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Tingkat Kelas
+                                                    <option value="" selected={idTingkatKelas == '' ? false : true}>
+                                                        {props.tingkatKelas == undefined ? "Pilih Tingkat Kelas" : props.tingkatKelas}
                                                     </option>
                                                     {tingkatKelas.map((data, i) => {
                                                         return (
@@ -136,7 +137,7 @@ export const FormCreateMateri = (props) => {
                                                     }
                                                 >
                                                     <option value="" selected disabled>
-                                                        Pilih Sub Kelas
+                                                        {props.subKelas == undefined ? "Pilih Sub Kelas" : props.subKelas}
                                                     </option>
                                                     {subKelas.map((data, i) => {
                                                         return (
@@ -175,7 +176,7 @@ export const FormCreateMateri = (props) => {
                                                     }}
                                                 >
                                                     <option value="" selected disabled>
-                                                        Pilih Mata Pelajaran
+                                                        {props.mataPelajaran == undefined ? "Pilih Mata Pelajaran" : props.mataPelajaran}
                                                     </option>
                                                     {pelajaran.map((data, i) => {
                                                         return (
@@ -200,51 +201,13 @@ export const FormCreateMateri = (props) => {
                                                     aria-label="Default select example"
                                                     name="nama_materi"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.titleDisabled}
+                                                    defaultValue={props.namaMateri}
                                                 >
                                                 </input>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div className="row">
-                                        {/* <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Nama Materi
-                                                </label>
-                                                <input
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="nama_materi"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                </input>
-                                            </div>
-                                        </div> */}
-
-                                        {/* <div className="col-lg-6 mb-3">
-                                            <div className="mt-4">
-                                                <NavLink
-                                                    activeClassName="active"
-                                                    to="/guru-create-materi"
-                                                    data-tab="archived"
-                                                    className="nav-content-bttn open-font"
-                                                >
-                                                    <button
-                                                        onClick=""
-                                                        className="bg-tumbler border-0 text-center text-black font-xsss fw-600 p-3 w-100 rounded-lg d-inline-block"
-                                                        type=""
-                                                        disabled={props.isDisabled}
-                                                    >
-                                                        Create Materi
-                                                    </button>
-                                                </NavLink>
-                                            </div>
-                                        </div> */}
-                                    </div>
-
 
                                     {props.form == "Tugas" ?
                                         <>
@@ -252,57 +215,9 @@ export const FormCreateMateri = (props) => {
                                                 Metode Mengerim Jawaban {props.form}
                                             </label>
                                             <div className="row">
-                                                <input name="is_upload" class="messageCheckbox" value={uploadTugas == null ? false : uploadTugas} onClick={() => { getClick(this?.value) }} style={{ marginTop: '2.5px' }} className="ml-3 mb-4" type="checkbox" />
+                                                <input name="is_upload" checked={props.isUpload == true ? true : null} disabled={props.isDisabled} class="messageCheckbox" value={uploadTugas == null ? false : uploadTugas} onClick={() => { getClick(this?.value) }} style={{ marginTop: '2.5px' }} className="ml-3 mb-4" type="checkbox" />
                                                 <p className="ml-2 lh-2">Upload Jawaban Tugas</p>
                                             </div>
-
-                                            {/* <div className="row">
-                                                <div className="col-lg-4 mb-3">
-                                                    <div className="form-group">
-                                                        <label className="mont-font fw-600 font-xsss">
-                                                            Hari
-                                                        </label>
-                                                        <input
-                                                            className="form-control"
-                                                            aria-label="Default select example"
-                                                            name="hari"
-                                                            required
-                                                            disabled={props.isDisabled}
-                                                        >
-                                                        </input>
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 mb-3">
-                                                    <div className="form-group">
-                                                        <label className="mont-font fw-600 font-xsss">
-                                                            Jam
-                                                        </label>
-                                                        <input
-                                                            className="form-control"
-                                                            aria-label="Default select example"
-                                                            name="jam"
-                                                            required
-                                                            disabled={props.isDisabled}
-                                                        >
-                                                        </input>
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 mb-3">
-                                                    <div className="form-group">
-                                                        <label className="mont-font fw-600 font-xsss">
-                                                            Menit
-                                                        </label>
-                                                        <input
-                                                            className="form-control"
-                                                            aria-label="Default select example"
-                                                            name="menit"
-                                                            required
-                                                            disabled={props.isDisabled}
-                                                        >
-                                                        </input>
-                                                    </div>
-                                                </div>
-                                            </div> */}
                                         </>
                                         : null}
 
@@ -319,6 +234,7 @@ export const FormCreateMateri = (props) => {
                                                     name="embed_materi"
                                                     id="iframe"
                                                     required
+                                                    defaultValue={props.embed}
                                                     disabled={props.isDisabled}
                                                 ></textarea>
                                                 <div className="mt--1 d-flex">
@@ -343,11 +259,14 @@ export const FormCreateMateri = (props) => {
                                                     placeholder="Isi Keterangan..."
                                                     name="keterangan"
                                                     required
-                                                    disabled={props.isDisabled}
+                                                    defaultValue={props.keterangan}
+                                                    disabled={props.descDisabled}
                                                 ></textarea>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <input type="hidden" name="kompetensi" value={idKom} />
 
                                     <div className="row">
                                         <div className="col-lg-5 mb-3">
@@ -355,7 +274,29 @@ export const FormCreateMateri = (props) => {
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Kompetensi
                                                 </label>
-                                                <select
+                                                <Select
+                                                    className="pt-1 pb-1"
+                                                    name="kompetensi"
+                                                    size="large"
+                                                    mode={uploadTugas == true ? "multiple" : ''}
+                                                    allowClear
+                                                    style={{ width: '100%', borderRadius: '0.25rem', color: '#495057', }}
+                                                    placeholder="Pilih Kompotensi"
+                                                    // onChange={props.GetIdJam}
+                                                    onChange={handleChange}
+                                                    disabled={props.isDisabled}
+                                                >
+                                                    {kompetensi.map((data, i) => {
+                                                        return (
+                                                            <Option value={data.id_kompetensi} key={data.id_kompetensi}
+                                                            // selected={data.id != idProv ? false : true}
+                                                            >
+                                                                {data.competence_desc}
+                                                            </Option>
+                                                        )
+                                                    })}
+                                                </Select>
+                                                {/* <select
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="kompetensi"
@@ -377,56 +318,19 @@ export const FormCreateMateri = (props) => {
                                                             </option>
                                                         )
                                                     })}
-                                                </select>
-                                                {/* <Select
-                                                    className=""
-                                                    mode="multiple"
-                                                    size='large'
-                                                    style={{
-                                                        width: '100%',
-                                                    }}
-                                                    placeholder="Pilih Kompetensi"
-                                                    onChange={handleChange}
-                                                    optionLabelProp="label"
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    {kompetensi.map((data, i) => {
-                                                        return (
-                                                            <Option value={data.id_kompetensi}
-                                                            selected={data.id != idKecamatan ? false : true} key={i}
-                                                            >
-                                                                {data.competence_desc}
-                                                            </Option>
-                                                        )
-                                                    })}
-                                                    <Option value="Kompetensi 1">
-                                                        Kompetensi 1
-                                                    </Option>
-                                                    <Option value="Kompetensi 2">
-                                                        Kompetensi 2
-                                                    </Option>
-                                                    <Option value="Kompetensi 3">
-                                                        Kompetensi 3
-                                                    </Option>
-                                                    <Option value="Kompetensi 4">
-                                                        Kompetensi 4
-                                                    </Option>
-                                                    <Option value="Kompetensi 5">
-                                                        Kompetensi 5
-                                                    </Option>
-                                                </Select> */}
+                                                </select> */}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="row">
                                         {!disabledButton ? <div className="col-lg-12">
-                                            <button
+                                            {/* <button
                                                 className="bg-tumblr border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                                 type="submit"
                                             >
                                                 Draft
-                                            </button>
+                                            </button> */}
                                             <button
                                                 className="ml-2 bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                                 type="submit"

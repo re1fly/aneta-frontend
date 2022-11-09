@@ -42,7 +42,7 @@ export const FormCreatePertemuanTugas = (props) => {
         localStorage.setItem("idJam", [id]);
     };
 
-    let disabledButton = props.isDisabled;
+    let disabledButton = props.disabledButton;
     return (
         <div className="container px-3 py-4">
             <div className="row">
@@ -84,8 +84,8 @@ export const FormCreatePertemuanTugas = (props) => {
                                                         setIdTugas(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih tugas
+                                                    <option value="" selected={idTugas == '' ? false : true}>
+                                                        {props.namaMateri == undefined ? "Pilih Tugas" : props.namaMateri}
                                                     </option>
                                                     {tugas.map((data, i) => {
                                                         return (
@@ -109,7 +109,8 @@ export const FormCreatePertemuanTugas = (props) => {
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="nama_pertemuan"
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.titleDisable}
+                                                    defaultValue={props.namaPertemuan}
                                                     required
                                                 >
                                                 </input>
@@ -140,8 +141,8 @@ export const FormCreatePertemuanTugas = (props) => {
                                                         setIdTanggal(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Tanggal
+                                                    <option value="" selected={idTanggal == '' ? false : true}>
+                                                        {props.tanggalPertemuan == undefined ? "Pilih Tanggal" : props.tanggalPertemuan}
                                                     </option>
                                                     {tanggal.map((data, i) => {
                                                         return (
@@ -170,7 +171,7 @@ export const FormCreatePertemuanTugas = (props) => {
                                                     mode="multiple"
                                                     allowClear
                                                     style={{ width: '100%', borderRadius: '0.25rem', color: '#495057', }}
-                                                    placeholder="Pilih Jam"
+                                                    placeholder={props.jam == undefined ? "Pilih Jam" : props.jam}
                                                     // onChange={props.GetIdJam}
                                                     onChange={handleChange}
                                                     disabled={props.isDisabled}

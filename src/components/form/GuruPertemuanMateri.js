@@ -15,7 +15,6 @@ export const FormCreatePertemuanMateri = (props) => {
     const [idMateri, setIdMateri] = useState('');
     const [idTanggal, setIdTanggal] = useState('');
     const [idJam, setIdJam] = useState([]);
-    console.log(idJam);
 
     useEffect(() => {
         dispatch(GetMateri());
@@ -42,10 +41,9 @@ export const FormCreatePertemuanMateri = (props) => {
 
     const handleChange = (id, e) => {
         setIdJam(id)
-        localStorage.setItem("idJam", [id]);
     };
 
-    let disabledButton = props.isDisabled;
+    let disabledButton = props.disabledButton;
     return (
         <div className="container px-3 py-4">
             <div className="row">
@@ -87,8 +85,8 @@ export const FormCreatePertemuanMateri = (props) => {
                                                         setIdMateri(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Materi
+                                                    <option value="" selected={idMateri == '' ? false : true}>
+                                                        {props.namaMateri == undefined ? "Pilih Materi" : props.namaMateri}
                                                     </option>
                                                     {materi.map((data, i) => {
                                                         return (
@@ -112,7 +110,8 @@ export const FormCreatePertemuanMateri = (props) => {
                                                     className="form-control"
                                                     aria-label="Default select example"
                                                     name="nama_pertemuan"
-                                                    disabled={props.isDisabled}
+                                                    disabled={props.titleDisable}
+                                                    defaultValue={props.namaPertemuan}
                                                     required
                                                 >
                                                 </input>
@@ -143,8 +142,8 @@ export const FormCreatePertemuanMateri = (props) => {
                                                         setIdTanggal(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Tanggal
+                                                    <option value="" selected={idTanggal == '' ? false : true}>
+                                                        {props.tanggalPertemuan == undefined ? "Pilih Tanggal" : props.tanggalPertemuan}
                                                     </option>
                                                     {tanggal.map((data, i) => {
                                                         return (
@@ -173,7 +172,7 @@ export const FormCreatePertemuanMateri = (props) => {
                                                     mode="multiple"
                                                     allowClear
                                                     style={{ width: '100%', borderRadius: '0.25rem', color: '#495057', }}
-                                                    placeholder="Pilih Jam"
+                                                    placeholder={props.jam == undefined ? "Pilih Jam" : props.jam}
                                                     // onChange={props.GetIdJam}
                                                     onChange={handleChange}
                                                     disabled={props.isDisabled}

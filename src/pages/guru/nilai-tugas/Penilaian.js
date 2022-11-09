@@ -40,7 +40,6 @@ import { FormGuruNilaiTugas } from '../../../components/form/GuruNilaiTugas';
 function GuruPenilaian() {
     const [grid, setGrid] = useState(false);
     const [getNilai, setGetNilai] = useState([]);
-    console.log(getNilai);
     const [isViewPenilaian, setIsViewPenilaian] = useState(true);
     const [isViewEdit, setIsViewEdit] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
@@ -92,8 +91,8 @@ function GuruPenilaian() {
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            console.log(dataRes);
             const nilai = dataRes?.data
-            // console.log(nilai);
             setGetNilai(nilai);
         })
     }, [idContent, refreshState])
@@ -337,15 +336,6 @@ function GuruPenilaian() {
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
-                                {grid == false ?
-                                    <a>
-                                        <AppstoreOutlined style={{ fontSize: '30px' }}
-                                            onClick={() => setGrid(true)} />
-                                    </a> :
-                                    <a>
-                                        <MenuOutlined style={{ fontSize: '30px' }}
-                                            onClick={() => setGrid(false)} />
-                                    </a>}
                             </div>
                         </Col>
                     </Row>
@@ -391,7 +381,7 @@ function GuruPenilaian() {
                     columns={ uploadTugas == "true" ? columnsUpload : columns }
                     dataSource={data}
                     onChange={onChangeTable}
-                    pagination={{ position: ['bottomCenter'] }}
+                    pagination={false}
                     rowClassName="bg-greylight text-grey-900" />
                 <Adminfooter />
             </div>
@@ -420,7 +410,9 @@ function GuruPenilaian() {
                 // submit={editTingkatKelas}
                 isDisabled={false}
                 disableName={true}
-                id={selectedUser.idSiswa}
+                isUpload={selectedUser.isUpload}
+                idContent={selectedUser.idContent}
+                idSiswa={selectedUser.idSiswa}
                 nama={selectedUser.namaSiswa}
                 nilai={selectedUser.nilai}
             />
@@ -434,7 +426,9 @@ function GuruPenilaian() {
                 title="View Nilai Tugas"
                 isDisabled={true}
                 disableName={true}
-                id={selectedUser.idSiswa}
+                isUpload={selectedUser.isUpload}
+                idContent={selectedUser.idContent}
+                idSiswa={selectedUser.idSiswa}
                 nama={selectedUser.namaSiswa}
                 nilai={selectedUser.nilai}
             />

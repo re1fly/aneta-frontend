@@ -61,7 +61,6 @@ function DataGuruAdmin() {
     const [academicYears, setAcademicYears] = useState([]);
 
     const [getGuru, setGetGuru] = useState([]);
-    console.log(getGuru);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
@@ -555,7 +554,7 @@ function DataGuruAdmin() {
             }
         })
 
-        // console.log(channelList);
+        console.log(channelList);
 
         return (
             <div className="middle-sidebar-left">
@@ -573,7 +572,7 @@ function DataGuruAdmin() {
                                     <EllipsisOutlined />
                                 </Dropdown>
                                 <img
-                                    src={value.imageUrl}
+                                    src={value.imageUrl == 'http://10.1.6.109/storage/null' ? 'assets/images/user.png' : value.imageUrl}
                                     alt="icon"
                                     className="p-1"
                                     style={{ width: "70px", height: "70px" }}
@@ -1059,8 +1058,8 @@ function DataGuruAdmin() {
                     "value": {
                         "username": data.email_guru,
                         "email"   : data.email_guru,
-                        "password" : "password"
-                      
+                        "password" : "password",
+                        "roles": "author"
                     }
                 }
             ]

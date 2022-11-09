@@ -384,7 +384,7 @@ export const FormAdminGuru = (props) => {
                                                         setIdProv(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option selected={idProv == '' ? false : true}>
+                                                    <option value={''}  selected={idProv == '' ? false : true}>
                                                         {props.provinsi == undefined ? "Pilih Provinsi" : idProv != props.idProvinsi ? "Pilih Provinsi" : props.provinsi}
                                                     </option>
 
@@ -428,7 +428,7 @@ export const FormAdminGuru = (props) => {
                                                     }
                                                 >
 
-                                                    <option selected={idCity == '' ? false : true}>
+                                                    <option value={''} selected={idCity == '' ? false : true}>
                                                         {props.kota == undefined ? "Pilih Kota" : idCity != props.idKota ? "Pilih Kota" : props.kota}
                                                     </option>
                                                     {city.map((data, i) => {
@@ -466,7 +466,7 @@ export const FormAdminGuru = (props) => {
                                                         setIdKecamatan(event.currentTarget.value)
                                                     }}
                                                 >
-                                                    <option selected={idKecamatan == '' ? false : true}>
+                                                    <option value={''} selected={idKecamatan == '' ? false : true}>
                                                         {props.kecamatan == undefined ? "Pilih Kecamatan" : idKecamatan != props.idKec ? "Pilih Kecamatan" : props.kecamatan}
                                                     </option>
                                                     {kecamatan.map((data, i) => {
@@ -494,7 +494,7 @@ export const FormAdminGuru = (props) => {
                                                         setIdKelurahan(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option selected={idKelurahan == '' ? false : true}>
+                                                    <option value={''} selected={idKelurahan == '' ? false : true}>
                                                         {props.kelurahan == undefined ? "Pilih Kelurahan" : idKelurahan != props.idKel ? "Pilih Kelurahan" : props.kelurahan}
                                                     </option>
                                                     {kelurahan.map((data, i) => {

@@ -48,7 +48,7 @@ const GuruPertemuan = () => {
     const [isViewEdit, setIsViewEdit] = useState(false);
     const [isViewCreate, setIsViewCreate] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
-   
+
     const [selectedUser, setSelectedUser] = useState(null);
     const [refreshState, setRefreshState] = useState(false);
 
@@ -264,6 +264,7 @@ const GuruPertemuan = () => {
     const data = dataPertemuan.map((data, index) => {
         return {
             no: index + 1,
+            id: data.id,
             namaMateri: data.tittle,
             namaPertemuan: data.meeting_name,
             tanggalPertemuan: data.date,
@@ -312,7 +313,7 @@ const GuruPertemuan = () => {
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
-                                {grid == false ?
+                                {/* {grid == false ?
                                     <a>
                                         <AppstoreOutlined style={{ fontSize: '30px' }}
                                             onClick={() => setGrid(true)} />
@@ -320,7 +321,7 @@ const GuruPertemuan = () => {
                                     <a>
                                         <MenuOutlined style={{ fontSize: '30px' }}
                                             onClick={() => setGrid(false)} />
-                                    </a>}
+                                    </a>} */}
                             </div>
                         </Col>
                     </Row>
@@ -338,8 +339,8 @@ const GuruPertemuan = () => {
                                     Pilih Kelas
                                 </option>
                                 {getKelas?.map((data) => (
-                                        <option value={data.id}>{data.class_type} - {data.sub_class}</option>
-                                    ))}
+                                    <option value={data.id}>{data.class_type} - {data.sub_class}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -355,8 +356,8 @@ const GuruPertemuan = () => {
                                     Pilih Mata Pelajaran
                                 </option>
                                 {dataMapel?.map((data) => (
-                                        <option value={data.id}>{data.nama_mata}</option>
-                                    ))}
+                                    <option value={data.id}>{data.nama_mata}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -397,123 +398,6 @@ const GuruPertemuan = () => {
             </div>
         )
     }
-
-    const TambahMateri = () => {
-        return (
-            <div className="container px-3 py-4">
-                <div className="row">
-                    <div className="col-lg-12">
-                        <div className="middle">
-                            <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
-                                <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewPertemuan(true)} className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
-                                    <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
-                                        Tambah Data Pertemuan
-                                    </h4>
-                                </div>
-                                <div className="card-body p-lg-5 p-4 w-100 border-0 ">
-                                    <form id="mataPelajaran_form"
-                                        // onSubmit={createJadwalPelajaran}
-                                        method="POST">
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Nama Materi
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="materi"
-                                                        required
-                                                    >
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Nama Pertemuan
-                                                    </label>
-                                                    <input
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="materi"
-                                                        required
-                                                    >
-                                                    </input>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        <div className="row">
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Tanggal Pertemuan
-                                                    </label>
-                                                    <select
-                                                        className="form-control"
-                                                        aria-label="Default select example"
-                                                        name="pilih_mata_pelajaran"
-                                                        required
-                                                    >
-                                                        <option value="" selected disabled>
-                                                            Pilih Tanggal
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-lg-6 mb-3">
-                                                <div className="form-group">
-                                                    <label className="mont-font fw-600 font-xsss">
-                                                        Jam
-                                                    </label>
-                                                    <Select
-                                                        className="pt-1 pb-1"
-                                                        name="tanggal"
-                                                        size="large"
-                                                        mode="multiple"
-                                                        allowClear
-                                                        style={{ width: '100%', borderRadius: '0.25rem', color: '#495057', }}
-                                                        placeholder="Pilih Jam"
-                                                        onChange={handleChange}
-                                                    >
-                                                        {children}
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-lg-12">
-                                                <button
-                                                    className="ml-2 bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                                    type="submit"
-                                                >
-                                                    Simpan
-                                                </button>
-                                                <button
-                                                    onClick={() => setIsViewPertemuan(true)}
-
-                                                    className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block border-none"
-                                                >
-                                                    Batal
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
 
     const CreatePertemuan = (e) => {
         e.preventDefault();
@@ -576,6 +460,65 @@ const GuruPertemuan = () => {
         });
     }
 
+    const EditPertemuan = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        // const dateNow = new Date().toLocaleString()
+        console.log(data);
+
+        axios.post(url_by_institute, {
+            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_updatedata",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "x_academic_subjects_schedule_contents_meetingModel",
+                        "id": selectedUser.id,
+                        "tbl_coloumn": {
+                            "meeting_name": data.nama_pertemuan,
+                        }
+                    }
+                }
+            ]
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            console.log("Update :", response);
+            const valueRes = response.data.variables[2].value;
+            const valueResObj = JSON.parse(valueRes);
+            console.log(valueResObj);
+            if (valueResObj.message == "succes update data") {
+                setIsViewCreate(false)
+                setIsViewPertemuan(true)
+                setRefreshState(true)
+                pageLoad()
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Pertemuan berhasil diupdate.',
+                    placement: 'top'
+                });
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                });
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
     const viewCreatePertemuan = () => {
         setIsViewCreate(true)
         setIsViewPertemuan(false)
@@ -606,7 +549,6 @@ const GuruPertemuan = () => {
                 title="Tambah Data Pertemuan"
                 submit={CreatePertemuan}
                 isDisabled={false}
-            // GetIdJam={GetIdJam}
             />
         )
     }
@@ -616,8 +558,14 @@ const GuruPertemuan = () => {
             <FormCreatePertemuanTugas
                 setView={() => setIsViewPertemuan(true)}
                 title="Edit Data Pertemuan"
-                // submit={editGuru}
-                isDisabled={false}
+                submit={EditPertemuan}
+                isDisabled={true}
+                titleDisable={false}
+                disabledButton={false}
+                namaMateri={selectedUser.namaMateri}
+                namaPertemuan={selectedUser.namaPertemuan}
+                tanggalPertemuan={selectedUser.tanggalPertemuan}
+                jam={selectedUser.jam}
             />
         )
     }
@@ -627,9 +575,13 @@ const GuruPertemuan = () => {
             <FormCreatePertemuanTugas
                 setView={() => setIsViewPertemuan(true)}
                 title="View Data Pertemuan"
-                // submit={createGuru}
                 isDisabled={true}
-
+                titleDisable={true}
+                disabledButton={true}
+                namaMateri={selectedUser.namaMateri}
+                namaPertemuan={selectedUser.namaPertemuan}
+                tanggalPertemuan={selectedUser.tanggalPertemuan}
+                jam={selectedUser.jam}
             />
         )
     }

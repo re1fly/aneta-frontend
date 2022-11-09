@@ -92,6 +92,7 @@ function InputDataDeskripsiNilai() {
         const allDeskripsi = [];
         console.log(allDeskripsi);
         const Pengetahuan = [];
+        console.log(Pengetahuan);
         const Keterampilan = [];
 
         for (let i = 0; i < deskripsiPengetahuan.length; i++) {

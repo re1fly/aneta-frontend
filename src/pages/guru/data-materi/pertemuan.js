@@ -38,12 +38,14 @@ import { pageLoad } from '../../../components/misc/loadPage';
 const GuruPertemuan = () => {
     const [grid, setGrid] = useState(false);
     const [dataPertemuan, setDataPertemuan] = useState([])
+    console.log(dataPertemuan);
     const [isViewPertemuan, setIsViewPertemuan] = useState(true);
     const [isViewEdit, setIsViewEdit] = useState(false);
     const [isViewCreate, setIsViewCreate] = useState(false);
     const [isViewDetail, setIsViewDetail] = useState(false);
 
     const [selectedUser, setSelectedUser] = useState(null);
+    console.log(selectedUser);
     const [refreshState, setRefreshState] = useState(false);
 
     const [getKelas, setGetKelas] = useState(null);
@@ -249,6 +251,7 @@ const GuruPertemuan = () => {
     const data = dataPertemuan.map((data, index) => {
         return {
             no: index + 1,
+            id: data.id,
             namaMateri: data.tittle,
             namaPertemuan: data.meeting_name,
             tanggalPertemuan: data.date,
@@ -297,7 +300,7 @@ const GuruPertemuan = () => {
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
-                                {grid == false ?
+                                {/* {grid == false ?
                                     <a>
                                         <AppstoreOutlined style={{ fontSize: '30px' }}
                                             onClick={() => setGrid(true)} />
@@ -305,7 +308,7 @@ const GuruPertemuan = () => {
                                     <a>
                                         <MenuOutlined style={{ fontSize: '30px' }}
                                             onClick={() => setGrid(false)} />
-                                    </a>}
+                                    </a>} */}
                             </div>
                         </Col>
                     </Row>
@@ -393,10 +396,9 @@ const GuruPertemuan = () => {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        // const dateNow = new Date().toLocaleString()
+        console.log(data);
         const idJam = data.jam_pertemuan?.split(',')?.map(Number);
         console.log(idJam);
-        console.log(data);
 
         axios.post(url_by_institute, {
             "processDefinitionId": role_guru_create_data_pertemuan_materi,
@@ -448,6 +450,65 @@ const GuruPertemuan = () => {
         });
     }
 
+    const EditPertemuan = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        // const dateNow = new Date().toLocaleString()
+        console.log(data);
+
+        axios.post(url_by_institute, {
+            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_updatedata",
+                    "type": "json",
+                    "value": {
+                        "tbl_name": "x_academic_subjects_schedule_contents_meetingModel",
+                        "id": selectedUser.id,
+                        "tbl_coloumn": {
+                            "meeting_name": data.nama_pertemuan,
+                        }
+                    }
+                }
+            ]
+        },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            console.log("Update :", response);
+            const valueRes = response.data.variables[2].value;
+            const valueResObj = JSON.parse(valueRes);
+            console.log(valueResObj);
+            if (valueResObj.message == "succes update data") {
+                setIsViewCreate(false)
+                setIsViewPertemuan(true)
+                setRefreshState(true)
+                pageLoad()
+                notification.success({
+                    message: 'Sukses',
+                    description: 'Pertemuan berhasil diupdate.',
+                    placement: 'top'
+                });
+            } else {
+                notification.error({
+                    message: 'Error',
+                    description: 'Harap isi semua field',
+                    placement: 'top'
+                });
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
     const viewCreatePertemuan = () => {
         setIsViewCreate(true)
         setIsViewPertemuan(false)
@@ -478,7 +539,6 @@ const GuruPertemuan = () => {
                 title="Tambah Data Pertemuan"
                 submit={CreatePertemuan}
                 isDisabled={false}
-            // GetIdJam={GetIdJam}
             />
         )
     }
@@ -488,8 +548,14 @@ const GuruPertemuan = () => {
             <FormCreatePertemuanMateri
                 setView={() => setIsViewPertemuan(true)}
                 title="Edit Data Pertemuan"
-                // submit={editGuru}
-                isDisabled={false}
+                submit={EditPertemuan}
+                isDisabled={true}
+                titleDisable={false}
+                disabledButton={false}
+                namaMateri={selectedUser.namaMateri}
+                namaPertemuan={selectedUser.namaPertemuan}
+                tanggalPertemuan={selectedUser.tanggalPertemuan}
+                jam={selectedUser.jam}
             />
         )
     }
@@ -499,9 +565,13 @@ const GuruPertemuan = () => {
             <FormCreatePertemuanMateri
                 setView={() => setIsViewPertemuan(true)}
                 title="View Data Pertemuan"
-                // submit={createGuru}
                 isDisabled={true}
-
+                titleDisable={true}
+                disabledButton={true}
+                namaMateri={selectedUser.namaMateri}
+                namaPertemuan={selectedUser.namaPertemuan}
+                tanggalPertemuan={selectedUser.tanggalPertemuan}
+                jam={selectedUser.jam}
             />
         )
     }

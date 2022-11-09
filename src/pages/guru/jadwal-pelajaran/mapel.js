@@ -91,15 +91,6 @@ export default function GuruJadwalPelajaranMapel() {
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
                                         onSearch={_onSearch} style={{ width: '80%' }} />
-                                    {grid == false ?
-                                        <a>
-                                            <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
-                                                onClick={() => setGrid(true)} />
-                                        </a> :
-                                        <a>
-                                            <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
-                                                onClick={() => setGrid(false)} />
-                                        </a>}
                                 </div>
                             </div>
                         </Card>

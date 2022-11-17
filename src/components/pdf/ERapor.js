@@ -4,8 +4,6 @@ import "../../style/rapor.css"
 const ERapor = React.forwardRef((props, ref) => {
     const { data } = props;
 
-    console.log(JSON.stringify(data, null, 2));
-
     const [predicate, setPredicate] = useState('')
     const [predicateSocial, setPredicateSocial] = useState('')
 

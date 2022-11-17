@@ -139,7 +139,7 @@ export const FormCreateMateri = (props) => {
                                                     <option value="" selected disabled>
                                                         {props.subKelas == undefined ? "Pilih Sub Kelas" : props.subKelas}
                                                     </option>
-                                                    {subKelas.map((data, i) => {
+                                                    {subKelas?.map((data, i) => {
                                                         return (
                                                             <option value={data.id}
                                                             // selected={data.id != idCity ? false : true} key={i}

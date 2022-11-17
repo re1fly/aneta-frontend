@@ -70,3 +70,4 @@ export const role_siswa_update_status_tugas = sessionStorage.getItem('role_siswa
 export const role_siswa_get_materi = sessionStorage.getItem('role_siswa_get_materi');
 export const role_siswa_get_daftar_materi = sessionStorage.getItem('role_siswa_get_daftar_materi');
 export const role_siswa_get_nilai_materi = sessionStorage.getItem('role_siswa_get_nilai_materi');
+export const role_walikelas_update_eraport = sessionStorage.getItem('role_walikelas_update_eraport');

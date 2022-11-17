@@ -127,7 +127,6 @@ import DataPelajaranKelas from "./pages/admin/data-pelajaran/DataPelajaranKelas"
 import DataIntervalPredikat from "./pages/admin/data-pelajaran/DataIntervalPredikat";
 import PerencanaanNilai from "./pages/admin/penilaian/perencanaan-nilai";
 import NilaiPengetahuan from "./pages/admin/penilaian/perencanaan-nilai/NilaiPengetahuan";
-import JadwalPelajaranSiswa from "./pages/siswa/jadwal-pelajaran";
 import NilaiKeterampilan from "./pages/admin/penilaian/perencanaan-nilai/NilaiKeterampilan";
 import NilaiSpiritual from "./pages/admin/penilaian/perencanaan-nilai/NilaiSpiritual";
 import NilaiSosial from "./pages/admin/penilaian/perencanaan-nilai/NilaiSosial";
@@ -142,7 +141,6 @@ import JadwalPelajaranAdminSubKelas from "./pages/admin/jadwal-pelajaran/SubKela
 import DataEkstrakurikuler from "./pages/admin/ekstrakurikuler/DataEkstrakurikuler";
 import InputNilaiEkskul from "./pages/admin/ekstrakurikuler/InputNilaiEkskul";
 import InputDataDeskripsiSikap from "./pages/admin/penilaian/InputDataDeskripsiSikap";
-import JadwalPelajaranGuru from "./pages/guru/jadwal-pelajaran";
 import GuruCreateMateri from "./pages/guru/data-materi/createMateri";
 import MateriGuru from "./pages/guru/guruMateri";
 import GuruPenilaian from "./pages/guru/nilai-tugas/Penilaian";
@@ -194,6 +192,11 @@ import GuruNilaiTugas from "./pages/guru/nilai-tugas/tugas";
 import SiswaNilaiPelajaran from "./pages/siswa/tugas-nilai/mapel";
 import SiswaNilaiTugas from "./pages/siswa/tugas-nilai/Tugas";
 import SiswaPenilaian from "./pages/siswa/tugas-nilai/Nilai";
+import GuruSubmitRapor from "./pages/guru/E-Rapor/SubmitRapor";
+import GuruKalender from "./pages/guru/jadwal-pelajaran/kalender";
+import GuruListPertemuanKalender from "./pages/guru/jadwal-pelajaran/kalender/listPertemuan";
+import SiswaKalender from "./pages/siswa/jadwal-pelajaran/kalender";
+import SiswaListPertemuanKalender from "./pages/siswa/jadwal-pelajaran/kalender/listPertemuan";
 
 class Root extends Component {
   render() {
@@ -355,8 +358,13 @@ class Root extends Component {
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran`}
-              component={JadwalPelajaranGuru}
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender`}
+              component={GuruKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-list-pertemuan-kalender`}
+              component={GuruListPertemuanKalender}
             />
             <Route
               exact
@@ -518,6 +526,11 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/guru-kirim-penilaian`}
               component={GuruKirimPenilaian}
             />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-submit-rapor`}
+              component={GuruSubmitRapor}
+            />
 
             <Route
               exact
@@ -537,8 +550,13 @@ class Root extends Component {
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran`}
-              component={JadwalPelajaranSiswa}
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran-kalender`}
+              component={SiswaKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-list-pertemuan-kalender`}
+              component={SiswaListPertemuanKalender}
             />
             <Route
               exact

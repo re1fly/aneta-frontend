@@ -28,6 +28,7 @@ function KirimPenilaian() {
 
     const [getKirimPenilaian, setGetKirimPenilaian] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
+    const [paramsPage, setParamsPage] = useState("1");
     const [dataKirimNilai, setDataKirimNilai] = useState(null);
     const idHeader = dataKirimNilai?.id_header
 
@@ -114,7 +115,7 @@ function KirimPenilaian() {
                     }, {
                         "name": "page",
                         "type": "string",
-                        "value": "1"
+                        "value": paramsPage
                     }
                 ]
             }
@@ -122,7 +123,7 @@ function KirimPenilaian() {
             // console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value)
             setGetKirimPenilaian(dataRes?.data?.data)
-            // setBtnPagination(dataRes?.data?.links)
+            setBtnPagination(dataRes?.data?.links)
         })
 
     }, [academicYear])
@@ -198,13 +199,41 @@ function KirimPenilaian() {
         })
 
         return (
-            <Table className=""
-                columns={columns}
-                dataSource={data}
-                onChange={onChangeTable}
-                pagination={{ position: ['bottomCenter'] }}
-                rowClassName="bg-greylight text-grey-900"
-                scroll={{ x: 400 }} />
+
+            <>
+                <Table className=""
+                    columns={columns}
+                    dataSource={data}
+                    onChange={onChangeTable}
+                    pagination={false}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
+                <div className='text-center mt-4'>
+                    {btnPagination?.map((dataBtn) => {
+                        const labelBtn = dataBtn.label;
+                        const label = labelBtn
+                            .replace(/(&laquo\;)/g, "")
+                            .replace(/(&raquo\;)/g, "");
+                        let linkUrl = dataBtn.url;
+
+                        if (linkUrl != null) {
+                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                        }
+
+                        return (
+                            <Button
+                                className="btn btn-primary mr-2 font-xssss fw-600"
+                                disabled={linkUrl == null ? true : false}
+                                onClick={() => {
+                                    setParamsPage(linkUrl);
+                                }}
+                            >
+                                {label}
+                            </Button>
+                        );
+                    })}
+                </div>
+            </>
         )
     }
 
@@ -315,7 +344,7 @@ function KirimPenilaian() {
                 <PageHeader
                     className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                     onBack={() => window.history.back()}
-                    title="Kirim Penilaian"
+                    title="Status Penilaian"
                 />
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <div className="row">
@@ -572,15 +601,15 @@ function KirimPenilaian() {
                     kelas: data.kelas,
                     kkm: data.kkm,
                     // pengetahuan
-                    nilaiPengetahuan: dataKirimNilai?.siswa[index]?.data_nilai[0].given_value,
-                    predikatPengetahuan: dataKirimNilai?.siswa[index]?.data_nilai[0].predikat,
+                    nilaiPengetahuan: dataKirimNilai?.siswa[index]?.data_nilai[0]?.given_value,
+                    predikatPengetahuan: dataKirimNilai?.siswa[index]?.data_nilai[0]?.predikat,
                     // keterampilan
-                    nilaiKeterampilan: dataKirimNilai?.siswa[index]?.data_nilai[1].given_value,
-                    predikatKeterampilan: dataKirimNilai?.siswa[index]?.data_nilai[1].predikat,
+                    nilaiKeterampilan: dataKirimNilai?.siswa[index]?.data_nilai[1]?.given_value,
+                    predikatKeterampilan: dataKirimNilai?.siswa[index]?.data_nilai[1]?.predikat,
                     // spiritual
-                    predikatSpiritual: dataKirimNilai?.siswa[index]?.data_nilai[2].predikat,
+                    predikatSpiritual: dataKirimNilai?.siswa[index]?.data_nilai[2]?.predikat,
                     // sikap
-                    predikatSosial: dataKirimNilai?.siswa[index]?.data_nilai[2].predikat,
+                    predikatSosial: dataKirimNilai?.siswa[index]?.data_nilai[2]?.predikat,
                 })
             })
             return tmp;
@@ -591,7 +620,7 @@ function KirimPenilaian() {
                 <PageHeader
                     className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                     onBack={() => setIsViewKirimPenilaian(true)}
-                    title="Kirim Penilaian"
+                    title="Status Penilaian"
                 />
                 <GetMapelKelas valueFilter={(e) => _getDataKirimPenilaian(e)} />
                 {dataKirimNilai == null ?
@@ -649,7 +678,7 @@ function KirimPenilaian() {
                                 type="submit"
                                 onClick={onSubmit}
                             >
-                                Kirim
+                                Submit
                             </button>
                             <button
                                 className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"

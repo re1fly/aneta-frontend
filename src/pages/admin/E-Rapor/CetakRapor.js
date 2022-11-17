@@ -2,10 +2,8 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
 import React, { Fragment, useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { PageHeader, Select, Card, Row, Table, Input, Button, Modal } from "antd"
-import { getProcessId } from "../../../redux/Action";
 import ERapor from "../../../components/pdf/ERapor";
 import { useReactToPrint } from "react-to-print"
 import {
@@ -107,9 +105,9 @@ function CetakRapor() {
                 ]
             }, {
             headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
@@ -233,6 +231,7 @@ function CetakRapor() {
         {
             title: 'Kelas',
             align: "center",
+            // dataIndex: 'kelas',
             children: [
                 {
                     title: 'Semua',
@@ -242,30 +241,31 @@ function CetakRapor() {
                 },
             ]
         },
-        {
-            title: 'Cetak Rapor Tengah Semester',
-            align: "center",
-            children: [
-                {
-                    title: <Button className="rounded-xl" >
-                        <i className="feather-printer mr-2"></i>Cetak PDF
-                    </Button>,
-                    align: "center",
-                    dataIndex: 'raporTengahSemester',
-                    defaultSortOrder: 'ascend',
-                    render: (record) => {
-                        return (
-                            <Button className="rounded-xl" >
-                                <i className="feather-printer mr-2"></i>Cetak PDF
-                            </Button>
-                        )
-                    }
-                },
-            ],
-        },
+        // {
+        //     title: 'Cetak Rapor Tengah Semester',
+        //     align: "center",
+        //     children: [
+        //         {
+        //             title: <Button className="rounded-xl" >
+        //                 <i className="feather-printer mr-2"></i>Cetak PDF
+        //             </Button>,
+        //             align: "center",
+        //             dataIndex: 'raporTengahSemester',
+        //             defaultSortOrder: 'ascend',
+        //             render: (record) => {
+        //                 return (
+        //                     <Button className="rounded-xl" >
+        //                         <i className="feather-printer mr-2"></i>Cetak PDF
+        //                     </Button>
+        //                 )
+        //             }
+        //         },
+        //     ],
+        // },
         {
             title: 'Cetak Rapor Akhir Semester',
             align: "center",
+            // dataIndex: 'raporAkhirSemester',
             children: [
                 {
                     title: <Button className="rounded-xl" >
@@ -290,14 +290,16 @@ function CetakRapor() {
         },
         {
             title: 'Tanggal Cetak Terakhir',
-            children: [
-                {
-                    title: '',
-                    align: "center",
-                    dataIndex: 'tanggalCetakTerakhir',
-                    defaultSortOrder: 'ascend',
-                },
-            ]
+            dataIndex: 'tanggalCetakTerakhir',
+            align: "center",
+            // children: [
+            //     {
+            //         title: '',
+            //         align: "center",
+            //         dataIndex: 'tanggalCetakTerakhir',
+            //         defaultSortOrder: 'ascend',
+            //     },
+            // ]
         },
 
     ]

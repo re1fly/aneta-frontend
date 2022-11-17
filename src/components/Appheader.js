@@ -1,4 +1,4 @@
-    import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useHistory } from 'react-router-dom';
 import Darkbutton from '../components/Darkbutton';
 import { Collapse } from 'antd';
@@ -9,6 +9,7 @@ function Appheader() {
     const [isActive, setIsActive] = useState(false);
     // const [collapseShow, setCollapseShow] = useState("hidden");
     const [role, setRole] = useState("");
+    const [isWalikelas, setIsWalikelas] = useState("")
     let router = useHistory();
 
     const email = sessionStorage.getItem("user")
@@ -26,6 +27,7 @@ function Appheader() {
     useEffect(() => {
         const getStorageRole = localStorage.getItem("role");
         setRole(getStorageRole);
+        setIsWalikelas(localStorage.getItem("is_walikelas"))
     }, []);
 
     const _handleLogout = () => {
@@ -417,7 +419,7 @@ function Appheader() {
                                             className="nav-content-bttn open-font"
                                         >
                                             <i className="feather-send mr-3"></i>
-                                            <span>Kirim Penilaian</span>
+                                            <span>Status Penilaian</span>
                                         </NavLink>
                                     </li>
                                     <li className="has-droupdown nav-item">
@@ -428,7 +430,7 @@ function Appheader() {
                                         <ul className="submenu">
                                             <li className="nav-item">
                                                 <NavLink className="navi-link nav-content-bttn open-font" to="/admin-status-penilaian">
-                                                    <span>Status Penilaian</span>
+                                                    <span>Pratinjau Status Penilaian</span>
                                                 </NavLink>
                                             </li>
                                             <li className="nav-item">
@@ -525,16 +527,23 @@ function Appheader() {
                                             </li>
                                         </ul>
                                     </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
-                                            to="/guru-jadwal-pelajaran-kelas"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-calendar mr-3"></i>
+                                    <li className="has-droupdown nav-item">
+                                        <Link to="#" className="navi-link">
+                                            <i className="feather-calendar mr-2 droupdown-toggle"></i>
                                             <span>Jadwal Pelajaran</span>
-                                        </NavLink>
+                                        </Link>
+                                        <ul className="submenu">
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-jadwal-pelajaran-kelas">
+                                                    <span>Mata Pelajaran</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/guru-jadwal-pelajaran-kalender">
+                                                    <span>Kalender</span>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
                                     </li>
                                     <li className="has-droupdown nav-item">
                                         <Link to="#" className="navi-link">
@@ -592,6 +601,22 @@ function Appheader() {
                                             </li>
                                         </ul>
                                     </li>
+                                    { isWalikelas == "true" ?
+                                        <li className="has-droupdown nav-item">
+                                            <Link to="#" className="navi-link">
+                                                <i className="feather-book mr-2 droupdown-toggle"></i>
+                                                <span>E-Rapor</span>
+                                            </Link>
+                                            <ul className="submenu">
+                                                <li className="nav-item">
+                                                    <NavLink className="navi-link nav-content-bttn open-font"
+                                                             to="/guru-submit-rapor">
+                                                        <span>Publish Rapor</span>
+                                                    </NavLink>
+                                                </li>
+                                            </ul>
+                                        </li> : null
+                                    }
                                     {/* <li>
                                         <NavLink
                                             activeClassName="active"
@@ -671,6 +696,11 @@ function Appheader() {
                                             <li className="nav-item">
                                                 <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-jadwal-tugas">
                                                     <span>Tugas</span>
+                                                </NavLink>
+                                            </li>
+                                            <li className="nav-item">
+                                                <NavLink className="navi-link nav-content-bttn open-font" to="/siswa-jadwal-pelajaran-kalender">
+                                                    <span>Kalender</span>
                                                 </NavLink>
                                             </li>
                                         </ul>

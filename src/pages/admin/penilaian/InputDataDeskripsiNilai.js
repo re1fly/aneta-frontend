@@ -58,25 +58,16 @@ function InputDataDeskripsiNilai() {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            // console.log(dataRes.siswa);
+            console.log(dataRes);
             setDeskripsiNilai(dataRes?.siswa)
-
-            // if (dataRes[0].data.length >= 2) {
-            //     setDeskripsiNilai(dataRes?.siswa)
-            //     notification.success({
-            //         message: "Data Ditemukan",
-            //         description: "Data Dapat dilihat dalam table",
-            //         placement: 'top'
-            //     })
-            // } else {
-            //     setDeskripsiNilai(null)
-            //     notification.info({
-            //         message: "Not Found",
-            //         description: "Data tidak ditemukan",
-            //         placement: 'top'
-            //     })
-            // }
-
+            const resCode = dataRes.code
+            if (resCode === false) {
+                notification.error({
+                    message: "Warning",
+                    description: "Data nilai ada yang kosong, harap periksa kembali pada menu input data nilai",
+                    placement: 'top'
+                })
+            }
         }, [academic])
     }
 

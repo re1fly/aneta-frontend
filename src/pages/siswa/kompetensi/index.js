@@ -3,25 +3,13 @@ import axios from "axios";
 import {
     Menu,
     Card,
-    Row,
-    Col,
-    Button,
     Dropdown,
     message,
-    Select,
     Tag,
-    Space,
-    notification,
     Table,
-    Input,
     PageHeader
 } from "antd";
 import {
-    DownOutlined,
-    AppstoreOutlined,
-    MenuOutlined,
-    EditOutlined,
-    DeleteOutlined,
     EllipsisOutlined,
 } from "@ant-design/icons";
 import Search from "antd/lib/input/Search";
@@ -30,15 +18,46 @@ import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
 import {
-    get_data_pelajaran_by_tingkat,
-    get_kompetensi_dashboard,
-    get_where_no_join,
     url_by_institute
 } from "../../../api/reference";
 
 export default function KompetensiSiswa() {
-    const [grid, setGrid] = useState(false)
-    const academicYear = localStorage.getItem('academic_year')
+
+    const [grid, setGrid] = useState(false);
+    const [dataKompetensi, setDataKompetensi] = useState([]);
+
+    const academicYear = localStorage.getItem('academic_year');
+
+    useEffect(() => {
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": "rolegurugetkalenderdetail:1:1f6a41e1-655b-11ed-bb6a-a2fb3d782380",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_guru": '',
+                            "date": ''
+                        }
+                    }
+                ]
+            }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            console.log(dataRes);
+            const dataList = dataRes?.data
+            setDataKompetensi(dataList)
+            // const pagination = dataRes?.data?.links;
+            // setBtnPagination(pagination)
+        })
+    }, [])
 
     const _onSearch = value => console.log(value);
 
@@ -52,7 +71,6 @@ export default function KompetensiSiswa() {
             <Menu.Item key="2">Hapus</Menu.Item>
         </Menu>
     );
-
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -122,23 +140,23 @@ export default function KompetensiSiswa() {
             },
         ];
 
-        const channelList = [
-            {
-                no: "1",
-                namaKompetensi: "Kompetensi 1",
-                kelas: "1/A",
-                semester: "2020/2021 Semester 1",
-                kode: "1.1",
-                kompetensiDasar: "KD 1",
-                keterangan: "Keterangan 1",
-                status: ["true"],
-            },
-        ];
+        // const channelList = [
+        //     {
+        //         no: "1",
+        //         namaKompetensi: "Kompetensi 1",
+        //         kelas: "1/A",
+        //         semester: "2020/2021 Semester 1",
+        //         kode: "1.1",
+        //         kompetensiDasar: "KD 1",
+        //         keterangan: "Keterangan 1",
+        //         status: ["true"],
+        //     },
+        // ];
 
         return (
             <Table className=""
                 columns={columns}
-                dataSource={channelList}
+                // dataSource={channelList}
                 onChange={onChangeTable}
                 pagination={false}
                 rowClassName="bg-greylight text-grey-900"
@@ -263,7 +281,7 @@ export default function KompetensiSiswa() {
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
                                         onSearch={_onSearch} style={{ width: '80%' }} />
-                                    {grid == false ?
+                                    {/* {grid == false ?
                                         <a>
                                             <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
                                                 onClick={() => setGrid(true)} />
@@ -271,7 +289,7 @@ export default function KompetensiSiswa() {
                                         <a>
                                             <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
                                                 onClick={() => setGrid(false)} />
-                                        </a>}
+                                        </a>} */}
                                 </div>
                             </div>
                         </Card>
@@ -299,7 +317,7 @@ export default function KompetensiSiswa() {
                                 </div>
                             </div>
                         </div>
-                        {grid ? <CardDataKompetensi /> : <TabelKompetensi />}
+                        <TabelKompetensi />
                     </div>
                 </div>
             </div>

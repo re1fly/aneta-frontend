@@ -96,6 +96,7 @@ function Login() {
                     localStorage.setItem("token", dataLogin.token);
                     localStorage.setItem("user_id", dataLogin.user.id);
                     localStorage.setItem("institute", dataLogin.user.institute_id);
+                    localStorage.setItem("is_walikelas", dataLogin.is_walikelas);
                     sessionStorage.setItem("user", email)
                     sessionStorage.setItem("key", ciphertext)
 

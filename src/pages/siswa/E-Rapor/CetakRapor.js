@@ -24,7 +24,9 @@ function SiswaCetakRapor() {
     const [getErapor, setGetErapor] = useState([])
     const [selectClass, setSelectClass] = useState([]);
     const [selectAcademic, setSelectAcademic] = useState([]);
+    const [statusPublish, setStatusPublish] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null)
+    const [idPrint, setIdPrint] = useState(null)
 
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -35,14 +37,14 @@ function SiswaCetakRapor() {
     let componentRef = useRef();
 
     const handlePrint = useReactToPrint({
-        content: () => componentRef.current
+        content: () => componentRef.current,
     });
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
     }
 
-    useEffect(() => {
+    const getDataSiswa = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": "globaljoinsubfirst:1:884bddf2-2ccb-11ed-aacc-9a44706f3589",
@@ -57,7 +59,12 @@ function SiswaCetakRapor() {
                                 "users.name",
                                 "users.id as id_user",
                                 "r_class_type.class_type",
-                                "x_academic_class.sub_class"
+                                "x_academic_class.sub_class",
+                                "x_academic_year.academic_year",
+                                "x_academic_year.semester",
+                                "x_academic_students.last_print_rapor_date",
+                                "x_academic_students.id",
+                                "x_academic_students.eraport"
                             ],
 
                             "join": [
@@ -77,6 +84,12 @@ function SiswaCetakRapor() {
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_class",
                                     "foregenkey": "class"
+                                },
+                                {
+                                    "tbl_join": "x_academic_year",
+                                    "refkey": "id",
+                                    "tbl_join2": "x_academic_students",
+                                    "foregenkey": "academic_year_id"
                                 }
                             ],
                             "where": [
@@ -93,14 +106,21 @@ function SiswaCetakRapor() {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value)
-            setGetErapor(dataRes.data)
-            console.log(dataRes.data);
+            const data = dataRes.data
+            setGetErapor(data)
+            setIdPrint(data.id)
+            if(dataRes.code == false){
+                setStatusPublish(false)
+                console.log(statusPublish)
+            }else{
+                setStatusPublish(true)
+                console.log(statusPublish)
+            }
         }).catch(error => {
             console.log(error);
         })
 
-
-    }, [refreshState, academic])
+    }
 
     const getDataRapor = () => {
         axios.post(url_by_institute,
@@ -119,11 +139,43 @@ function SiswaCetakRapor() {
                 ]
             }
         ).then(function (response) {
-            console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[2]?.value)
             setDataRapor(dataRes?.data)
         })
     }
+
+    const cetakTanggal = () => {
+        const dateNow = new Date().toLocaleString();
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "global_updatedata",
+                        "type": "json",
+                        "value": {
+                            "tbl_name": "x_academic_studentsModel",
+                            "id": idPrint,
+                            "tbl_coloumn": {
+                                "last_print_rapor_date": dateNow
+                            }
+                        }
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            if(dataRes.status == "success"){
+                getDataSiswa()
+            }
+        })
+    }
+
+
+    useEffect(() => {
+        getDataSiswa()
+    }, [refreshState, academic])
 
     useEffect(() => {
         getDataRapor()
@@ -142,26 +194,28 @@ function SiswaCetakRapor() {
             dataIndex: "kelas"
         },
         {
-            title: 'Cetak Rapor Tengah Semester',
+            title: 'Semester',
             align: "center",
-            render: (record) => {
-                return (
-                    <Button className="rounded-xl" >
-                        <i className="feather-printer mr-2"></i>Cetak PDF
-                    </Button>
-                )
-            }
+            dataIndex: "semester"
+            // render: (record) => {
+            //     return (
+            //         <Button className="rounded-xl" >
+            //             <i className="feather-printer mr-2"></i>Cetak PDF
+            //         </Button>
+            //     )
+            // }
         },
         {
-            title: 'Cetak Rapor Akhir Semester',
+            title: 'Cetak Rapor',
             align: "center",
             render: (text, record) => {
                 return (
                     <Button className="rounded-xl" onClick={() => {
-                        console.log(record);
                         setModalVisible(true);
                         setSelectedUser(record);
-                    }} >
+                    }}
+                    disabled={statusPublish == true ? false : true}
+                    >
                         <i className="feather-printer mr-2"></i>Cetak PDF
                     </Button>
                 )
@@ -170,7 +224,7 @@ function SiswaCetakRapor() {
         },
         {
             title: 'Tanggal Cetak Terakhir',
-            dataIndex: 'tanggalCetakTerakhir',
+            dataIndex: 'tanggalCetak',
         },
 
     ]
@@ -180,7 +234,8 @@ function SiswaCetakRapor() {
             idSiswa: getErapor.id_user,
             namaSiswa: getErapor.name,
             kelas: `${getErapor.class_type} - ${getErapor.sub_class}`,
-            tanggalCetak: "12-10-2022"
+            tanggalCetak: getErapor.last_print_rapor_date,
+            semester: `${getErapor.academic_year} / ${getErapor.semester}`
         },
     ];
 
@@ -215,7 +270,11 @@ function SiswaCetakRapor() {
                                     top: 20,
                                 }}
                                 visible={modalVisible}
-                                onOk={handlePrint}
+                                onOk={() => {
+                                    // handlePrint
+                                    cetakTanggal()
+                                    handlePrint()
+                                }}
                                 onCancel={() => setModalVisible(false)}
                             >
                                 <ERapor ref={componentRef} data={dataRapor} />

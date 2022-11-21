@@ -10,7 +10,7 @@ import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
 import {LoadingOutlined, PlusOutlined, SearchOutlined, UserAddOutlined} from "@ant-design/icons";
 import {BASE_URL} from "../../api/Url";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import {RequiredTooltip} from "../../components/misc/RequiredTooltip";
 import {ReactSearchAutocomplete} from "react-search-autocomplete";
 import {create_institute, dashboard_admin} from "../../api/reference";
@@ -60,6 +60,7 @@ function BerandaAdmin() {
     const [dataNpsn, setDataNpsn] = useState({})
     const [dataNpsnSearch, setDataNpsnSearch] = useState([])
     console.log(dataNpsnSearch)
+    let router = useHistory();
 
 
     useEffect(() => {
@@ -78,6 +79,7 @@ function BerandaAdmin() {
         } else {
             setVisible(false);
             //getacademic
+            console.log('institute: ',institute)
             axios.post(BASE_URL, {
                     "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
                     "returnVariables": true,
@@ -120,19 +122,26 @@ function BerandaAdmin() {
             ).then(function (response) {
                 const resData = response.data.variables[2].value;
                 const academic = JSON.parse(resData);
+                const isVerification = localStorage.getItem('is_verification')
+                console.log('isVerif',isVerification)
+                console.log('insst',institute)
                 if (academic.status == false) {
                     const btn = (
                         <Button href='/admin-list-tahun-akademik' type="primary" shape="round" size="middle">
                             Disini
                         </Button>
                     );
-                    notification.info({
-                        message: 'Warning !',
-                        description: 'Mohon isi tahun akademik terlebih dahulu dengan klik button disini',
-                        btn,
-                        duration: null,
-                        placement: 'top'
-                    });
+                    if(isVerification == 'false' && institute != null){
+                           router.push("/not-verification");
+                    }else{
+                        notification.info({
+                            message: 'Warning !',
+                            description: 'Mohon isi tahun akademik terlebih dahulu dengan klik button disini',
+                            btn,
+                            duration: null,
+                            placement: 'top'
+                        });
+                    }
                 } else {
                     localStorage.setItem('academic_year', academic[0].id);
                     localStorage.setItem('year', academic[0].academic_year);
@@ -226,7 +235,7 @@ function BerandaAdmin() {
         });
     }, [academicYear])
 
-    const getDataNpsn = () => {
+   /* const getDataNpsn = () => {
         const npsn = document.querySelector('input[name="npsn_institute"]').value
         axios.post(BASE_URL, {
                 "processDefinitionId": "getwherenojoinfirst:1:84d5c713-2cc7-11ed-aacc-9a44706f3589",
@@ -286,7 +295,7 @@ function BerandaAdmin() {
                 })
             }
         });
-    }
+    }*/
 
     const PicForm = () => {
         return (
@@ -539,7 +548,7 @@ function BerandaAdmin() {
         )
             .then(function (response) {
                 const message = response.data.variables[8].value;
-                console.log(response)
+                console.log('create_isntitute',response)
                 if (response.data.variables[6].value == 422) {
                     notification.error({
                         message: "Error",
@@ -547,7 +556,7 @@ function BerandaAdmin() {
                         placement: 'top'
                     })
                 } else if (response.data.variables[6].value == 200) {
-                    localStorage.setItem('institute', response.data.variables[10].value)
+                    localStorage.setItem('institute', response.data.variables[9].value)
                     setVisible(false)
                     window.location.reload();
                 }

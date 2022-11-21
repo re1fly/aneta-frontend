@@ -306,9 +306,6 @@ function GuruSubmitRapor() {
 
     useEffect(() => {
         _selectTingkatKelas()
-    }, []);
-
-    useEffect(() => {
         _getSiswaFirst()
     }, []);
 

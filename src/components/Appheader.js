@@ -359,17 +359,6 @@ function Appheader() {
                                     <li>
                                         <NavLink
                                             activeClassName="active"
-                                            to="/admin-capaian-penilaian"
-                                            data-tab="archived"
-                                            className="nav-content-bttn open-font"
-                                        >
-                                            <i className="feather-trending-up mr-3"></i>
-                                            <span>Capaian Penilaian</span>
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
-                                            activeClassName="active"
                                             to="/admin-perencanaan-nilai"
                                             data-tab="archived"
                                             className="nav-content-bttn open-font"
@@ -387,6 +376,17 @@ function Appheader() {
                                         >
                                             <i className="feather-database mr-3"></i>
                                             <span>Input Data Nilai</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            activeClassName="active"
+                                            to="/admin-capaian-penilaian"
+                                            data-tab="archived"
+                                            className="nav-content-bttn open-font"
+                                        >
+                                            <i className="feather-trending-up mr-3"></i>
+                                            <span>Capaian Penilaian</span>
                                         </NavLink>
                                     </li>
                                     <li>

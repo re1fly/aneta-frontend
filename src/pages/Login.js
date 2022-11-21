@@ -141,12 +141,14 @@ function Login() {
                         .then((res) => {
                             const response = JSON.parse(res?.data?.variables[2]?.value);
                             const dataRes = response.data;
-                            console.log(res)
-                            localStorage.setItem("url", dataRes.endpoint);
-                            localStorage.setItem("school", dataRes.name);
+                            if(dataRes != null){
+                                localStorage.setItem("url", dataRes.endpoint);
+                                localStorage.setItem("school", dataRes.name);
+                            }
 
                             if (dataLogin.user.user_role_id === 1) {
                                 localStorage.setItem("role", "admin");
+                                localStorage.setItem("is_verification", dataLogin.is_apiman_verif)
                                 router.push("/admin-beranda");
                             } else if (dataLogin.user.user_role_id === 2) {
                                 document.getElementById("form_wp").submit();

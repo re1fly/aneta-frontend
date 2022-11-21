@@ -81,7 +81,7 @@ import Homefive from "./pages/Homefive";
 import Homesix from "./pages/Homesix";
 import Homefour from "./pages/Homefour";
 
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import {BrowserRouter, Switch, Route, Redirect} from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
 
 // Role Admin
@@ -197,6 +197,7 @@ import GuruKalender from "./pages/guru/jadwal-pelajaran/kalender";
 import GuruListPertemuanKalender from "./pages/guru/jadwal-pelajaran/kalender/listPertemuan";
 import SiswaKalender from "./pages/siswa/jadwal-pelajaran/kalender";
 import SiswaListPertemuanKalender from "./pages/siswa/jadwal-pelajaran/kalender/listPertemuan";
+import Verification from "./pages/Verification";
 
 class Root extends Component {
   render() {
@@ -208,6 +209,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/`}
               component={Homefour}
+            />
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/not-verification`}
+                component={Verification}
             />
             <Route
               exact
@@ -1059,6 +1065,7 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/home-2`}
               component={Hometwo}
             />
+            <Redirect to="/notfound" />
           </Switch>
         </BrowserRouter>
       </Provider>

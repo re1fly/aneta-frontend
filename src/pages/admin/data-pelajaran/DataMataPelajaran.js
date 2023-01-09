@@ -287,7 +287,7 @@ export default function DataMataPelajaranAdmin() {
                 kode: pelajaran.code,
                 tag2: '',
                 tag3: '',
-                kelompok: pelajaran.kel_id,
+                kelompok: pelajaran.kelompok,
                 noUrutRapor: pelajaran.urut_lapor,
                 status: [pelajaran.status],
             }
@@ -313,7 +313,7 @@ export default function DataMataPelajaranAdmin() {
               >
               <i className="ti-more text-grey-500 font-xs"></i>
               </a> */}
-                                <a
+                                {/* <a
                                     href=""
                                     className="btn-round-xxxl rounded-lg bg-lightblue ml-auto mr-auto mt-4"
                                 >
@@ -322,7 +322,7 @@ export default function DataMataPelajaranAdmin() {
                                         alt="icon"
                                         className="p-1 w-100"
                                     />
-                                </a>
+                                </a> */}
                                 <h4 className="fw-700 font-xs mt-4">{value.namaPelajaran}</h4>
                                 <div className="clearfix"></div>
                                 {value.kode ? (
@@ -766,7 +766,7 @@ export default function DataMataPelajaranAdmin() {
                         "urut_lapor": data.noUrut_rapor,
                         "kel_id": data.kelompok,
                         "status": data.status,
-                        "jumlah_pertemuan": data.jumlah_pertemuan
+                        "jumlah_pertemuan": 0
                     }
                 },
                 {

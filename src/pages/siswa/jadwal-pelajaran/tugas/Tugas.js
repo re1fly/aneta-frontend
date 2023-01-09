@@ -6,14 +6,15 @@ import Appheader from "../../../../components/Appheader";
 
 import axios from "axios";
 import { role_siswa_get_materi, url_by_institute } from "../../../../api/reference";
+import { PageHeader } from 'antd';
 
 function SiswaJadwalTugas() {
     const [getTugas, setGetTugas] = useState([]);
 
     const user = localStorage.getItem('user_name');
     const userId = localStorage.getItem('user_id');
-    const institute = localStorage.getItem('institute')
-    const academicId = localStorage.getItem('academic_id')
+    const institute = localStorage.getItem('institute');
+    const academicId = localStorage.getItem('academic_id');
 
 
     useEffect(() => {
@@ -39,11 +40,9 @@ function SiswaJadwalTugas() {
                 }
             }
         ).then(function (response) {
-            console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetTugas(dataRes?.data);
         })
-
 
     }, [academicId, userId]);
 
@@ -60,8 +59,8 @@ function SiswaJadwalTugas() {
     })
 
     let history = useHistory();
-    const handleRouter = (id) => {
-        history.push(`/siswa-data-tugas-${id}`)
+    const handleRouter = (id, mapel) => {
+        history.push(`/siswa-data-tugas-${id}-${mapel}`)
     }
 
     return (
@@ -73,28 +72,17 @@ function SiswaJadwalTugas() {
                     <div className="container px-3 py-4">
                         <div className="row mb-3">
                             <div className="col-lg-12">
-                                {/* <div className="d-flex alignt-items-center justify-content-between mb-4">
-                                    <div className="strong">
-                                        <h5 className='font-xsss pt-1 mb-0'>{currentDate} WIB</h5>
-                                    </div>
-                                    <div className="d-flex align-items-center  pl-4 gap-1 pr-8">
-                                        <h5 className='mb-0 mt-1'>
-                                            <i className="feather-calendar mr-2"></i>
-                                        </h5>
-                                        <Button className="mr-1 px-1" style={{ height: '25px' }}>
-                                            <i className='feather-chevron-left'></i>
-                                        </Button>
-                                        <Button className=" shadow-md px-1" style={{ height: '25px' }}>
-                                            <i className='feather-chevron-right'></i>
-                                        </Button>
-                                    </div>
-                                </div> */}
-                                <div className=''>
+                                <PageHeader
+                                    className="site-page-header card bg-lightblue text-grey-900 fw-700 "
+                                    onBack={() => window.history.back()}
+                                    title="Jadwal Pelajaran / Tugas"
+                                />
+                                <div className='mt-4'>
                                     <div className="row">
                                         {data?.map((value, index) => (
                                             <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                                                 <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center"
-                                                    onClick={() => handleRouter(value.idMapel)}>
+                                                    onClick={() => handleRouter(value.idMapel, value.mata_pelajaran)}>
                                                     <span
                                                         className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
                                                         Online

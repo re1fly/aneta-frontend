@@ -37,7 +37,10 @@ const SiswaPertemuanMateri = () => {
     const academicId = localStorage.getItem('academic_id')
 
     const params = useParams()
-    const idMateri = params.id
+    const path = params.id.split("-")
+    const idMateri = path[0]
+    const mapel = path[1]
+    const materi = path[2]
 
     useEffect(() => {
         axios.post(url_by_institute, {
@@ -171,7 +174,7 @@ const SiswaPertemuanMateri = () => {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Pertemuan Materi"
+                            title={`Jadwal Pelajaran / Materi / ${mapel} / ${materi}`}
                         />
                     </div>
                 </div>

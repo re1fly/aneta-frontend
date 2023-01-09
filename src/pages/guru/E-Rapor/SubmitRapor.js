@@ -21,15 +21,10 @@ import {BASE_URL} from "../../../api/Url";
 function GuruSubmitRapor() {
 
     const [submitRapor, setSubmitRapor] = useState(false)
-
-    const [refreshState, setRefreshState] = useState(false)
-    const [selectedUser, setSelectedUser] = useState(null)
     const [tingkatKelas, setTingkatKelas] = useState([])
     const [selectedKelas, setSelectedKelas] = useState(null)
     const [listSiswa, setListSiswa] = useState([])
     const [selectedSiswa, setSelectedSiswa] = useState([])
-    const institute = localStorage.getItem('institute');
-    const academic = localStorage.getItem('academic_id');
     const userId = localStorage.getItem('user_id');
     const lastClass = localStorage.getItem('kelas');
 
@@ -319,6 +314,8 @@ function GuruSubmitRapor() {
         if(submitRapor == false){
             let checkedV = [...document.querySelectorAll("#checkbox")].map(e => e.name)
             setSelectedSiswa(checkedV)
+        }else{
+            setSelectedSiswa([])
         }
 
     }

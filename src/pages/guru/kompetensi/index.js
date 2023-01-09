@@ -38,6 +38,7 @@ import {
     get_data_pelajaran_by_tingkat,
     get_kompetensi_dashboard,
     get_where_no_join, global_delete_record, insert_kompetensi,
+    role_guru_get_matpel,
     url_by_institute
 } from "../../../api/reference";
 
@@ -112,7 +113,7 @@ export default function KompetensiGuru() {
             .post(
                 url_by_institute,
                 {
-                    "processDefinitionId": "rolegurugetmatpel:1:0328ed1e-4a0c-11ed-8f22-927b5be84510",
+                    "processDefinitionId": role_guru_get_matpel,
                     "returnVariables": true,
                     "variables": [
                         {

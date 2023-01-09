@@ -63,6 +63,7 @@ export default function DataMataPelajaranAdmin() {
     const [academicYears, setAcademicYears] = useState([]);
 
     const [getKkmPelajaran, setGetKkmPelajaran] = useState([])
+    console.log(getKkmPelajaran);
     const [getPelajaran, setGetPelajaran] = useState([]);
     const [tingkatKelas, setTingkatKelas] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
@@ -376,7 +377,7 @@ export default function DataMataPelajaranAdmin() {
             return {
                 imageUrl: 'user.png',
                 namaPelajaran: kkm.nama_mata,
-                ta_semester: '_',
+                ta_semester: `${kkm.academic_year} / ${kkm.semester}`,
                 tag2: '',
                 tag3: '',
                 tingkatKelas: kkm.tingkat,

@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useEffect} from "react"
+import React, { Fragment, useState, useEffect } from "react"
 import {
     Menu,
     Card,
@@ -13,13 +13,13 @@ import {
     MenuOutlined,
 } from "@ant-design/icons";
 
-import {Link, useHistory} from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import axios from "axios";
 import Search from "antd/es/input/Search";
 import Adminfooter from '../../../components/Adminfooter';
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
-import {get_jadwal_pelajaran_awal, url_by_institute} from "../../../api/reference";
+import { get_jadwal_pelajaran_awal, url_by_institute } from "../../../api/reference";
 
 export default function JadwalPelajaranAdmin() {
     const [grid, setGrid] = useState(false)
@@ -44,11 +44,11 @@ export default function JadwalPelajaranAdmin() {
                     }
                 ]
             }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
+        }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const kelas = dataRes?.data
@@ -64,9 +64,9 @@ export default function JadwalPelajaranAdmin() {
     })
 
     let history = useHistory();
-    const handleSubClass = (id) => {
+    const handleSubClass = (id, kelas) => {
         console.log(id);
-        history.push(`/admin-jadwal-pelajaran-sub-kelas-${id}`)
+        history.push(`/admin-jadwal-pelajaran-sub-kelas-${id}-${kelas}`)
     }
 
     const ViewPelajaran = () => {
@@ -85,15 +85,15 @@ export default function JadwalPelajaranAdmin() {
                                 </div>
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                            onSearch={_onSearch} style={{width: '80%'}}/>
+                                        onSearch={_onSearch} style={{ width: '80%' }} />
                                     {grid == false ?
                                         <a>
-                                            <AppstoreOutlined style={{fontSize: '2em', lineHeight: 1}}
-                                                              onClick={() => setGrid(true)}/>
+                                            <AppstoreOutlined style={{ fontSize: '2em', lineHeight: 1 }}
+                                                onClick={() => setGrid(true)} />
                                         </a> :
                                         <a>
-                                            <MenuOutlined style={{fontSize: '2em', lineHeight: 1}}
-                                                          onClick={() => setGrid(false)}/>
+                                            <MenuOutlined style={{ fontSize: '2em', lineHeight: 1 }}
+                                                onClick={() => setGrid(false)} />
                                         </a>}
                                 </div>
                             </div>
@@ -105,19 +105,11 @@ export default function JadwalPelajaranAdmin() {
 
                                     return (
                                         <div className="col-xl-3 col-lg-4 col-md-4">
-                                            {/* <Link
-                        onClick={() => {
-                          dispatch({ type: 'SET_CLASS', value: value })
-                        }
-                        }
-                        to={{ pathname: `/admin-jadwal-pelajaran-sub-kelas` }}
-                      > */}
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleSubClass(value.idClass)}>
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">Kelas {value.kelas}</h2>
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleSubClass(value.idClass, value.kelas)}>
+                                                    <h2 className="font-weight-bold mb-0">Kelas {value.kelas}</h2>
                                             </div>
-                                            {/* </Link> */}
                                         </div>
                                     )
                                 })}
@@ -132,11 +124,11 @@ export default function JadwalPelajaranAdmin() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader/>
+                <Navheader />
                 <div className="main-content">
-                    <Appheader/>
-                    <ViewPelajaran/>
-                    <Adminfooter/>
+                    <Appheader />
+                    <ViewPelajaran />
+                    <Adminfooter />
                 </div>
             </div>
         </Fragment>

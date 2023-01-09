@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux";
+import { PathMapelNilaiGuru } from "../../../redux/Action";
 import {
     Card,
     PageHeader
@@ -27,6 +29,11 @@ export default function GuruNilaiMapel() {
     const paramsId = params?.id?.split('-');
     const idTingkat = paramsId[1]
     const idSubClass = paramsId[0]
+
+    const dispatch = useDispatch();
+    const PathNilaiGuru = useSelector((state) => state.dataPathNilaiGuru)
+    const kelas = PathNilaiGuru.kelas
+    const subKelas = PathNilaiGuru.subKelas
 
     const _onSearch = value => console.log(value);
 
@@ -69,8 +76,9 @@ export default function GuruNilaiMapel() {
     })
 
     let history = useHistory();
-    const handleSubClass = (id) => {
+    const handleSubClass = (id, mapel) => {
         console.log(id);
+        dispatch(PathMapelNilaiGuru(mapel))
         history.push(`/guru-nilai-tugas-${id}`)
     }
 
@@ -82,7 +90,7 @@ export default function GuruNilaiMapel() {
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Mata Pelajaran"
+                            title={`Data Nilai / Kelas ${kelas} / ${subKelas}`}
                         />
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
@@ -103,10 +111,10 @@ export default function GuruNilaiMapel() {
 
                                         <div className="col-xl-3 col-lg-4 col-md-4">
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleSubClass(value.idMapel)}
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleSubClass(value.idMapel, value.mapel)}
                                             >
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.mapel}</h2>
+                                                <h2 className="ml-auto mr-auto font-weight-bold mb-0">{value.mapel}</h2>
                                             </div>
                                         </div>
                                     )

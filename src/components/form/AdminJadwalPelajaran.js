@@ -19,7 +19,7 @@ export const FormAdminJadwalPelajaran = (props) => {
 
     const dataDateTime = useSelector(state => state?.dataDateTime);
     const getDateTime = dataDateTime.DateTime
-    console.log(JSON.stringify(getDateTime, null, 2));
+    // console.log(JSON.stringify(getDateTime, null, 2));
 
     const format = 'HH:mm:ss';
     const dateFormat = 'YYYY-MM-DD';

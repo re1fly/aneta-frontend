@@ -7,6 +7,7 @@ import Appheader from "../../../../components/Appheader";
 
 import axios from "axios";
 import { role_siswa_get_materi, url_by_institute } from "../../../../api/reference";
+import { PageHeader } from 'antd';
 
 function SiswaJadwalMateri() {
     const [getMateri, setGetMateri] = useState([]);
@@ -60,8 +61,8 @@ function SiswaJadwalMateri() {
     })
 
     let history = useHistory();
-    const handleRouter = (id) => {
-        history.push(`/siswa-data-materi-${id}`)
+    const handleRouter = (id, mapel) => {
+        history.push(`/siswa-data-materi-${id}-${mapel}`)
     }
 
     return (
@@ -73,12 +74,17 @@ function SiswaJadwalMateri() {
                     <div className="container px-3 py-4">
                         <div className="row mb-3">
                             <div className="col-lg-12">
-                                <div className=''>
+                                <PageHeader
+                                    className="site-page-header card bg-lightblue text-grey-900 fw-700 "
+                                    onBack={() => window.history.back()}
+                                    title="Jadwal Pelajaran / Materi"
+                                />
+                                <div className='mt-4'>
                                     <div className="row">
                                         {data?.map((value, index) => (
                                             <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                                                 <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center"
-                                                    onClick={() => handleRouter(value.idMapel)}>
+                                                    onClick={() => handleRouter(value.idMapel, value.mata_pelarajan)}>
                                                     <span
                                                         className="badge badge-success rounded-xl position-absolute px-2 py-1 left-0 ml-4 top-0 mt-3">
                                                         Online

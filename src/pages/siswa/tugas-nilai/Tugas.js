@@ -17,15 +17,17 @@ import Appheader from '../../../components/Appheader';
 import { role_siswa_get_nilai_materi, url_by_institute } from "../../../api/reference";
 
 export default function SiswaNilaiTugas() {
-    const [grid, setGrid] = useState(false)
+    const [grid, setGrid] = useState(false);
     const [getMateri, setGetMateri] = useState([]);
 
     const userId = localStorage.getItem('user_id');
-    const academicYear = localStorage.getItem('academic_id')
-    const instituteId = localStorage.getItem('institute')
+    const academicYear = localStorage.getItem('academic_id');
+    const instituteId = localStorage.getItem('institute');
 
-    const params = useParams()
-    const idMapel = params.id
+    const params = useParams();
+    const path = params.id.split("-");
+    const idMapel = path[0];
+    const mapel = path[1];
 
     const _onSearch = value => console.log(value);
 
@@ -59,9 +61,8 @@ export default function SiswaNilaiTugas() {
     }, [academicYear])
 
     let history = useHistory();
-    const handleRouter = (id) => {
-        console.log(id);
-        history.push(`/siswa-penilaian-${id}`)
+    const handleRouter = (id, mapel, tugas) => {
+        history.push(`/siswa-penilaian-${id}-${mapel}-${tugas}`)
     }
 
     const ViewPelajaran = () => {
@@ -72,7 +73,7 @@ export default function SiswaNilaiTugas() {
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Tugas"
+                            title={`Data nilai / ${mapel}`}
                         />
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
@@ -91,10 +92,10 @@ export default function SiswaNilaiTugas() {
                                     return (
                                         <div className="col-xl-3 col-lg-4 col-md-4">
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleRouter(value.id)}
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleRouter(value.id, mapel, value.tittle)}
                                             >
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.tittle}</h2>
+                                                <h2 className="ml-auto mr-auto font-weight-bold mb-0">{value.tittle}</h2>
                                             </div>
                                         </div>
                                     )

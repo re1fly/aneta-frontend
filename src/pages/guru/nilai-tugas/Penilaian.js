@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from "react-router-dom";
 import Adminfooter from "../../../components/Adminfooter";
 import {
@@ -34,7 +35,7 @@ import axios from 'axios';
 import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
-import { url_by_institute } from '../../../api/reference';
+import { export_tugas, url_by_institute } from '../../../api/reference';
 import { FormGuruNilaiTugas } from '../../../components/form/GuruNilaiTugas';
 
 function GuruPenilaian() {
@@ -54,9 +55,12 @@ function GuruPenilaian() {
     const paramsId = params?.id?.split('-');
     const idContent = paramsId[0]
     const uploadTugas = paramsId[1]
-    // console.log(uploadTugas);
 
-    const test = true
+    const PathNilaiGuru = useSelector((state) => state.dataPathNilaiGuru)
+    const kelas = PathNilaiGuru.kelas
+    const subKelas = PathNilaiGuru.subKelas
+    const mapel = PathNilaiGuru.mapel
+    const tugas = PathNilaiGuru.tugas
 
     const { Option } = Select;
     const children = [];
@@ -91,7 +95,6 @@ function GuruPenilaian() {
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes);
             const nilai = dataRes?.data
             setGetNilai(nilai);
         })
@@ -135,6 +138,41 @@ function GuruPenilaian() {
             const link = document.createElement('a');
             link.href = url;
             link.setAttribute('download', `${record?.namaTugas} ${record?.namaSiswa}.${resData?.data?.extension}`); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        })
+    }
+
+    const _exportDataExcel = () => {
+        axios.post(url_by_institute, {
+        "processDefinitionId": export_tugas,
+        "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+
+                        "id_content": idContent
+                    }
+                }
+            ]
+        }).then(response => {
+            const resData = JSON.parse(response.data.variables[2].value)
+            // console.log(resData);
+            const dataExcel = resData.data
+            const byteCharacters = atob(dataExcel);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'DataNilai.xlsx'); //or any other extension
             document.body.appendChild(link);
             link.click();
         })
@@ -324,20 +362,25 @@ function GuruPenilaian() {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Penilaian Tugas"
+                            title={`Data Nilai / Kelas ${kelas} / ${subKelas} / ${mapel} / ${tugas}`}
                         />
                     </div>
                 </div>
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <Row>
-                        <Col span={12}>
+                        <Col span={8}>
+                            <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
+                                shape="round" size='middle'
+                                onClick={() => _exportDataExcel()}>
+                                Download Nilai
+                            </Button>
                         </Col>
-                        <Col span={12}>
+                        {/* <Col span={4}>
                             <div className="float-right">
                                 <Search className="mr-5" placeholder="Cari kata kunci" allowClear
                                     onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
                             </div>
-                        </Col>
+                        </Col> */}
                     </Row>
                 </Card>
 
@@ -378,7 +421,7 @@ function GuruPenilaian() {
                 </div>
 
                 <Table className=""
-                    columns={ uploadTugas == "true" ? columnsUpload : columns }
+                    columns={uploadTugas == "true" ? columnsUpload : columns}
                     dataSource={data}
                     onChange={onChangeTable}
                     pagination={false}

@@ -14,6 +14,7 @@ import {Link, useHistory} from "react-router-dom";
 import {RequiredTooltip} from "../../components/misc/RequiredTooltip";
 import {ReactSearchAutocomplete} from "react-search-autocomplete";
 import {create_institute, dashboard_admin} from "../../api/reference";
+import {FormDaerah} from "../../components/form/FormDaerah.js";
 
 const lineChart = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',],
@@ -789,107 +790,14 @@ function BerandaAdmin() {
                         </div>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-lg-6 mb-3">
-                        <div className="form-group">
-                            <label className="mont-font fw-600 font-xsss">
-                                Provinsi <RequiredTooltip />
-                            </label>
-                            <select
-                                className="form-control"
-                                aria-label="Default select example"
-                                name="state_institute"
-                                required
-                            >
-                                <option value="11" selected disabled hidden>
-                                    ACEH
-                                </option>
-                            </select>
-                            {/*<input*/}
-                            {/*    name="state_institute"*/}
-                            {/*    type="text"*/}
-                            {/*    className="form-control"*/}
-                            {/*    defaultValue="11"*/}
-                            {/*    required*/}
-                            {/*/>*/}
-                        </div>
-                    </div>
-
-                    <div className="col-lg-6 mb-3">
-                        <div className="form-group">
-                            <label className="mont-font fw-600 font-xsss">
-                                Kota / Kabupaten <RequiredTooltip />
-                            </label>
-                            <select
-                                className="form-control"
-                                aria-label="Default select example"
-                                name="city_institute"
-                                required
-                            >
-                                <option value="1101" selected disabled hidden>
-                                    KABUPATEN SIMEULUE
-                                </option>
-                            </select>
-                            {/*<input*/}
-                            {/*    type="text"*/}
-                            {/*    name="city_institute"*/}
-                            {/*    className="form-control"*/}
-                            {/*    defaultValue="1101"*/}
-                            {/*    required*/}
-                            {/*/>*/}
-                        </div>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-6 mb-3">
-                        <div className="form-group">
-                            <label className="mont-font fw-600 font-xsss">
-                                Kecamatan <RequiredTooltip />
-                            </label>
-                            <select
-                                className="form-control"
-                                aria-label="Default select example"
-                                name="district_institute"
-                                required
-                            >
-                                <option value="1101010" selected disabled hidden>
-                                    TEUPAH SELATAN
-                                </option>
-                            </select>
-                            {/*<input*/}
-                            {/*    type="text"*/}
-                            {/*    name="district_institute"*/}
-                            {/*    className="form-control"*/}
-                            {/*    defaultValue="1101010"*/}
-                            {/*    required*/}
-                            {/*/>*/}
-                        </div>
-                    </div>
-                    <div className="col-lg-6 mb-3">
-                        <div className="form-group">
-                            <label className="mont-font fw-600 font-xsss">
-                                Kelurahan <RequiredTooltip />
-                            </label>
-                            <select
-                                className="form-control"
-                                aria-label="Default select example"
-                                name="subdistrict_institute"
-                                required
-                            >
-                                <option value="1101010001" selected disabled hidden>
-                                    LATIUNG
-                                </option>
-                            </select>
-                            {/*<input*/}
-                            {/*    type="text"*/}
-                            {/*    name="subdistrict_institute"*/}
-                            {/*    className="form-control"*/}
-                            {/*    defaultValue="1101010001"*/}
-                            {/*    required*/}
-                            {/*/>*/}
-                        </div>
-                    </div>
-                </div>
+                <FormDaerah location="create"
+                            nameProvinsi="state_institute"
+                            nameKota="city_institute"
+                            nameKecamatan="district_institute"
+                            nameKelurahan="subdistrict_institute"
+                            isDisabled={false}
+                            isRequired={true}
+                />
                 <div className="row">
                     <div className="col-lg-12 mb-3">
                         <label className="mont-font fw-600 font-xsss">

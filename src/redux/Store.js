@@ -9,6 +9,10 @@ import {
   ReducerIdjam,
   ReducerPertemuanTugas,
   ReducerDateTime,
+  ReducerPathJadwalGuru,
+  ReducerPathKalenderGuru,
+  ReducerPathNilaiGuru,
+  ReducerPathKalenderSiswa,
 } from "./Reducer";
 import thunk from "redux-thunk";
 
@@ -22,6 +26,10 @@ const allReducers = combineReducers({
   pertemuanTugas: ReducerPertemuanTugas,
   dataIdJam: ReducerIdjam,
   dataDateTime: ReducerDateTime,
+  dataPathJadwalGuru: ReducerPathJadwalGuru,
+  dataPathKalenderGuru: ReducerPathKalenderGuru,
+  dataPathNilaiGuru: ReducerPathNilaiGuru,
+  dataPathKalenderSiswa: ReducerPathKalenderSiswa,
 });
 
 export const store = createStore(allReducers, applyMiddleware(thunk));

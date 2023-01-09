@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { PathKalenderGuru } from '../../../../redux/Action';
 import axios from 'axios';
 import Adminfooter from "../../../../components/Adminfooter";
 import {
@@ -21,8 +23,8 @@ import {
 import Search from "antd/es/input/Search";
 import Navheader from "../../../../components/Navheader";
 import Appheader from "../../../../components/Appheader";
-import { global_join_sub_where_get, url_by_institute } from '../../../../api/reference';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { url_by_institute } from '../../../../api/reference';
+import { useHistory } from 'react-router-dom';
 
 function GuruListPertemuanKalender() {
     const [grid, setGrid] = useState(false);
@@ -31,12 +33,12 @@ function GuruListPertemuanKalender() {
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
-    const academicYear = localStorage.getItem('academic_year')
+    const academicId = localStorage.getItem("academic_year");
     const userId = localStorage.getItem('user_id')
 
-    const location = useLocation();
-    const tanggal = location.state.dataTanggal
-    console.log(tanggal);
+    const dispatch = useDispatch();
+    const tanggalKalenderGuru = useSelector((state) => state.dataPathKalenderGuru)
+    const tanggal = tanggalKalenderGuru.tanggal
 
     useEffect(() => {
         axios.post(url_by_institute,
@@ -49,7 +51,8 @@ function GuruListPertemuanKalender() {
                         "type": "json",
                         "value": {
                             "id_guru": userId,
-                            "date": tanggal
+                            "date": tanggal,
+                            "id_academik": academicId,
                         }
                     }
                 ]
@@ -61,7 +64,6 @@ function GuruListPertemuanKalender() {
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes);
             const dataList = dataRes?.data
             setDetailDate(dataList)
             // const pagination = dataRes?.data?.links;
@@ -71,13 +73,11 @@ function GuruListPertemuanKalender() {
 
     let history = useHistory();
     const handleRouter = (id, record) => {
-        console.log(record.keterangan);
+        dispatch(PathKalenderGuru(record))
         if(record.keterangan == "Materi") {
-            history.push(`/guru-jadwal-pelajaran-materi-pertemuan-${id}`)
+            history.push(`/guru-jadwal-pelajaran-kalender-materi-${id}`)
         } else if( record.keterangan == "Tugas"){
-            history.push(`/guru-jadwal-pelajaran-tugas-pertemuan-${id}`, {
-                dataTugas: record,
-            })
+            history.push(`/guru-jadwal-pelajaran-kalender-tugas-${id}`)
         } 
     }
 
@@ -172,7 +172,7 @@ function GuruListPertemuanKalender() {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Pertemuan"
+                            title="Jadwal Pelajaran Kalender / Materi dan Tugas"
                         />
                     </div>
                 </div>

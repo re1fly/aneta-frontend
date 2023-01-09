@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from "react"
+import { useDispatch } from "react-redux";
+import { PathKelasNilaiGuru } from "../../../redux/Action";
 import {
     Card,
     PageHeader
@@ -23,6 +25,7 @@ export default function GuruNilaiKelas() {
     const academicYear = localStorage.getItem('academic_year')
     const instituteId = localStorage.getItem('institute')
 
+    const dispatch = useDispatch();
     const _onSearch = value => console.log(value);
 
     useEffect(() => {
@@ -88,8 +91,8 @@ export default function GuruNilaiKelas() {
     })
 
     let history = useHistory();
-    const handleSubClass = (id) => {
-        console.log(id);
+    const handleSubClass = (id, kelas) => {
+        dispatch(PathKelasNilaiGuru(kelas));
         history.push(`/guru-nilai-sub-kelas-${id}`)
     }
 
@@ -101,7 +104,7 @@ export default function GuruNilaiKelas() {
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                             // onBack={() => window.history.back()}
-                            title="Data Kelas"
+                            title="Data Nilai"
                         />
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
@@ -121,10 +124,10 @@ export default function GuruNilaiKelas() {
                                     return (
                                         <div className="col-xl-3 col-lg-4 col-md-4">
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleSubClass(value.idClass)}
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleSubClass(value.idClass, value.kelas)}
                                             >
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">Kelas {value.kelas}</h2>
+                                                <h2 className="ml-auto mr-auto font-weight-bold mb-0">Kelas {value.kelas}</h2>
                                             </div>
                                         </div>
                                     )

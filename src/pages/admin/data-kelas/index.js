@@ -57,6 +57,7 @@ export default function DataKelasAdmin() {
         },
     ]);
     const [getKelas, setGetKelas] = useState([]);
+    console.log(getKelas);
     const defaultAcademic = localStorage.getItem('academic_year');
 
     const [btnPagination, setBtnPagination] = useState([]);
@@ -267,7 +268,7 @@ export default function DataKelasAdmin() {
                                 "users.name",
                                 "x_academic_teachers.id as id_walikelas",
                                 "users.institute_id",
-                                "r_class_type.id as id_tingkat"
+                                "r_class_type.id as id_tingkat",
                             ],
                             "paginate": 10,
                             "join": [
@@ -370,6 +371,13 @@ export default function DataKelasAdmin() {
                                     "tbl_coloumn": "users",
                                     "tbl_field": "institute_id",
                                     "tbl_value": institute,
+                                    "operator": "=",
+                                    "kondisi": "where"
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_teachers",
+                                    "tbl_field": "academic_year_id",
+                                    "tbl_value": academic,
                                     "operator": "=",
                                     "kondisi": "where"
                                 }
@@ -642,6 +650,11 @@ export default function DataKelasAdmin() {
             {
                 title: 'No',
                 dataIndex: 'no',
+            },
+            {
+                title: 'ID',
+                dataIndex: 'id',
+                align: 'center',
             },
             {
                 title: 'Tingkat Kelas',

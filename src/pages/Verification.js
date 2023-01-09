@@ -18,7 +18,7 @@ class Verification extends Component {
                                        Anda belum bisa menggunakan Fitur Aneta
                                     </h1>
                                     <p className="font-xss">
-                                        Mohon menunggu verifikasi dari Admin, jika terlalu lama harap hubungi admin.
+                                        Mohon tunggu admin verifikasi data sekolah & cek email yang sudah terdaftar secara berkala. Jika terlalu lama, Mohon hubungi Admin EDII.
                                     </p>
                                 </div>
                             </div>

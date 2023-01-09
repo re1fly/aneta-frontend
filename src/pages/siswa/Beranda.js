@@ -335,7 +335,7 @@ function BerandaSiswa() {
             console.log(dataRes.data);
             setDataSekolah(dataRes.data)
         }).catch(error => {
-            alert(error)
+            console.log(error);
         })
     }, [])
 

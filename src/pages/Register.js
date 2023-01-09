@@ -101,13 +101,22 @@ function Register() {
             <div className="main-wrap">
                 <div className="row">
                     <div
-                        className="col-xl-5 d-none d-xl-block p-0 vh-100 bg-image-cover bg-no-repeat"
-                        style={{
-                            backgroundImage: `url("https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80")`,
-                        }}
-                    ></div>
+                        className="col-xl-6 d-flex align-items-center justify-content-center"
+                        // style={{
+                        //     backgroundImage: `url("https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80")`,
+                        // }}
+                    >
+                        <div>
+                            <div className="d-flex justify-content-center">
+                                <img className='w300' src={`assets/images/logo/logo_pelindo_anper_bb.png`} alt="edii logo"></img>
+                            </div>
+                            <div className="d-flex justify-content-center mt-5">
+                                <img className='w300' src={`assets/images/logo/aneta.png`} alt="edii logo"></img>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div className="col-xl-7 vh-100 align-items-center d-flex bg-white rounded-lg overflow-hidden">
+                    <div className="col-xl-6 vh-100 align-items-center d-flex bg-white rounded-lg overflow-hidden">
                         <div className="card shadow-none border-0 ml-auto mr-auto login-card">
                             <div className="card-body rounded-0 text-left">
                                 <h2 className="fw-700 display1-size display2-md-size mb-4">

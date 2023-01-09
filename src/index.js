@@ -81,7 +81,7 @@ import Homefive from "./pages/Homefive";
 import Homesix from "./pages/Homesix";
 import Homefour from "./pages/Homefour";
 
-import {BrowserRouter, Switch, Route, Redirect} from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
 
 // Role Admin
@@ -198,22 +198,50 @@ import GuruListPertemuanKalender from "./pages/guru/jadwal-pelajaran/kalender/li
 import SiswaKalender from "./pages/siswa/jadwal-pelajaran/kalender";
 import SiswaListPertemuanKalender from "./pages/siswa/jadwal-pelajaran/kalender/listPertemuan";
 import Verification from "./pages/Verification";
+import GuruInputNilaiEkskul from "./pages/guru/penilaian/InputNilaiEkskul";
+import SuperAdminVerification from "./pages/superadmin/Verifification";
+import GuruKalenderMateri from "./pages/guru/jadwal-pelajaran/kalender/pertemuanMateri";
+import GuruKalenderTugas from "./pages/guru/jadwal-pelajaran/kalender/pertemuanTugas";
+import SiswaKalenderMateri from "./pages/siswa/jadwal-pelajaran/kalender/pertemuanMateri";
+import SiswaKalenderTugas from "./pages/siswa/jadwal-pelajaran/kalender/pertemuanTugas";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 class Root extends Component {
   render() {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("../firebase-messaging-sw.js")
+        .then(function (registration) {
+          console.log("Registration successful, scope is:", registration.scope);
+        })
+        .catch(function (err) {
+          console.log("Service worker registration failed, error:", err);
+        });
+    }
+    // const messaging = getMessaging()
+
+    // onMessage(messaging, (payload) => {
+    //   console.log('Message received. ', payload);
+    //   // ...
+    // });
     return (
       <Provider store={store}>
         <BrowserRouter basename={"/"}>
           <Switch>
             <Route
               exact
+              path={`${process.env.PUBLIC_URL}/superadmin-verification`}
+              component={SuperAdminVerification}
+            />
+            <Route
+              exact
               path={`${process.env.PUBLIC_URL}/`}
               component={Homefour}
             />
             <Route
-                exact
-                path={`${process.env.PUBLIC_URL}/not-verification`}
-                component={Verification}
+              exact
+              path={`${process.env.PUBLIC_URL}/not-verification`}
+              component={Verification}
             />
             <Route
               exact
@@ -366,6 +394,16 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender`}
               component={GuruKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender-materi-:id`}
+              component={GuruKalenderMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender-tugas-:id`}
+              component={GuruKalenderTugas}
             />
             <Route
               exact
@@ -548,7 +586,7 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/siswa-kelas`}
               component={KelasSiswa}
             />
-            
+
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/siswa-kelas-tugas-:id`}
@@ -563,6 +601,16 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/siswa-list-pertemuan-kalender`}
               component={SiswaListPertemuanKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran-kalender-materi-:id`}
+              component={SiswaKalenderMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran-kalender-tugas-:id`}
+              component={SiswaKalenderTugas}
             />
             <Route
               exact
@@ -714,6 +762,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/admin-input-data-ekstrakurikuler`}
               component={InputNilaiEkskul}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-input-data-ekstrakurikuler`}
+              component={GuruInputNilaiEkskul}
             />
 
             <Route

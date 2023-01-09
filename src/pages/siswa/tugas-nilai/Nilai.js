@@ -25,14 +25,16 @@ import { url_by_institute } from '../../../api/reference';
 function SiswaPenilaian() {
     const [grid, setGrid] = useState(false);
     const [isViewPenilaian, setIsViewPenilaian] = useState(true);
-    const [selectedUser, setSelectedUser] = useState([])
+    const [selectedUser, setSelectedUser] = useState([]);
     const [getnilai, setGetNilai] = useState([]);
-    console.log(getnilai);
 
     const userId = localStorage.getItem('user_id');
 
-    const params = useParams()
-    const idMateri = params.id
+    const params = useParams();
+    const path = params.id.split("-");
+    const idMateri = path[0];
+    const mapel = path[1];
+    const tugas = path[2];
 
     useEffect(() => {
         axios.post(url_by_institute, {
@@ -56,7 +58,6 @@ function SiswaPenilaian() {
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes);
             setGetNilai(dataRes?.data);
         })
 
@@ -64,8 +65,8 @@ function SiswaPenilaian() {
 
     const columns = [
         {
-            title: 'Nama Materi',
-            dataIndex: 'namaMateri',
+            title: 'Nama Tugas',
+            dataIndex: 'namaTugas',
             align: 'center',
         },
         {
@@ -93,7 +94,7 @@ function SiswaPenilaian() {
 
     const data = [
         {
-            namaMateri: getnilai.tittle,
+            namaTugas: getnilai.tittle,
             namaSiswa: getnilai.nama,
             nilai: getnilai.score,
         },
@@ -136,7 +137,7 @@ function SiswaPenilaian() {
                                                         className="form-control"
                                                         aria-label="Default select example"
                                                         name="materi"
-                                                        placeholder={selectedUser.namaMateri}
+                                                        placeholder={selectedUser.namaTugas}
                                                         disabled
                                                     >
                                                     </input>
@@ -191,7 +192,7 @@ function SiswaPenilaian() {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Nilai"
+                            title={`Data Nilai / ${mapel} / ${tugas}`}
                         />
                     </div>
                 </div>

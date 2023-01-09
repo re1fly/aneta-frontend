@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import axios from "axios";
-import { GetMapelKelas } from "../../../components/filter/GetMapelKelas";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
@@ -29,8 +28,9 @@ function GuruKirimPenilaian() {
 
     const [getKirimPenilaian, setGetKirimPenilaian] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
+    const [paramsPage, setParamsPage] = useState("1");
     const [dataKirimNilai, setDataKirimNilai] = useState(null);
-    console.log(getKirimPenilaian);
+    const [selectedUser, setSelectedUser] = useState(null)
     const idHeader = dataKirimNilai?.id_header
 
     const userId = localStorage.getItem("user_id")
@@ -39,6 +39,7 @@ function GuruKirimPenilaian() {
 
     const [grid, setGrid] = useState(false);
     const [isViewKirimPenilaian, setIsViewKirimPenilaian] = useState(true);
+    const [isViewDetail, setIsviewDeatil] = useState(false)
 
     const academicYear = localStorage.getItem('academic_year');
     const institute = localStorage.getItem('institute');
@@ -118,7 +119,7 @@ function GuruKirimPenilaian() {
                     }, {
                         "name": "page",
                         "type": "string",
-                        "value": "1"
+                        "value": paramsPage
                     }
                 ]
             }
@@ -126,7 +127,7 @@ function GuruKirimPenilaian() {
             // console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[3]?.value)
             setGetKirimPenilaian(dataRes?.data?.data)
-            // setBtnPagination(dataRes?.data?.links)
+            setBtnPagination(dataRes?.data?.links)
         })
 
     }, [academicYear])
@@ -179,9 +180,9 @@ function GuruKirimPenilaian() {
                 title: 'Aksi',
                 dataIndex: 'aksi',
                 defaultSortOrder: 'descend',
-                render: () => (
+                render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined style={{ color: "black" }} />
+                        <EyeOutlined style={{ color: "black" }} onClick={() => viewDetail(record)} />
                     </Space>
                 ),
             },
@@ -202,13 +203,40 @@ function GuruKirimPenilaian() {
         })
 
         return (
-            <Table className=""
-                columns={columns}
-                dataSource={data}
-                onChange={onChangeTable}
-                pagination={{ position: ['bottomCenter'] }}
-                rowClassName="bg-greylight text-grey-900"
-                scroll={{ x: 400 }} />
+            <>
+                <Table className=""
+                    columns={columns}
+                    dataSource={data}
+                    onChange={onChangeTable}
+                    pagination={false}
+                    rowClassName="bg-greylight text-grey-900"
+                    scroll={{ x: 400 }} />
+                <div className='text-center mt-4'>
+                    {btnPagination?.map((dataBtn) => {
+                        const labelBtn = dataBtn.label;
+                        const label = labelBtn
+                            .replace(/(&laquo\;)/g, "")
+                            .replace(/(&raquo\;)/g, "");
+                        let linkUrl = dataBtn.url;
+
+                        if (linkUrl != null) {
+                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                        }
+
+                        return (
+                            <Button
+                                className="btn btn-primary mr-2 font-xssss fw-600"
+                                disabled={linkUrl == null ? true : false}
+                                onClick={() => {
+                                    setParamsPage(linkUrl);
+                                }}
+                            >
+                                {label}
+                            </Button>
+                        );
+                    })}
+                </div>
+            </>
         )
     }
 
@@ -668,13 +696,171 @@ function GuruKirimPenilaian() {
         )
     }
 
+    const DetailKirimPenilaian = () => {
+        return (
+            <div className="container px-3 py-4">
+                <div className="row">
+                    <div className="col-lg-12">
+                        <div className="middle-wrap">
+                            <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
+                                <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
+                                    <i onClick={() => quitDetail()} className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
+                                    <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
+                                        View Status Penilaian
+                                    </h4>
+                                </div>
+                                <div className="card-body p-lg-5 p-4 w-100 border-0 ">
+                                    <div className="row">
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Kelas / Sub Kelas
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='kelas_subkelas'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.kelas}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Mata Pelajaran
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='mata_pelajaran'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.mataPelajaran}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Pendidik
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='pendidik'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.pendidik}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    TA / SMT
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='ta_smt'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.ta_smt}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Status
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='status'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.status}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Tanggal Proses
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='tanggal_proses'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.tanggalProses}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Dibuat Oleh
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name='created'
+                                                    className="form-control"
+                                                    defaultValue={selectedUser.dibuatOleh}
+                                                    required
+                                                    disabled={true}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const viewDetail = (record) => {
+        setSelectedUser(record)
+        setIsViewKirimPenilaian(false)
+        setIsviewDeatil(true)
+    }
+
+    const quitDetail = () => {
+        setIsViewKirimPenilaian(true)
+        setIsviewDeatil(false)
+    }
+
     return (
         <Fragment>
             <div className="main-wrapper">
                 <Navheader />
                 <div className="main-content">
                     <Appheader />
-                    {isViewKirimPenilaian ? <ViewKirimPenilaian /> : <TambahKirimPenilaian />}
+                    {
+                        isViewKirimPenilaian ?
+                            <ViewKirimPenilaian /> :
+                            isViewDetail ?
+                                <DetailKirimPenilaian /> :
+                                <TambahKirimPenilaian />
+                    }
                     <Adminfooter />
                 </div>
             </div>

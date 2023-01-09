@@ -7,6 +7,8 @@ import Appheader from "../../../../components/Appheader";
 import Navheader from "../../../../components/Navheader";
 import moment from "moment";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { TanggalKalenderGuru } from "../../../../redux/Action";
 import { url_by_institute } from "../../../../api/reference";
 import axios from "axios";
 import { useState } from "react";
@@ -16,9 +18,11 @@ export default function GuruKalender() {
     const [dataTanggal, setDataTanggal] = useState([])
 
     const userId = localStorage.getItem("user_id")
+    const academicId = localStorage.getItem("academic_year");
     const currentMonth = 1 + moment().month();
     const currentYear = moment().year();
 
+    const dispatch = useDispatch();
     const _onSearch = value => console.log(value);
 
     useEffect(() => {
@@ -33,7 +37,9 @@ export default function GuruKalender() {
                         "value": {
                             "id_guru": userId,
                             "bulan": currentMonth,
-                            "year": currentYear
+                            "year": currentYear,
+                            "id_academik": academicId,
+
                         }
                     }
                 ]
@@ -45,7 +51,6 @@ export default function GuruKalender() {
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            console.log(dataRes);
             setDataTanggal(dataRes.data)
         })
     }, [userId, currentMonth, currentYear])
@@ -118,7 +123,7 @@ export default function GuruKalender() {
     let history = useHistory();
     const selectKalender = (e) => {
         const tanggal = e.format("YYYY/MM/DD")
-        console.log(tanggal);
+        dispatch(TanggalKalenderGuru(tanggal));
         history.push(`/guru-list-pertemuan-kalender`, {
             dataTanggal: tanggal
         })

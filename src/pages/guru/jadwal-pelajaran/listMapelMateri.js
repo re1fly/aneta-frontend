@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux";
+import { PathMateriJadwalGuru } from "../../../redux/Action";
 import {
     Card,
     PageHeader
@@ -8,7 +10,7 @@ import {
     MenuOutlined,
 } from "@ant-design/icons";
 
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import axios from "axios";
 import Search from "antd/es/input/Search";
 import Adminfooter from '../../../components/Adminfooter';
@@ -25,6 +27,12 @@ export default function GuruJadwalPelajaranMapelMateri() {
 
     const params = useParams()
     const idMapel = params?.id
+
+    const dispatch = useDispatch();
+    const pathJadwalGuru = useSelector((state) => state.dataPathJadwalGuru);
+    const kelas = pathJadwalGuru.kelas
+    const subKelas = pathJadwalGuru.subKelas
+    const mapel = pathJadwalGuru.mapel
 
     const _onSearch = value => console.log(value);
 
@@ -122,9 +130,12 @@ export default function GuruJadwalPelajaranMapelMateri() {
     })
 
     let history = useHistory();
-    const handleSubClass = (id) => {
+    const handleSubClass = (id, materi) => {
         console.log(id);
-        history.push(`/guru-jadwal-pelajaran-materi-pertemuan-${id}`)
+        dispatch(PathMateriJadwalGuru(materi))
+        history.push(`/guru-jadwal-pelajaran-materi-pertemuan-${id}`, {
+            materi
+        })
     }
 
     const ViewPelajaran = () => {
@@ -135,7 +146,7 @@ export default function GuruJadwalPelajaranMapelMateri() {
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Materi"
+                            title={`Jadwal Pelajaran / Kelas ${kelas} / ${subKelas} / ${mapel} / Materi`}
                         />
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
@@ -156,10 +167,10 @@ export default function GuruJadwalPelajaranMapelMateri() {
 
                                         <div className="col-xl-3 col-lg-4 col-md-4">
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleSubClass(value.id)}
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleSubClass(value.id, value.namaMateri)}
                                             >
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.namaMateri}</h2>
+                                                <h2 className="ml-auto mr-auto font-weight-bold mb-0">{value.namaMateri}</h2>
                                             </div>
                                         </div>
                                     )

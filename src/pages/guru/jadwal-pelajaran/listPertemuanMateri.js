@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { PathPertemuanJadwalGuru } from '../../../redux/Action';
 import axios from 'axios';
 import Adminfooter from "../../../components/Adminfooter";
 import {
@@ -20,11 +22,11 @@ import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import { global_join_sub_where_get, url_by_institute } from '../../../api/reference';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 function GuruListPertemuanMateri() {
     const [grid, setGrid] = useState(false);
-    const [materi, setGetMateri] = useState([])
+    const [getMateri, setGetMateri] = useState([])
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
@@ -34,6 +36,13 @@ function GuruListPertemuanMateri() {
 
     const params = useParams()
     const idMateri = params?.id
+
+    const dispatch = useDispatch();
+    const pathJadwalGuru = useSelector((state) => state.dataPathJadwalGuru);
+    const kelas = pathJadwalGuru.kelas
+    const subKelas = pathJadwalGuru.subKelas
+    const mapel = pathJadwalGuru.mapel
+    const materi = pathJadwalGuru.materi
 
     useEffect(() => {
         axios.post(url_by_institute,
@@ -109,11 +118,12 @@ function GuruListPertemuanMateri() {
     }, [userId, paramsPage])
 
     let history = useHistory();
-    const handleRouter = (id) => {
+    const handleRouter = (id, pertemuan) => {
+        dispatch(PathPertemuanJadwalGuru(pertemuan))
         history.push(`/guru-materi-${id}`)
     }
 
-    const data = materi.map((data, index) => {
+    const data = getMateri.map((data, index) => {
         return {
             no: index + 1,
             id: data.id,
@@ -150,7 +160,7 @@ function GuruListPertemuanMateri() {
             responsive: ['sm'],
             render: (text, record) => (
                 <Space size="middle">
-                    <EyeOutlined onClick={() => handleRouter(record.id)} style={{ color: "black" }} />
+                    <EyeOutlined onClick={() => handleRouter(record.id, record.namaPertemuan)} style={{ color: "black" }} />
                 </Space>
             ),
         },
@@ -170,7 +180,7 @@ function GuruListPertemuanMateri() {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Pertemuan Materi"
+                            title={`Jadwal Pelajaran / Kelas ${kelas} / ${subKelas} / ${mapel} / Materi / ${materi}`}
                         />
                     </div>
                 </div>

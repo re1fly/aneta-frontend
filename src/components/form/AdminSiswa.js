@@ -4,6 +4,7 @@ import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
 import {PlusOutlined, UserAddOutlined} from "@ant-design/icons";
 import {RequiredTooltip} from "../misc/RequiredTooltip";
+import {FormDaerah} from "./FormDaerah.js";
 
 
 // const ButtonFormOrtu = (props) => {
@@ -413,84 +414,23 @@ export const FormAdminSiswa = (props) => {
                                             </div>
                                         </div>
                                     </div>
+                                    <FormDaerah location="edit"
+                                                nameProvinsi="provinsi_siswa"
+                                                idProvinsi={props.idProvSiswa}
+                                                provinsi={props.provSiswa}
+                                                nameKota="kota_siswa"
+                                                idKota={props.idKotaSiswa}
+                                                kota={props.kotaSiswa}
+                                                nameKecamatan="kecamatan_siswa"
+                                                idKec={props.idKecSiswa}
+                                                kecamatan={props.kecSiswa}
+                                                nameKelurahan="kelurahan_siswa"
+                                                kelurahan={props.kelurahanSiswa}
+                                                idKel={props.idKelurahanSiswa}
+                                                isDisabled={props.isDisabled}
+                                                isRequired={true}
+                                    />
                                     <div className="row">
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Provinsi <RequiredTooltip />
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="provinsi_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idProvSiswa} selected disabled hidden>
-                                                        {props.provSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kota <RequiredTooltip />
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kota_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idKotaSiswa} selected disabled hidden>
-                                                        {props.kotaSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kecamatan <RequiredTooltip />
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kecamatan_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idKecSiswa} selected disabled hidden>
-                                                        {props.kecSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kelurahan <RequiredTooltip />
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kelurahan_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idKelurahanSiswa} selected disabled hidden>
-                                                        {props.kelurahanSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
                                         <div className="col-lg-12 mb-3">
                                             <label className="mont-font fw-600 font-xsss">
                                                 Alamat <RequiredTooltip />

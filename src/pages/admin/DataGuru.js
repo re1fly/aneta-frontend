@@ -355,7 +355,7 @@ function DataGuruAdmin() {
             setAcademicYears(academics?.data?.data);
         })
 
-    }, [academic, paramsPage, isViewGuru])
+    }, [academic, paramsPage, institute])
 
     const _exportDataExcel = () => {
         axios.post(url_by_institute, {
@@ -371,9 +371,9 @@ function DataGuruAdmin() {
                 }
             ]
         }).then(response => {
-            console.log(response);
             const resData = JSON.parse(response.data.variables[2].value)
             const dataExcel = resData.data
+            console.log(dataExcel);
             const byteCharacters = atob(dataExcel);
             const byteNumbers = new Array(byteCharacters.length);
             for (let i = 0; i < byteCharacters.length; i++) {
@@ -410,7 +410,7 @@ function DataGuruAdmin() {
         let uploaded = e.target.files[0];
         const base64 = await convertBase64(uploaded);
         const getLinkUrl = base64.split(',')[1]
-        // console.log(getLinkUrl);
+        console.log(getLinkUrl);
 
         axios.post(url_by_institute,
             {
@@ -734,6 +734,7 @@ function DataGuruAdmin() {
                 tahunAktif: tahunAktifGuru,
                 kelas: guru.class,
                 nomorHp: guru.mobile_phone,
+                phone: guru.phone,
                 email: guru.email,
                 tempatLahir: guru.place_of_birth,
                 tanggalLahir: guru.date_of_birth,
@@ -747,6 +748,23 @@ function DataGuruAdmin() {
                 idKel: guru.sub_discrict_id,
                 kelurahan: guru.sub_district,
                 alamat: guru.address,
+                nuptk: guru.nuptk,
+                nip: guru.nip,
+                gender: guru.gender,
+                statusKepegawaian: guru.employment_status,
+                agama: guru.religion,
+                namaDusun: guru.village_name,
+                rt: guru.rt,
+                rw: guru.rw,
+                kodePos: guru.postal_code,
+                jenisPtk: guru.ptk_type,
+                tmtPengangkatan: guru.tmt_appointment,
+                lembagaPengangkatan: guru.agency_appointment,
+                sumberGaji: guru.source_of_salary,
+                namaIbu: guru.mother_name,
+                pekerjaanPasangan: guru.profession_husband_or_wife,
+                negara: guru.citizenship,
+                nik: guru.nik
             }
         })
 
@@ -828,11 +846,11 @@ function DataGuruAdmin() {
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                 style={{ display: "none" }}
                             />
-                            {/* <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
+                            <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
                                 shape="round" size='middle'
                                 onClick={_modalImportNew}>
                                 Import Data Baru
-                            </Button> */}
+                            </Button>
 
                             <FilterAcademic getYear={(e) => setAcademic(e.target.value)}
                                 selectYear={academicYears.map((data) => {
@@ -882,47 +900,14 @@ function DataGuruAdmin() {
             "returnVariables": true,
             "variables": [
                 {
-                    "name": "validasi",
+                    "name": "data",
                     "type": "json",
                     "value": {
-                        "data": {
-                            "user_email": "required",
-                            "user_name": "required",
-                            "user_role_id": "required",
-                            "user_email_verified_at": "required",
-                            "user_password": "required",
-                            "user_place_of_birth": "required",
-                            "user_date_of_birth": "required",
-                            "user_mobile_phone": "required",
-                            "user_state_id": "required",
-                            "user_city_id": "required",
-                            "user_district_id": "required",
-                            "user_sub_discrict_id": "required",
-                            "user_address": "required",
-                            "user_image": "required",
-                            "user_image_type": "required",
-                            "user_academic_year_id": "required",
-                            "user_register_date": "required",
-                            "status": "required",
-                            "created_at": "required",
-                            "updated_at": "required",
-                            "institute_id": "required",
-                            "employment_status": "required",
-                            "religion": "required",
-                            "tmt_appointment": "required",
-                            "agency_appointment": "required",
-                            "source_of_salary": "required",
-                            "mother_name": "required",
-                            "profession_husband_or_wife": "required",
-                            "citizenship": "required",
-                            "nik": "required",
-                            "ptk_type": "required"
-                        },
-                        "user_email": data.email_guru,
                         "user_name": data.nama_guru,
-                        "user_role_id": 2,
-                        "user_email_verified_at": dateNow,
-                        "user_password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6",
+                        "user_email": data.email_guru,
+                        "institute_id": institute,
+                        "image": data.image_base64,
+                        "image_type": "string",
                         "user_place_of_birth": data.tempatlahir_guru,
                         "user_date_of_birth": data.tanggallahir_guru,
                         "user_mobile_phone": data.nomortelefon_guru,
@@ -931,137 +916,53 @@ function DataGuruAdmin() {
                         "user_district_id": data.kecamatan_guru,
                         "user_sub_discrict_id": data.kelurahan_guru,
                         "user_address": data.alamat_guru,
-                        "user_image": data.image_base64,
-                        "user_image_type": "string",
-                        "user_academic_year_id": academicYear,
-                        "user_register_date": dateNow,
+                        "nuptk": data.nuptk,
+                        "nip": data.nip,
+                        "gender": data.jenis_kelamin,
                         "status": data.status_guru,
-                        "created_at": dateNow,
-                        "updated_at": dateNow,
-                        "institute_id": institute,
                         "employment_status": data.status_kepegawaian,
                         "religion": data.agama,
+                        "phone": data.nomortelefon2_guru,
+                        "village_name": data.nama_dusun,
+                        "rt": data.rt,
+                        "rw": data.rw,
+                        "postal_code": data.kode_pos,
+                        "additional_task": data.tugas_tambahan,
+                        "sk_cpns": data.sk_cpns,
+                        "date_cpns": data.tanggal_cpns,
+                        "sk_appointment": data.sk_pengangkatan,
                         "tmt_appointment": data.tmt_pengangkatan,
                         "agency_appointment": data.lembaga_pengangkatan,
+                        "group_rank": data.pangkat_golongan,
                         "source_of_salary": data.sumber_gaji,
                         "mother_name": data.nama_ibu,
+                        "marital_status": data.status_perkawinan,
+                        "name_husband_or_wife": data.nama_pasangan,
+                        "nip_husband_or_wife": data.nip_pasangan,
                         "profession_husband_or_wife": data.pekerjaan_pasangan,
+                        "tmt_pns": data.tmt_pns,
+                        "already_licensed_principal": data.lisensi_kepsek,
+                        "ever_working_training": data.diklat_kepegawaian,
+                        "braille_skill": data.lkeahian_braille,
+                        "sign_language_skill": data.bahasa_isyarat,
+                        "npwp": data.npwp,
+                        "name_of_the_taxpayer": data.nama_wajibpajak,
                         "citizenship": data.kewarganegaraan,
                         "nik": data.nik,
+                        "no_kk": data.no_kk,
+                        "bank": data.bank,
+                        "no_rek": data.no_rekening,
+                        "account_name": data.nama_rekening,
+                        "karpeg": data.kerpeg,
+                        "karis": data.karis_karsu,
+                        "latitude": data.lintang,
+                        "longitude": data.bujur,
+                        "nuks": data.nuks,
                         "ptk_type": data.jenis_ptk,
+                        "academic_year_id": academicYear,
+                        "sk_number": data.sk_guru,
                     }
                 },
-                {
-                    "name": "user_email",
-                    "type": "string",
-                    "value": ""
-                },
-                {
-                    "name": "users",
-                    "type": "json",
-                    "value": {
-                        "tbl_name": "usersModel",
-                        "tbl_coloumn": {
-                            "name": data.nama_guru,
-                            "email": data.email_guru,
-                            "user_role_id": 2,
-                            "institute_id": institute,
-                            "email_verified_at": dateNow,
-                            "password": "$2a$12$4Qy.9BLBPpRlwl2eboY3xeTAld8ukLjfmc2s6gH6PfmFFQb4WcCW6"
-                        }
-                    }
-                },
-                {
-                    "name": "m_profile",
-                    "type": "json",
-                    "value": {
-                        "tbl_name": "m_user_profile",
-                        "tbl_coloumn": {
-                            "place_of_birth": data.tempatlahir_guru,
-                            "date_of_birth": data.tanggallahir_guru,
-                            "mobile_phone": data.nomortelefon_guru,
-                            "state_id": data.provinsi_guru,
-                            "city_id": data.kota_guru,
-                            "district_id": data.kecamatan_guru,
-                            "sub_discrict_id": data.kelurahan_guru,
-                            "address": data.alamat_guru,
-                            "nuptk": data.nuptk,
-                            "nip": data.nip,
-                            "gender": data.jenis_kelamin,
-                            "employment_status": data.status_kepegawaian,
-                            "religion": data.agama,
-                            "phone": data.nomortelefon2_guru,
-                            "village_name": data.nama_dusun,
-                            "rt": data.rt,
-                            "rw": data.rw,
-                            "postal_code": data.kode_pos,
-                            "additional_task": data.tugas_tambahan,
-                            "sk_cpns": data.sk_cpns,
-                            "date_cpns": data.tanggal_cpns,
-                            "sk_appointment": data.sk_pengangkatan,
-                            "tmt_appointment": data.tmt_pengangkatan,
-                            "agency_appointment": data.lembaga_pengangkatan,
-                            "group_rank": data.pangkat_golongan,
-                            "source_of_salary": data.sumber_gaji,
-                            "mother_name": data.nama_ibu,
-                            "marital_status": data.status_perkawinan,
-                            "name_husband_or_wife": data.nama_pasangan,
-                            "nip_husband_or_wife": data.nip_pasangan,
-                            "profession_husband_or_wife": data.pekerjaan_pasangan,
-                            "tmt_pns": data.tmt_pns,
-                            "already_licensed_principal": data.lisensi_kepsek,
-                            "ever_working_training": data.diklat_kepegawaian,
-                            "braille_skill": data.lkeahian_braille,
-                            "sign_language_skill": data.bahasa_isyarat,
-                            "npwp": data.npwp,
-                            "name_of_the_taxpayer": data.nama_wajibpajak,
-                            "citizenship": data.kewarganegaraan,
-                            "nik": data.nik,
-                            "no_kk": data.no_kk,
-                            "bank": data.bank,
-                            "no_rek": data.no_rekening,
-                            "account_name": data.nama_rekening,
-                            "karpeg": data.kerpeg,
-                            "karis": data.karis_karsu,
-                            "latitude": data.lintang,
-                            "longitude": data.bujur,
-                            "nuks": data.nuks
-                        }
-                    }
-                },
-                {
-                    "name": "upload_image",
-                    "type": "json",
-                    "value": {
-                        "image": data.image_base64,
-                        "image_type": "png",
-                        "nama_folder": "image_guru"
-                    }
-                },
-                {
-                    "name": "x_academic_teachers",
-                    "type": "json",
-                    "value": {
-                        "tbl_name": "x_academic_teachers",
-                        "tbl_coloumn": {
-                            "academic_year_id": academicYear,
-                            "register_date": dateNow,
-                            "sk_number": data.sk_guru,
-                            "sk_date": dateNow,
-                            "status": data.status_guru
-                        }
-                    }
-                },
-                {
-                    "name": "users_wordpress",
-                    "type": "json",
-                    "value": {
-                        "username": data.email_guru,
-                        "email"   : data.email_guru,
-                        "password" : "password",
-                        "roles": "author"
-                    }
-                }
             ]
         },
             {
@@ -1072,12 +973,12 @@ function DataGuruAdmin() {
             }
         ).then(function (response) {
             console.log("Insert :", response);
-            const valueRes = response.data.variables[19].value;
+            const valueRes = response.data.variables[2].value;
             const valueResObj = JSON.parse(valueRes);
             console.log(valueResObj);
-            if (valueResObj.status == "success") {
+            if (valueResObj.status == 200) {
                 setIsViewCreate(false)
-                setIsViewGuru(true)
+                setIsViewGuru(true)  
                 notification.success({
                     message: 'Sukses',
                     description: 'Guru berhasil ditambahkan.',
@@ -1086,43 +987,12 @@ function DataGuruAdmin() {
             } else {
                 notification.error({
                     message: 'Error',
-                    description: 'Harap isi semua field',
+                    description: 'Harap isi semua field dan pastikan email belum terdaftar',
                     placement: 'top'
                 });
             }
-            // if (response.data.variables[8].value == 200) {
-            //     if (response.data.variables[10].value == 404) {
-            //         setIsViewCreate(false)
-            //         setIsViewGuru(true)
-            //         notification.success({
-            //             message: 'Sukses',
-            //             description: 'Guru berhasil ditambahkan.',
-            //             placement: 'top'
-            //         });
-            //     } else if (response.data.variables[10].value == 200) {
-            //         notification.error({
-            //             message: 'Error',
-            //             description: 'Email sudah terdaftar, mohon masukkan email lain.',
-            //             placement: 'top'
-            //         });
-            //     } else {
-            //         notification.error({
-            //             message: 'error',
-            //             description: 'Email sudah terdaftar, mohon masukan email lain.',
-            //             placement: "top"
-            //         });
-            //     }
-            //     // pageLoad()
-            // } else {
-            //     notification.error({
-            //         message: 'Error',
-            //         description: 'Harap isi semua field',
-            //         placement: 'top'
-            //     });
-            // }
-            // console.log(response)
         }).catch(error => {
-            // alert('Email Telah di gunakan, silahkan gunakan email lain.')
+            console.log(error);
         });
     };
 
@@ -1226,7 +1096,11 @@ function DataGuruAdmin() {
                 "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
         }).then(function (response) {
-            if (response.data.variables[5].value == 200) {
+            const valueRes = response.data.variables[8].value
+            // console.log(valueRes);
+            // const status = JSON.parse(valueRes)
+            // console.log(status);
+            if (response.status == 201) {
                 setIsViewEdit(false)
                 setIsViewGuru(true)
                 notification.success({
@@ -1321,6 +1195,7 @@ function DataGuruAdmin() {
                 title="Tambah Guru"
                 submit={createGuru}
                 isDisabled={false}
+                isEdit={false}
                 disabledEmail={false}
                 isViewForm={isViewGuru}
                 location={"create"}
@@ -1351,9 +1226,28 @@ function DataGuruAdmin() {
                 kelurahan={selectedUser.kelurahan}
                 statusGuru={selectedUser.statusGuru[0]}
                 alamat={selectedUser.alamat}
-                isDisabled={false}
+                isDisabled={true}
+                isEdit={false}
                 disabledEmail={true}
                 location={"edit"}
+                nuptk={selectedUser.nuptk}
+                nip={selectedUser.nip}
+                gender={selectedUser.gender}
+                statusKepegawaian={selectedUser.statusKepegawaian}
+                agama={selectedUser.agama}
+                phone={selectedUser.phone}
+                namaDusun={selectedUser.namaDusun}
+                rt={selectedUser.rt}
+                rw={selectedUser.rw}
+                kodePos={selectedUser.kodePos}
+                tmtPengangkatan={selectedUser.tmtPengangkatan}
+                lembagaPengangkatan={selectedUser.lembagaPengangkatan}
+                jenisPtk={selectedUser.jenisPtk}
+                sumberGaji={selectedUser.sumberGaji}
+                namaIbu={selectedUser.namaIbu}
+                pekerjaanPasangan={selectedUser.pekerjaanPasangan}
+                negara={selectedUser.negara}
+                nik={selectedUser.nik}
             />
         )
     }
@@ -1382,10 +1276,27 @@ function DataGuruAdmin() {
                 statusGuru={selectedUser.statusGuru[0]}
                 alamat={selectedUser.alamat}
                 isDisabled={true}
+                isEdit={true}
                 disabledTanggal={true}
                 disabledEmail={true}
                 location={"detail"}
-
+                nuptk={selectedUser.nuptk}
+                nip={selectedUser.nip}
+                gender={selectedUser.gender}
+                statusKepegawaian={selectedUser.statusKepegawaian}
+                agama={selectedUser.agama}
+                phone={selectedUser.phone}
+                namaDusun={selectedUser.namaDusun}
+                rt={selectedUser.rt}
+                rw={selectedUser.rw}
+                kodePos={selectedUser.kodePos}
+                tmtPengangkatan={selectedUser.tmtPengangkatan}
+                lembagaPengangkatan={selectedUser.lembagaPengangkatan}
+                sumberGaji={selectedUser.sumberGaji}
+                namaIbu={selectedUser.namaIbu}
+                pekerjaanPasangan={selectedUser.pekerjaanPasangan}
+                negara={selectedUser.negara}
+                nik={selectedUser.nik}
             />
         )
     }

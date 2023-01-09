@@ -35,7 +35,9 @@ export default function JadwalPelajaranAdminSubKelas() {
     const _onSearch = value => console.log(value);
 
     const params = useParams()
-    const idClass1 = params.id
+    const path = params.id.split("-")
+    const idClass = path[0]
+    const kelas = path[1]
 
     useEffect(() => {
         axios.post(url_by_institute,
@@ -107,7 +109,7 @@ export default function JadwalPelajaranAdminSubKelas() {
                                 }, {
                                     "tbl_coloumn": "x_academic_class",
                                     "tbl_field": "class",
-                                    "tbl_value": idClass1,
+                                    "tbl_value": idClass,
                                     "operator": "=",
                                     "kondisi": "where"
                                 }
@@ -144,8 +146,8 @@ export default function JadwalPelajaranAdminSubKelas() {
     })
 
     let history = useHistory();
-    const handleSubClass = (id) => {
-        history.push(`/admin-jadwal-pelajaran-detail-${id}`)
+    const handleSubClass = (id, kelas, subKelas) => {
+        history.push(`/admin-jadwal-pelajaran-detail-${id}-${kelas}-${subKelas}`)
     }
 
     const ViewPelajaran = () => {
@@ -156,7 +158,7 @@ export default function JadwalPelajaranAdminSubKelas() {
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Jadwal Pelajaran"
+                            title={`Jadwal Pelajaran / Kelas ${kelas}`}
                         />
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
@@ -186,19 +188,11 @@ export default function JadwalPelajaranAdminSubKelas() {
                                 {channelList.map((value, index) => {
                                     return (
                                         <div className="col-xl-3 col-lg-4 col-md-4">
-                                            {/* <Link
-                        onClick={() => {
-                          dispatch({ type: 'SET_SUBCLASS', value: value })
-                        }
-                        }
-                        to={{ pathname: `/admin-jadwal-pelajaran-detail` }}
-                      > */}
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleSubClass(value.idSubclass)}>
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">{value.class} - {value.sub_class}</h2>
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleSubClass(value.idSubclass, value.class, value.sub_class)}>
+                                                <h2 className="font-weight-bold mb-0">{value.class} / {value.sub_class}</h2>
                                             </div>
-                                            {/* </Link> */}
                                         </div>
                                     )
                                 })}

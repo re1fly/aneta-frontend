@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux";
+import { PathSubKelasNilaiGuru } from "../../../redux/Action";
 import { useParams } from "react-router-dom";
 import {
     Card,
@@ -26,6 +28,11 @@ export default function GuruNialiSubKelas() {
 
     const params = useParams()
     const idTingkat = params.id
+
+    const dispatch = useDispatch();
+    const PathNilaiGuru = useSelector((state) => state.dataPathNilaiGuru)
+    const kelas = PathNilaiGuru.kelas
+    console.log(kelas);
 
     const _onSearch = value => console.log(value);
 
@@ -66,8 +73,8 @@ export default function GuruNialiSubKelas() {
     })
 
     let history = useHistory();
-    const handleSubClass = (idTingkat, idSubClass) => {
-        console.log(idTingkat, idSubClass);
+    const handleSubClass = (idTingkat, idSubClass, subKelas) => {
+        dispatch(PathSubKelasNilaiGuru(subKelas))
         history.push(`/guru-nilai-mapel-${idTingkat}-${idSubClass}`)
     }
 
@@ -79,7 +86,7 @@ export default function GuruNialiSubKelas() {
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Sub Kelas"
+                            title={`Data Nilai / Kelas ${kelas}`}
                         />
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
@@ -99,10 +106,10 @@ export default function GuruNialiSubKelas() {
                                     return (
                                         <div className="col-xl-3 col-lg-4 col-md-4">
                                             <div
-                                                className="card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center"
-                                                onClick={() => handleSubClass(value.idSubClass, idTingkat)}
+                                                className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
+                                                onClick={() => handleSubClass(value.idSubClass, idTingkat, value.kelas)}
                                             >
-                                                <h2 className="ml-auto mr-auto font-weight-bold mt-5 mb-0">Sub Kelas {value.kelas}</h2>
+                                                <h2 className="ml-auto mr-auto font-weight-bold mb-0">Sub Kelas {value.kelas}</h2>
                                             </div>
                                         </div>
                                     )

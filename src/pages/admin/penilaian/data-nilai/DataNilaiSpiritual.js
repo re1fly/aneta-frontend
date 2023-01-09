@@ -93,6 +93,7 @@ function DataNilaiSpiritual() {
                 }
             )
         });
+        console.log(splitObject(data))
 
         axios
             .post(

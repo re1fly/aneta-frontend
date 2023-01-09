@@ -22,8 +22,9 @@ function CetakRapor() {
     const [refreshState, setRefreshState] = useState(false);
 
     const [dataRapor, setDataRapor] = useState([])
+    // console.log(JSON.stringify(dataRapor, null, 2));
     const [getErapor, setGetErapor] = useState([])
-    console.log(getErapor);
+    // console.log(getErapor);
     const [selectClass, setSelectClass] = useState([]);
     const [selectAcademic, setSelectAcademic] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null)
@@ -104,11 +105,11 @@ function CetakRapor() {
                     }
                 ]
             }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
             }
-        }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
             setGetKelas(dataRes?.data);
@@ -200,7 +201,8 @@ function CetakRapor() {
                         "type": "json",
                         "value": {
                             "id_user": selectedUser?.id,
-                            "id_academic": academic
+                            "id_academic": academic,
+                            "json_pdf_admin": true
                         }
                     }
                 ]
@@ -339,9 +341,9 @@ function CetakRapor() {
                                 <Card className="shadow-md my-6 rounded">
                                     <Row>
                                         <select style={{ width: '100%' }}
-                                            name="select_class"
-                                            className='w600 h35'
-                                            onChange={(e) => setSelectClass(e.target.value)}
+                                                name="select_class"
+                                                className='w600 h35'
+                                                onChange={(e) => setSelectClass(e.target.value)}
                                         >
                                             <option selected disabled>
                                                 Pilih Kelas
@@ -363,9 +365,9 @@ function CetakRapor() {
                                 <Card className="shadow-md my-6 rounded">
                                     <Row>
                                         <select style={{ width: '100%' }}
-                                            name="select_academic"
-                                            className='w600 h35'
-                                            onChange={(e) => setSelectAcademic(e.target.value)}
+                                                name="select_academic"
+                                                className='w600 h35'
+                                                onChange={(e) => setSelectAcademic(e.target.value)}
                                         >
                                             <option selected disabled>
                                                 Pilih Tahun Akademik / Semester
@@ -395,14 +397,14 @@ function CetakRapor() {
                         </div>
                         <div className="mt-4">
                             <Table className="py-8"
-                                columns={columns}
-                                dataSource={channelList}
-                                onChange={onChangeTable}
-                                pagination={false}
-                                rowClassName="bg-greylight text-grey-900"
-                                scroll={{ x: 400 }}
-                                size='middle'
-                                bordered />
+                                   columns={columns}
+                                   dataSource={channelList}
+                                   onChange={onChangeTable}
+                                   pagination={false}
+                                   rowClassName="bg-greylight text-grey-900"
+                                   scroll={{ x: 400 }}
+                                   size='middle'
+                                   bordered />
 
                             <Modal
                                 title=""

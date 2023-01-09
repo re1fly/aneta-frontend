@@ -18,6 +18,7 @@ import {
     Divider,
     Tooltip,
     DatePicker,
+    Modal
 } from "antd";
 import {
     AppstoreOutlined,
@@ -47,6 +48,8 @@ import {
     create_siswa,
     global_data_join_where,
     global_join_sub_where_get, global_update,
+    siswa_export,
+    siswa_import,
     update_siswa,
     url_by_institute
 } from "../../api/reference";
@@ -331,7 +334,7 @@ function DataSiswaAdmin() {
 
     const _exportDataExcel = () => {
         axios.post(url_by_institute, {
-            "processDefinitionId": "siswaexport:1:be7a477f-5900-11ed-8f22-927b5be84510",
+            "processDefinitionId": siswa_export,
             "returnVariables": true,
             "variables": [
                 {
@@ -344,7 +347,6 @@ function DataSiswaAdmin() {
                 }
             ]
         }).then(response => {
-            console.log(response);
             const resData = JSON.parse(response.data.variables[2].value)
             const dataExcel = resData.data
             const byteCharacters = atob(dataExcel);
@@ -383,11 +385,10 @@ function DataSiswaAdmin() {
         let uploaded = e.target.files[0];
         const base64 = await convertBase64(uploaded);
         const getLinkUrl = base64.split(',')[1]
-        // console.log(getLinkUrl);
 
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "siswaimport:1:1dff88c4-5913-11ed-8f22-927b5be84510",
+                "processDefinitionId": siswa_import,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -408,7 +409,6 @@ function DataSiswaAdmin() {
         }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
-            console.log(resData);
             const resCode = resData.data
             if (resCode == "success") {
                 setRefreshState(true);
@@ -432,21 +432,21 @@ function DataSiswaAdmin() {
         let uploaded = e.target.files[0];
         const base64 = await convertBase64(uploaded);
         const getLinkUrl = base64.split(',')[1]
-        // console.log(getLinkUrl);
 
         axios.post(url_by_institute,
             {
-                "processDefinitionId": '',
+                "processDefinitionId": siswa_import,
                 "returnVariables": true,
                 "variables": [
                     {
-                        "name": "get_data",
+                        "name": "data",
                         "type": "json",
                         "value": {
                             "file_base64": getLinkUrl,
                             "file_type": "xlsx",
                             "type": "clear",
                             "institute_id": institute
+
                         }
                     }
                 ]
@@ -458,23 +458,51 @@ function DataSiswaAdmin() {
         }
         ).then(function (response) {
             const resData = JSON.parse(response.data.variables[2].value)
-            console.log(resData);
             const resCode = resData.data
             if (resCode == "success") {
                 setRefreshState(true);
                 notification.success({
                     message: "Sukses",
-                    description: 'Data Guru berhasil di Import',
+                    description: 'Data Siswa berhasil di Import',
                     placement: 'top'
                 })
             } else {
                 notification.error({
                     message: "Error",
-                    description: 'Gagal menambahkan data guru, mohon cek kembali file excel anda.',
+                    description: 'Gagal menambahkan data siswa, mohon cek kembali file excel anda.',
                     placement: 'top'
                 })
             }
         })
+
+    }
+
+    const _modalImportNew = () => {
+        Modal.warning({
+            title: 'Jika anda memilih fitur ini, maka semua data guru akan di replace dengan data excel yang anda impor.',
+            width: '800px',
+            content: (
+                <div>
+                    {/*<p>Klik Button dibawah ini untuk mengimpor data :</p>*/}
+                    <label id='label_import_new' htmlFor="file_excel_kelas_baru"
+                        className="bg-dark border-0 text-center text-white ant-btn-round mr-4 mt-3"
+                        style={{ padding: '4px 16px', cursor: 'pointer' }}>
+                        Upload File Disini
+                    </label>
+                    <input
+                        onChange={_changeExcelFormatNew}
+                        name="new_excel_initiator"
+                        className="w100"
+                        type="file"
+                        id="file_excel_kelas_baru"
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        style={{ display: "none" }}
+                    />
+                </div>
+            ),
+            okText: 'Batal',
+            okType: 'danger'
+        });
 
     }
 
@@ -984,11 +1012,11 @@ function DataSiswaAdmin() {
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                 style={{ display: "none" }}
                             />
-                            {/* <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
+                            <Button className="mr-4" style={{ backgroundColor: '#5e7082', color: 'white' }}
                                 shape="round" size='middle'
                                 onClick={_modalImportNew}>
                                 Import Data Baru
-                            </Button> */}
+                            </Button>
                             <FilterAcademic
                                 academicNow={academic}
                                 id="filter_academic_data_siswa"
@@ -1070,7 +1098,6 @@ function DataSiswaAdmin() {
     }
 
     const viewEditSiswa = (record) => {
-        console.log(record)
         setSelectedUser(record)
         setIsViewEdit(true)
         setIsViewCreate(false)
@@ -1092,8 +1119,6 @@ function DataSiswaAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-
-        console.log(data)
         axios
             .post(
                 url_by_institute, {
@@ -1203,10 +1228,8 @@ function DataSiswaAdmin() {
                 }
             )
             .then(function (response) {
-                console.log('res ', response)
                 const res = JSON.parse(response.data.variables[2].value)
                 const messageError = res.errors
-                console.log('error', messageError)
                 if (res.status == 200) {
                     setIsViewSiswa(true);
                     notification.success({
@@ -1226,7 +1249,11 @@ function DataSiswaAdmin() {
                 }
             })
             .catch((error) => {
-                alert("Email Telah di gunakan, silahkan gunakan email lain.");
+                notification.error({
+                    message: "Error",
+                    description: "Email Telah di gunakan / form email orang tua wali dan siswa sama, silahkan gunakan email lain.",
+                    placement: "top",
+                });
             });
     };
 
@@ -1405,15 +1432,7 @@ function DataSiswaAdmin() {
                 })}
                 isDisabled={false}
                 disabledEmail={false}
-                provSiswa="ACEH"
-                idProvSiswa="11"
-                kotaSiswa="KABUPATEN SIMEULUE"
-                idKotaSiswa="1101"
-                kecSiswa="TEUPAH SELATAN"
-                idKecSiswa="1101010"
-                kelurahanSiswa="LATIUNG"
-                idKelurahanSiswa="1101010001"
-
+                location={"create"}
             />
         )
     }

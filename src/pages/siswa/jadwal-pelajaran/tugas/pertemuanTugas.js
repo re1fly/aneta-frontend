@@ -27,16 +27,21 @@ import {useHistory, useParams} from 'react-router-dom';
 
 const SiswaPertemuanTugas = () => {
     const [grid, setGrid] = useState(false);
-    const [dataPertemuan, setDataPertemuan] = useState([])
+    const [dataPertemuan, setDataPertemuan] = useState([]);
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
     const userId = localStorage.getItem('user_id');
-    const academicId = localStorage.getItem('academic_id')
+    const academicId = localStorage.getItem('academic_id');
 
-    const params = useParams()
-    const idTugas = params.id
+    const params = useParams();
+    const path = params.id.split("-");
+    const idTugas = path[0];
+    const mapel = path[1];
+    const tugas = path[2];
+    // const location = useLocation();
+    // const dataMapel = location.state
 
     const _getDataPertemuan = () => {
         axios.post(url_by_institute, {
@@ -201,7 +206,7 @@ const SiswaPertemuanTugas = () => {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title="Data Pertemuan Tugas"
+                            title={`Jadwal Pelajaran / Tugas / ${mapel} / ${tugas}`}
                         />
                     </div>
                 </div>

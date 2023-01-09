@@ -25,7 +25,7 @@ export const FormAdminPelajaran = (props) => {
                                 <form id="teacher_form"
                                     onSubmit={props.submit}
                                     method="POST">
-                                    <div className="row justify-content-center">
+                                    {/* <div className="row justify-content-center">
                                         <div className="col-lg-4 text-center">
                                             <figure className="avatar mr-auto mb-4 mt-2 w100">
                                                 <Card style={{ width: 200 }}>
@@ -44,7 +44,7 @@ export const FormAdminPelajaran = (props) => {
                                                 </Card>
                                             </figure>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="row">
                                         <div className="col-lg-6 mb-3">
@@ -134,7 +134,7 @@ export const FormAdminPelajaran = (props) => {
                                     <div className="row">
 
 
-                                        <div className="col-lg-6 mb-3">
+                                        <div className="col-lg-12 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Status
@@ -160,7 +160,7 @@ export const FormAdminPelajaran = (props) => {
                                             </div>
                                         </div>
 
-                                        <div className="col-lg-6 mb-3">
+                                        {/* <div className="col-lg-6 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Jumlah Pertemuan
@@ -174,7 +174,7 @@ export const FormAdminPelajaran = (props) => {
                                                     disabled={props.isDisabled}
                                                 />
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         {!disabledButton ? <div className="col-lg-12">
                                             <button

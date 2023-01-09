@@ -8,6 +8,7 @@ import Navheader from "../../components/Navheader";
 import Appheader from "../../components/Appheader";
 import axios from "axios";
 import {global_join_sub_first, global_update, url_by_institute} from "../../api/reference";
+import {FormDaerah} from "../../components/form/FormDaerah.js";
 
 function ProfilSekolah() {
     const [fileList, setFileList] = useState([
@@ -22,6 +23,7 @@ function ProfilSekolah() {
     const [dataSekolah, setDataSekolah] = useState({})
     const [yearSekolah, setYearSekolah] = useState(dataSekolah.year_of_found)
 
+    console.log(dataSekolah)
     useEffect(() => {
         axios.post(url_by_institute, {
                 "processDefinitionId": global_join_sub_first,
@@ -241,26 +243,6 @@ function ProfilSekolah() {
                                         />
                                     </div>
                                 </div>
-
-                                <div className="col-lg-6 mb-3">
-                                    <div className="form-group">
-                                        <label className="mont-font fw-600 font-xsss">
-                                            Provinsi
-                                        </label>
-                                        <select
-                                            className="form-control"
-                                            aria-label="Default select example"
-                                            name="provinsi_sekolah"
-                                            required
-                                        >
-                                            <option value={dataSekolah.state_id} selected disabled hidden>
-                                                {dataSekolah.state}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
                                 <div className="col-lg-6 mb-3">
                                     <div className="form-group">
                                         <label className="mont-font fw-600 font-xsss">
@@ -274,25 +256,8 @@ function ProfilSekolah() {
                                         />
                                     </div>
                                 </div>
-
-                                <div className="col-lg-6 mb-3">
-                                    <div className="form-group">
-                                        <label className="mont-font fw-600 font-xsss">
-                                            Kota / Kabupaten
-                                        </label>
-                                        <select
-                                            className="form-control"
-                                            aria-label="Default select example"
-                                            name="kota_sekolah"
-                                            required
-                                        >
-                                            <option value={dataSekolah.city_id} selected disabled hidden>
-                                                {dataSekolah.city}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
                             </div>
+
                             <div className="row">
                                 <div className="col-lg-6 mb-3">
                                     <div className="form-group">
@@ -303,72 +268,6 @@ function ProfilSekolah() {
                                             type="number"
                                             defaultValue={dataSekolah.fax}
                                             name="fax_sekolah"
-                                            className="form-control"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="col-lg-6 mb-3">
-                                    <div className="form-group">
-                                        <label className="mont-font fw-600 font-xsss">
-                                            Kecamatan
-                                        </label>
-                                        <select
-                                            className="form-control"
-                                            aria-label="Default select example"
-                                            name="kecamatan_sekolah"
-                                            required
-                                        >
-                                            <option value={dataSekolah.district_id} selected disabled hidden>
-                                                {dataSekolah.district}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-lg-6 mb-3">
-                                    <div className="form-group">
-                                        <label className="mont-font fw-600 font-xsss">
-                                            Address
-                                        </label>
-                                        <input
-                                            type="text"
-                                            defaultValue={dataSekolah.address}
-                                            name="address_sekolah"
-                                            className="form-control"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="col-lg-6 mb-3">
-                                    <div className="form-group">
-                                        <label className="mont-font fw-600 font-xsss">
-                                            Kelurahan
-                                        </label>
-                                        <select
-                                            className="form-control"
-                                            aria-label="Default select example"
-                                            name="kelurahan_sekolah"
-                                            required
-                                        >
-                                            <option value={dataSekolah.sub_district_id} selected disabled hidden>
-                                                {dataSekolah.sub_district}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-lg-6 mb-3">
-                                    <div className="form-group">
-                                        <label className="mont-font fw-600 font-xsss">
-                                            Website
-                                        </label>
-                                        <input
-                                            type="text"
-                                            defaultValue={dataSekolah.website}
-                                            name="website_sekolah"
                                             className="form-control"
                                         />
                                     </div>
@@ -390,7 +289,55 @@ function ProfilSekolah() {
                                         />
                                     </div>
                                 </div>
+
                             </div>
+                            {
+                                Object.keys(dataSekolah).length == 15 ? <FormDaerah location="edit"
+                                                                                    nameProvinsi="provinsi_sekolah"
+                                                                                    idProvinsi={dataSekolah.state_id}
+                                                                                    provinsi={dataSekolah.state}
+                                                                                    nameKota="kota_sekolah"
+                                                                                    idKota={dataSekolah.city_id}
+                                                                                    kota={dataSekolah.city}
+                                                                                    nameKecamatan="kecamatan_sekolah"
+                                                                                    idKec={dataSekolah.district_id}
+                                                                                    kecamatan={dataSekolah.district}
+                                                                                    nameKelurahan="kelurahan_sekolah"
+                                                                                    idKel={dataSekolah.sub_district_id}
+                                                                                    kelurahan={dataSekolah.sub_district}
+                                                                                    isDisabled={false}
+                                                                                    isRequired={false}
+                                /> : null
+                            }
+                            <div className="row">
+                                <div className="col-lg-6 mb-3">
+                                    <div className="form-group">
+                                        <label className="mont-font fw-600 font-xsss">
+                                            Address
+                                        </label>
+                                        <input
+                                            type="text"
+                                            defaultValue={dataSekolah.address}
+                                            name="address_sekolah"
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-lg-6 mb-3">
+                                    <div className="form-group">
+                                        <label className="mont-font fw-600 font-xsss">
+                                            Website
+                                        </label>
+                                        <input
+                                            type="text"
+                                            defaultValue={dataSekolah.website}
+                                            name="website_sekolah"
+                                            className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="row">
                                 <div className="col-lg-12">
                                     <button

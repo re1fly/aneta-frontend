@@ -46,8 +46,8 @@ function GuruPerencanaanNilai() {
                                 to={value.url}
                             >
                                 <div
-                                    className="card mb-4 d-block ant-card-hoverable h150 w-100 shadow-md rounded-xl p-xxl-5 pt-3 text-center">
-                                    <h2 className="ml-auto mr-auto p-3 mt-4 font-weight-bold">{value.title}</h2>
+                                    className="d-flex align-items-center justify-content-center card mb-4 d-block ant-card-hoverable h150 w-100 shadow-md rounded-xl p-xxl-5 text-center">
+                                    <h2 className="ml-auto mr-auto p-3 font-weight-bold">{value.title}</h2>
                                 </div>
                             </Link>
                         </div>

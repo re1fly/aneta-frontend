@@ -50,6 +50,7 @@ export default function ListTahunAkademik() {
     const [selectedUser, setSelectedUser] = useState(null);
 
     const [getTahunAkademik, setGetTahunAkademik] = useState([])
+    console.log(getTahunAkademik);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
@@ -286,6 +287,11 @@ export default function ListTahunAkademik() {
     const TableTahunAkademik = () => {
         const columns = [
             {
+                title: 'ID',
+                dataIndex: 'id',
+                align: 'center',
+            },
+            {
                 title: 'Tahun Akademik',
                 dataIndex: 'tahunAkademik',
                 align: 'center',
@@ -332,6 +338,7 @@ export default function ListTahunAkademik() {
             {
                 title: 'Aksi',
                 key: 'action',
+                align: 'center',
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">

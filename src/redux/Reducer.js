@@ -47,6 +47,32 @@ const AllDate = {
   DateTime: [],
 }
 
+const PathJadwalGuru = {
+  kelas: '',
+  subKelas: '',
+  mapel: '',
+  type: '',
+  materi: '',
+  pertemuan: '',
+}
+
+const PathKalenderGuru = {
+  tanggal: '',
+  allPath: [],
+}
+
+const PathNilaiGuru = {
+  kelas: '',
+  subKelas: '',
+  mapel: '',
+  tugas: '',
+}
+
+const PathKalenderSiswa = {
+  tanggal: '',
+  allPath: [],
+}
+
 export const reducerSearch = (state = searchReduce, action) => {
   if (action.type === "SEARCH_GLOBAL") {
     return {
@@ -234,4 +260,106 @@ export const ReducerDateTime = (state = AllDate, action) => {
   }
 
   return state;
+};
+
+export const ReducerPathJadwalGuru = (state = PathJadwalGuru, action) => {
+  switch (action.type) {
+    case "ADD_KELAS":
+      return {
+        ...state,
+        kelas: action.value
+      }
+    case "ADD_SUBKELAS":
+      return {
+        ...state,
+        subKelas: action.value
+      }
+    case "ADD_MAPEL":
+      return {
+        ...state,
+        mapel: action.value
+      }
+    case "ADD_TYPE":
+      return {
+        ...state,
+        type: action.value
+      }
+    case "ADD_MATERI":
+      return {
+        ...state,
+        materi: action.value
+      }
+    case "ADD_PERTEMUAN":
+      return {
+        ...state,
+        pertemuan: action.value
+      }
+    default:
+      return state;
+
+  }
+};
+
+export const ReducerPathKalenderGuru = (state = PathKalenderGuru, action) => {
+  switch (action.type) {
+    case "ADD_TANGGAL":
+      return {
+        ...state,
+        tanggal: action.value
+      }
+    case "ADD_ALLPATHKALENDER":
+      return {
+        ...state,
+        allPath: action.value
+      }
+    default:
+      return state;
+
+  }
+};
+
+export const ReducerPathNilaiGuru = (state = PathNilaiGuru, action) => {
+  switch (action.type) {
+    case "ADD_NILAIKELAS":
+      return {
+        ...state,
+        kelas: action.value
+      }
+    case "ADD_NILAISUBKELAS":
+      return {
+        ...state,
+        subKelas: action.value
+      }
+      case "ADD_NILAIMAPEL":
+      return {
+        ...state,
+        mapel: action.value
+      }
+    case "ADD_NILAITUGAS":
+      return {
+        ...state,
+        tugas: action.value
+      }
+    default:
+      return state;
+
+  }
+};
+
+export const ReducerPathKalenderSiswa = (state = PathKalenderSiswa, action) => {
+  switch (action.type) {
+    case "ADD_TANGGALSISWA":
+      return {
+        ...state,
+        tanggal: action.value
+      }
+    case "ADD_ALLPATHKALENDERSISWA":
+      return {
+        ...state,
+        allPath: action.value
+      }
+    default:
+      return state;
+
+  }
 };

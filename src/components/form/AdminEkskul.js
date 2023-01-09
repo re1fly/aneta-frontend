@@ -4,175 +4,9 @@ import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 
 export const FormAdminEkskul = (props) => {
     let disabledButton = props.isDisabled;
-    let isViewEdit = props.isEdit;
-    const dataSiswa = [
-        {
-            id_siswa: 1,
-            nisn: 123321,
-            nama_siswa: "Lola",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        },
-        {
-            id_siswa: 2,
-            nisn: 12134,
-            nama_siswa: "Rachel",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        },
-        {
-            id_siswa: 3,
-            nisn: 10132,
-            nama_siswa: "Lizzy",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        },
-        {
-            id_siswa: 3,
-            nisn: 10132,
-            nama_siswa: "Lizzy",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        },
-        {
-            id_siswa: 3,
-            nisn: 10132,
-            nama_siswa: "Lizzy",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        },
-        {
-            id_siswa: 3,
-            nisn: 10132,
-            nama_siswa: "Lizzy",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        },
-        {
-            id_siswa: 3,
-            nisn: 10132,
-            nama_siswa: "Lizzy",
-            id_kelas: 1,
-            nama_kelas: "I",
-            sub_kelas: "B"
-        }
-    ]
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const allDataSiswa = dataSiswa.map((data, index) => {
-        return {
-            no: index + 1,
-            idSiswa: data.id_siswa,
-            nisn: data.nisn,
-            namaSiswa: data.nama_siswa,
-            idKelas: data.id_kelas,
-            namaKelas: data.nama_kelas,
-            subKelas: data.sub_kelas
-        }
-    })
-    const columns = [
-        {
-            title: 'No',
-            dataIndex: 'no',
-        },
-        {
-            title: 'NISN',
-            dataIndex: 'nisn',
-        },
-        {
-            title: 'Nama Siswa',
-            dataIndex: 'namaSiswa',
-
-        },
-        {
-            title: 'Kelas',
-            dataIndex: 'namaKelas',
-        },
-        {
-            title: 'Aksi',
-            key: 'action',
-            responsive: ['sm'],
-            align: 'center',
-            render: (text, record) => (
-                <Space size="middle">
-                    <DeleteOutlined style={{color: 'red'}} onClick={() => console.log(record)}/>
-                </Space>
-            ),
-        },
-    ];
-    const columnsAddSiswa = [
-        {
-            title: 'Pilih Siswa',
-            key: 'action',
-            responsive: ['sm'],
-            align: 'center',
-            render: (text, record) => (
-                <input
-                    type="checkbox"
-                    className="form-control"
-                    style={{zoom: 0.4}}
-                    name="siswa"
-                    id={record.id}
-                />
-            ),
-        },
-        {
-            title: 'NISN',
-            dataIndex: 'nisn',
-        },
-        {
-            title: 'Nama Siswa',
-            dataIndex: 'namaSiswa',
-
-        },
-        {
-            title: 'Kelas',
-            dataIndex: 'namaKelas',
-        },
-    ];
-
-    const showModal = () => {
-        setIsModalVisible(true);
-    };
-    const handleOk = () => {
-        setIsModalVisible(false);
-    };
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
     return (
         <div className="container px-3 py-4">
-            <Modal title="Tambah Data Siswa"
-                   visible={isModalVisible}
-                   onOk={handleOk}
-                   onCancel={handleCancel}
-                   width={1000}
-                   footer={[
-                       <Button key="submit" type="primary" onClick={handleOk} className='bg-current border-0 rounded-pill'>
-                           Submit
-                       </Button>,
-                       <Button key="back" onClick={handleCancel} className='rounded-pill'>
-                           Cancel
-                       </Button>
-
-                   ]}
-            >
-                <Table className="py-8 p-3"
-                       columns={columnsAddSiswa}
-                       dataSource={allDataSiswa}
-                       pagination={false}
-                       rowClassName="bg-white text-grey-900"
-                       scroll={{y: 250}}
-                       height={250}
-                />
-            </Modal>
             <div className="row">
                 <div className="col-lg-12">
                     <div className="middle-wrap">
@@ -215,7 +49,7 @@ export const FormAdminEkskul = (props) => {
                                                     required
                                                 >
                                                     <option value={props.idTahunAkademik} selected disabled hidden>
-                                                        {props.thAkademik} / {props.semester}
+                                                        {props.thAkademik} / Semester {props.semester}
                                                     </option>
                                                     {props.selectTahunAkademik}
                                                 </select>
@@ -260,37 +94,6 @@ export const FormAdminEkskul = (props) => {
                                         </div>
 
                                     </div>
-                                    {
-                                        isViewEdit ?
-                                        <div className="row">
-                                            <div className="col-lg-12">
-                                                <div className="mt-3 float-right">
-                                                    <button
-                                                        className="bg-linkedin border-0 text-center text-white font-xsss fw-600 p-2 w150 rounded-pill d-inline-block"
-                                                        type="button"
-                                                        onClick={showModal}
-                                                    >
-                                                        Tambah Siswa
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-12">
-                                                <h2 className='mt-5 pt-4 mb-3 text-center'>Daftar Siswa</h2>
-                                                <Table className="py-8"
-                                                       columns={columns}
-                                                       dataSource={allDataSiswa}
-                                                       pagination={false}
-                                                       rowClassName="bg-white text-grey-900"
-                                                       scroll={{y: 250}}
-                                                       height={250}
-                                                       style={{
-                                                           boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px'
-                                                       }}
-                                                />
-                                            </div>
-
-                                        </div> : null
-                                    }
 
                                     <div className="mt-5 pt-2 float-right">
                                         {!disabledButton ?

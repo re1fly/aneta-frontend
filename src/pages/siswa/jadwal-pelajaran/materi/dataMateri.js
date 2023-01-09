@@ -7,17 +7,19 @@ import Appheader from "../../../../components/Appheader";
 
 import axios from "axios";
 import { role_siswa_get_daftar_materi, url_by_institute } from "../../../../api/reference";
+import { PageHeader } from 'antd';
 
 function SiswaDataMateri() {
     const [getMateri, setGetMateri] = useState([]);
-    console.log(getMateri);
 
     const userId = localStorage.getItem('user_id');
     const institute = localStorage.getItem('institute')
     const academicId = localStorage.getItem('academic_id')
 
     const params = useParams()
-    const idMapel = params.id
+    const path = params.id.split("-")
+    const idMapel = path[0]
+    const mapel = path[1]
 
     useEffect(() => {
         axios.post(url_by_institute, {
@@ -58,9 +60,8 @@ function SiswaDataMateri() {
     })
 
     let history = useHistory();
-    const handleRouter = (id) => {
-        console.log(id);
-        history.push(`/siswa-pertemuan-materi-${id}`)
+    const handleRouter = (id, mapel, materi) => {
+        history.push(`/siswa-pertemuan-materi-${id}-${mapel}-${materi}`)
     }
 
     return (
@@ -72,7 +73,13 @@ function SiswaDataMateri() {
                     <div className="container px-3 py-4">
                         <div className="row mb-3">
                             <div className="col-lg-12">
-                                {/* <div className="d-flex alignt-items-center justify-content-between mb-4">
+                                <PageHeader
+                                    className="site-page-header card bg-lightblue text-grey-900 fw-700 "
+                                    onBack={() => window.history.back()}
+                                    title={`Jadwal Pelajaran / Materi / ${mapel}`}
+                                />
+                                {/* calendar navigation
+                                <div className="d-flex alignt-items-center justify-content-between mb-4">
                                     <div className="strong">
                                         <h5 className='font-xsss pt-1 mb-0'>{currentDate} WIB</h5>
                                     </div>
@@ -88,12 +95,12 @@ function SiswaDataMateri() {
                                         </Button>
                                     </div>
                                 </div> */}
-                                <div className=''>
+                                <div className='mt-4'>
                                     <div className="row">
                                         {data?.map((value, index) => (
                                             <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                                                 <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center"
-                                                    onClick={() => handleRouter(value.id)}>
+                                                    onClick={() => handleRouter(value.id, mapel, value.namaMateri)}>
                                                     <h4 className="media fw-700 font-lg mt-1 mb-3">{value.namaMateri}</h4>
                                                     <div className="clearfix "></div>
                                                     <div className='media'>

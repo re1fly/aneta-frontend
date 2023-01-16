@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Navbar, Nav } from 'react-bootstrap';
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 
 class Header extends Component {
   state = {
@@ -9,23 +9,32 @@ class Header extends Component {
   toggleOpen = () => this.setState({ isOpen: !this.state.isOpen });
 
   render() {
-    const navClass = `${this.state.isOpen ? ' show' : ''}`;
-    const { divClass, color = 'light' } = this.props;
+    const navClass = `${this.state.isOpen ? " show" : ""}`;
+    const { divClass, color = "light" } = this.props;
     let colorClass;
-    if (color === 'dark') {
-      colorClass = 'text-white';
+    if (color === "dark") {
+      colorClass = "text-white";
     }
     return (
       <div className={`header-wrapper pt-2 pb-2 shadow-xss ${divClass}`}>
         <div className="container">
           <div className="row">
-            <div className="col-lg-12 navbar pt-0 pb-0">
-              <Link to="/" className=''>
-                <img className='w125' src="https://aneta.id/assets/img/aneta.png" alt="aneta logo"></img>
-              </Link>
-              <button className="navbar-toggler" onClick={this.toggleOpen}>
+            <div className="navbar col-lg-12 row pt-0 pb-0">
+              <div className="">
+                {/* <Link to="/" className=''>
+                    <img className='w125' src={`assets/images/logo/logo_pelindo_anper_bb.png`} alt="edii logo"></img>
+                  </Link> */}
+                <Link to="/">
+                  <img
+                    className="w125 mr-5"
+                    src={`assets/images/logo/aneta.png`}
+                    alt="aneta logo"
+                  ></img>
+                </Link>
+              </div>
+              {/* <button className="navbar-toggler" onClick={this.toggleOpen}>
                 <span className="navbar-toggler-icon"></span>
-              </button>
+              </button> */}
               <div
                 className={`collapse navbar-collapse ${navClass}`}
                 id="navbarNavDropdown"
@@ -36,9 +45,7 @@ class Header extends Component {
                 >
                   <Navbar id="basic-navbar-nav" className="w-100 d-block">
                     <Nav className={`mt-2 ${colorClass}`}>
-                      <a className="mr-5 navbar-feature">
-                        Tentang Kami
-                      </a>
+                      <a className="mr-5 navbar-feature">Tentang Kami</a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
                         Tentang Kami
                       </NavDropdown.Item> */}
@@ -59,9 +66,7 @@ class Header extends Component {
                           Home Five
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-5 navbar-feature">
-                        Fitur
-                      </a>
+                      <a className="mr-4 navbar-feature">Fitur</a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
                         Fitur
                       </NavDropdown.Item> */}
@@ -77,24 +82,30 @@ class Header extends Component {
                           404
                         </NavDropdown.Item>
                       </NavDropdown> */}
-                      <a className="mr-5 navbar-feature">
-                        Cara Pendaftaran
-                      </a>
-                      {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
-                        Cara Pendaftaran
-                      </NavDropdown.Item> */}
-                      {/* <NavDropdown title="Blog" id="basic-nav-dropdown">
-                        <NavDropdown.Item href="/blog">Blog</NavDropdown.Item>
-                        <NavDropdown.Item href="/blog-sidebar">
-                          Blog Sidebar
+                      {/*<a className="mr-5 navbar-feature">*/}
+                      {/*  Cara Pendaftaran*/}
+                      {/*</a>*/}
+                      <NavDropdown title="Download" id="basic-nav-dropdown">
+                        <NavDropdown.Item
+                          target="_blank"
+                          href="https://drive.google.com/file/d/1hdT4WNztwtZzVc1B4xxt8Mv7VXY8Kt7z/view?usp=share_link"
+                        >
+                          User Manual Admin
                         </NavDropdown.Item>
-                        <NavDropdown.Item href="/blog-single">
-                          Blog Single
+                        <NavDropdown.Item
+                          target="_blank"
+                          href="https://drive.google.com/file/d/1RI6Dl3R01wrRG0StypKTEynJWf2JRW4T/view?usp=share_link"
+                        >
+                          User Manual Guru
                         </NavDropdown.Item>
-                      </NavDropdown> */}
-                      <a className="mr-5 pr-5 navbar-feature">
-                        Bantuan
-                      </a>
+                        <NavDropdown.Item
+                          target="_blank"
+                          href="https://drive.google.com/file/d/1nspzTQC4YAA3etX7hrp68rM4x-0xNjD_/view?usp=share_link"
+                        >
+                          User Manual Siswa
+                        </NavDropdown.Item>
+                      </NavDropdown>
+                      <a className="mr-5 ml-4 pr-5 navbar-feature">Bantuan</a>
                       {/* <NavDropdown.Item className="mr-3 navbar-feature" href="/contact">
                         Bantuan
                       </NavDropdown.Item> */}
@@ -124,11 +135,11 @@ class Header extends Component {
                       <NavDropdown.Item href="/contact">
                         Contact
                       </NavDropdown.Item> */}
-                      <div className='mr-5 w125'>
+                      {/* <div className='mr-5 w125'>
 
-                      </div>
-                      
-                      <div className="mr-0 d-flex align-items-center">
+                      </div> */}
+
+                      <div className="mr-0 d-flex align-items-center ml-5 pl-5">
                         <Link
                           to="/login"
                           className={`text-center text-grey-800`}

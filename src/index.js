@@ -81,7 +81,7 @@ import Homefive from "./pages/Homefive";
 import Homesix from "./pages/Homesix";
 import Homefour from "./pages/Homefour";
 
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
 
 // Role Admin
@@ -100,7 +100,7 @@ import CetakRapor from "./pages/admin/E-Rapor/CetakRapor";
 // Role Guru
 import BerandaGuru from "./pages/guru/Beranda";
 import GuruDataMateri from "./pages/guru/data-materi/index";
-import DataMateriDetail from "./pages/guru/data-materi/Detail";
+// import DataMateriDetail from "./pages/guru/data-materi/Detail";
 // import DataMateriGuru from "./pages/guru/data-materi";
 // import MateriPelajaranGuru from "./pages/guru/data-materi/Pelajaran";
 // import GuruDetailPelajaran from "./pages/guru/data-materi/Detail";
@@ -127,7 +127,6 @@ import DataPelajaranKelas from "./pages/admin/data-pelajaran/DataPelajaranKelas"
 import DataIntervalPredikat from "./pages/admin/data-pelajaran/DataIntervalPredikat";
 import PerencanaanNilai from "./pages/admin/penilaian/perencanaan-nilai";
 import NilaiPengetahuan from "./pages/admin/penilaian/perencanaan-nilai/NilaiPengetahuan";
-import JadwalPelajaranSiswa from "./pages/siswa/jadwal-pelajaran";
 import NilaiKeterampilan from "./pages/admin/penilaian/perencanaan-nilai/NilaiKeterampilan";
 import NilaiSpiritual from "./pages/admin/penilaian/perencanaan-nilai/NilaiSpiritual";
 import NilaiSosial from "./pages/admin/penilaian/perencanaan-nilai/NilaiSosial";
@@ -142,19 +141,107 @@ import JadwalPelajaranAdminSubKelas from "./pages/admin/jadwal-pelajaran/SubKela
 import DataEkstrakurikuler from "./pages/admin/ekstrakurikuler/DataEkstrakurikuler";
 import InputNilaiEkskul from "./pages/admin/ekstrakurikuler/InputNilaiEkskul";
 import InputDataDeskripsiSikap from "./pages/admin/penilaian/InputDataDeskripsiSikap";
-import JadwalPelajaranGuru from "./pages/guru/jadwal-pelajaran";
 import GuruCreateMateri from "./pages/guru/data-materi/createMateri";
+import MateriGuru from "./pages/guru/guruMateri";
+import GuruPenilaian from "./pages/guru/nilai-tugas/Penilaian";
+import SiswaStatusPenilaian from "./pages/siswa/E-Rapor/StatusPenilaian";
+import SiswaCetakRapor from "./pages/siswa/E-Rapor/CetakRapor";
+import KompetensiSiswa from "./pages/siswa/kompetensi";
+import GuruCapaianPenilaian from "./pages/guru/penilaian/CapaianPenilaian";
+import GuruPerencanaanNilai from "./pages/guru/penilaian/perencanaan-nilai";
+import GuruNilaiPengetahuan from "./pages/guru/penilaian/perencanaan-nilai/NilaiPengetahuan";
+import GuruNilaiKeterampilan from "./pages/guru/penilaian/perencanaan-nilai/NilaiKeterampilan";
+import GuruNilaiSpiritual from "./pages/guru/penilaian/perencanaan-nilai/NilaiSpiritual";
+import GuruNilaiSosial from "./pages/guru/penilaian/perencanaan-nilai/NilaiSosial";
+import GuruRencanaBobot from "./pages/guru/penilaian/perencanaan-nilai/RencanaBobot";
+import GuruInputDataNilai from "./pages/guru/penilaian/data-nilai";
+import GuruDataNilaiPengetahuan from "./pages/guru/penilaian/data-nilai/DataNilaiPengetahuan";
+import GuruDataNilaiKeterampilan from "./pages/guru/penilaian/data-nilai/DataNilaiKeterampilan";
+import GuruDataNilaiSpiritual from "./pages/guru/penilaian/data-nilai/DataNilaiSpiritual";
+import GuruDataNilaiSosial from "./pages/guru/penilaian/data-nilai/DataNilaiSosial";
+import GuruDataNilaiUjian from "./pages/guru/penilaian/data-nilai/DataNilaiUjian";
+import GuruInputDataDeskripsiNilai from "./pages/guru/penilaian/InputDataDeskripsiNilai";
+import GuruInputDataDeskripsiSikap from "./pages/guru/penilaian/InputDataDeskripsiSikap";
+import GuruKirimPenilaian from "./pages/guru/penilaian/KirimPenilaian";
+import KompetensiGuru from "./pages/guru/kompetensi";
+import GuruPertemuan from "./pages/guru/data-materi/pertemuan";
+import GuruPertemuanTugas from "./pages/guru/data-tugas/pertemuan";
+import GuruDataTugas from "./pages/guru/data-tugas";
+import GuruCreateTugas from "./pages/guru/data-tugas/createTugas";
+import AdminTingkatKelas from "./pages/admin/data-kelas/tingkatKelas";
+import GuruJadwalPelajaranKelas from "./pages/guru/jadwal-pelajaran/kelas";
+import GuruJadwalPelajaranSubKelas from "./pages/guru/jadwal-pelajaran/subKelas";
+import GuruJadwalPelajaranMapel from "./pages/guru/jadwal-pelajaran/mapel";
+import GuruJadwalPelajaranMateriTugas from "./pages/guru/jadwal-pelajaran/materiTugas";
+import SiswaPertemuanMateri from "./pages/siswa/jadwal-pelajaran/materi/pertemuanMateri";
+import SiswaPertemuanTugas from "./pages/siswa/jadwal-pelajaran/tugas/pertemuanTugas";
+import SiswaJadwalTugas from "./pages/siswa/jadwal-pelajaran/tugas/Tugas";
+import SiswaDataTugas from "./pages/siswa/jadwal-pelajaran/tugas/dataTugas";
+import SiswaJadwalMateri from "./pages/siswa/jadwal-pelajaran/materi/Materi";
+import SiswaDataMateri from "./pages/siswa/jadwal-pelajaran/materi/dataMateri";
+import GuruNilaiKelas from "./pages/guru/nilai-tugas/kelas";
+import GuruNialiSubKelas from "./pages/guru/nilai-tugas/subKelas";
+import GuruNilaiMapel from "./pages/guru/nilai-tugas/mapel";
+import TugasGuru from "./pages/guru/guruTugas";
+import GuruJadwalPelajaranMapelMateri from "./pages/guru/jadwal-pelajaran/listMapelMateri";
+import GuruJadwalPelajaranMapelTugas from "./pages/guru/jadwal-pelajaran/listMapelTugas";
+import GuruListPertemuanMateri from "./pages/guru/jadwal-pelajaran/listPertemuanMateri";
+import GuruListPertemuanTugas from "./pages/guru/jadwal-pelajaran/listPertemuanTugas";
+import GuruNilaiTugas from "./pages/guru/nilai-tugas/tugas";
+import SiswaNilaiPelajaran from "./pages/siswa/tugas-nilai/mapel";
+import SiswaNilaiTugas from "./pages/siswa/tugas-nilai/Tugas";
+import SiswaPenilaian from "./pages/siswa/tugas-nilai/Nilai";
+import GuruSubmitRapor from "./pages/guru/E-Rapor/SubmitRapor";
+import GuruKalender from "./pages/guru/jadwal-pelajaran/kalender";
+import GuruListPertemuanKalender from "./pages/guru/jadwal-pelajaran/kalender/listPertemuan";
+import SiswaKalender from "./pages/siswa/jadwal-pelajaran/kalender";
+import SiswaListPertemuanKalender from "./pages/siswa/jadwal-pelajaran/kalender/listPertemuan";
+import Verification from "./pages/Verification";
+import GuruInputNilaiEkskul from "./pages/guru/penilaian/InputNilaiEkskul";
+import SuperAdminVerification from "./pages/superadmin/Verifification";
+import GuruKalenderMateri from "./pages/guru/jadwal-pelajaran/kalender/pertemuanMateri";
+import GuruKalenderTugas from "./pages/guru/jadwal-pelajaran/kalender/pertemuanTugas";
+import SiswaKalenderMateri from "./pages/siswa/jadwal-pelajaran/kalender/pertemuanMateri";
+import SiswaKalenderTugas from "./pages/siswa/jadwal-pelajaran/kalender/pertemuanTugas";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import EditJadwalPelajaran from "./pages/admin/jadwal-pelajaran/EditDetail";
 
 class Root extends Component {
   render() {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("../firebase-messaging-sw.js")
+        .then(function (registration) {
+          console.log("Registration successful, scope is:", registration.scope);
+        })
+        .catch(function (err) {
+          console.log("Service worker registration failed, error:", err);
+        });
+    }
+    // const messaging = getMessaging()
+
+    // onMessage(messaging, (payload) => {
+    //   console.log('Message received. ', payload);
+    //   // ...
+    // });
     return (
       <Provider store={store}>
         <BrowserRouter basename={"/"}>
           <Switch>
             <Route
               exact
+              path={`${process.env.PUBLIC_URL}/superadmin-verification`}
+              component={SuperAdminVerification}
+            />
+            <Route
+              exact
               path={`${process.env.PUBLIC_URL}/`}
               component={Homefour}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/not-verification`}
+              component={Verification}
             />
             <Route
               exact
@@ -193,18 +280,28 @@ class Root extends Component {
             />
             <Route
               exact
+              path={`${process.env.PUBLIC_URL}/admin-tingkat-kelas`}
+              component={AdminTingkatKelas}
+            />
+            <Route
+              exact
               path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran`}
               component={JadwalPelajaranAdmin}
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-sub-kelas`}
+              path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-sub-kelas-:id`}
               component={JadwalPelajaranAdminSubKelas}
             />
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-detail-:id`}
               component={JadwalPelajaranAdminDetail}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-edit-:id`}
+              component={EditJadwalPelajaran}
             />
             <Route
               exact
@@ -270,14 +367,215 @@ class Root extends Component {
             />
             <Route
               exact
+              path={`${process.env.PUBLIC_URL}/guru-materi-pertemuan`}
+              component={GuruPertemuan}
+            />
+            <Route
+              exact
               path={`${process.env.PUBLIC_URL}/guru-create-materi`}
               component={GuruCreateMateri}
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran`}
-              component={JadwalPelajaranGuru}
+              path={`${process.env.PUBLIC_URL}/guru-data-tugas`}
+              component={GuruDataTugas}
             />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-tugas-pertemuan`}
+              component={GuruPertemuanTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-create-tugas`}
+              component={GuruCreateTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender`}
+              component={GuruKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender-materi-:id`}
+              component={GuruKalenderMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kalender-tugas-:id`}
+              component={GuruKalenderTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-list-pertemuan-kalender`}
+              component={GuruListPertemuanKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-kelas`}
+              component={GuruJadwalPelajaranKelas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-sub-kelas-:id`}
+              component={GuruJadwalPelajaranSubKelas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-mapel-:id`}
+              component={GuruJadwalPelajaranMapel}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-materi-tugas-:id`}
+              component={GuruJadwalPelajaranMateriTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-list-materi-:id`}
+              component={GuruJadwalPelajaranMapelMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-list-tugas-:id`}
+              component={GuruJadwalPelajaranMapelTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-materi-pertemuan-:id`}
+              component={GuruListPertemuanMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-jadwal-pelajaran-tugas-pertemuan-:id`}
+              component={GuruListPertemuanTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-materi-:id`}
+              component={MateriGuru}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-tugas-:id`}
+              component={TugasGuru}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-nilai-kelas`}
+              component={GuruNilaiKelas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-nilai-sub-kelas-:id`}
+              component={GuruNialiSubKelas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-nilai-mapel-:id`}
+              component={GuruNilaiMapel}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-nilai-tugas-:id`}
+              component={GuruNilaiTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-penilaian-:id`}
+              component={GuruPenilaian}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-kompetensi`}
+              component={KompetensiGuru}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-capaian-penilaian`}
+              component={GuruCapaianPenilaian}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-perencanaan-nilai`}
+              component={GuruPerencanaanNilai}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-perencanaan-nilai-pengetahuan`}
+              component={GuruNilaiPengetahuan}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-perencanaan-nilai-keterampilan`}
+              component={GuruNilaiKeterampilan}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-perencanaan-nilai-spiritual`}
+              component={GuruNilaiSpiritual}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-perencanaan-nilai-sosial`}
+              component={GuruNilaiSosial}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-perencanaan-nilai-bobot`}
+              component={GuruRencanaBobot}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-input-nilai`}
+              component={GuruInputDataNilai}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-data-nilai-pengetahuan`}
+              component={GuruDataNilaiPengetahuan}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-data-nilai-keterampilan`}
+              component={GuruDataNilaiKeterampilan}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-data-nilai-spiritual`}
+              component={GuruDataNilaiSpiritual}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-data-nilai-sosial`}
+              component={GuruDataNilaiSosial}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-data-nilai-ujian`}
+              component={GuruDataNilaiUjian}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-input-deskripsi-nilai`}
+              component={GuruInputDataDeskripsiNilai}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-input-deskripsi-sikap`}
+              component={GuruInputDataDeskripsiSikap}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-kirim-penilaian`}
+              component={GuruKirimPenilaian}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-submit-rapor`}
+              component={GuruSubmitRapor}
+            />
+
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/siswa-beranda`}
@@ -288,20 +586,96 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/siswa-kelas`}
               component={KelasSiswa}
             />
+
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/siswa-kelas-materi`}
-              component={MateriSiswa}
-            />
-            <Route
-              exact
-              path={`${process.env.PUBLIC_URL}/siswa-kelas-tugas`}
+              path={`${process.env.PUBLIC_URL}/siswa-kelas-tugas-:id`}
               component={TugasiSiswa}
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran`}
-              component={JadwalPelajaranSiswa}
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran-kalender`}
+              component={SiswaKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-list-pertemuan-kalender`}
+              component={SiswaListPertemuanKalender}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran-kalender-materi-:id`}
+              component={SiswaKalenderMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-pelajaran-kalender-tugas-:id`}
+              component={SiswaKalenderTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-materi`}
+              component={SiswaJadwalMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-data-materi-:id`}
+              component={SiswaDataMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-pertemuan-materi-:id`}
+              component={SiswaPertemuanMateri}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-kelas-materi-:id`}
+              component={MateriSiswa}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-jadwal-tugas`}
+              component={SiswaJadwalTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-data-tugas-:id`}
+              component={SiswaDataTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-pertemuan-tugas-:id`}
+              component={SiswaPertemuanTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-penilaian-:id`}
+              component={SiswaPenilaian}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-nilai-pelajaran`}
+              component={SiswaNilaiPelajaran}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-nilai-tugas-:id`}
+              component={SiswaNilaiTugas}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-status-penilaian`}
+              component={SiswaStatusPenilaian}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-cetak-rapor`}
+              component={SiswaCetakRapor}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/siswa-kompetensi`}
+              component={KompetensiSiswa}
             />
 
             <Route
@@ -388,6 +762,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/admin-input-data-ekstrakurikuler`}
               component={InputNilaiEkskul}
+            />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-input-data-ekstrakurikuler`}
+              component={GuruInputNilaiEkskul}
             />
 
             <Route
@@ -739,6 +1118,7 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/home-2`}
               component={Hometwo}
             />
+            <Redirect to="/notfound" />
           </Switch>
         </BrowserRouter>
       </Provider>

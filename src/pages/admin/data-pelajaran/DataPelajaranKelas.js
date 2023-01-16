@@ -36,6 +36,7 @@ import { dateNow } from "../../../components/misc/date";
 import Swal from "sweetalert2";
 import {
   get_data_mata_pelajaran,
+  get_data_pelajaran_by_tingkat,
   get_where_no_join,
   global_data_join_where,
   global_join_sub_where_get,
@@ -146,6 +147,12 @@ function DataPelajaranKelas() {
                     tbl_value: selectedClass,
                     operator: allClass,
                   },
+                  {
+                    tbl_coloumn: "x_academic_subject_master",
+                    tbl_field: "deleted_at",
+                    tbl_value: "",
+                    operator: "",
+                  },
                 ],
                 order_coloumn: "x_academic_subjects.updated_at",
                 order_by: "desc",
@@ -166,6 +173,7 @@ function DataPelajaranKelas() {
         }
       )
       .then(function (response) {
+        console.log(response);
         const resData = JSON.parse(response.data.variables[3].value);
         const dataPel = resData.data.data;
         const pagination = resData.data.links;
@@ -306,21 +314,17 @@ function DataPelajaranKelas() {
       .post(
         url_by_institute,
         {
-          processDefinitionId: get_data_mata_pelajaran,
+          processDefinitionId: get_data_pelajaran_by_tingkat,
           returnVariables: true,
           variables: [
             {
               name: "get_data",
               type: "json",
               value: {
-                id_academic: academic,
+                id_academic: defaultAcademic,
                 paginate: false,
+                tingkat: selectedTingkatKelas,
               },
-            },
-            {
-              name: "page",
-              type: "string",
-              value: "1",
             },
           ],
         },
@@ -332,10 +336,10 @@ function DataPelajaranKelas() {
         }
       )
       .then(function (response) {
-        const resData = JSON.parse(response.data.variables[3].value);
+        console.log(response);
+        const resData = JSON.parse(response.data.variables[2].value);
         const dataMapel = resData.data;
         console.log(resData);
-
         setDataMapel(dataMapel);
       });
   };
@@ -518,7 +522,7 @@ function DataPelajaranKelas() {
   useEffect(() => {
     _selectMapel();
     _selectTahunAkademik();
-  }, [!isViewDataPelajaranKelas]);
+  }, [!isViewDataPelajaranKelas, selectedTingkatKelas]);
 
   useEffect(() => {
     if (DataSearch != "") {

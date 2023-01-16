@@ -1,96 +1,328 @@
-import React, { Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import React, {Fragment, useEffect, useState} from 'react';
+import {useHistory, useLocation, useParams} from 'react-router-dom';
 
-import { Upload, message, PageHeader} from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import {PageHeader, Upload, notification} from "antd";
 
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
 import Adminfooter from '../../../components/Adminfooter';
+import axios from 'axios';
+import {
+    global_join_sub_first,
+    role_siswa_get_pertemuan,
+    role_siswa_update_status_tugas,
+    url_by_institute
+} from '../../../api/reference';
+import {InboxOutlined} from '@ant-design/icons';
+import {pageLoad} from '../../../components/misc/loadPage';
+import {CountdownCircleTimer} from "react-countdown-circle-timer";
+import CryptoJS from "crypto-js";
 
 export default function TugasiSiswa() {
-  const { Dragger } = Upload;
+    const params = useParams()
+    const location = useLocation();
+    const history = useHistory();
+    const idContent = params.id
+    const selectedContent = location.state.dataTugas
+    console.log(selectedContent)
+    // console.log(window.location.pathname)
 
-  const props = {
-    name: 'file',
-    multiple: true,
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-      }
-      if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-      } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-    onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files);
-    },
-  };
-  
-  return (
-    <Fragment>
-      <div id="main-wrapper">
-        <Navheader/>
-        <div className="main-content">
-          <Appheader/>
-            <div className="container px-3 py-4">
-              <div className="row">
-                <div className="col-lg-12">
-                    <div className="flex-wrap">
-                      <PageHeader
-                        className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
-                        onBack={() => window.history.back()}
-                        title="TM01 - Tematik 1 - Tugas Harian"
-                      />
-                        <Link
-                            to="/siswa-kelas-materi"
-                            className="card w-50 bg-lightblue text-center font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                        >
-                            Materi
-                        </Link>
-                        <Link
-                            to="/siswa-kelas-tugas"
-                            className="border-1 w-50 bg-current text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                        >
-                            Tugas Harian
-                        </Link>
-                        {/* <h4 className="mt-5 mb-4 strong text-lg">1.1 Buatlah gambar yang berkenaan dengan materi sebelumnya. Lalu upload tugas anda dibawah sini.</h4> */}
-                        <h4 className="mt-5 mb-4 strong text-lg">1.1 Jawablah Pertanyan-pertanyaan berikut dengan benar.</h4>
-                        <iframe src="http://localhost/wordpress/wp-admin/admin-ajax.php?action=h5p_embed&id=2" width="1150" height="300" frameborder="0" allowfullscreen="allowfullscreen" title="Soal Pejumlahan"></iframe><script src="http://localhost/wordpress/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charset="UTF-8"></script>
-                        {/* <Dragger {...props} style={{height:"80%"}} className="mt-12">
-                            <p className="ant-upload-drag-icon">
-                                <InboxOutlined />
-                            </p>
-                            <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                            <p className="ant-upload-hint">
-                                Ukuran file tidak boleh melebihi 20MB dan berformat PDF, JPG, PNG, DOCS
-                            </p>
-                        </Dragger> */}
-                        {/* <div className='items-center mt-3'>
-                            <Link
-                                to="/account-information"
-                                className="bg-current ml-2 mb-2 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                >
-                                Selanjutnya
-                            </Link>
-                            <Link
-                                to="/account-information"
-                                className="border-0 ml-2 bg-lightblue text-center font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                                >
-                                Kembali
-                            </Link>
-                        </div> */}
-                    </div>
+    const [duration, setDuration] = useState(selectedContent.menit)
+    const [isFinished, setIsfinished] = useState(false)
+    const [isSubmited, setIsSubmited] = useState(false)
+    const [fileUrl, setFileUrl] = useState('');
+    const [typeFile, setTypeFile] = useState('');
+
+    const iFrame = selectedContent?.file_name
+    const forWidth = iFrame?.split('width="')[1]
+    const height = forWidth?.split('"')[0]
+
+    const userId = localStorage.getItem('user_id');
+    const academicId = localStorage.getItem('academic_id')
+
+
+    const renderTime = ({remainingTime}) => {
+        setDuration(remainingTime)
+        if (remainingTime === 0) {
+            setIsfinished(true)
+            return <div className="timer" style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center'
+            }}>Waktu telah habis</div>;
+        }
+        const hours = Math.floor(remainingTime / 3600)
+        const minutes = Math.floor((remainingTime % 3600) / 60)
+        const seconds = remainingTime % 60
+
+        return (
+            <>
+                <div className="timer" style={{
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center'
+                }}>
+                    {/*<div className="text" style={{ color: '#aaa'}}>Remaining</div>*/}
+                    <div className="value" style={{fontSize: '30px'}}>{hours}</div>
+                    <div className="text" style={{color: '#aaa'}}>Jam</div>
                 </div>
-              </div>
+
+                <div className="timer" style={{
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', margin: '0 20px'
+                }}>
+                    {/*<div className="text" style={{ color: '#aaa'}}>Remaining</div>*/}
+                    <div className="value" style={{fontSize: '30px'}}>{minutes}</div>
+                    <div className="text" style={{color: '#aaa'}}>Menit</div>
+                </div>
+
+                <div className="timer" style={{
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center'
+                }}>
+                    {/*<div className="text" style={{ color: '#aaa'}}>Remaining</div>*/}
+                    <div className="value" style={{fontSize: '30px'}}>{seconds}</div>
+                    <div className="text" style={{color: '#aaa'}}>Detik</div>
+                </div>
+            </>
+        );
+    };
+
+    const _finishedTask = () => {
+        axios.post(url_by_institute, {
+            "processDefinitionId": role_siswa_update_status_tugas,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+                        "id_siswa": userId,
+                        "id": selectedContent.id,
+                        "status": 1,
+                        "id_academic": academicId
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }).then(response => {
+                if (isSubmited == true) {
+                    notification.info({
+                        message: "Informasi",
+                        description: "Tugas telah di submit !",
+                        placement: 'topRight',
+                        duration: 10
+                    })
+                }else if(isFinished == true) {
+                    notification.info({
+                        message: "Informasi",
+                        description: "Waktu mengerjakan tugas telah habis",
+                        placement: 'topRight'
+                    })
+                }
+            }
+        )
+    }
+
+    useEffect(() => {
+        _finishedTask()
+    }, [isFinished === true]);
+
+    useEffect(() => {
+        const unlisten = history.listen((location) => {
+            // React.createElement('form',{method: 'post', id: 'form_wp', action: 'https://lms.aneta.id:8443/wp-login.php'},
+            //     [
+            //         React.createElement('input',{id: 'log', name: 'log', type: 'hidden',value: email}),
+            //         React.createElement('input', {id: 'pwd', name: 'pwd', type: 'hidden',value: originalText}),
+            //     ]
+            // )
+            console.log('new location: ', location)
+            document.getElementById("form_wp").submit();
+            console.log('after login')
+            setTimeout(function () {
+                console.log('timer')
+            }, 3000);
+        })
+        return function cleanup() {
+            unlisten()
+        }
+    }, [])
+
+
+    const convertBase64 = (uploaded) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(uploaded);
+
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+
+            fileReader.onerror = (error) => {
+                reject(error)
+            }
+        })
+    }
+
+    const handleUploadChange = async (e) => {
+        // console.log("test", e);
+        let uploaded = e?.target?.files[0];
+        console.log(uploaded);
+        const base64 = await convertBase64(uploaded);
+        setFileUrl(base64?.split(',')[1])
+        console.log(base64.split(',')[1]);
+        const nameFile = uploaded?.name?.split('.');
+        const nameType = nameFile?.slice(-1)
+        setTypeFile(nameType?.toString())
+    }
+
+    const handleSubmit = () => {
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": "rolesiswauploadtugas:1:293f0e1e-5423-11ed-8f22-927b5be84510",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "file": fileUrl,
+                            "file_type": typeFile,
+                            "user_id": userId,
+                            "id_academic": academicId,
+                            "id_content": selectedContent.idTugas
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            // console.log(response);
+            const resData = JSON.parse(response.data.variables[2].value)
+            console.log(resData);
+            const resCode = resData.message
+            if (resCode == "success upload") {
+                // setRefreshState(true);
+                pageLoad()
+                notification.success({
+                    message: "Sukses",
+                    description: 'Tugas berhasil di Upload',
+                    placement: 'top'
+                })
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: 'Gagal Upload Tugas, mohon cek kembali file anda.',
+                    placement: 'top'
+                })
+            }
+        })
+    }
+
+    return (
+        <Fragment>
+            <div id="main-wrapper">
+                <Navheader/>
+                <div className="main-content">
+                    <Appheader/>
+                    <div className="container px-3 py-4">
+                        <div className="row">
+                            <div className="col-lg-12">
+                                <div className="flex-wrap">
+                                    {selectedContent != null ?
+                                        <>
+                                            <PageHeader
+                                                className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
+                                                onBack={() => window.history.back()}
+                                                title={`${selectedContent?.class_type}/${selectedContent?.sub_class} - ${selectedContent?.meeting_name} - ${selectedContent?.tittle}`}
+                                            />
+                                            <div className="timer-wrapper m-4"
+                                                 style={{display: 'flex', justifyContent: 'center'}}>
+                                                <CountdownCircleTimer
+                                                    isPlaying
+                                                    duration={selectedContent.menit * 60}
+                                                    colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
+                                                    colorsTime={[10, 6, 3, 0]}
+                                                    onComplete={() => ({shouldRepeat: false, delay: 1})}
+                                                    size={240}
+                                                >
+                                                    {renderTime}
+                                                </CountdownCircleTimer>
+                                            </div>
+                                            {/* <h4 className="mt-5 strong text-lg">1.1 Bangun Ruang</h4> */}
+                                            <div style={{display: 'flex', justifyContent: 'center'}}>
+                                                <iframe
+                                                    src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${selectedContent?.file_path}`}
+                                                    width="1000" frameBorder="0"
+                                                    allowFullScreen="allowfullscreen"
+                                                    style={{minHeight: '800px'}}
+                                                    title="test soal multiple"></iframe>
+                                                <script
+                                                    src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js"
+                                                    charSet="UTF-8"></script>
+                                            </div>
+                                            {selectedContent.statusSiswa == 1 && selectedContent.status == 1 ? <div className="text-center">
+                                                <button
+                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 mt-2 w175 rounded-lg d-inline-block"
+                                                    onClick={() => {
+                                                        setIsSubmited(true)
+                                                        _finishedTask()
+                                                    }}
+                                                >
+                                                    Selesaikan
+                                                </button>
+                                            </div> : null
+                                            }
+
+
+                                            {/* download materi
+                      <div className="d-flex mt-2 mb-5">
+                        <div className="h5 text-center cursor-pointer">
+                          <i style={{ border: 'none' }}>
+                            <FilePdfOutlined style={{ fontSize: '40px' }} />
+                          </i>
+                          <p className="font-xssss">file 4.pdf</p>
+                        </div>
+                      </div> */}
+                                        </>
+                                        : <PageHeader
+                                            className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
+                                            onBack={() => window.history.back()}
+                                            title="Materi Kosong"
+                                        />}
+                                    <div className="col-lg-12 d-flex justify-content-center">
+                                        <div>
+                                            {selectedContent.is_upload == true ?
+
+                                                <>
+                                                    <h5 className="mt-3 strong text-lg">Upload tugas dibawah sini</h5>
+                                                    <form id='form'>
+                                                        <input onChange={handleUploadChange} type='file'/>
+                                                    </form>
+
+                                                    <button
+                                                        className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 mt-2 w175 rounded-lg d-inline-block"
+                                                        onClick={handleSubmit}
+                                                    >
+                                                        Submit Tugas
+                                                    </button>
+                                                </>
+                                                : null}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <Adminfooter/>
+                </div>
             </div>
-            <Adminfooter />
-          </div>
-      </div>
-    </Fragment>
-  );
+        </Fragment>
+    );
 };

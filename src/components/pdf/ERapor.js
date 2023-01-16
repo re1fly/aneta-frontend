@@ -4,8 +4,6 @@ import "../../style/rapor.css"
 const ERapor = React.forwardRef((props, ref) => {
     const { data } = props;
 
-    console.log(JSON.stringify(data, null, 2));
-
     const [predicate, setPredicate] = useState('')
     const [predicateSocial, setPredicateSocial] = useState('')
 
@@ -298,22 +296,16 @@ const ERapor = React.forwardRef((props, ref) => {
                             <th className="text-center" height="60px" width="55%" >Deskripsi</th>
                         </tr>
                     </thead>
+                    {data?.extrakurikuler?.map((item, index) => (
                     <tbody>
                         <tr>
-                            <td className="text-center strong" >1</td>
-                            <td className="pl-2" >-</td>
-                            <td className="text-center" >-</td>
-                            <td className="text-center" >-</td>
+                            <td className="text-center strong" >{index + 1}</td>
+                            <td className="pl-2" >{item.name}</td>
+                            <td className="text-center" >{item.indicator_name}</td>
+                            <td className="text-center" >{item.description}</td>
                         </tr>
                     </tbody>
-                    <tbody>
-                        <tr>
-                            <td className="text-center strong" >2</td>
-                            <td className="pl-2" >-</td>
-                            <td className="text-center" >-</td>
-                            <td className="text-center" >-</td>
-                        </tr>
-                    </tbody>
+                    ))}
                 </table>
             </div>
 
@@ -361,7 +353,7 @@ const ERapor = React.forwardRef((props, ref) => {
 
 
             <div className="mt-4">
-                <p className="p-0 m-0 mb-2">Bandung, 08 Agustus 2022</p>
+                <p className="p-0 m-0 mb-2">{data?.alamat}, ............................</p>
                 <p>Mengetahui,</p>
             </div>
 
@@ -373,14 +365,14 @@ const ERapor = React.forwardRef((props, ref) => {
 
                 <div className="left-margin">
                     <p className="mb-5 ml-4">Wali Kelas</p>
-                    <p className="mb-5">Toni rostandi, S.Pd.</p>
+                    <p className="mb-5">.........................................</p>
                 </div>
             </div>
 
             <div className="mt-4 d-flex">
                 <div className="left-margin-xl">
                     <p className="mb-5 ml-4">Kepala Sekolah</p>
-                    <p className="mb-5">Dr. H. Ahmad Sanusi, M.Pd.</p>
+                    <p className="mb-5">.........................................................</p>
                 </div>
             </div>
 

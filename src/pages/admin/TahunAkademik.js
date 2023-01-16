@@ -1,34 +1,30 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import { DatePicker, Input, PageHeader, Select, Button } from "antd";
 
 import Appheader from "../../components/Appheader";
-import Navheader from "../../components/Navheader";
+import Navheader from "../../components/Navheader"
 import Adminfooter from "../../components/Adminfooter";
 import axios from "axios";
-import {
-  get_where_no_join,
-  global_insert,
-  url_by_institute,
-} from "../../api/reference";
+import {get_where_no_join, global_insert, url_by_institute} from "../../api/reference";
 
 function TahunAkademikAdmin() {
   const [isViewTahunAkademik, setIsViewTahunAkademik] = useState(true);
 
-  const dateFormat = "YYYY-MM-DD";
+  const dateFormat = 'YYYY-MM-DD';
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
 
   const [getTahunAkademik, setGetTahunAkademik] = useState(null);
 
-  const academicYear = localStorage.getItem("academic_year");
-  const institute = localStorage.getItem("institute");
-  const user = localStorage.getItem("user_id");
+  const academicYear = localStorage.getItem('academic_year')
+  const institute = localStorage.getItem('institute');
+  const user = localStorage.getItem('user_id')
 
   useEffect(() => {
-    axios
-      .post(url_by_institute, {
+    axios.post(url_by_institute,
+      {
         processDefinitionId: get_where_no_join,
         returnVariables: true,
         variables: [
@@ -46,27 +42,29 @@ function TahunAkademikAdmin() {
                   kondisi: "where",
                   tbl_coloumn: "institute_id",
                   tbl_value: institute,
-                  operator: "=",
+                  operator: "="
                 },
                 {
                   kondisi: "where",
                   tbl_coloumn: "is_active",
                   tbl_value: "T",
-                  operator: "=",
-                },
+                  operator: "="
+                }
               ],
-              tbl_coloumn: ["*"],
+              tbl_coloumn: [
+                "*"
+              ]
             },
           },
         ],
-      })
-      .then(function (response) {
-        // console.log(response);
-        const akademik = JSON.parse(response.data.variables[2].value);
-        const data = akademik[0];
-        setGetTahunAkademik(data);
-      });
-  }, []);
+      }
+    ).then(function (response) {
+      // console.log(response);
+      const akademik = JSON.parse(response.data.variables[2].value);
+      const data = akademik[0]
+      setGetTahunAkademik(data);
+    })
+  }, [])
 
   const creatTahunAkademik = (e) => {
     e.preventDefault();
@@ -74,43 +72,41 @@ function TahunAkademikAdmin() {
     for (const el of e.target.elements) {
       if (el.name !== "") data[el.name] = el.value;
     }
-    const dateNow = new Date().toLocaleString();
-    console.log(data, dateNow);
-    console.log("institute", institute);
-    console.log("academic_year", academicYear);
+    const dateNow = new Date().toLocaleString()
+    console.log(data, dateNow)
+    console.log('institute', institute)
+    console.log('academic_year', academicYear)
 
-    axios
-      .post(url_by_institute, {
-        processDefinitionId: global_insert,
-        returnVariables: true,
-        variables: [
-          {
-            name: "global_Insert",
-            type: "json",
-            value: {
-              tbl_name: "x_academic_yearModel",
-              tbl_coloumn: {
-                uuid: "",
-                institute_id: institute,
-                academic_year: data.tahun_akademik,
-                periode_start: data.periode_awal,
-                periode_end: data.periode_akhir,
-                is_active: data.status_akhir,
-                number_of_student: data.jumlah_murid,
-                number_of_teachers: data.jumlah_guru,
-                number_of_staff: data.jumlah_staff,
-                created_at: dateNow,
-                updated_at: dateNow,
-                created_by: user,
-              },
-            },
-          },
-        ],
-      })
-      .then(function (response) {
-        console.log(response);
-      });
-  };
+    axios.post(url_by_institute, {
+      "processDefinitionId": global_insert,
+      "returnVariables": true,
+      "variables": [
+        {
+          "name": "global_Insert",
+          "type": "json",
+          "value": {
+            "tbl_name": "x_academic_yearModel",
+            "tbl_coloumn": {
+              "uuid": "",
+              "institute_id": institute,
+              "academic_year": data.tahun_akademik,
+              "periode_start": data.periode_awal,
+              "periode_end": data.periode_akhir,
+              "is_active": data.status_akhir,
+              "number_of_student": data.jumlah_murid,
+              "number_of_teachers": data.jumlah_guru,
+              "number_of_staff": data.jumlah_staff,
+              "created_at": dateNow,
+              "updated_at": dateNow,
+              "created_by": user
+            }
+          }
+        }
+      ]
+    }).then(function (response) {
+      console.log(response);
+    })
+  }
 
   const ViewTahunAkademik = () => {
     // console.log(_Akademik);
@@ -144,10 +140,12 @@ function TahunAkademikAdmin() {
 
             <div className="col-lg-6 mb-3">
               <div className="form-group">
-                <label className="mont-font fw-600 font-xsss">Semester</label>
+                <label className="mont-font fw-600 font-xsss">
+                  Semester
+                </label>
                 <Input
                   disabled={true}
-                  defaultValue={getTahunAkademik?.semester ?? "1"}
+                  defaultValue={getTahunAkademik?.semester ?? '1'}
                   className="text-black form-control"
                   name="semester"
                   placeholder="Pilih Tahun Akademik"
@@ -189,14 +187,14 @@ function TahunAkademikAdmin() {
           <div className="row">
             <div className="col-lg-12 mb-3">
               <div className="form-group">
-                <label className="mont-font fw-600 font-xsss">Status</label>
+                <label className="mont-font fw-600 font-xsss">
+                  Status
+                </label>
                 <Input
                   disabled={true}
                   type="text"
                   className="text-black form-control"
-                  defaultValue={
-                    getTahunAkademik?.is_active === "T" ? "Aktif" : "Non Aktif"
-                  }
+                  defaultValue={getTahunAkademik?.is_active === 'T' ? 'Aktif' : 'Non Aktif'}
                   name="status"
                 />
               </div>
@@ -206,12 +204,12 @@ function TahunAkademikAdmin() {
             <div className="col-lg-12">
               <button
                 className="bg-lightblue text-center text-blue border-none font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
-                onClick={() => setIsViewTahunAkademik(false)}
-              >
+                onClick={() => setIsViewTahunAkademik(false)}>
                 Tambah Data
               </button>
             </div>
           </div>
+
         </form>
       </div>
     );
@@ -223,17 +221,12 @@ function TahunAkademikAdmin() {
         <div className="row">
           <div className="col-lg-12">
             <div className="middle-wrap">
-              <form
-                id="teacher_form"
+              <form id="teacher_form"
                 onSubmit={creatTahunAkademik}
-                method="POST"
-              >
+                method="POST">
                 <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                   <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                    <i
-                      onClick={() => setIsViewTahunAkademik(true)}
-                      className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"
-                    ></i>
+                    <i onClick={() => setIsViewTahunAkademik(true)} className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                       Tambah Data Tahun Akademik
                     </h4>
@@ -320,22 +313,9 @@ function TahunAkademikAdmin() {
                           <label className="mont-font fw-600 font-xsss">
                             Status
                           </label>
-                          <select
-                            className="form-control"
-                            defaultValue="Pilih Status"
-                            name="status_akhir"
-                            onChange={handleChange}
-                            disabled={true}
-                          >
-                            {getTahunAkademik != null ? (
-                              <option className="form-control" value="F">
-                                Nonaktif
-                              </option>
-                            ) : (
-                              <option className="form-control" value="T">
-                                Aktif
-                              </option>
-                            )}
+                          <select className="form-control" defaultValue="Pilih Status" name="status_akhir" onChange={handleChange} disabled={true}>
+                            {getTahunAkademik != null ? <option className="form-control" value="F">Nonaktif</option>
+                              : <option className="form-control" value="T">Aktif</option>}
                             {/* <option className="form-control" value="aktif">Aktif</option>
                             <option className="form-control" value="nonaktif">Nonaktif</option> */}
                           </select>
@@ -422,16 +402,12 @@ function TahunAkademikAdmin() {
         <Navheader />
         <div className="main-content">
           <Appheader />
-          {isViewTahunAkademik ? (
-            <ViewTahunAkademik />
-          ) : (
-            <TambahTahunAkademik />
-          )}
+          {isViewTahunAkademik ? <ViewTahunAkademik /> : <TambahTahunAkademik />}
           <Adminfooter />
         </div>
       </div>
     </Fragment>
-  );
+  )
 }
 
 export default TahunAkademikAdmin;

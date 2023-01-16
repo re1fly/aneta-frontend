@@ -1,12 +1,14 @@
 import {Button, Card, DatePicker, Divider, Image, Tooltip, Upload} from "antd";
 import {UserAddOutlined} from "@ant-design/icons";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {RequiredTooltip} from "../misc/RequiredTooltip";
 import DefaultAvatar from '../../assets/images/user-default.png';
 import UploadImage from "../misc/UploadImage";
+import {useDispatch, useSelector} from "react-redux";
+import {GetCity, GetKecamatan, GetKelurahan, GetProvinsi} from "../../redux/Action.js";
+import {FormDaerah} from "./FormDaerah";
 
 export const DataFormSiswaCreate = (props) => {
-
     return (
         <div className="container px-3 py-4">
             <div className="row">
@@ -45,7 +47,7 @@ export const DataFormSiswaCreate = (props) => {
                                                     NISN <RequiredTooltip/>
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control"
                                                     name="nisn_siswa"
                                                     required
@@ -59,7 +61,7 @@ export const DataFormSiswaCreate = (props) => {
                                                     NIPD <RequiredTooltip/>
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control"
                                                     name="nipd_siswa"
                                                     required
@@ -344,84 +346,16 @@ export const DataFormSiswaCreate = (props) => {
                                             </div>
                                         </div>
                                     </div>
+                                    <FormDaerah location="create"
+                                                nameProvinsi="provinsi_siswa"
+                                                nameKota="kota_siswa"
+                                                nameKecamatan="kecamatan_siswa"
+                                                nameKelurahan="kelurahan_siswa"
+                                                isDisabled={props.isDisabled}
+                                                isRequired={true}
+                                    />
+
                                     <div className="row">
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Provinsi <RequiredTooltip/>
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="provinsi_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idProvSiswa} selected disabled hidden>
-                                                        {props.provSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kota <RequiredTooltip/>
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kota_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idKotaSiswa} selected disabled hidden>
-                                                        {props.kotaSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kecamatan <RequiredTooltip/>
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kecamatan_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idKecSiswa} selected disabled hidden>
-                                                        {props.kecSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-lg-6 mb-3">
-                                            <div className="form-group">
-                                                <label className="mont-font fw-600 font-xsss">
-                                                    Kelurahan <RequiredTooltip/>
-                                                </label>
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
-                                                    name="kelurahan_siswa"
-                                                    required
-                                                    disabled={props.isDisabled}
-                                                >
-                                                    <option value={props.idKelurahanSiswa} selected disabled hidden>
-                                                        {props.kelurahanSiswa}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-
                                         <div className="col-lg-5 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">
@@ -542,10 +476,10 @@ export const DataFormSiswaCreate = (props) => {
                                                     <option value="" selected disabled>
                                                         Pilih Jenis KPS
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Iya
                                                     </option>
-                                                    <option value="0">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -623,10 +557,10 @@ export const DataFormSiswaCreate = (props) => {
                                                     <option value="" selected disabled>
                                                         Pilih Jenis
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Iya
                                                     </option>
-                                                    <option value="0">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -659,10 +593,10 @@ export const DataFormSiswaCreate = (props) => {
                                                     <option value="" selected disabled>
                                                         Pilih Jenis
                                                     </option>
-                                                    <option value="1">
+                                                    <option value={true}>
                                                         Iya
                                                     </option>
-                                                    <option value="0">
+                                                    <option value={false}>
                                                         Tidak
                                                     </option>
                                                 </select>
@@ -700,11 +634,21 @@ export const DataFormSiswaCreate = (props) => {
                                                 <label className="mont-font fw-600 font-xsss">
                                                     Kebutuhan Khusus
                                                 </label>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     className="form-control"
+                                                    aria-label="Default select example"
                                                     name="kebutuhankhusus_siswa"
-                                                />
+                                                >
+                                                    <option value="" selected disabled>
+                                                        Pilih Jenis
+                                                    </option>
+                                                    <option value={true}>
+                                                        Iya
+                                                    </option>
+                                                    <option value={false}>
+                                                        Tidak
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -713,38 +657,6 @@ export const DataFormSiswaCreate = (props) => {
 
 
                                     {<DataFormOrangtua setView={props.setView}
-                                                       provSiswa="ACEH"
-                                                       idProvSiswa="11"
-                                                       kotaSiswa="KABUPATEN SIMEULUE"
-                                                       idKotaSiswa="1101"
-                                                       kecSiswa="TEUPAH SELATAN"
-                                                       idKecSiswa="1101010"
-                                                       kelurahanSiswa="LATIUNG"
-                                                       idKelurahanSiswa="1101010001"
-                                                       provAyah="ACEH"
-                                                       idProvAyah="11"
-                                                       kotaAyah="KABUPATEN SIMEULUE"
-                                                       idKotaAyah="1101"
-                                                       kecAyah="TEUPAH SELATAN"
-                                                       idKecAyah="1101010"
-                                                       kelurahanAyah="LATIUNG"
-                                                       idKelurahanAyah="1101010001"
-                                                       provIbu="ACEH"
-                                                       idProvIbu="11"
-                                                       kotaIbu="KABUPATEN SIMEULUE"
-                                                       idKotaIbu="1101"
-                                                       kecIbu="TEUPAH SELATAN"
-                                                       idKecIbu="1101010"
-                                                       kelurahanIbu="LATIUNG"
-                                                       idKelurahanIbu="1101010001"
-                                                       provWali="ACEH"
-                                                       idProvWali="11"
-                                                       kotaWali="KABUPATEN SIMEULUE"
-                                                       idKotaWali="1101"
-                                                       kecWali="TEUPAH SELATAN"
-                                                       idKecWali="1101010"
-                                                       kelurahanWali="LATIUNG"
-                                                       idKelurahanWali="1101010001"
                                     />}
                                 </div>
                             </div>
@@ -781,7 +693,7 @@ const DataFormOrangtua = (props) => {
                             NIK
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control"
                             name="nik_ayah"
                         />
@@ -901,83 +813,15 @@ const DataFormOrangtua = (props) => {
                     </div>
                 </div>
             </div>
+            <FormDaerah location="create"
+                        nameProvinsi="provinsi_ayah"
+                        nameKota="kota_ayah"
+                        nameKecamatan="kecamatan_ayah"
+                        nameKelurahan="kelurahan_ayah"
+                        isDisabled={props.isDisabled}
+                        isRequired={true}
+            />
             <div className="row">
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Provinsi <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="provinsi_ayah"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idProvAyah} selected disabled hidden>
-                                {props.provAyah}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kota <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kota_ayah"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKotaAyah} selected disabled hidden>
-                                {props.kotaAyah}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kecamatan <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kecamatan_ayah"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKecAyah} selected disabled hidden>
-                                {props.kecAyah}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kelurahan <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kelurahan_ayah"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKelurahanAyah} selected disabled hidden>
-                                {props.kelurahanAyah}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
                 <div className="col-lg-12 mb-3">
                     <label className="mont-font fw-600 font-xsss">
                         Alamat <RequiredTooltip/>
@@ -1014,7 +858,7 @@ const DataFormOrangtua = (props) => {
                             NIK
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control"
                             name="nik_ibu"
                         />
@@ -1101,83 +945,15 @@ const DataFormOrangtua = (props) => {
                     </div>
                 </div>
             </div>
+            <FormDaerah location="create"
+                        nameProvinsi="provinsi_ibu"
+                        nameKota="kota_ibu"
+                        nameKecamatan="kecamatan_ibu"
+                        nameKelurahan="kelurahan_ibu"
+                        isDisabled={props.isDisabled}
+                        isRequired={true}
+            />
             <div className="row">
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Provinsi <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="provinsi_ibu"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idProvIbu} selected disabled hidden>
-                                {props.provIbu}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kota <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kota_ibu"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKotaIbu} selected disabled hidden>
-                                {props.kotaIbu}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kecamatan <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kecamatan_ibu"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKecIbu} selected disabled hidden>
-                                {props.kecIbu}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kelurahan <RequiredTooltip/>
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kelurahan_ibu"
-                            required
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKelurahanIbu} selected disabled hidden>
-                                {props.kelurahanIbu}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
                 <div className="col-lg-12 mb-3">
                     <label className="mont-font fw-600 font-xsss">
                         Alamat <RequiredTooltip/>
@@ -1212,7 +988,7 @@ const DataFormOrangtua = (props) => {
                             NIK
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control"
                             name="nik_wali"
                         />
@@ -1297,79 +1073,16 @@ const DataFormOrangtua = (props) => {
                 </div>
             </div>
 
-            <div className="row">
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Provinsi
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="provinsi_wali"
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idProvWali} selected disabled hidden>
-                                {props.provWali}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kota
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kota_wali"
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKotaWali} selected disabled hidden>
-                                {props.kotaWali}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kecamatan
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kecamatan_wali"
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKecWali} selected disabled hidden>
-                                {props.kecWali}
-                            </option>
-                        </select>
-                    </div>
-                </div>
+            <FormDaerah location="create"
+                        nameProvinsi="provinsi_wali"
+                        nameKota="kota_wali"
+                        nameKecamatan="kecamatan_wali"
+                        nameKelurahan="kelurahan_wali"
+                        isDisabled={props.isDisabled}
+                        isRequired={false}
+            />
 
-                <div className="col-lg-6 mb-3">
-                    <div className="form-group">
-                        <label className="mont-font fw-600 font-xsss">
-                            Kelurahan
-                        </label>
-                        <select
-                            className="form-control"
-                            aria-label="Default select example"
-                            name="kelurahan_wali"
-                            disabled={props.isDisabled}
-                        >
-                            <option value={props.idKelurahanWali} selected disabled hidden>
-                                {props.kelurahanWali}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
+            <div className="row">
                 <div className="col-lg-12 mb-3">
                     <label className="mont-font fw-600 font-xsss">
                         Alamat

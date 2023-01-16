@@ -643,6 +643,10 @@
   height: 7px !important;
 }
 
+.h35 {
+  height: 35px !important;
+}
+
 .h75 {
   height: 75px !important;
 }
@@ -13481,7 +13485,7 @@ strong,
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  height: 96px;
+  height: 65px;
   padding: 0 15px;
   background: #ffffff;
   border-bottom: 2px #eee solid;
@@ -13493,7 +13497,7 @@ strong,
   .main-content .middle-sidebar-header {
     padding: 10px 15px 10px 15px;
     height: auto;
-    /* position: fixed; */
+    /*position: fixed;*/
     top: env(safe-area-inset-top);
     left: 0;
     right: 0;

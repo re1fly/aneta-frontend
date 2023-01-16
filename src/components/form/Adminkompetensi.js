@@ -150,6 +150,7 @@ export const FormKompetensi = (props) => {
         }
       )
       .then(function (response) {
+        console.log(response);
         const dataMapelApi = JSON.parse(response.data.variables[2].value);
         const getMapel = dataMapelApi.data;
 

@@ -366,9 +366,6 @@ function InputDataDeskripsiSikap() {
                                                                                 <option value="" disabled selected>
                                                                                     Pilih Predikat
                                                                                 </option>
-                                                                                <option value="1" >
-                                                                                    Sangat Kurang
-                                                                                </option>
                                                                                 <option value="2">
                                                                                     Kurang
                                                                                 </option>
@@ -398,9 +395,6 @@ function InputDataDeskripsiSikap() {
                                                                             >
                                                                                 <option value="" disabled selected>
                                                                                     Pilih Predikat
-                                                                                </option>
-                                                                                <option value="1">
-                                                                                    Sangat Kurang
                                                                                 </option>
                                                                                 <option value="2">
                                                                                     Kurang
@@ -435,9 +429,6 @@ function InputDataDeskripsiSikap() {
                                                                                 <option value="" disabled selected={siswa?.data[1].id_indikator == 0 ? true : false}>
                                                                                     Pilih Predikat
                                                                                 </option>
-                                                                                <option value="1" selected={siswa?.data[1].id_indikator == 1 ? true : false}>
-                                                                                    Sangat Kurang
-                                                                                </option>
                                                                                 <option value="2" selected={siswa?.data[1].id_indikator == 2 ? true : false}>
                                                                                     Kurang
                                                                                 </option>
@@ -468,9 +459,6 @@ function InputDataDeskripsiSikap() {
                                                                             >
                                                                                 <option value="" disabled selected={siswa?.data[0].id_indikator == 0 ? true : false}>
                                                                                     Pilih Predikat
-                                                                                </option>
-                                                                                <option value="1" selected={siswa?.data[0].id_indikator == 1 ? true : false}>
-                                                                                    Sangat Kurang
                                                                                 </option>
                                                                                 <option value="2" selected={siswa?.data[0].id_indikator == 2 ? true : false}>
                                                                                     Kurang

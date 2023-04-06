@@ -172,7 +172,6 @@ export const FormAdminDataInterval = (props) => {
                                                                setDMax(e.target.value - 1)
                                                                checkValidation()
                                                            }}
-                                                           disabled
                                                     />
                                                     <span id="c_min_error" style={{color: 'red'}}></span>
                                                 </div>
@@ -188,7 +187,6 @@ export const FormAdminDataInterval = (props) => {
                                                            name="nilai_c_max"
                                                            className="form-control"
                                                            defaultValue={props.nilai_c_max}
-                                                           disabled
                                                            value={cMax}
                                                     />
                                                     <span id="c_max_error" style={{color: 'red'}}></span>
@@ -233,7 +231,6 @@ export const FormAdminDataInterval = (props) => {
                                                            className="form-control"
                                                            defaultValue={props.nilai_d_max}
                                                            value={cMin-1}
-                                                           disabled
                                                     />
                                                     <span id="d_max_error" style={{color: 'red'}}></span>
                                                 </div>

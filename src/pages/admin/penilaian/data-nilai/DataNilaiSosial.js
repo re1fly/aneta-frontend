@@ -208,9 +208,6 @@ function DataNilaiSosial() {
                                                                                 <option value="">
                                                                                     Pilih Penilaian
                                                                                 </option>
-                                                                                <option value="1">
-                                                                                    Sangat Kurang
-                                                                                </option>
                                                                                 <option value="2">
                                                                                     Kurang
                                                                                 </option>

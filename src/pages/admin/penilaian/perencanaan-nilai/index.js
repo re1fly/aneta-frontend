@@ -23,10 +23,10 @@ function PerencanaanNilai() {
             title: 'Nilai Sikap Sosial',
             url: '/admin-perencanaan-nilai-sosial'
         },
-        {
-            title: 'Bobot PH, PTS, dan PAS',
-            url: '/admin-perencanaan-nilai-bobot'
-        },
+        // {
+        //     title: 'Bobot PH, PTS, dan PAS',
+        //     url: '/admin-perencanaan-nilai-bobot'
+        // },
     ]
 
     const listPerencanaan = getPerencanaan.map((data, index) => {

@@ -1,4 +1,4 @@
-import { Badge, Calendar, Card, PageHeader } from "antd";
+import {Badge, Calendar, Card, PageHeader, Spin, Tooltip} from "antd";
 import Search from "antd/lib/transfer/search";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import moment from "moment";
 
 export default function SiswaKalender() {
   const [dataTanggal, setDataTanggal] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const userId = localStorage.getItem("user_id");
   const academicId = localStorage.getItem("academic_id");
@@ -54,8 +55,10 @@ export default function SiswaKalender() {
         }
       )
       .then(function (response) {
+        console.log('kalender depan',response)
         const dataRes = JSON.parse(response?.data?.variables[2]?.value);
         setDataTanggal(dataRes.data);
+        setLoading(false)
       });
   }, [userId, currentMonth, currentYear]);
 
@@ -117,9 +120,11 @@ export default function SiswaKalender() {
     return (
       <ul className="events">
         {listData.map((item) => (
+            <Tooltip title="example for tooltip">
           <li key={item.content}>
             <Badge status={item.type} text={item.content} />
           </li>
+            </Tooltip>
         ))}
       </ul>
     );
@@ -161,12 +166,14 @@ export default function SiswaKalender() {
                     </div>
                   </div>
                 </Card>
+                <Spin tip="Loading..." spinning={loading}>
                 <Calendar
                   dateCellRender={dateCellRender}
                   // monthCellRender={monthCellRender}
                   onSelect={selectKalender}
                   headerRender={headerRender}
                 />
+                </Spin>
               </div>
             </div>
           </div>

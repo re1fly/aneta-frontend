@@ -37,7 +37,7 @@ import Swal from "sweetalert2";
 import {
     get_data_pelajaran_by_tingkat,
     get_kompetensi_dashboard,
-    get_where_no_join, global_delete_record, insert_kompetensi,
+    get_where_no_join, global_delete_record, global_join_sub_where_get, insert_kompetensi,
     role_guru_get_matpel,
     url_by_institute
 } from "../../../api/reference";
@@ -60,9 +60,14 @@ export default function KompetensiGuru() {
     const [getKelas, setGetKelas] = useState([]);
     const [getkompetensiInsert, setGetKompetensiInsert] = useState([]); // => Harus nya kompetensi (4)
     const [selectedClass, setSelectedClass] = useState(null)
-    console.log(selectedClass);
     const [selectedMapel, setSelectedMapel] = useState(null)
+    const [selectedCategory, setSelectedCategory] = useState(null)
+    const [selectedPertemuan, setSelectedPertemuan] = useState(null)
     const [dataMapel, setDataMapel] = useState(null);
+    const [dataPertemuan, setDataPertemuan] = useState([]);
+    const [dataKompetensi, setDataKompetensi] = useState([]);
+    const [selectedKompetensi, setSelectedKompetensi] = useState(null)
+
 
     const _getDataKelas = () => {
         axios
@@ -123,6 +128,7 @@ export default function KompetensiGuru() {
                                 "user_id": userId,
                                 // "id_class": selectedClass
                                 "id_tingkat": selectedClass,
+                                "academic_year_id": academicYear
                             }
                         }
                     ]
@@ -137,7 +143,6 @@ export default function KompetensiGuru() {
             .then(function (response) {
                 const dataMapelApi = JSON.parse(response.data.variables[2].value);
                 const getMapel = dataMapelApi?.data
-                // console.log(getMapel);
                 if (dataMapelApi.message == "success get data") {
                     setDataMapel(getMapel);
                 } else {
@@ -145,7 +150,150 @@ export default function KompetensiGuru() {
                 }
             })
     }
-    
+    const _getPertemuan = () => {
+        axios
+            .post(
+                url_by_institute,
+                {
+                    "processDefinitionId": global_join_sub_where_get,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_academic_subjects_schedule_contents_meeting",
+                                "select": [
+                                    "x_academic_subjects_schedule_contents_meeting.meeting_name",
+                                    "x_academic_subjects_schedule_contents_meeting.id as id_meeting"
+                                ],
+                                "paginate": false,
+                                "join": [
+                                    {
+                                        "tbl_join": "x_academic_subjects_schedule_contents",
+                                        "refkey": "id",
+                                        "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
+                                        "foregenkey": "contents_id"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting",
+                                        "tbl_field": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "="
+                                    },{
+                                        "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                        "tbl_field": "deleted_at",
+                                        "tbl_value": "",
+                                        "operator": "="
+                                    },{
+                                        "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                        "tbl_field": "academic_year_id",
+                                        "tbl_value": academicYear,
+                                        "operator": "="
+                                    },{
+                                        "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                        "tbl_field": "class_type_id",
+                                        "tbl_value": selectedClass, //id kelas
+                                        "operator": "="
+                                    },{
+                                        "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                        "tbl_field": "subjects_master_id",
+                                        "tbl_value": selectedMapel, // id matpel
+                                        "operator": "="
+                                    }
+                                ],
+                                "order_coloumn": "x_academic_subjects_schedule_contents_meeting.meeting_name",
+                                "order_by": "asc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataPertemuan = JSON.parse(response.data.variables[3].value);
+                const getPertemuan = dataPertemuan?.data
+                setDataPertemuan(getPertemuan)
+            })
+    }
+    const _getDataKompetensi = () => {
+        axios
+            .post(
+                url_by_institute,
+                {
+                    "processDefinitionId": global_join_sub_where_get,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_join_where_sub",
+                            "type": "json",
+                            "value": {
+                                "tbl_induk": "x_competence",
+                                "select": [
+                                    "x_competence_detail.id as id_kompetensi",
+                                    "x_competence_detail.code",
+                                    "x_competence_detail.competence_desc"
+                                ],
+                                "paginate": false,
+                                "join": [
+                                    {
+                                        "tbl_join": "x_competence_detail",
+                                        "refkey": "competence_id",
+                                        "tbl_join2": "x_competence",
+                                        "foregenkey": "id"
+                                    }
+                                ],
+                                "where": [
+                                    {
+                                        "tbl_coloumn": "x_competence",
+                                        "tbl_field": "academic_year_id",
+                                        "tbl_value": academicYear,
+                                        "operator": "="
+                                    },{
+                                        "tbl_coloumn": "x_competence",
+                                        "tbl_field": "academic_courses_id",
+                                        "tbl_value": selectedMapel,
+                                        "operator": "="
+                                    }
+                                ],
+                                "order_coloumn": "x_competence_detail.code",
+                                "order_by": "asc"
+                            }
+                        },
+                        {
+                            "name": "page",
+                            "type": "string",
+                            "value": "1"
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataKompetensi = JSON.parse(response.data.variables[3].value);
+                const getKompetensi = dataKompetensi?.data
+                setDataKompetensi(getKompetensi)
+            })
+    }
+
+
     const _getKompetensi = () => {
         axios.post(url_by_institute, {
             "processDefinitionId": get_kompetensi_dashboard,
@@ -170,8 +318,53 @@ export default function KompetensiGuru() {
         }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value)
-            console.log(dataRes?.data?.data);
             setGetKompetensi(dataRes?.data?.data)
+        })
+    }
+
+    const _getKompetensiPertemuan = () => {
+        axios.post(url_by_institute, {
+                "processDefinitionId": "e32d3db3-c6fa-11ed-845a-4a8d2a16230d",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_tingkat": selectedClass,
+                            "id_matpel": selectedMapel,
+                            "id_pertemuan": selectedPertemuan,
+                            "kategori": 1
+                        }
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            setGetKompetensi(dataRes?.data)
+        })
+    }
+
+    const _getKompetensiKompetensi = () => {
+        axios.post(url_by_institute, {
+                "processDefinitionId": "e32d3db3-c6fa-11ed-845a-4a8d2a16230d",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_tingkat": selectedClass,
+                            "id_matpel": selectedMapel,
+                            "id_kompetensi": selectedKompetensi,
+                            "kategori": 0
+                        }
+                    }
+                ]
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value)
+            setGetKompetensi(dataRes?.data)
         })
     }
 
@@ -194,16 +387,23 @@ export default function KompetensiGuru() {
         }
     }, [selectedClass]);
 
+    useEffect(() => {
+        _getPertemuan()
+        _getDataKompetensi()
+    }, [selectedCategory]);
 
-    let [count, setCount] = useState(1);
+    useEffect(() => {
+        _getKompetensiPertemuan()
+    }, [selectedPertemuan]);
 
-    const increment = () => {
-        setCount((prevCount) => prevCount + 1);
-    };
+    useEffect(() => {
+        _getKompetensiKompetensi()
+    }, [selectedKompetensi]);
 
-    const decrement = () => {
-        setCount((prevCount) => prevCount - 1);
-    };
+    useEffect(() => {
+        setDataKompetensi([])
+    }, [selectedCategory]);
+
 
     const { TextArea } = Input;
 
@@ -345,17 +545,33 @@ export default function KompetensiGuru() {
                 ],
                 onFilter: (value, record) => record.status.indexOf(value) === 0,
             },
+            // {
+            //     title: 'Aksi',
+            //     key: 'action',
+            //     responsive: ['sm'],
+            //     render: (text, record) => (
+            //         <Space size="middle">
+            //             {/*<EditOutlined style={{color: "blue"}} onClick={() => viewEditKompetensi(record)}/>*/}
+            //             <DeleteOutlined style={{ color: 'red' }} onClick={() => deleteKompetensi(record)} />
+            //         </Space>
+            //     ),
+            // },
+        ];
+
+        const columnsFilter = [
             {
-                title: 'Aksi',
-                key: 'action',
+                title: 'No',
+                dataIndex: 'no',
+                defaultSortOrder: 'ascend',
                 responsive: ['sm'],
-                render: (text, record) => (
-                    <Space size="middle">
-                        {/*<EditOutlined style={{color: "blue"}} onClick={() => viewEditKompetensi(record)}/>*/}
-                        <DeleteOutlined style={{ color: 'red' }} onClick={() => deleteKompetensi(record)} />
-                    </Space>
-                ),
+                align: "center"
             },
+            {
+                title: 'Keterangan',
+                dataIndex: 'keterangan',
+                align: "center"
+            },
+
         ];
 
         const channelList = getKompetensi?.map((data, index) => {
@@ -372,10 +588,17 @@ export default function KompetensiGuru() {
             }
         })
 
+        const channelListFilter = getKompetensi?.map((data, index) => {
+            return {
+                no: index + 1,
+                keterangan: data.keterangan
+            }
+        })
+
         return (
             <Table className=""
-                columns={columns}
-                dataSource={channelList}
+                columns={selectedCategory == "0" || selectedCategory == "1" ? columnsFilter : columns}
+                dataSource={selectedCategory == "0" || selectedCategory == "1" ? channelListFilter : channelList}
                 onChange={onChangeTable}
                 pagination={{ position: ['bottomCenter'] }}
                 rowClassName="bg-greylight text-grey-900"
@@ -496,11 +719,11 @@ export default function KompetensiGuru() {
                         <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                             <div className="row">
                                 <div className="col-lg-8 col-md-6 my-2">
-                                    <Button className="mr-4" type="primary" shape="round" size='middle'
-                                        // onClick={() => setIsViewKompetensi(false)}
-                                        onClick={viewCreateKompetensi}>
-                                        Tambah Data
-                                    </Button>
+                                    {/*<Button className="mr-4" type="primary" shape="round" size='middle'*/}
+                                    {/*    // onClick={() => setIsViewKompetensi(false)}*/}
+                                    {/*    onClick={viewCreateKompetensi}>*/}
+                                    {/*    Tambah Data*/}
+                                    {/*</Button>*/}
                                 </div>
                                 <div className="col-lg-4 col-md-6 my-2">
                                     <Search className="mr-3" placeholder="Cari kata kunci" allowClear
@@ -536,7 +759,7 @@ export default function KompetensiGuru() {
                                             {/*        )*/}
                                             {/*    })}*/}
                                             {/*</select>*/}
-                                            <div className="col-lg-5 mb-3">
+                                            <div className="col-lg-2 mb-3">
                                                 <div className="form-group">
                                                     <select
                                                         className="form-control"
@@ -547,7 +770,7 @@ export default function KompetensiGuru() {
                                                         value={selectedClass}
                                                     >
                                                         <option value="" selected disabled>
-                                                            Pilih Kelas
+                                                            Kelas
                                                         </option>
                                                         {getKelas?.map((data) => {
                                                             return (
@@ -557,7 +780,7 @@ export default function KompetensiGuru() {
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div className="col-lg-5 mb-3">
+                                            <div className="col-lg-3 mb-3">
                                                 <div className="form-group">
                                                     <select
                                                         className="form-control"
@@ -568,7 +791,7 @@ export default function KompetensiGuru() {
                                                         value={selectedMapel}
                                                     >
                                                         <option value="" selected disabled>
-                                                            Pilih Mata Pelajaran
+                                                            Mata Pelajaran
                                                         </option>
                                                         {dataMapel == null ? null : dataMapel?.map((data) => (
                                                             <option value={data.id}>{data.nama_mata}</option>
@@ -577,10 +800,66 @@ export default function KompetensiGuru() {
                                                 </div>
                                             </div>
                                             <div className="col-lg-2 mb-3">
+                                                <div className="form-group">
+                                                    <select
+                                                        className="form-control"
+                                                        id="id_kategori"
+                                                        key="id_kategori"
+                                                        name="id_kategori"
+                                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                                        value={selectedCategory}
+                                                    >
+                                                        <option value="" selected disabled>
+                                                            Kategori
+                                                        </option>
+                                                        <option value="0">Kompetensi</option>
+                                                        <option value="1">Pertemuan</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-3 mb-3">
+                                                <div className="form-group">
+                                                    {
+                                                        selectedCategory == "0" ?
+                                                    <select
+                                                        className="form-control"
+                                                        id="id_dataKompetensi"
+                                                        key="id_dataKompetensi"
+                                                        name="id_dataKompetensi"
+                                                        onChange={(e) => setSelectedKompetensi(e.target.value)}
+                                                        value={selectedKompetensi}
+                                                    >
+                                                        <option value="" selected disabled>
+                                                            Pilih Kompetensi
+                                                        </option>
+                                                        {dataKompetensi == null ? null : dataKompetensi?.map((data) => (
+                                                            <option value={data.id_kompetensi}>( {data.code} ) {data.competence_desc}</option>
+                                                        ))}
+                                                    </select> : selectedCategory == "1" ?
+                                                            <select
+                                                                className="form-control"
+                                                                id="id_pertemuan"
+                                                                key="id_pertemuan"
+                                                                name="id_pertemuan"
+                                                                onChange={(e) => setSelectedPertemuan(e.target.value)}
+                                                                value={selectedPertemuan}
+                                                            >
+                                                                <option value="" selected disabled>
+                                                                    Pilih Pertemuan
+                                                                </option>
+                                                                {dataPertemuan == null ? null : dataPertemuan?.map((data) => (
+                                                                    <option value={data.id_meeting}>{data.meeting_name}</option>
+                                                                ))}
+                                                            </select> : null
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-2 mb-3">
                                                 <Button className="mt-2" type="primary" shape="round"
                                                     onClick={() => {
                                                         setSelectedClass(null)
                                                         setSelectedMapel(null)
+                                                        setSelectedCategory("")
                                                     }}>
                                                     Reset
                                                 </Button>

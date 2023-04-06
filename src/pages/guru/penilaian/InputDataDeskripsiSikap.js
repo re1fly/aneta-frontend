@@ -46,6 +46,7 @@ function GuruInputDataDeskripsiSikap() {
               type: "json",
               value: {
                 user_id: userId,
+                academic_year_id: academic
               },
             },
           ],

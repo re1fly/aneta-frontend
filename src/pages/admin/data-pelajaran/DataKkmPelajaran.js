@@ -63,7 +63,6 @@ export default function DataMataPelajaranAdmin() {
     const [academicYears, setAcademicYears] = useState([]);
 
     const [getKkmPelajaran, setGetKkmPelajaran] = useState([])
-    console.log(getKkmPelajaran);
     const [getPelajaran, setGetPelajaran] = useState([]);
     const [tingkatKelas, setTingkatKelas] = useState([]);
     const [btnPagination, setBtnPagination] = useState([]);
@@ -190,7 +189,7 @@ export default function DataMataPelajaranAdmin() {
         }
     }
 
-    useEffect(() => {
+    const getListKkmPelajaran = () =>{
         axios.post(url_by_institute,
             {
                 "processDefinitionId": global_data_join_where,
@@ -259,6 +258,11 @@ export default function DataMataPelajaranAdmin() {
             const pagination = dataRes?.data?.links
             setBtnPagination(pagination)
         })
+    }
+
+    useEffect(() => {
+       
+        getListKkmPelajaran();
 
         axios.post(url_by_institute,
             {
@@ -517,6 +521,11 @@ export default function DataMataPelajaranAdmin() {
                 responsive: ['sm'],
             },
             {
+                title: 'Id',
+                dataIndex: 'idPelajaran',
+                align: "center"
+            },
+            {
                 title: 'Mata Pelajaran',
                 dataIndex: 'mataPelajaran',
             },
@@ -712,7 +721,7 @@ export default function DataMataPelajaranAdmin() {
                     description: 'KKM Pelajaran berhasil ditambahkan.',
                     placement: 'top'
                 })
-                // pageLoad()
+                getListKkmPelajaran();
             } else {
                 notification.error({
                     message: 'Error',
@@ -761,7 +770,7 @@ export default function DataMataPelajaranAdmin() {
                     description: 'KKM Pelajaran berhasil di update.',
                     placement: 'top'
                 })
-                //   pageLoad()
+                getListKkmPelajaran();
             } else {
                 notification.error({
                     message: 'Error',
@@ -807,14 +816,13 @@ export default function DataMataPelajaranAdmin() {
                 }
                     }
                 ).then(function (response) {
-                    console.log(response);
                     setRefreshState(true);
                     Swal.fire(
                         'Data telah terhapus!',
                         'Menghapus data pelajaran' + record.namaPelajaran,
                         'success'
                     )
-                    // pageLoad()
+                    getListKkmPelajaran();
                 })
             }
         })

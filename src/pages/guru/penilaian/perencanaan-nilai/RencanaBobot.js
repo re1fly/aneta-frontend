@@ -81,6 +81,7 @@ function GuruRencanaBobot() {
               value: {
                 user_id: userId,
                 id_class: selectedClass,
+                academic_year_id: academic
               },
             },
           ],
@@ -112,6 +113,7 @@ function GuruRencanaBobot() {
               type: "json",
               value: {
                 user_id: userId,
+                academic_year_id: academic
               },
             },
           ],

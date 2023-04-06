@@ -15,6 +15,7 @@ import {
 
 const institute = localStorage.getItem("institute");
 const userId = localStorage.getItem("user_id");
+const academic = localStorage.getItem("academic_year");
 
 export const searchGlobal =
   (value, paramsPage, processDef, variablesSearch) => (dispatch) => {
@@ -243,65 +244,70 @@ export const GetTingkatKelas = () => (dispatch) => {
     .then(function (response) {
       const dataTingkatKelas = JSON.parse(response?.data?.variables[3]?.value);
       dispatch({ type: "SET_TINGKATCLASS", value: dataTingkatKelas?.data });
-      console.log(dataTingkatKelas);
+      console.log("tingkat", dataTingkatKelas);
     })
     .catch(function (error) {
       console.log(error);
     });
 };
 
-export const GetSubKelas = (idTingkatKelas) => (dispatch) => {
-  axios
-    .post(url_by_institute, {
-      processDefinitionId: role_guru_get_sub_class,
-      returnVariables: true,
-      variables: [
-        {
-          name: "get_sub_kelas_guru",
-          type: "json",
-          value: {
-            id_tingkat: idTingkatKelas,
-            user_id: userId,
+export const GetSubKelas =
+  (idTingkatKelas, academicYear, user) => (dispatch) => {
+    axios
+      .post(url_by_institute, {
+        processDefinitionId: role_guru_get_sub_class,
+        returnVariables: true,
+        variables: [
+          {
+            name: "get_sub_kelas_guru",
+            type: "json",
+            value: {
+              id_tingkat: idTingkatKelas,
+              user_id: user,
+              academic_year_id: academicYear,
+            },
           },
-        },
-      ],
-    })
-    .then(function (response) {
-      const dataSubKelas = JSON.parse(response?.data?.variables[2]?.value);
-      dispatch({ type: "SET_SUBCLASS", value: dataSubKelas?.data });
-      console.log(dataSubKelas);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-};
+        ],
+      })
+      .then(function (response) {
+        const dataSubKelas = JSON.parse(response?.data?.variables[2]?.value);
+        dispatch({ type: "SET_SUBCLASS", value: dataSubKelas?.data });
+        console.log("ini", academicYear);
+        console.log("subkelas", dataSubKelas);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
-export const GetPelajaran = (idTingkatKelas, idSubKelas) => (dispatch) => {
-  axios
-    .post(url_by_institute, {
-      processDefinitionId: role_guru_get_matpel,
-      returnVariables: true,
-      variables: [
-        {
-          name: "update_jadwal_pelajaran",
-          type: "json",
-          value: {
-            user_id: userId,
-            id_tingkat: idTingkatKelas,
-            id_class: idSubKelas,
+export const GetPelajaran =
+  (idTingkatKelas, idSubKelas, academicYear, user) => (dispatch) => {
+    axios
+      .post(url_by_institute, {
+        processDefinitionId: role_guru_get_matpel,
+        returnVariables: true,
+        variables: [
+          {
+            name: "update_jadwal_pelajaran",
+            type: "json",
+            value: {
+              user_id: user,
+              id_tingkat: idTingkatKelas,
+              id_class: idSubKelas,
+              academic_year_id: academicYear,
+            },
           },
-        },
-      ],
-    })
-    .then(function (response) {
-      const dataPelajaran = JSON.parse(response?.data?.variables[2]?.value);
-      dispatch({ type: "SET_PELAJARAN", value: dataPelajaran?.data });
-      console.log(dataPelajaran);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-};
+        ],
+      })
+      .then(function (response) {
+        const dataPelajaran = JSON.parse(response?.data?.variables[2]?.value);
+        dispatch({ type: "SET_PELAJARAN", value: dataPelajaran?.data });
+        console.log("mapel", dataPelajaran);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
 export const GetKompetensi = (idPelajaran) => (dispatch) => {
   axios
@@ -349,7 +355,7 @@ export const GetKompetensi = (idPelajaran) => (dispatch) => {
     .then(function (response) {
       const dataKompetensi = JSON.parse(response?.data?.variables[3]?.value);
       dispatch({ type: "SET_KOMPETENSI", value: dataKompetensi?.data });
-      console.log(dataKompetensi);
+      console.log("kompetensi", dataKompetensi);
     })
     .catch(function (error) {
       console.log(error);
@@ -370,14 +376,37 @@ export const GetMateri = () => (dispatch) => {
             select: [
               "x_academic_subjects_schedule_contents.id",
               "x_academic_subjects_schedule_contents.tittle",
+              "r_class_type.class_type",
+              "x_academic_class.sub_class",
+              "x_academic_subjects_schedule_contents.subjects_master_id",
+              "x_academic_subject_master.nama_mata",
+
             ],
             paginate: false,
             join: [
+              // {
+              //   tbl_join: "x_academic_subjects_schedule_contents_files",
+              //   refkey: "subjects_schedule_contents_id",
+              //   tbl_join2: "x_academic_subjects_schedule_contents",
+              //   foregenkey: "id",
+              // },
               {
-                tbl_join: "x_academic_subjects_schedule_contents_files",
-                refkey: "subjects_schedule_contents_id",
+                tbl_join: "x_academic_class",
+                refkey: "id",
                 tbl_join2: "x_academic_subjects_schedule_contents",
-                foregenkey: "id",
+                foregenkey: "class_id",
+              },
+              {
+                tbl_join: "r_class_type",
+                refkey: "id",
+                tbl_join2: "x_academic_class",
+                foregenkey: "class",
+              },
+              {
+                tbl_join: "x_academic_subject_master",
+                refkey: "id",
+                tbl_join2: "x_academic_subjects_schedule_contents",
+                foregenkey: "subjects_master_id",
               },
             ],
             where: [
@@ -391,6 +420,12 @@ export const GetMateri = () => (dispatch) => {
                 tbl_coloumn: "x_academic_subjects_schedule_contents",
                 tbl_field: "created_by",
                 tbl_value: userId,
+                operator: "=",
+              },
+              {
+                tbl_coloumn: "x_academic_subjects_schedule_contents",
+                tbl_field: "deleted_at",
+                tbl_value: "",
                 operator: "=",
               },
             ],
@@ -408,7 +443,7 @@ export const GetMateri = () => (dispatch) => {
     .then(function (response) {
       const dataMateri = JSON.parse(response?.data?.variables[3]?.value);
       dispatch({ type: "SET_MATERIPERTEMUAN", value: dataMateri?.data });
-      console.log(dataMateri);
+      console.log("materi", dataMateri);
     })
     .catch(function (error) {
       console.log(error);
@@ -507,14 +542,30 @@ export const GetTugas = () => (dispatch) => {
             select: [
               "x_academic_subjects_schedule_contents.id",
               "x_academic_subjects_schedule_contents.tittle",
+              "r_class_type.class_type",
+              "x_academic_class.sub_class",
+              "x_academic_subjects_schedule_contents.subjects_master_id",
+              "x_academic_subject_master.nama_mata",
             ],
             paginate: false,
             join: [
               {
-                tbl_join: "x_academic_subjects_schedule_contents_files",
-                refkey: "subjects_schedule_contents_id",
+                tbl_join: "x_academic_class",
+                refkey: "id",
                 tbl_join2: "x_academic_subjects_schedule_contents",
-                foregenkey: "id",
+                foregenkey: "class_id",
+              },
+              {
+                tbl_join: "r_class_type",
+                refkey: "id",
+                tbl_join2: "x_academic_class",
+                foregenkey: "class",
+              },
+              {
+                tbl_join: "x_academic_subject_master",
+                refkey: "id",
+                tbl_join2: "x_academic_subjects_schedule_contents",
+                foregenkey: "subjects_master_id",
               },
             ],
             where: [
@@ -530,10 +581,16 @@ export const GetTugas = () => (dispatch) => {
                 tbl_value: userId,
                 operator: "=",
               },
+              {
+                tbl_coloumn: "x_academic_subjects_schedule_contents",
+                tbl_field: "deleted_at",
+                tbl_value: "",
+                operator: "=",
+              },
             ],
             order_coloumn: "x_academic_subjects_schedule_contents.tittle",
             order_by: "asc",
-          },
+          }
         },
         {
           name: "page",
@@ -696,10 +753,17 @@ export const PathMapelNilaiGuru = (mapel) => (dispatch) => {
 export const PathTugasNilaiGuru = (tugas) => (dispatch) => {
   dispatch({ type: "ADD_NILAITUGAS", value: tugas });
 };
+export const PathPertemuanNilaiGuru = (tugas) => (dispatch) => {
+  dispatch({ type: "ADD_NILAIPERTEMUAN", value: tugas });
+};
 
 export const TanggalKalenderSiswa = (tanggal) => (dispatch) => {
   dispatch({ type: "ADD_TANGGALSISWA", value: tanggal });
 };
 export const PathKalenderSiswa = (allPath) => (dispatch) => {
   dispatch({ type: "ADD_ALLPATHKALENDERSISWA", value: allPath });
+};
+
+export const JadwalPelajaranDetail = (record) => (dispatch) => {
+  dispatch({ type: "SET_JADWALPELAJARANDETAIL", value: record });
 };

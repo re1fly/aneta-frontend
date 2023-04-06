@@ -59,6 +59,7 @@ const ERapor = React.forwardRef((props, ref) => {
     useEffect(() => {
         switchPredicate(data?.predikat_spiritual)
     }, [data])
+    console.log(data)
 
 
     return (

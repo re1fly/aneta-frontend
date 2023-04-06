@@ -20,7 +20,6 @@ export default function TugasGuru() {
     const idContent = params.id
 
     useEffect(() => {
-
         axios.post(url_by_institute, {
             "processDefinitionId": global_join_sub_first,
             "returnVariables": true,
@@ -34,11 +33,6 @@ export default function TugasGuru() {
                             "class_type", "sub_class", "file_name", "file_path", "x_academic_subjects_schedule_contents.tittle", "x_academic_subjects_schedule_contents_meeting.meeting_name"],
                         "join": [
                             {
-                                "tbl_join": "x_academic_subjects_schedule_contents_files",
-                                "refkey": "subjects_schedule_contents_id",
-                                "tbl_join2": "x_academic_subjects_schedule_contents",
-                                "foregenkey": "id"
-                            }, {
                                 "tbl_join": "x_academic_class",
                                 "refkey": "id",
                                 "tbl_join2": "x_academic_subjects_schedule_contents",
@@ -53,9 +47,13 @@ export default function TugasGuru() {
                                 "refkey": "contents_id",
                                 "tbl_join2": "x_academic_subjects_schedule_contents",
                                 "foregenkey": "id"
+                            },
+                            {
+                                "tbl_join": "x_academic_subjects_schedule_contents_files",
+                                "refkey": "subjects_schedule_contents_id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
+                                "foregenkey": "id"
                             }
-
-
                         ],
                         "where": [
                             {

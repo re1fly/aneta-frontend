@@ -50,7 +50,6 @@ export default function ListTahunAkademik() {
     const [selectedUser, setSelectedUser] = useState(null);
 
     const [getTahunAkademik, setGetTahunAkademik] = useState([])
-    console.log(getTahunAkademik);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
@@ -151,8 +150,8 @@ export default function ListTahunAkademik() {
     // }
 
     // Get Tahun Akademik
-    
-    useEffect(() => {
+
+    const getListTahunAkademik = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": get_where_no_join,
@@ -192,10 +191,13 @@ export default function ListTahunAkademik() {
             setGetTahunAkademik(tahunAkademik?.data)
             setBtnPagination(tahunAkademik?.links)
         })
+    }
+
+    useEffect(() => {
+        getListTahunAkademik();
     }, [institute, paramsPage])
 
     const CardTahunAkademik = () => {
-
         const data_sampel = getTahunAkademik?.map((data, index) => {
             return {
                 tahunAkademik: data.academic_year,
@@ -670,7 +672,7 @@ export default function ListTahunAkademik() {
         }).then(function (response) {
             const dataRes = JSON.parse(response.data.variables[2].value)
             if (dataRes.status == 'success') {
-                // setIsViewPelajaran(true)
+                setIsViewTahunAkademik(true);
                 notification.success({
                     message: 'Sukses',
                     description: 'Tahun Akademik berhasil ditambahkan.',
@@ -688,7 +690,7 @@ export default function ListTahunAkademik() {
                 localStorage.setItem('year', data.tahun_akademik);
                 localStorage.setItem('semester', data.semester);
             }
-            pageLoad()
+            getListTahunAkademik();
         })
     }
 
@@ -746,7 +748,7 @@ export default function ListTahunAkademik() {
                     description: 'Data Tahun Akademik berhasil di update.',
                     placement: 'top'
                 })
-                pageLoad()
+                getListTahunAkademik();
             } else {
                 notification.error({
                     message: 'Error',
@@ -754,7 +756,6 @@ export default function ListTahunAkademik() {
                     placement: 'top'
                 })
             }
-            console.log(response)
         })
     }
 
@@ -796,7 +797,7 @@ export default function ListTahunAkademik() {
                         'Menghapus data tahun akademik ' + record.tahunAkademik,
                         'success'
                     )
-                    pageLoad()
+                    getListTahunAkademik()
                 })
             }
         })

@@ -25,8 +25,11 @@ export default function GuruJadwalPelajaranMapelMateri() {
     const academicYear = localStorage.getItem('academic_year')
     const userId = localStorage.getItem('user_id')
 
+
     const params = useParams()
-    const idMapel = params?.id
+    const paramsId = params?.id?.split('-');
+    const idSubClass = paramsId[0]
+    const idMapel = paramsId[1]
 
     const dispatch = useDispatch();
     const pathJadwalGuru = useSelector((state) => state.dataPathJadwalGuru);
@@ -46,34 +49,19 @@ export default function GuruJadwalPelajaranMapelMateri() {
                         "name": "global_join_where_sub",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_academic_subjects_schedule_contents_meeting",
+                            "tbl_induk": "x_academic_subjects_schedule_contents",
                             "select": [
                                 "x_academic_subjects_schedule_contents.id",
-                                "x_academic_subjects_schedule_contents.tittle",
-                                "x_academic_subjects_schedule_date.date",
-                                "x_academic_subjects_schedule_time.time_start",
-                                "x_academic_subjects_schedule_time.time_end"
+                                "x_academic_subjects_schedule_contents.tittle"
                             ],
-                            "paginate": 10,
+                            "paginate": 1000,
                             "join": [
                                 {
-                                    "tbl_join": "x_academic_subjects_schedule_date",
+                                    "tbl_join": "r_subjects_content_type",
                                     "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
-                                    "foregenkey": "schedule_date_id"
+                                    "tbl_join2": "x_academic_subjects_schedule_contents",
+                                    "foregenkey": "subjects_content_type_id"
                                 },
-                                {
-                                    "tbl_join": "x_academic_subjects_schedule_time",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
-                                    "foregenkey": "schedule_time_id"
-                                }, {
-                                    "tbl_join": "x_academic_subjects_schedule_contents",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
-                                    "foregenkey": "contents_id"
-
-                                }
                             ],
                             "where": [
                                 {
@@ -86,20 +74,33 @@ export default function GuruJadwalPelajaranMapelMateri() {
                                     "tbl_field": "created_by",
                                     "tbl_value": userId,
                                     "operator": "="
-                                }, {
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                    "tbl_field": "class_id",
+                                    "tbl_value": idSubClass,
+                                    "operator": "="
+                                },
+                                {
                                     "tbl_coloumn": "x_academic_subjects_schedule_contents",
                                     "tbl_field": "subjects_master_id",
                                     "tbl_value": idMapel,
                                     "operator": "="
-                                }, {
+                                },
+                                {
                                     "tbl_coloumn": "x_academic_subjects_schedule_contents",
                                     "tbl_field": "status",
                                     "tbl_value": "publish",
                                     "operator": "="
-                                }
-
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "=",
+                                },
                             ],
-                            "order_coloumn": "x_academic_subjects_schedule_contents_meeting.updated_at",
+                            "order_coloumn": "x_academic_subjects_schedule_contents.updated_at",
                             "order_by": "desc"
                         }
                     },
@@ -119,6 +120,7 @@ export default function GuruJadwalPelajaranMapelMateri() {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
             const mapel = dataRes?.data?.data
             setGetMateri(mapel);
+            console.log('ini materi: ', mapel)
         })
     }, [academicYear])
 

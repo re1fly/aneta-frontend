@@ -40,7 +40,7 @@ function SiswaJadwalMateri() {
                 }
             }
         ).then(function (response) {
-            console.log(response);
+            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetMateri(dataRes?.data);
         })

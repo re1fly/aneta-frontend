@@ -166,7 +166,6 @@ export default function DataMataPelajaranAdmin() {
     }
 
     const getListPelajaran = () => {
-
         axios.post(url_by_institute,
             {
                 "processDefinitionId": get_data_mata_pelajaran,
@@ -416,7 +415,7 @@ export default function DataMataPelajaranAdmin() {
         const channelList = getPelajaran.map((pelajaran, index) => {
             return {
                 no: index + 1,
-                idPelajaran: pelajaran.id_master,
+                idPelajaran: pelajaran.id,
                 namaPelajaran: pelajaran.nama_mata,
                 kode: pelajaran.code,
                 idKelompok: pelajaran.id_kelompok,
@@ -819,7 +818,7 @@ export default function DataMataPelajaranAdmin() {
                     description: 'Pelajaran berhasil ditambahkan.',
                     placement: 'top'
                 })
-                // pageLoad()
+                getListPelajaran();
             } else {
                 notification.error({
                     message: 'Error',
@@ -875,7 +874,7 @@ export default function DataMataPelajaranAdmin() {
                     description: 'Pelajaran berhasil di update.',
                     placement: 'top'
                 })
-                // pageLoad()
+                getListPelajaran();
             } else {
                 notification.error({
                     message: 'Error',
@@ -925,7 +924,7 @@ export default function DataMataPelajaranAdmin() {
                         'Menghapus data mata pelajaran ' + record.namaPelajaran,
                         'success'
                     )
-                    // pageLoad()
+                    getListPelajaran();
                 })
             }
         })

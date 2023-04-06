@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import Adminfooter from "../../../components/Adminfooter";
 import {
     Card,
-    Col,
+    Col, Collapse, Divider,
     PageHeader,
     Row,
     Space,
@@ -20,21 +20,25 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { url_by_institute } from '../../../api/reference';
+import {role_guru_get_nilai_siswa_feedback, url_by_institute} from '../../../api/reference';
 
 function SiswaPenilaian() {
     const [grid, setGrid] = useState(false);
     const [isViewPenilaian, setIsViewPenilaian] = useState(true);
     const [selectedUser, setSelectedUser] = useState([]);
     const [getnilai, setGetNilai] = useState([]);
+    const [reviewSiswa, setReviewSiswa] = useState([]);
+    const academicId = localStorage.getItem('academic_id')
 
     const userId = localStorage.getItem('user_id');
+    const userEmail = localStorage.getItem('email')
 
     const params = useParams();
     const path = params.id.split("-");
     const idMateri = path[0];
     const mapel = path[1];
     const tugas = path[2];
+    const { Panel } = Collapse;
 
     useEffect(() => {
         axios.post(url_by_institute, {
@@ -46,7 +50,8 @@ function SiswaPenilaian() {
                     "type": "json",
                     "value": {
                         "id_user": userId,
-                        "id_materi": idMateri
+                        "id_materi": idMateri,
+                        "id_academic": academicId
                     }
                 }
             ]
@@ -57,11 +62,13 @@ function SiswaPenilaian() {
             }
         }
         ).then(function (response) {
+            console.log('klik setelah mapel',response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetNilai(dataRes?.data);
         })
 
     }, [idMateri, userId])
+
 
     const columns = [
         {
@@ -70,13 +77,13 @@ function SiswaPenilaian() {
             align: 'center',
         },
         {
-            title: 'Nama Siswa',
-            dataIndex: 'namaSiswa',
+            title: 'Nilai',
+            dataIndex: 'nilai',
             align: 'center',
         },
         {
-            title: 'Nilai',
-            dataIndex: 'nilai',
+            title: 'Feedback Guru',
+            dataIndex: 'feedback',
             align: 'center',
         },
         {
@@ -92,13 +99,15 @@ function SiswaPenilaian() {
         },
     ];
 
-    const data = [
-        {
-            namaTugas: getnilai.tittle,
-            namaSiswa: getnilai.nama,
-            nilai: getnilai.score,
-        },
-    ];
+    const data = getnilai.map((dataNilai) => {
+        return {
+            namaTugas: dataNilai.tittle,
+            namaSiswa: dataNilai.nama,
+            nilai: dataNilai.score,
+            feedback: dataNilai.feedback,
+            idContent: dataNilai.file_path
+        }
+    })
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -109,6 +118,23 @@ function SiswaPenilaian() {
     const dataSiswa = (record) => {
         setSelectedUser(record)
         setIsViewPenilaian(false)
+        axios.post(url_by_institute, {
+            "processDefinitionId": role_guru_get_nilai_siswa_feedback,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+                        "id_content": record.idContent,
+                        "email": userEmail
+                    }
+                }
+            ]
+        }).then(response => {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            setReviewSiswa(dataRes.data)
+        })
     }
 
     const DetailPenilaian = () => {
@@ -175,6 +201,66 @@ function SiswaPenilaian() {
                                             </div>
                                         </div>
                                     </form>
+                                    <label className="mont-font fw-600 font-xss mb-3">
+                                        Review Penilaian
+                                    </label>
+                                    {
+                                        reviewSiswa.map((data, index) => {
+                                            const time = data.time
+                                            const bits = time.split(/\D/);
+                                            const dateString = new Date(bits[0], --bits[1], bits[2], bits[3], bits[4]);
+                                            const dataJawabanSiswa = data.jawaban
+                                            const dataJawabanBenar = data.jawaban_benar
+
+                                            const jawabanBenar = dataJawabanBenar == null ? dataJawabanBenar : dataJawabanBenar.join(', ');
+                                            const jawabanSiswa = dataJawabanSiswa == null ? dataJawabanSiswa : dataJawabanSiswa.join(', ');
+                                            return (
+                                                <>
+                                                    {/*<Card title={index+1+'. ' + data.pertanyaan} bordered={false} style={{ width: 300 }}>*/}
+                                                    {/*    <p>{data.jawaban}</p>*/}
+                                                    {/*</Card>*/}
+                                                    <h4>{index + 1 + '. ' + data.pertanyaan}</h4>
+                                                    <Collapse bordered={false} defaultActiveKey={['1', '3', '4']}>
+                                                        <Panel header="Jawaban Siswa" key="1">
+                                                            {jawabanBenar}
+                                                        </Panel>
+                                                        <Panel header="Jawaban Benar" key="2">
+                                                            {jawabanSiswa}
+                                                        </Panel>
+                                                        <Panel header="Nilai Siswa" key="3">
+                                                            <input
+                                                                type="hidden"
+                                                                name="id_review"
+                                                                className="form-control mb-1 w-25"
+                                                                defaultValue={data.id}
+                                                            />
+                                                            <input
+                                                                type="number"
+                                                                name="nilai_review"
+                                                                className="form-control mb-1 w-25"
+                                                                defaultValue={data.nilai}
+                                                                disabled
+                                                            />
+                                                        </Panel>
+                                                        <Panel header="Feedback" key="4">
+                                         <textarea
+                                             className="form-control mb-0 p-3 lh-16"
+                                             rows="5"
+                                             placeholder=""
+                                             name="feedback_review"
+                                             defaultValue={data.feedback}
+                                             disabled
+                                         ></textarea>
+                                                        </Panel>
+                                                    </Collapse>
+                                                    {/*<Badge key={index} color={'orange'} text={new Date(time).toUTCString()} />*/}
+                                                    <span className='float-right p-2 font-xssss text-ornage'>{new Date(time).toUTCString()}</span>
+
+                                                    <Divider/>
+                                                </>
+                                            )
+                                        })
+                                    }
                                 </div>
                             </div>
                         </div>

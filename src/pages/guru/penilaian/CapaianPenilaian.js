@@ -12,6 +12,7 @@ import {
   role_guru_get_sub_class,
   url_by_institute,
 } from "../../../api/reference";
+import {defaultFuseOptions} from "react-search-autocomplete/dist/config/config.js";
 
 function GuruCapaianPenilaian() {
   const [dataCapaian, setDataCapaian] = useState([]);
@@ -67,6 +68,7 @@ function GuruCapaianPenilaian() {
               type: "json",
               value: {
                 user_id: userId,
+                academic_year_id: defaultAcademic
               },
             },
           ],

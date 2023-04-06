@@ -20,8 +20,10 @@ export default function GuruJadwalPelajaranMateriTugas() {
 
     const _onSearch = value => console.log(value);
 
-    const params = useParams();
-    const idMapel = params?.id
+    const params = useParams()
+    const paramsId = params?.id?.split('-');
+    const idSubClass = paramsId[0]
+    const idMapel = paramsId[1]
 
     const pathJadwalGuru = useSelector((state) => state.dataPathJadwalGuru);
     const kelas = pathJadwalGuru.kelas
@@ -29,12 +31,12 @@ export default function GuruJadwalPelajaranMateriTugas() {
     const mapel = pathJadwalGuru.mapel
 
     let history = useHistory();
-    const handleSubClass1 = (id) => {
-        history.push(`/guru-jadwal-pelajaran-list-materi-${id}`)
+    const handleSubClass1 = (idSubClass, idMapel) => {
+        history.push(`/guru-jadwal-pelajaran-list-materi-${idSubClass}-${idMapel}`)
     }
 
     const handleSubClass2 = (id) => {
-        history.push(`/guru-jadwal-pelajaran-list-tugas-${id}`)
+        history.push(`/guru-jadwal-pelajaran-list-tugas-${idSubClass}-${idMapel}`)
     }
 
     const ViewPelajaran = () => {
@@ -63,7 +65,7 @@ export default function GuruJadwalPelajaranMateriTugas() {
                                 <div className="col-xl-3 col-lg-4 col-md-4">
                                     <div
                                         className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
-                                        onClick={() => handleSubClass1(idMapel)}
+                                        onClick={() => handleSubClass1(idSubClass, idMapel)}
                                     >
                                         <h2 className="font-weight-bold mb-0">Materi</h2>
                                     </div>
@@ -71,7 +73,7 @@ export default function GuruJadwalPelajaranMateriTugas() {
                                 <div className="col-xl-3 col-lg-4 col-md-4">
                                     <div
                                         className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
-                                        onClick={() => handleSubClass2(idMapel)}
+                                        onClick={() => handleSubClass2(idSubClass, idMapel)}
                                     >
                                         <h2 className="font-weight-bold mb-0">Tugas</h2>
                                     </div>

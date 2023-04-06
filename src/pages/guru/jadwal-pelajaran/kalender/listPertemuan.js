@@ -65,6 +65,7 @@ function GuruListPertemuanKalender() {
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const dataList = dataRes?.data
+            console.log('res detail', dataList)
             setDetailDate(dataList)
             // const pagination = dataRes?.data?.links;
             // setBtnPagination(pagination)
@@ -88,7 +89,7 @@ function GuruListPertemuanKalender() {
             subKelas: `${data.class_type} / ${data.sub_class}`,
             namaPelajaran: data.nama_mata,
             namaPertemuan: data.meeting_name,
-            tanggalPertemuan: data.date,
+            tanggalPertemuan: data.date  + ', ' +`${data.time_start} - ${data.time_end}`,
             jam: `${data.time_start} - ${data.time_end}`,
             meeting_name: data.meeting_name,
             tittle: data.tittle,
@@ -142,8 +143,8 @@ function GuruListPertemuanKalender() {
             ),
         },
         {
-            title: 'Jam',
-            dataIndex: 'jam',
+            title: 'Tanggal',
+            dataIndex: 'tanggalPertemuan',
             align: 'center',
         },
         {

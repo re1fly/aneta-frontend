@@ -17,6 +17,7 @@ import {InboxOutlined} from '@ant-design/icons';
 import {pageLoad} from '../../../components/misc/loadPage';
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import CryptoJS from "crypto-js";
+import AppNoHeader from "../../../components/AppNoHeader.js";
 
 export default function TugasiSiswa() {
     const params = useParams()
@@ -24,9 +25,8 @@ export default function TugasiSiswa() {
     const history = useHistory();
     const idContent = params.id
     const selectedContent = location.state.dataTugas
-    console.log(selectedContent)
+    // console.log(selectedContent)
     // console.log(window.location.pathname)
-
     const [duration, setDuration] = useState(selectedContent.menit)
     const [isFinished, setIsfinished] = useState(false)
     const [isSubmited, setIsSubmited] = useState(false)
@@ -108,6 +108,48 @@ export default function TugasiSiswa() {
                 "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
         }).then(response => {
+            console.log(response)
+                if (isSubmited == true) {
+                    notification.info({
+                        message: "Informasi",
+                        description: "Tugas telah di submit !",
+                        placement: 'topRight',
+                        duration: 10
+                    })
+                }else if(isFinished == true) {
+                    notification.info({
+                        message: "Informasi",
+                        description: "Waktu mengerjakan tugas telah habis",
+                        placement: 'topRight'
+                    })
+                }
+            }
+        )
+    }
+
+    const _finishedTaskEnd = () => {
+        axios.post(url_by_institute, {
+            "processDefinitionId": role_siswa_update_status_tugas,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+                        "id_siswa": userId,
+                        "id": selectedContent.id,
+                        "status": 2,
+                        "id_academic": academicId
+                    }
+                }
+            ]
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+            }
+        }).then(response => {
+                console.log(response)
                 if (isSubmited == true) {
                     notification.info({
                         message: "Informasi",
@@ -127,7 +169,9 @@ export default function TugasiSiswa() {
     }
 
     useEffect(() => {
-        _finishedTask()
+        if(selectedContent.status_siswa == 2){
+            _finishedTask()
+        }
     }, [isFinished === true]);
 
     useEffect(() => {
@@ -178,7 +222,7 @@ export default function TugasiSiswa() {
         setTypeFile(nameType?.toString())
     }
 
-    const handleSubmit = () => {
+    const handleSubmitUpload = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": "rolesiswauploadtugas:1:293f0e1e-5423-11ed-8f22-927b5be84510",
@@ -192,7 +236,8 @@ export default function TugasiSiswa() {
                             "file_type": typeFile,
                             "user_id": userId,
                             "id_academic": academicId,
-                            "id_content": selectedContent.idTugas
+                            "id_content": selectedContent.idTugas,
+                            "id_pertemuan": selectedContent.id
                         }
                     }
                 ]
@@ -203,9 +248,8 @@ export default function TugasiSiswa() {
                 }
             }
         ).then(function (response) {
-            // console.log(response);
+            console.log(response)
             const resData = JSON.parse(response.data.variables[2].value)
-            console.log(resData);
             const resCode = resData.message
             if (resCode == "success upload") {
                 // setRefreshState(true);
@@ -230,7 +274,7 @@ export default function TugasiSiswa() {
             <div id="main-wrapper">
                 <Navheader/>
                 <div className="main-content">
-                    <Appheader/>
+                    <AppNoHeader/>
                     <div className="container px-3 py-4">
                         <div className="row">
                             <div className="col-lg-12">
@@ -261,18 +305,18 @@ export default function TugasiSiswa() {
                                                     src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${selectedContent?.file_path}`}
                                                     width="1000" frameBorder="0"
                                                     allowFullScreen="allowfullscreen"
-                                                    style={{minHeight: '800px'}}
+                                                    style={{minHeight: '600px'}}
                                                     title="test soal multiple"></iframe>
                                                 <script
                                                     src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js"
                                                     charSet="UTF-8"></script>
                                             </div>
-                                            {selectedContent.statusSiswa == 1 && selectedContent.status == 1 ? <div className="text-center">
+                                            {selectedContent.statusSiswa == 1 && selectedContent.status == 1 && selectedContent.is_upload == false || selectedContent.statusSiswa == 0 && selectedContent.status == 1 && selectedContent.is_upload == false? <div className="text-center">
                                                 <button
                                                     className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 mt-2 w175 rounded-lg d-inline-block"
                                                     onClick={() => {
                                                         setIsSubmited(true)
-                                                        _finishedTask()
+                                                        _finishedTaskEnd()
                                                     }}
                                                 >
                                                     Selesaikan
@@ -308,7 +352,7 @@ export default function TugasiSiswa() {
 
                                                     <button
                                                         className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 mt-2 w175 rounded-lg d-inline-block"
-                                                        onClick={handleSubmit}
+                                                        onClick={handleSubmitUpload}
                                                     >
                                                         Submit Tugas
                                                     </button>

@@ -54,6 +54,7 @@ export default function SiswaNilaiTugas() {
             }
         }
         ).then(function (response) {
+            console.log('nilai',response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const materi = dataRes?.data
             setGetMateri(materi);

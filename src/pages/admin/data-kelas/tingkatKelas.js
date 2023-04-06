@@ -57,7 +57,7 @@ export default function AdminTingkatKelas() {
     const searchRedux = useSelector(state => state.search);
     const DataSearch = searchRedux.DataSearch;
 
-    useEffect(() => {
+    const getListTingkatKelas = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": global_join_sub_where_get,
@@ -112,8 +112,11 @@ export default function AdminTingkatKelas() {
             setGetTingkatKelas(dataRes.data.data);
             setBtnPagination(dataRes.data.links);
         })
-    }, [institute, refreshState])
+    }
 
+    useEffect(() => {
+        getListTingkatKelas();
+    }, [institute, refreshState])
 
     useEffect(() => {
         if (DataSearch != '') {
@@ -121,7 +124,6 @@ export default function AdminTingkatKelas() {
             setBtnPagination(DataSearch?.data?.links)
         }
     }, [DataSearch])
-
 
     const _onSelectMenu = ({ key }) => {
         message.info(`Click on item ${key}`);
@@ -235,6 +237,11 @@ export default function AdminTingkatKelas() {
                 align: "center",
             },
             {
+                title: 'ID',
+                dataIndex: 'id',
+                align: "center",
+            },
+            {
                 title: 'Tingkat Kelas',
                 dataIndex: 'tingkatKelas',
                 align: "center",
@@ -307,7 +314,6 @@ export default function AdminTingkatKelas() {
     }
 
     const CardDataKelas = () => {
-
         const channelList = getTingkatKelas.map((data, index) => {
             return {
                 // imageUrl: 'user.png',
@@ -466,7 +472,6 @@ export default function AdminTingkatKelas() {
             const dataRes = response.data.variables[2].value
             const dataResObj = JSON.parse(dataRes)
             const status = dataResObj.status
-            console.log(status);
             if (status == 'success') {
                 setIsViewCreate(false)
                 setIsViewKelas(true)
@@ -476,6 +481,7 @@ export default function AdminTingkatKelas() {
                     description: 'Data tingkat kelas berhasil ditambahkan',
                     placement: 'top'
                 })
+                getListTingkatKelas();
             } else {
                 notification.error({
                     message: "Error",
@@ -520,7 +526,6 @@ export default function AdminTingkatKelas() {
             }
         }
         ).then(function (response) {
-            console.log(response);
             const resCode = JSON.parse(response.data.variables[2].value)
             const statusCode = resCode.status;
             if (statusCode == 'success') {
@@ -532,6 +537,7 @@ export default function AdminTingkatKelas() {
                     description: 'Data tingkat kelas berhasil di update',
                     placement: 'top'
                 })
+                getListTingkatKelas();
             } else {
                 notification.error({
                     message: "Error",
@@ -582,6 +588,7 @@ export default function AdminTingkatKelas() {
                         'Menghapus data tingkat kelas ' + record.tingkatKelas,
                         'success'
                     )
+                    getListTingkatKelas();
                 })
             }
         })

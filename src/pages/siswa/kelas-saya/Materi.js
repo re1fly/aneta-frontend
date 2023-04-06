@@ -22,63 +22,68 @@ export default function MateriSiswa() {
 
     useEffect(() => {
         axios.post(url_by_institute, {
-                "processDefinitionId": global_join_sub_first,
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "global_join_where_sub_first",
-                        "type": "json",
-                        "value": {
-                            "tbl_induk": "x_academic_subjects_schedule_contents",
-                            "select": ["x_academic_subjects_schedule_contents_files.file_name",
-                                "x_academic_subjects_schedule_contents_files.file_path",
-                                "r_class_type.class_type",
-                                "x_academic_class.sub_class",
-                                "x_academic_subjects_schedule_contents_meeting.meeting_name",
-                                "x_academic_subjects_schedule_contents.tittle"
-                            ],
-                            "join": [
-                                {
-                                    "tbl_join": "x_academic_subjects_schedule_contents_files",
-                                    "refkey": "subjects_schedule_contents_id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents",
-                                    "foregenkey": "id"
-                                }, {
-                                    "tbl_join": "r_class_type",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents",
-                                    "foregenkey": "class_type_id"
-                                }, {
-                                    "tbl_join": "x_academic_class",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents",
-                                    "foregenkey": "class_id"
-                                }, {
-                                    "tbl_join": "x_academic_subjects_schedule_contents_meeting",
-                                    "refkey": "contents_id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents",
-                                    "foregenkey": "id"
-                                }
+            "processDefinitionId": global_join_sub_first,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where_sub_first",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_academic_subjects_schedule_contents",
+                        "select": [
+                            "x_academic_subjects_schedule_contents_files.file_name",
+                            "x_academic_subjects_schedule_contents_files.file_path",
+                            "r_class_type.class_type",
+                            "x_academic_class.sub_class",
+                            "x_academic_subjects_schedule_contents_meeting.meeting_name",
+                            "x_academic_subjects_schedule_contents.tittle"
+                        ],
+                        "join": [
 
-                            ],
-                            "where": [
-                                {
-                                    "tbl_coloumn": "x_academic_subjects_schedule_contents",
-                                    "tbl_field": "id",
-                                    "tbl_value": idContent,
-                                    "operator": "="
-                                }
-                            ]
-                        }
+                            {
+                                "tbl_join": "r_class_type",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "class_type_id"
+                            },
+                            {
+                                "tbl_join": "x_academic_class",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "class_id"
+                            },
+                            {
+                                "tbl_join": "x_academic_subjects_schedule_contents_meeting",
+                                "refkey": "contents_id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents",
+                                "foregenkey": "id"
+                            },
+                            {
+                                "tbl_join": "x_academic_subjects_schedule_contents_files",
+                                "refkey": "subjects_schedule_contents_id",
+                                "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
+                                "foregenkey": "id"
+                            }
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting",
+                                "tbl_field": "id",
+                                "tbl_value": idContent,
+                                "operator": "="
+                            }
+                        ]
                     }
-                ]
-            }, {
+                }
+            ]
+        }, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Basic YWRtaW46TWFuYWczciE="
                 }
             }
         ).then(function (response) {
+            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetContent(dataRes?.data);
         })

@@ -75,12 +75,19 @@ function GuruListPertemuanMateri() {
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
                                     "foregenkey": "schedule_time_id"
-                                }, {
+                                },
+                                {
                                     "tbl_join": "x_academic_subjects_schedule_contents",
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
                                     "foregenkey": "contents_id"
 
+                                },
+                                {
+                                    "tbl_join": "x_academic_subjects_schedule_contents_files",
+                                    "refkey": "subjects_schedule_contents_id",
+                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
+                                    "foregenkey": "id"
                                 }
                             ],
                             "where": [
@@ -89,11 +96,17 @@ function GuruListPertemuanMateri() {
                                     "tbl_field": "contents_id",
                                     "tbl_value": idMateri,
                                     "operator": "="
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "="
                                 }
 
                             ],
-                            "order_coloumn": "x_academic_subjects_schedule_contents_meeting.updated_at",
-                            "order_by": "desc"
+                            "order_coloumn": "x_academic_subjects_schedule_date.date",
+                            "order_by": "asc"
                         }
                     },
                     {

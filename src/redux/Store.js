@@ -13,6 +13,7 @@ import {
   ReducerPathKalenderGuru,
   ReducerPathNilaiGuru,
   ReducerPathKalenderSiswa,
+  ReducerJadwalPelajaranDetail,
 } from "./Reducer";
 import thunk from "redux-thunk";
 
@@ -30,6 +31,7 @@ const allReducers = combineReducers({
   dataPathKalenderGuru: ReducerPathKalenderGuru,
   dataPathNilaiGuru: ReducerPathNilaiGuru,
   dataPathKalenderSiswa: ReducerPathKalenderSiswa,
+  dataJadwalDetail: ReducerJadwalPelajaranDetail,
 });
 
 export const store = createStore(allReducers, applyMiddleware(thunk));

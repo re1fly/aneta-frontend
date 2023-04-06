@@ -102,8 +102,7 @@ function GuruKirimPenilaian() {
         }
     }
 
-    // kirim penilaian tampilan depan
-    useEffect(() => {
+    const _getDataPenilaian = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": get_kirim_penilaian,
@@ -129,7 +128,11 @@ function GuruKirimPenilaian() {
             setGetKirimPenilaian(dataRes?.data?.data)
             setBtnPagination(dataRes?.data?.links)
         })
+    }
 
+    // kirim penilaian tampilan depan
+    useEffect(() => {
+        _getDataPenilaian()
     }, [academicYear])
 
 
@@ -441,6 +444,7 @@ function GuruKirimPenilaian() {
                     description: "Data Dapat dilihat dalam table",
                     placement: 'top'
                 })
+                _getDataPenilaian()
             } else {
                 setDataKirimNilai(null);
                 notification.info({

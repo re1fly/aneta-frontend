@@ -8,83 +8,92 @@ import {BASE_URL} from "../../../api/Url";
 import {notification, PageHeader} from "antd";
 import {
     global_insert,
-    global_join_sub_where_get,
+    global_join_sub_where_get, role_guru_get_sub_class,
     url_by_institute,
 } from "../../../api/reference";
-import Data from "bootstrap/js/src/dom/data";
 
-export default function InputNilaiEkskul() {
+export default function PenilaianEkskul() {
     const academic = localStorage.getItem("academic_year");
-    const [dataKelas, setDataKelas] = useState([]);
+    const instituteId = localStorage.getItem('institute');
+    const userId = localStorage.getItem("user_id");
     const [dataEkskul, setDataEkskul] = useState([]);
     const [dataSiswa, setDataSiswa] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
+    const [selectedSubClass, setSelectedSubClass] = useState(null);
     const [selectedEkskul, setSelectedEkskul] = useState(null);
+    const [tingkatKelas, setTingkatKelas] = useState([])
+    const [subKelas, setSubKelas] = useState([]);
 
-    const _getDataKelas = () => {
+    const _getTingkatKelas = () => {
         axios
-            .post(
-                url_by_institute,
-                {
-                    processDefinitionId: global_join_sub_where_get,
-                    returnVariables: true,
-                    variables: [
-                        {
-                            name: "global_join_where_sub",
-                            type: "json",
-                            value: {
-                                tbl_induk: "x_academic_class",
-                                select: [
-                                    "x_academic_class.id",
-                                    "r_class_type.class_type as class",
-                                    "x_academic_class.sub_class",
-                                ],
-                                paginate: false,
-                                join: [
-                                    {
-                                        tbl_join: "r_class_type",
-                                        refkey: "id",
-                                        tbl_join2: "x_academic_class",
-                                        foregenkey: "class",
-                                    },
-                                ],
-                                where: [
-                                    {
-                                        tbl_coloumn: "x_academic_class",
-                                        tbl_field: "academic_year_id",
-                                        tbl_value: academic,
-                                        operator: "=",
-                                    },
-                                    {
-                                        tbl_coloumn: "x_academic_class",
-                                        tbl_field: "deleted_at",
-                                        tbl_value: "",
-                                        operator: "=",
-                                    },
-                                ],
-                                order_coloumn: "x_academic_class.id",
-                                order_by: "asc",
-                            },
+            .post(url_by_institute, {
+                processDefinitionId: global_join_sub_where_get,
+                returnVariables: true,
+                variables: [
+                    {
+                        name: "global_join_where_sub",
+                        type: "json",
+                        value: {
+                            tbl_induk: "r_class_type",
+                            select: ["r_class_type.id", "r_class_type.class_type"],
+                            paginate: false,
+                            join: [
+                                {
+                                    tbl_join: "m_institutes",
+                                    refkey: "id",
+                                    tbl_join2: "r_class_type",
+                                    foregenkey: "institute_id",
+                                },
+                            ],
+                            where: [
+                                {
+                                    tbl_coloumn: "r_class_type",
+                                    tbl_field: "institute_id",
+                                    tbl_value: instituteId,
+                                    operator: "=",
+                                },
+                            ],
+                            order_coloumn: "r_class_type.class_type",
+                            order_by: "asc",
                         },
-                        {
-                            name: "page",
-                            type: "string",
-                            value: "1",
-                        },
-                    ],
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
                     },
-                }
-            )
+                    {
+                        name: "page",
+                        type: "string",
+                        value: "1",
+                    },
+                ],
+            })
             .then(function (response) {
-                const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-                setDataKelas(dataRes?.data);
-            });
-    };
+                const dataTingkatKelas = JSON.parse(response?.data?.variables[3]?.value);
+                const dataTingkat = dataTingkatKelas?.data
+                setTingkatKelas(dataTingkat);
+                console.log(dataTingkat)
+            })
+    }
+    const _getSubKelas = () => {
+        axios.post(url_by_institute, {
+            processDefinitionId: role_guru_get_sub_class,
+            returnVariables: true,
+            variables: [
+                {
+                    name: "get_sub_kelas_guru",
+                    type: "json",
+                    value: {
+                        id_tingkat: selectedClass,
+                        user_id: userId,
+                        academic_year_id: academic,
+                    },
+                },
+            ],
+        })
+            .then(function (response) {
+                const dataSubKelas = JSON.parse(response?.data?.variables[2]?.value);
+                const dataSub = dataSubKelas?.data;
+                setSubKelas(dataSub);
+                console.log(response)
+            })
+    }
     const _getDataEkskul = () => {
         axios
             .post(
@@ -162,7 +171,7 @@ export default function InputNilaiEkskul() {
                             type: "json",
                             value: {
                                 id_extrakurikuler: selectedEkskul,
-                                id_class: selectedClass,
+                                id_class: selectedSubClass,
                             },
                         },
                     ],
@@ -223,29 +232,37 @@ export default function InputNilaiEkskul() {
             const resData = JSON.parse(response?.data?.variables[2]?.value)
 
             if (resData.status == "success") {
-              notification.success({
-                message: "Sukses",
-                description: "Nilai ekstrakurikuler berhasil diinput.",
-                placement: "top",
-              });
+                notification.success({
+                    message: "Sukses",
+                    description: "Nilai ekstrakurikuler berhasil diinput.",
+                    placement: "top",
+                });
             } else {
-              notification.error({
-                message: "Error",
-                description: "Error, harap hubungi admin EDII",
-                placement: "top",
-              });
+                notification.error({
+                    message: "Error",
+                    description: "Error, harap hubungi admin EDII",
+                    placement: "top",
+                });
             }
         })
     };
 
     useEffect(() => {
-        _getDataKelas();
-        _getDataEkskul();
+        _getTingkatKelas();
     }, []);
 
     useEffect(() => {
+        _getSubKelas();
+    }, [selectedClass]);
+
+    useEffect(() => {
+        _getDataEkskul();
+    }, [selectedSubClass]);
+
+
+    useEffect(() => {
         _getDataSiswa();
-    }, [selectedClass, selectedEkskul]);
+    }, [selectedEkskul]);
 
     return (
         <Fragment>
@@ -267,7 +284,7 @@ export default function InputNilaiEkskul() {
                             <DataNotFound/>
                         ) : (
                             <div className="row">
-                                <div className="col-lg-6 mb-3">
+                                <div className="col-lg-4 mb-3">
                                     <div className="form-group mr-4">
                                         <select
                                             className="form-control"
@@ -275,17 +292,35 @@ export default function InputNilaiEkskul() {
                                             onChange={(e) => setSelectedClass(e.target.value)}
                                         >
                                             <option value="" selected disabled>
-                                                Pilih Kelas
+                                                Pilih Tingkat Kelas
                                             </option>
-                                            {dataKelas.map((data) => (
+                                            {tingkatKelas.map((data) => (
                                                 <option value={data.id}>
-                                                    {data.class} / {data.sub_class}
+                                                    {data.class_type}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
                                 </div>
-                                <div className="col-lg-6 mb-3">
+                                <div className="col-lg-4 mb-3">
+                                    <div className="form-group">
+                                        <select
+                                            className="form-control"
+                                            key="id_class_filter"
+                                            onChange={(e) => setSelectedSubClass(e.target.value)}
+                                        >
+                                            <option value="" selected disabled>
+                                                Pilih Sub Kelas
+                                            </option>
+                                            {subKelas?.map((data) => (
+                                                <option value={data.id}>
+                                                    {data.sub_class}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="col-lg-4 mb-3">
                                     <div className="form-group ml-4">
                                         <select
                                             className="form-control"
@@ -301,7 +336,7 @@ export default function InputNilaiEkskul() {
                                         </select>
                                     </div>
                                 </div>
-                                {dataSiswa.length >= 1 ?
+                                { dataSiswa.length >= 1 ?
                                     <div className="col-lg-12 pt-3">
                                         <div className="table-responsive-xl">
 
@@ -394,8 +429,7 @@ export default function InputNilaiEkskul() {
                                                 </a>
                                             </div>
                                         </div>
-                                    </div>
-                                    : <DataNotFound />
+                                    </div> : <DataNotFound />
                                 }
                             </div>
                         )}

@@ -84,6 +84,12 @@ const SiswaKalenderMateri = () => {
                                     "tbl_field": "contents_id",
                                     "tbl_value": idMateri,
                                     "operator": "="
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "="
                                 }
                             ],
                             "order_coloumn": "x_academic_subjects_schedule_contents_meeting.meeting_name",

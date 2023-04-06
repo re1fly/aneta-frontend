@@ -70,6 +70,7 @@ const SiswaKalenderTugas = () => {
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
             setDataPertemuan(dataRes?.data);
+            console.log(dataRes.data)
             const pagination = dataRes?.data?.links;
             setBtnPagination(pagination)
         })
@@ -108,8 +109,8 @@ const SiswaKalenderTugas = () => {
             no: index + 1,
             id: data.contents_id,
             namaPertemuan: data.meeting_name,
-            tanggalPertemuan: data.date,
-            jam: `${data.time_start} - ${data.time_end}`,
+            startDate: data.date_mulai,
+            endDate: data.date_akhir,
             menit: data.menit,
             status: data.status,
             statusSiswa: data.status_siswa,
@@ -137,13 +138,13 @@ const SiswaKalenderTugas = () => {
             align: 'center',
         },
         {
-            title: 'Tanggal Pertemuan',
-            dataIndex: 'tanggalPertemuan',
+            title: 'Tanggal Mulai',
+            dataIndex: 'startDate',
             align: 'center',
         },
         {
-            title: 'Jam',
-            dataIndex: 'jam',
+            title: 'Tanggal Berakhir',
+            dataIndex: 'endDate',
             align: 'center',
         },
         {

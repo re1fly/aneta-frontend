@@ -38,7 +38,7 @@ export default function SiswaNilaiPelajaran() {
                         "value": {
                             "id_academic": academicYear,
                             "id_user": userId,
-                            "type": 1
+                            "type": 2
                         }
                     }
                 ]

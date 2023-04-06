@@ -23,10 +23,10 @@ function InputDataNilai() {
             title: 'Input Nilai Sikap Sosial',
             url: 'admin-data-nilai-sosial'
         },
-        {
-            title: 'Input Nilai PTS dan PAS',
-            url: 'admin-data-nilai-ujian'
-        },
+        // {
+        //     title: 'Input Nilai PTS dan PAS',
+        //     url: 'admin-data-nilai-ujian'
+        // },
     ]
 
     const listPenilaian = getPerencanaan.map((data, index) => {

@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Select } from "antd";
-import { GetIdJam, GetMateri, GetTanggalPertemuan, GetWaktuPertemuan } from "../../redux/Action";
+import { GetIdJam, GetKompetensi, GetMateri, GetTanggalPertemuan, GetWaktuPertemuan } from "../../redux/Action";
+import axios from "axios";
+import {global_join_sub_where_get, url_by_institute} from "../../api/reference.js";
 
 export const FormCreatePertemuanMateri = (props) => {
 
     const dispatch = useDispatch();
     const dataPertemuanMateri = useSelector(state => state.pertemuanMateri);
+    const dataClassMateri = useSelector((state) => state.classMateri);
+
+    const kompetensi = dataClassMateri?.DataKompetensi;
 
     const materi = dataPertemuanMateri?.DataMateri
     const tanggal = dataPertemuanMateri?.DataTanggal
     const jam = dataPertemuanMateri?.DataJam
 
     const [idMateri, setIdMateri] = useState('');
+    const [idPelajaran, setIdPelajaran] = useState('');
     const [idTanggal, setIdTanggal] = useState('');
     const [idJam, setIdJam] = useState([]);
+    const [idKom, setIdKom] = useState([]);
+    const user= localStorage.getItem("user_id");
+
+    const getValue = (value) => {
+        setIdMateri(value.split(",")[0])
+        setIdPelajaran(value.split(",")[1])
+        console.log(value.split(",")[0]);
+    }
+
 
     useEffect(() => {
         dispatch(GetMateri());
         if (idMateri != '') {
             dispatch(GetTanggalPertemuan(idMateri));
+        }
+        if (idPelajaran != '') {
+            dispatch(GetKompetensi(idPelajaran));
         }
         if (idTanggal != '') {
             dispatch(GetWaktuPertemuan(idTanggal));
@@ -39,8 +57,11 @@ export const FormCreatePertemuanMateri = (props) => {
         <Option key="3">13:00 - 14:00</Option>,
     );
 
-    const handleChange = (id, e) => {
+    const handleChangeJam = (id, e) => {
         setIdJam(id)
+    };
+    const handleChangeKompetensi = (id, e) => {
+        setIdKom(id)
     };
 
     let disabledButton = props.disabledButton;
@@ -82,18 +103,18 @@ export const FormCreatePertemuanMateri = (props) => {
                                                                 setIdJam('');
                                                             }
                                                         }
-                                                        setIdMateri(event.currentTarget.value);
+                                                        getValue(event.currentTarget.value)
                                                     }}
                                                 >
-                                                    <option value="" selected={idMateri == '' ? false : true}>
+                                                    <option value="">
                                                         {props.namaMateri == undefined ? "Pilih Materi" : props.namaMateri}
                                                     </option>
                                                     {materi.map((data, i) => {
                                                         return (
-                                                            <option value={data.id}
+                                                            <option value={`${data.id},${data.subjects_master_id}`}
                                                             // selected={data.id != idProv ? false : true}
                                                             >
-                                                                {data.tittle}
+                                                                {`${data.class_type}/${data.sub_class} - ${data.nama_mata} - ${data.tittle} `}
                                                             </option>
                                                         )
                                                     })}
@@ -142,10 +163,10 @@ export const FormCreatePertemuanMateri = (props) => {
                                                         setIdTanggal(event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value="" selected={idTanggal == '' ? false : true}>
+                                                    <option value="">
                                                         {props.tanggalPertemuan == undefined ? "Pilih Tanggal" : props.tanggalPertemuan}
                                                     </option>
-                                                    {tanggal.map((data, i) => {
+                                                    {tanggal?.map((data, i) => {
                                                         return (
                                                             <option value={data.id}
                                                             // selected={data.id != idProv ? false : true}
@@ -159,6 +180,7 @@ export const FormCreatePertemuanMateri = (props) => {
                                         </div>
 
                                         <input type="hidden" name="jam_pertemuan" value={idJam} />
+                                        <input type="hidden" name="id_kompetensi" value={idKom} />
 
                                         <div className="col-lg-6 mb-3">
                                             <div className="form-group">
@@ -174,7 +196,7 @@ export const FormCreatePertemuanMateri = (props) => {
                                                     style={{ width: '100%', borderRadius: '0.25rem', color: '#495057', }}
                                                     placeholder={props.jam == undefined ? "Pilih Jam" : props.jam}
                                                     // onChange={props.GetIdJam}
-                                                    onChange={handleChange}
+                                                    onChange={handleChangeJam}
                                                     disabled={props.isDisabled}
                                                 >
                                                     {jam.map((data, i) => {
@@ -185,6 +207,65 @@ export const FormCreatePertemuanMateri = (props) => {
                                                                 {`${data.time_start} - ${data.time_end}`}
                                                             </Option>
                                                         )
+                                                    })}
+                                                </Select>
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-12 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Embed {props.form}
+                                                </label>
+                                                <textarea
+                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                    rows="3"
+                                                    placeholder=""
+                                                    name="embed_materi"
+                                                    id="iframe"
+                                                    required
+                                                    defaultValue={props.embed}
+                                                    disabled={props.isDisabled}
+                                                ></textarea>
+                                                <div className="mt--1 d-flex">
+                                                    {/* <RequiredTooltip /> */}
+                                                    <p className="text-red">*</p>
+                                                    <p className="ml-1 mt-0 font-xssss">
+                                                        Embed {props.form} diperoleh dari menu LMS
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-5 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Kompetensi
+                                                </label>
+                                                <Select
+                                                    className="pt-1 pb-1"
+                                                    name="kompetensi"
+                                                    size="large"
+                                                    mode="multiple"
+                                                    allowClear
+                                                    style={{
+                                                        width: "100%",
+                                                        borderRadius: "0.25rem",
+                                                        color: "#495057",
+                                                    }}
+                                                    placeholder="Pilih Kompotensi"
+                                                    // onChange={props.GetIdJam}
+                                                    onChange={handleChangeKompetensi}
+                                                    disabled={props.isDisabled}
+                                                >
+                                                    {kompetensi.map((data, i) => {
+                                                        return (
+                                                            <Option
+                                                                value={data.id_kompetensi}
+                                                                key={data.id_kompetensi}
+                                                            >
+                                                                {data.competence_desc}
+                                                            </Option>
+                                                        );
                                                     })}
                                                 </Select>
                                             </div>

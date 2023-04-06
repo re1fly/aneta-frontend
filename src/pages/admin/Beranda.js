@@ -548,7 +548,7 @@ function BerandaAdmin() {
             }
         )
             .then(function (response) {
-                const message = response.data.variables[8].value;
+                // const message = response.data.variables[8].value;
                 console.log('create_isntitute',response)
                 if (response.data.variables[6].value == 422) {
                     notification.error({
@@ -562,9 +562,9 @@ function BerandaAdmin() {
                     window.location.reload();
                 }
             })
-            .catch(function (error) {
-                alert(error);
-            });
+            // .catch(function (error) {
+            //     alert(error);
+            // });
 
     }
 

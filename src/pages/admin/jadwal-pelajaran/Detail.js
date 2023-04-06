@@ -47,7 +47,7 @@ import {
   insert_jadwal_pelajaran,
   get_where_no_join,
 } from "../../../api/reference";
-import { GetAllDate } from "../../../redux/Action";
+import { GetAllDate, JadwalPelajaranDetail } from "../../../redux/Action";
 
 export default function JadwalPelajaranAdminDetail() {
   const [grid, setGrid] = useState(false);
@@ -270,7 +270,7 @@ export default function JadwalPelajaranAdminDetail() {
         const guru = JSON.parse(response?.data?.variables[3]?.value);
         setGetGuru(guru?.data?.data);
       });
-  }, [academicYear, refreshState, , academicYear, selectedUser]);
+  }, [academicYear, refreshState, idSubClass, academicYear, selectedUser]);
 
   // data calendar
   const dataSenin = senin?.map((data, index) => {
@@ -510,7 +510,7 @@ export default function JadwalPelajaranAdminDetail() {
             />
             <EditOutlined
               style={{ color: "blue" }}
-              onClick={() => viewEditJadwal(record)}
+              onClick={() => viewInsertEditJadwal(record)}
             />
             <DeleteOutlined
               style={{ color: "red" }}
@@ -985,7 +985,6 @@ export default function JadwalPelajaranAdminDetail() {
       if (el.name !== "") data[el.name] = el.value;
     }
     // console.log(data.tanggal.split(","));
-    console.log(data);
     axios
       .post(
         url_by_institute,
@@ -1017,12 +1016,10 @@ export default function JadwalPelajaranAdminDetail() {
         }
       )
       .then(function (response) {
-        console.log(response);
         setRefreshState(true);
         // console.log(JSON.stringify(response.data.variables[2].value, null, 2));
         const valueRes = response.data.variables[2].value;
         const valueResObj = JSON.parse(valueRes);
-        console.log(valueResObj.data);
         if (valueResObj.data == "Success insert") {
           setIsViewCreate(false);
           setIsViewPelajaran(true);
@@ -1031,7 +1028,7 @@ export default function JadwalPelajaranAdminDetail() {
             description: "Jadwal Pelajaran berhasil ditambahkan.",
             placement: "top",
           });
-          pageLoad();
+          getListJadwalPelajaran();
         } else {
           notification.error({
             message: "Error",
@@ -1092,7 +1089,7 @@ export default function JadwalPelajaranAdminDetail() {
             description: "Jadwal Pelajaran berhasil diupdate.",
             placement: "top",
           });
-          pageLoad();
+          getListJadwalPelajaran();
         } else {
           notification.error({
             message: "Error",
@@ -1164,7 +1161,7 @@ export default function JadwalPelajaranAdminDetail() {
               "Menghapus pelajaran " + record.namaPelajaran,
               "success"
             );
-            pageLoad();
+            getListJadwalPelajaran();
           });
       }
     });
@@ -1189,6 +1186,13 @@ export default function JadwalPelajaranAdminDetail() {
     setIsViewCreate(false);
     setIsViewPelajaran(false);
     setIsViewDetail(false);
+  };
+
+  const viewInsertEditJadwal = (record) => {
+    dispatch(GetAllDate(record?.id));
+    dispatch(JadwalPelajaranDetail(record))
+    setSelectedUser(record);
+    history.push(`/admin-jadwal-pelajaran-edit-${record.id}`);
   };
 
   const viewDetailJadwal = (record) => {

@@ -15,7 +15,7 @@ export const FormAdminSiswaEkskul = (props) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [submitRapor, setSubmitRapor] = useState(false)
     const [selectedSiswa, setSelectedSiswa] = useState([])
-    const idEkskul = sessionStorage.getItem('id_ekskul')
+    const idEkskul = localStorage.getItem('id_ekskul')
     const academicYear = localStorage.getItem('academic_year')
     const [dataSelectedSiswa, setDataSelectedSiswa] = useState([])
     const [dataAllSiswa, setDataAllSiswa] = useState([])

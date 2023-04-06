@@ -1,11 +1,11 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import React, {Fragment, useState, useEffect} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
 import Adminfooter from "../../../../components/Adminfooter";
 import {
     Button,
     Card,
     Col,
-    PageHeader,
+    PageHeader, Progress,
     Row,
     Space,
     Table, Tag, Tooltip,
@@ -29,18 +29,44 @@ import Appheader from "../../../../components/Appheader";
 const SiswaPertemuanMateri = () => {
     const [grid, setGrid] = useState(false);
     const [dataPertemuan, setDataPertemuan] = useState([])
-
+    const [percentage, setPercentage] = useState("");
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
-
     const userId = localStorage.getItem('user_id');
     const academicId = localStorage.getItem('academic_id')
+    const userEmail = localStorage.getItem('email')
 
     const params = useParams()
     const path = params.id.split("-")
     const idMateri = path[0]
     const mapel = path[1]
     const materi = path[2]
+
+    const progressPercentage = () => {
+        axios.post(url_by_institute, {
+                "processDefinitionId": "8f80d8f9-cc71-11ed-845a-4a8d2a16230d",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_content": idMateri,
+                            "email": userEmail
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            setPercentage(dataRes.persentase)
+        })
+    }
 
     useEffect(() => {
         axios.post(url_by_institute, {
@@ -53,11 +79,12 @@ const SiswaPertemuanMateri = () => {
                         "value": {
                             "tbl_induk": "x_academic_subjects_schedule_contents_meeting",
                             "select": [
-                                "x_academic_subjects_schedule_contents_meeting.contents_id",
+
                                 "x_academic_subjects_schedule_contents_meeting.meeting_name",
                                 "x_academic_subjects_schedule_date.date",
                                 "x_academic_subjects_schedule_time.time_start",
-                                "x_academic_subjects_schedule_time.time_end"
+                                "x_academic_subjects_schedule_time.time_end",
+                                "x_academic_subjects_schedule_contents_files.subjects_schedule_contents_id as contents_id"
                             ],
                             "paginate": false,
                             "join": [
@@ -66,16 +93,24 @@ const SiswaPertemuanMateri = () => {
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
                                     "foregenkey": "contents_id"
-                                }, {
+                                },
+                                {
                                     "tbl_join": "x_academic_subjects_schedule_date",
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
                                     "foregenkey": "schedule_date_id"
-                                }, {
+                                },
+                                {
                                     "tbl_join": "x_academic_subjects_schedule_time",
                                     "refkey": "id",
                                     "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
                                     "foregenkey": "schedule_time_id"
+                                },
+                                {
+                                    "tbl_join": "x_academic_subjects_schedule_contents_files",
+                                    "refkey": "subjects_schedule_contents_id",
+                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
+                                    "foregenkey": "id"
                                 }
                             ],
                             "where": [
@@ -84,9 +119,15 @@ const SiswaPertemuanMateri = () => {
                                     "tbl_field": "contents_id",
                                     "tbl_value": idMateri,
                                     "operator": "="
+                                },
+                                {
+                                    "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "="
                                 }
                             ],
-                            "order_coloumn": "x_academic_subjects_schedule_contents_meeting.meeting_name",
+                            "order_coloumn": "x_academic_subjects_schedule_date.date",
                             "order_by": "asc"
                         }
                     },
@@ -104,11 +145,13 @@ const SiswaPertemuanMateri = () => {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-            console.log(dataRes);
             setDataPertemuan(dataRes?.data);
             const pagination = dataRes?.links;
             setBtnPagination(pagination)
+            console.log(dataRes)
         })
+
+        progressPercentage()
 
     }, [idMateri])
 
@@ -154,7 +197,7 @@ const SiswaPertemuanMateri = () => {
             responsive: ['sm'],
             render: (text, record) => (
                 <Space size="middle">
-                    <EyeOutlined onClick={() => handleRouter(record.id)} style={{ color: "black" }} />
+                    <EyeOutlined onClick={() => handleRouter(record.id)} style={{color: "black"}}/>
                 </Space>
             ),
         },
@@ -191,12 +234,42 @@ const SiswaPertemuanMateri = () => {
                     </Row>
                 </Card>
 
+                {/*<Row>*/}
+                {/*    <Col span={8}>*/}
+                {/*        <div className="my-4 ml-2">*/}
+                {/*            Progress materi :*/}
+                {/*            <Progress*/}
+                {/*                percent={30} success={{*/}
+                {/*                percent: 30,*/}
+                {/*            }}*/}
+                {/*            />*/}
+                {/*        </div>*/}
+                {/*    </Col>*/}
+                {/*    <Col span={12}>*/}
+                {/*    </Col>*/}
+                {/*</Row>*/}
+
+                <Row>
+                    <Col span={8}>
+                        <div className="my-4 ml-2">
+                            Progress materi :
+                            <Progress
+                                percent={percentage} success={{
+                                percent: {percentage},
+                            }}
+                            />
+                        </div>
+                    </Col>
+                    <Col span={12}>
+                    </Col>
+                </Row>
+
                 <Table className=""
-                    columns={columns}
-                    dataSource={data}
-                    onChange={onChangeTable}
-                    pagination={false}
-                    rowClassName="bg-greylight text-grey-900" />
+                       columns={columns}
+                       dataSource={data}
+                       onChange={onChangeTable}
+                       pagination={false}
+                       rowClassName="bg-greylight text-grey-900"/>
                 <div className='text-center mt-4'>
                     {btnPagination?.map((dataBtn) => {
                         const labelBtn = dataBtn.label;
@@ -222,7 +295,7 @@ const SiswaPertemuanMateri = () => {
                         );
                     })}
                 </div>
-                <Adminfooter />
+                <Adminfooter/>
             </div>
         )
     }
@@ -230,10 +303,10 @@ const SiswaPertemuanMateri = () => {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
-                    <ViewPertemuan />
+                    <Appheader/>
+                    <ViewPertemuan/>
                 </div>
             </div>
         </Fragment>

@@ -66,11 +66,16 @@ const PathNilaiGuru = {
   subKelas: '',
   mapel: '',
   tugas: '',
+  pertemuan: '',
 }
 
 const PathKalenderSiswa = {
   tanggal: '',
   allPath: [],
+}
+
+const JadwalPelajaranDetail = {
+  record: [],
 }
 
 export const reducerSearch = (state = searchReduce, action) => {
@@ -330,7 +335,7 @@ export const ReducerPathNilaiGuru = (state = PathNilaiGuru, action) => {
         ...state,
         subKelas: action.value
       }
-      case "ADD_NILAIMAPEL":
+    case "ADD_NILAIMAPEL":
       return {
         ...state,
         mapel: action.value
@@ -339,6 +344,11 @@ export const ReducerPathNilaiGuru = (state = PathNilaiGuru, action) => {
       return {
         ...state,
         tugas: action.value
+      }
+    case "ADD_NILAIPERTEMUAN":
+      return {
+        ...state,
+        pertemuan: action.value
       }
     default:
       return state;
@@ -362,4 +372,15 @@ export const ReducerPathKalenderSiswa = (state = PathKalenderSiswa, action) => {
       return state;
 
   }
+};
+
+export const ReducerJadwalPelajaranDetail = (state = JadwalPelajaranDetail, action) => {
+  if (action.type === "SET_JADWALPELAJARANDETAIL") {
+    return {
+      ...state,
+      record: action.value,
+    };
+  }
+
+  return state;
 };

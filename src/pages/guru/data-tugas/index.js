@@ -26,7 +26,7 @@ import {
   role_guru_get_matpel,
   global_join_sub_where_get,
   role_guru_get_sub_class,
-  global_update,
+  global_update, role_guru_get_materi, role_guru_create_materi_v2,
 } from "../../../api/reference";
 
 import axios from "axios";
@@ -35,6 +35,8 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import { FormCreateMateri } from "../../../components/form/GuruCreateMateri";
 import { pageLoad } from "../../../components/misc/loadPage";
+import Swal from "sweetalert2";
+import { dateNow } from "../../../components/misc/date";
 
 function GuruDataTugas() {
   const [grid, setGrid] = useState(false);
@@ -45,11 +47,11 @@ function GuruDataTugas() {
   const [isViewDetail, setIsViewDetail] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
-  console.log(selectedUser);
   const [refreshState, setRefreshState] = useState(false);
 
   const [getKelas, setGetKelas] = useState(null);
   const [dataMapel, setDataMapel] = useState(null);
+  console.log(dataMapel);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedMapel, setSelectedMapel] = useState(null);
 
@@ -121,16 +123,71 @@ function GuruDataTugas() {
       });
   };
 
-  useEffect(() => {
-    _getDataKelas();
-    _getDataMapel();
+  const deleteTugas = (record) => {
+    console.log(record);
+    Swal.fire({
+      title: "Apakah anda yakin menghapus data?",
+      text: "Anda tidak dapat mengembalikan data yang sudah terhapus",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Batalkan",
+      confirmButtonText: "Hapus",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .post(
+            url_by_institute,
+            {
+              processDefinitionId:
+                "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+              returnVariables: true,
+              variables: [
+                {
+                  name: "global_updatedata",
+                  type: "json",
+                  value: {
+                    tbl_name: "x_academic_subjects_schedule_contentsModel",
+                    id: record.id,
+                    tbl_coloumn: {
+                      deleted_at: dateNow,
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Basic YWRtaW46TWFuYWczciE=",
+              },
+            }
+          )
+          .then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            const code = dataRes.status;
+            if (code == "success") {
+              getListTugas();
+              Swal.fire(
+                "Data telah terhapus!",
+                "Menghapus data tugas " + record.namaTugas,
+                "success"
+              );
+            } else {
+              Swal.fire("Data not found!", "Error");
+            }
+          });
+      }
+    });
+  };
 
+  const getListTugas = () => {
     axios
       .post(
         url_by_institute,
         {
-          processDefinitionId:
-            "rolegurugetmateri:1:23ca27b4-5e7c-11ed-bb6a-a2fb3d782380",
+          processDefinitionId: role_guru_get_materi,
           returnVariables: true,
           variables: [
             {
@@ -139,6 +196,7 @@ function GuruDataTugas() {
               value: {
                 id_subject_type: 2,
                 created_by: userId,
+                id_academic: academic_year_id,
               },
             },
             {
@@ -162,6 +220,12 @@ function GuruDataTugas() {
         const pagination = dataRes?.data?.links;
         setBtnPagination(pagination);
       });
+  }
+
+  useEffect(() => {
+    _getDataKelas();
+    _getDataMapel();
+    getListTugas();
   }, [userId, refreshState, paramsPage, selectedClass]);
 
   const columns = [
@@ -172,13 +236,13 @@ function GuruDataTugas() {
       responsive: ["sm"],
     },
     {
-      title: "Nama Materi",
-      dataIndex: "namaMateri",
-    },
-    {
-      title: "Tingkat Kelas",
+      title: "Kelas",
       dataIndex: "tingkatKelas",
       align: "center",
+    },
+    {
+      title: "Nama Tugas",
+      dataIndex: "namaMateri",
     },
     {
       title: "TA / Semester",
@@ -212,7 +276,10 @@ function GuruDataTugas() {
             style={{ color: "blue" }}
             onClick={() => viewEditMateri(record)}
           />
-          <DeleteOutlined style={{ color: "red" }} />
+          <DeleteOutlined
+            style={{ color: "red" }}
+            onClick={() => deleteTugas(record)}
+          />
         </Space>
       ),
     },
@@ -228,7 +295,7 @@ function GuruDataTugas() {
       idPelajaran: data.id_mata,
       mataPelajaran: data.nama_mata,
       idTingkatKelas: data.id_tingkat,
-      tingkatKelas: data.tingkat_nama,
+      tingkatKelas: `${data.tingkat_nama} / ${data.sub_class}`,
       idSubKelas: data.id_sub_class,
       subKelas: data.sub_class,
       isUpload: data.is_upload,
@@ -330,8 +397,8 @@ function GuruDataTugas() {
                 {dataMapel == null
                   ? null
                   : dataMapel?.map((data) => (
-                      <option value={data.id}>{data.nama_mata}</option>
-                    ))}
+                    <option value={data.id}>{data.nama_mata}</option>
+                  ))}
               </select>
             </div>
           </div>
@@ -392,7 +459,7 @@ function GuruDataTugas() {
       .post(
         url_by_institute,
         {
-          processDefinitionId: role_guru_create_materi,
+          processDefinitionId: role_guru_create_materi_v2,
           returnVariables: true,
           variables: [
             {
@@ -405,10 +472,10 @@ function GuruDataTugas() {
                 id_sub_kelas: data.sub_kelas,
                 id_matpel: data.mata_pelajaran,
                 nama_materi: data.nama_materi,
-                embed_materi: data.embed_materi,
-                id_content_wp: id_content_wp,
+                // embed_materi: data.embed_materi,
+                // id_content_wp: id_content_wp,
                 keterangan: data.keterangan,
-                id_kompetensi: idKompetensi,
+                // id_kompetensi: idKompetensi,
                 status: "publish",
                 academic_year_id: academic_year_id,
                 is_upload: data.is_upload,
@@ -424,15 +491,14 @@ function GuruDataTugas() {
         }
       )
       .then(function (response) {
-        console.log("Insert Tugas:", response);
+        // console.log("Insert Tugas:", response);
         const valueRes = response.data.variables[2].value;
         const valueResObj = JSON.parse(valueRes);
-        console.log(valueResObj);
         if (valueResObj.message == "success insert materi") {
           setIsViewCreate(false);
           setIsViewTugas(true);
           setRefreshState(true);
-          // pageLoad()
+          getListTugas();
           notification.success({
             message: "Sukses",
             description: "Tugas berhasil ditambahkan.",
@@ -492,12 +558,11 @@ function GuruDataTugas() {
         // console.log("Update :", response);
         const valueRes = response.data.variables[2].value;
         const valueResObj = JSON.parse(valueRes);
-        console.log(valueResObj);
         if (valueResObj.message == "succes update data") {
           setIsViewCreate(false);
           setIsViewTugas(true);
           setRefreshState(true);
-          // pageLoad()
+          getListTugas();
           notification.success({
             message: "Sukses",
             description: "Tugas berhasil diupdate.",

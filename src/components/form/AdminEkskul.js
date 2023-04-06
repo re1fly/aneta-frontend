@@ -64,17 +64,26 @@ export const FormAdminEkskul = (props) => {
                                                     Pembina
                                                 </label>
 
-                                                <select
-                                                    className="form-control"
-                                                    aria-label="Default select example"
+                                                {/*<select*/}
+                                                {/*    className="form-control"*/}
+                                                {/*    aria-label="Default select example"*/}
+                                                {/*    name="nama_pembina"*/}
+                                                {/*    required*/}
+                                                {/*>*/}
+                                                {/*    <option value={props.idPembina} selected disabled hidden>*/}
+                                                {/*        {props.namaPembina}*/}
+                                                {/*    </option>*/}
+                                                {/*    {props.selectPembina}*/}
+                                                {/*</select>*/}
+                                                <input
+                                                    type="text"
                                                     name="nama_pembina"
+                                                    className="form-control"
+                                                    defaultValue={props.namaPembina}
+                                                    placeholder="Isi Pembina"
                                                     required
-                                                >
-                                                    <option value={props.idPembina} selected disabled hidden>
-                                                        {props.namaPembina}
-                                                    </option>
-                                                    {props.selectPembina}
-                                                </select>
+                                                    disabled={props.isDisabled}
+                                                />
                                             </div>
                                         </div>
                                         <div className="col-lg-6 mb-3">

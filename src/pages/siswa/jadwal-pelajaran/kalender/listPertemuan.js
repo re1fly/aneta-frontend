@@ -62,6 +62,7 @@ function SiswaListPertemuanKalender() {
         }
       )
       .then(function (response) {
+        console.log('kalender klik', response)
         const dataRes = JSON.parse(response?.data?.variables[2]?.value);
         const dataList = dataRes?.data;
         setDetailDate(dataList);
@@ -87,7 +88,7 @@ function SiswaListPertemuanKalender() {
       id: data.id,
       namaPelajaran: data.nama_mata,
       namaPertemuan: data.meeting_name,
-      tanggalPertemuan: data.date,
+      tanggalPertemuan: data.date  + ', ' +`${data.time_start} - ${data.time_end}`,
       jam: `${data.time_start} - ${data.time_end}`,
       meeting_name: data.meeting_name,
       tittle: data.tittle,
@@ -139,9 +140,9 @@ function SiswaListPertemuanKalender() {
       ),
     },
     {
-      title: "Jam",
-      dataIndex: "jam",
-      align: "center",
+      title: 'Tanggal',
+      dataIndex: 'tanggalPertemuan',
+      align: 'center',
     },
     {
       title: "Aksi",

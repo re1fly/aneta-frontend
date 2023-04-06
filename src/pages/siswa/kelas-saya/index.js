@@ -8,9 +8,9 @@ import {global_join_sub_first, url_by_institute} from "../../../api/reference";
 function KelasSiswa() {
     const [profileSiswa, setProfileSiswa] = useState([]);
     const [getKelasSiswa, setGetKelas] = useState([]);
-    console.log(getKelasSiswa);
 
     const userId = localStorage.getItem('user_id');
+    const waliKelas = localStorage.getItem('walikelas_name');
     const userName = localStorage.getItem('user_name');
     const institute = localStorage.getItem('institute');
 
@@ -70,7 +70,7 @@ function KelasSiswa() {
                                 "refkey": "id",
                                 "tbl_join2": "m_user_profile",
                                 "foregenkey": "city_id"
-                            }
+                            },
                         ],
                         "where": [
                             {
@@ -91,7 +91,6 @@ function KelasSiswa() {
                 }
             }
         ).then(function (response) {
-            console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setProfileSiswa([dataRes?.data]);
         })
@@ -171,7 +170,6 @@ function KelasSiswa() {
                 }
             }
         ).then(function (response) {
-            console.log(response);
             const dataRes = JSON.parse(response?.data?.variables[2]?.value)
             setGetKelas([dataRes?.data])
         })
@@ -241,7 +239,7 @@ function KelasSiswa() {
                                                 </div>
                                                 <div className='row'>
                                                     <p className='col-lg-5 strong mb-0'>Wali Kelas </p>
-                                                    <p className='col-lg-7 strong mb-0'>: Sujoko {value.waliKelas}</p>
+                                                    <p className='col-lg-7 strong mb-0'>: {waliKelas}</p>
                                                 </div>
                                             </div>
                                         </div>

@@ -19,7 +19,7 @@ function NilaiPengetahuan() {
     const [selectedClass, setSelectedClass] = useState(null)
     let jumlahPenilaian = [];
 
-    jumlahPenilaian = new Array(20).fill().map((e, i) => {
+    jumlahPenilaian = new Array(1).fill().map((e, i) => {
         return (
             {
                 id: i + 1,
@@ -296,8 +296,6 @@ function NilaiPengetahuan() {
             planing: allPlaning,
             kompetensi: allCompetency
         }
-
-        console.log(insertToApi)
 
         axios
             .post(

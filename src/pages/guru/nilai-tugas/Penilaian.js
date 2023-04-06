@@ -1,6 +1,6 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from "react-router-dom";
+import React, {Fragment, useState, useEffect} from 'react';
+import {useSelector} from 'react-redux';
+import {useParams} from "react-router-dom";
 import Adminfooter from "../../../components/Adminfooter";
 import {
     Button,
@@ -18,7 +18,7 @@ import {
     Tag,
     Upload,
     Select,
-    Input
+    Input, Divider, Collapse, Badge
 } from "antd";
 import Link from "react-router-dom/es/Link";
 import {
@@ -35,8 +35,13 @@ import axios from 'axios';
 import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
-import { export_tugas, url_by_institute } from '../../../api/reference';
-import { FormGuruNilaiTugas } from '../../../components/form/GuruNilaiTugas';
+import {
+    export_tugas,
+    role_guru_download_tugas,
+    role_guru_get_list_penilaian_siswa_v2, role_guru_get_nilai_siswa_feedback,
+    url_by_institute
+} from '../../../api/reference';
+import {FormGuruNilaiTugas} from '../../../components/form/GuruNilaiTugas';
 
 function GuruPenilaian() {
     const [grid, setGrid] = useState(false);
@@ -46,29 +51,34 @@ function GuruPenilaian() {
     const [isViewDetail, setIsViewDetail] = useState(false);
     const [selectedUser, setSelectedUser] = useState([]);
     const [refreshState, setRefreshState] = useState(false);
+    const [reviewSiswa, setReviewSiswa] = useState([])
 
     const academicYear = localStorage.getItem('academic_year')
     const instituteId = localStorage.getItem('institute')
     const userId = localStorage.getItem('user_id')
 
     const params = useParams()
+    console.log('params',params)
     const paramsId = params?.id?.split('-');
     const idContent = paramsId[0]
     const uploadTugas = paramsId[1]
+    console.log('uploadTugas',uploadTugas)
 
     const PathNilaiGuru = useSelector((state) => state.dataPathNilaiGuru)
     const kelas = PathNilaiGuru.kelas
     const subKelas = PathNilaiGuru.subKelas
     const mapel = PathNilaiGuru.mapel
     const tugas = PathNilaiGuru.tugas
+    const pertemuan = PathNilaiGuru.pertemuan
 
-    const { Option } = Select;
+    const {Option} = Select;
     const children = [];
 
     const _onSearch = value => console.log(value);
     const handleChange1 = (value) => {
         console.log(`selected ${value}`);
     };
+
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
     }
@@ -76,7 +86,7 @@ function GuruPenilaian() {
     useEffect(() => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "78db790c-4ec0-11ed-8f22-927b5be84510",
+                "processDefinitionId": role_guru_get_list_penilaian_siswa_v2,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -88,11 +98,11 @@ function GuruPenilaian() {
                     }
                 ]
             }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
             }
-        }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const nilai = dataRes?.data
@@ -100,11 +110,21 @@ function GuruPenilaian() {
         })
     }, [idContent, refreshState])
 
+    // useEffect(() => {
+    //     const onConfirmRefresh = function (event) {
+    //         event.preventDefault();
+    //         return event.returnValue = "Are you sure you want to leave the page?"; //alertrefresh
+    //     }
+    //
+    //     window.addEventListener("beforeunload", onConfirmRefresh, {capture: true});
+    // }, [isViewDetail]);
+
+
     const handleDownload = (record) => {
         console.log(record);
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "rolegurudownloadtugas:1:31ec3b57-54cc-11ed-8f22-927b5be84510",
+                "processDefinitionId": role_guru_download_tugas,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -118,14 +138,14 @@ function GuruPenilaian() {
                     }
                 ]
             }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
             }
-        }
         ).then(function (response) {
             const resData = JSON.parse(response?.data?.variables[2]?.value)
-            console.log(resData);
+            console.log(response);
             const dataFile = resData?.data?.decode
             const byteCharacters = atob(dataFile);
             const byteNumbers = new Array(byteCharacters.length);
@@ -133,7 +153,7 @@ function GuruPenilaian() {
                 byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const blob = new Blob([byteArray], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
@@ -144,9 +164,10 @@ function GuruPenilaian() {
     }
 
     const _exportDataExcel = () => {
+        console.log(idContent)
         axios.post(url_by_institute, {
-        "processDefinitionId": export_tugas,
-        "returnVariables": true,
+            "processDefinitionId": export_tugas,
+            "returnVariables": true,
             "variables": [
                 {
                     "name": "data",
@@ -159,7 +180,7 @@ function GuruPenilaian() {
             ]
         }).then(response => {
             const resData = JSON.parse(response.data.variables[2].value)
-            // console.log(resData);
+            console.log(resData);
             const dataExcel = resData.data
             const byteCharacters = atob(dataExcel);
             const byteNumbers = new Array(byteCharacters.length);
@@ -167,7 +188,7 @@ function GuruPenilaian() {
                 byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const blob = new Blob([byteArray], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
@@ -191,14 +212,15 @@ function GuruPenilaian() {
                         <div className="middle">
                             <div className="card w-100 border-0 bg-white shadow-xs p-0 mb-4">
                                 <div className="card-body p-4 w-100 bg-current border-0 d-flex rounded-lg">
-                                    <i onClick={() => setIsViewPenilaian(true)} className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
+                                    <i onClick={() => setIsViewPenilaian(true)}
+                                       className="cursor-pointer d-inline-block mt-2 ti-arrow-left font-sm text-white"></i>
                                     <h4 className="font-xs text-white fw-600 ml-4 mb-0 mt-2">
                                         View Penilaian
                                     </h4>
                                 </div>
                                 <div className="card-body p-lg-5 p-4 w-100 border-0 ">
                                     <form id="mataPelajaran_form"
-                                        method="POST">
+                                          method="POST">
                                         <div className="row">
                                             <div className="col-lg-6 mb-3">
                                                 <div className="form-group">
@@ -259,7 +281,10 @@ function GuruPenilaian() {
                 namaSiswa: data.nama,
                 nilai: data.nilai,
                 keterangan: data.keterangan == true ? "Sudah Upload Tugas" : "Belum Upload Tugas",
-                isUpload: data.is_upload,
+                isUpload: data.is_upload == true ? true : false,
+                id_wp: data.id_content_wp,
+                email: data.email,
+                feedback: data.feedback
             }
         })
 
@@ -297,11 +322,11 @@ function GuruPenilaian() {
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined onClick={() => viewDetailNilai(record)} style={{ color: "black" }} />
+                        <EyeOutlined onClick={() => viewDetailNilai(record)} style={{color: "black"}}/>
+                        <EditOutlined onClick={() => viewEditNilai(record)} style={{color: "blue"}}/>
                         {record.keterangan == "Sudah Upload Tugas" ?
                             <>
-                                <DownloadOutlined onClick={() => handleDownload(record)} style={{ color: "red" }} />
-                                <EditOutlined onClick={() => viewEditNilai(record)} style={{ color: "blue" }} />
+                                <DownloadOutlined onClick={() => handleDownload(record)} style={{color: "red"}}/>
                             </>
                             : null}
                     </Space>
@@ -343,11 +368,11 @@ function GuruPenilaian() {
                 responsive: ['sm'],
                 render: (text, record) => (
                     <Space size="middle">
-                        <EyeOutlined onClick={() => viewDetailNilai(record)} style={{ color: "black" }} />
+                        <EyeOutlined onClick={() => viewDetailNilai(record)} style={{color: "black"}}/>
+                        <EditOutlined onClick={() => viewEditNilai(record)} style={{color: "blue"}}/>
                         {record.keterangan == "Sudah Upload Tugas" ?
                             <>
-                                <DownloadOutlined onClick={() => handleDownload(record)} style={{ color: "red" }} />
-                                <EditOutlined onClick={() => viewEditNilai(record)} style={{ color: "blue" }} />
+                                <DownloadOutlined onClick={() => handleDownload(record)} style={{color: "red"}}/>
                             </>
                             : null}
                     </Space>
@@ -362,18 +387,26 @@ function GuruPenilaian() {
                         <PageHeader
                             className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                             onBack={() => window.history.back()}
-                            title={`Data Nilai / Kelas ${kelas} / ${subKelas} / ${mapel} / ${tugas}`}
+                            title={`Data Nilai / Kelas ${kelas} / ${subKelas} / ${mapel} / ${tugas} / ${pertemuan}`}
                         />
                     </div>
                 </div>
                 <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
                     <Row>
-                        <Col span={8}>
-                            <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
-                                shape="round" size='middle'
-                                onClick={() => _exportDataExcel()}>
+                        <Col span={12}>
+                            <Button className="mr-4" style={{backgroundColor: '#00a629', color: 'white'}}
+                                    shape="round" size='middle'
+                                    disabled={getNilai.length < 1 ? true : false}
+                                    onClick={() => _exportDataExcel()}>
                                 Download Nilai
                             </Button>
+                            <Button className="mr-4" style={{backgroundColor: '#00a629', color: 'white'}}
+                                    shape="round" size='middle'
+                                    disabled={getNilai.length < 1 ? true : false}
+                                    onClick={() => alert('tugas upload download')}>
+                                Download Semua File upload
+                            </Button>
+
                         </Col>
                         {/* <Col span={4}>
                             <div className="float-right">
@@ -393,7 +426,7 @@ function GuruPenilaian() {
                                 mode="multiple"
                                 allowClear
                                 listHeight={250}
-                                style={{ width: '100%', }}
+                                style={{width: '100%',}}
                                 placeholder="Pilih Nama Siswa"
                                 onChange={handleChange1}
                             >
@@ -414,19 +447,20 @@ function GuruPenilaian() {
                     </div>
                     <div className="col-lg-2 mb-2">
                         <Button className="" type="primary" shape="round"
-                            onClick={() => { }}>
+                                onClick={() => {
+                                }}>
                             Cari
                         </Button>
                     </div>
                 </div>
 
                 <Table className=""
-                    columns={uploadTugas == "true" ? columnsUpload : columns}
-                    dataSource={data}
-                    onChange={onChangeTable}
-                    pagination={false}
-                    rowClassName="bg-greylight text-grey-900" />
-                <Adminfooter />
+                       columns={uploadTugas == "true" ? columnsUpload : columns}
+                       dataSource={data}
+                       onChange={onChangeTable}
+                       pagination={false}
+                       rowClassName="bg-greylight text-grey-900"/>
+                <Adminfooter/>
             </div>
         )
     }
@@ -438,11 +472,37 @@ function GuruPenilaian() {
         setIsViewDetail(false)
     }
 
+
+    const _getReview = (record) => {
+        console.log(record)
+        axios.post(url_by_institute, {
+            "processDefinitionId": role_guru_get_nilai_siswa_feedback,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+                        "id_content": record.id_wp,
+                        "email": record.email
+                    }
+                }
+            ]
+        }).then(response => {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            setReviewSiswa(dataRes.data)
+            console.log('datadetail: ', dataRes.data)
+        })
+    }
     const viewDetailNilai = (record) => {
-        setSelectedUser(record)
-        setIsViewPenilaian(false)
-        setIsViewEdit(false)
-        setIsViewDetail(true)
+        _getReview(record)
+        setTimeout(() => {
+            setSelectedUser(record)
+            setIsViewPenilaian(false)
+            setIsViewEdit(false)
+            setIsViewDetail(true)
+        }, 2000);
+
     }
 
     const FormEdit = () => {
@@ -452,6 +512,7 @@ function GuruPenilaian() {
                 title="Edit Nilai Tugas"
                 // submit={editTingkatKelas}
                 isDisabled={false}
+                isReview={true}
                 disableName={true}
                 isUpload={selectedUser.isUpload}
                 idContent={selectedUser.idContent}
@@ -462,6 +523,7 @@ function GuruPenilaian() {
         )
     }
 
+    const { Panel } = Collapse;
     const FormDetail = () => {
         return (
             <FormGuruNilaiTugas
@@ -469,11 +531,71 @@ function GuruPenilaian() {
                 title="View Nilai Tugas"
                 isDisabled={true}
                 disableName={true}
+                isReview={true}
                 isUpload={selectedUser.isUpload}
                 idContent={selectedUser.idContent}
                 idSiswa={selectedUser.idSiswa}
                 nama={selectedUser.namaSiswa}
                 nilai={selectedUser.nilai}
+                review={
+                    reviewSiswa.map((data, index) => {
+                        const time = data.time
+                        const bits = time.split(/\D/);
+                        const dateString = new Date(bits[0], --bits[1], bits[2], bits[3], bits[4]);
+                        const dataJawabanSiswa = data.jawaban
+                        const dataJawabanBenar = data.jawaban_benar
+
+                        const jawabanBenar = dataJawabanBenar == null ? dataJawabanBenar : dataJawabanBenar.join(', ');
+                        const jawabanSiswa = dataJawabanSiswa == null ? dataJawabanSiswa : dataJawabanSiswa.join(', ');
+                        return (
+                            <>
+                                {/*<Card title={index+1+'. ' + data.pertanyaan} bordered={false} style={{ width: 300 }}>*/}
+                                {/*    <p>{data.jawaban}</p>*/}
+                                {/*</Card>*/}
+                                    <h4>{index + 1 + '. ' + data.pertanyaan}</h4>
+                                <Collapse bordered={false} defaultActiveKey={['1', '3', '4']}>
+                                    <Panel header="Jawaban Siswa" key="1">
+                                        {jawabanBenar}
+                                    </Panel>
+                                    <Panel header="Jawaban Benar" key="2">
+                                        {jawabanSiswa}
+                                    </Panel>
+                                    <Panel header="Nilai Siswa" key="3">
+                                        <input
+                                            type="hidden"
+                                            name="id_review"
+                                            className="form-control mb-1 w-25"
+                                            defaultValue={data.id}
+                                            required
+                                        />
+                                        <input
+                                            type="number"
+                                            name="nilai_review"
+                                            className="form-control mb-1 w-25"
+                                            defaultValue={data.nilai}
+                                            required
+                                        />
+                                    </Panel>
+                                    <Panel header="Feedback" key="4">
+                                         <textarea
+                                             className="form-control mb-0 p-3 lh-16"
+                                             rows="5"
+                                             placeholder=""
+                                             name="feedback_review"
+                                             defaultValue={data.feedback}
+                                         ></textarea>
+                                    </Panel>
+                                </Collapse>
+                                {/*<Badge key={index} color={'orange'} text={new Date(time).toUTCString()} />*/}
+                                <span className='float-right p-2 font-xssss text-ornage'>{new Date(time).toUTCString()}</span>
+
+                                <Divider/>
+                            </>
+                        )
+                    })
+                }
+                feedback={selectedUser.feedback}
+                dataReview={reviewSiswa}
             />
         )
     }
@@ -481,17 +603,17 @@ function GuruPenilaian() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
+                    <Appheader/>
                     {
                         isViewPenilaian ?
-                            <ViewPenilaian /> :
+                            <ViewPenilaian/> :
                             isViewEdit ?
-                                <FormEdit /> :
+                                <FormEdit/> :
                                 isViewDetail ?
-                                    <FormDetail /> :
-                                    <ViewPenilaian />
+                                    <FormDetail/> :
+                                    <ViewPenilaian/>
                     }
                     {/* {isViewPenilaian ? <ViewPenilaian /> : <DetailPenilaian />} */}
                 </div>

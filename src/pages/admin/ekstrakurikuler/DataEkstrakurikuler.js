@@ -77,7 +77,6 @@ export default function DataEkstrakurikuler() {
                 }
             }
         ).then(function (response) {
-            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
             setDataEkskul(dataRes.data)
             setBtnPagination(dataRes.links);
@@ -170,7 +169,6 @@ export default function DataEkstrakurikuler() {
         ).then(function (response) {
             const tahunAkademik = JSON.parse(response?.data?.variables[3]?.value)
             setDataTahunAkademik(tahunAkademik)
-            console.log(response)
         })
     }
 
@@ -256,7 +254,6 @@ export default function DataEkstrakurikuler() {
                 }
             }
         ).then(function (response) {
-            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
             const data = dataRes.data
             setDataSelectedSiswa(data)
@@ -298,7 +295,7 @@ export default function DataEkstrakurikuler() {
                             "name": "data",
                             "type": "json",
                             "value": {
-                                "id": sessionStorage.getItem("id_ekskul"),
+                                "id": localStorage.getItem("id_ekskul"),
                                 "id_academic": academicYear,
                                 "id_tingkat": selectedClass
                             }
@@ -977,7 +974,7 @@ export default function DataEkstrakurikuler() {
                         <Tooltip title="Tambah Siswa Ekskul">
                             <UserAddOutlined style={{color: "black"}} onClick={() => {
                                 viewSiswaEkskul(record)
-                                sessionStorage.setItem('id_ekskul', record.idEkskul)
+                                localStorage.setItem('id_ekskul', record.idEkskul)
                             }}/>
                         </Tooltip>
                         <DeleteOutlined style={{color: 'red'}} onClick={() => deleteEkskul(record)}/>
@@ -1044,7 +1041,7 @@ export default function DataEkstrakurikuler() {
                             "tbl_coloumn": {
                                 "name": data.nama_ekskul,
                                 "academic_year_id": data.ta_semester,
-                                "teacher_id": data.nama_pembina,
+                                "nama_pembina": data.nama_pembina,
                                 "location": data.lokasi_ekskul
                             }
                         }
@@ -1096,7 +1093,7 @@ export default function DataEkstrakurikuler() {
                             "tbl_coloumn": {
                                 "name": data.nama_ekskul,
                                 "academic_year_id": data.ta_semester,
-                                "teacher_id": data.nama_pembina,
+                                "nama_pembina": data.nama_pembina,
                                 "location": data.lokasi_ekskul
                             }
                         }
@@ -1133,7 +1130,7 @@ export default function DataEkstrakurikuler() {
                 setView={() => setIsViewEkskul(true)}
                 title="Tambah Ekstrakurikuler"
                 submit={createEkskul}
-                namaPembina="Pilih Pembina"
+                // namaPembina="Pilih Pembina"
                 idPembina=""
                 selectPembina={dataPembina.map((data) => (
                     <option value={data.id_guru}>{data.name}</option>

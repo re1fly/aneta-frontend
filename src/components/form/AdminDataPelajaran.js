@@ -3,6 +3,7 @@ import { Card } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import Upload from "antd/es/upload/Upload";
+import {RequiredTooltip} from "../misc/RequiredTooltip.js";
 
 export const FormAdminPelajaran = (props) => {
     let disabledButton = props.isDisabled;
@@ -130,10 +131,69 @@ export const FormAdminPelajaran = (props) => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="row">
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Agama
+                                                </label>
+                                                <select
+                                                    className="form-control"
+                                                    aria-label="Default select example"
+                                                    name="agama"
+                                                    disabled={props.isDisabled}
+                                                >
+                                                    <option value="" selected disabled>
+                                                        Pilih Agama
+                                                    </option>
+                                                    <option value="islam">
+                                                        Islam
+                                                    </option>
+                                                    <option value="protestan">
+                                                        Protestan
+                                                    </option>
+                                                    <option value="katolik">
+                                                        Katolik
+                                                    </option>
+                                                    <option value="hindu">
+                                                        Hindu
+                                                    </option>
+                                                    <option value="buddha">
+                                                        Buddha
+                                                    </option>
+                                                    <option value="khonghucu">
+                                                        Khonghucu
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-lg-6 mb-3">
+                                            <div className="form-group">
+                                                <label className="mont-font fw-600 font-xsss">
+                                                    Kebutuhan Khusus
+                                                </label>
+                                                <select
+                                                    className="form-control"
+                                                    aria-label="Default select example"
+                                                    name="kebutuhan_khusus"
+                                                    disabled={props.isDisabled}
+                                                >
+                                                    <option value="" selected disabled>
+                                                        Pilih Jenis
+                                                    </option>
+                                                    <option value={true}>
+                                                        Iya
+                                                    </option>
+                                                    <option value={false}>
+                                                        Tidak
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div className="row">
-
-
                                         <div className="col-lg-12 mb-3">
                                             <div className="form-group">
                                                 <label className="mont-font fw-600 font-xsss">

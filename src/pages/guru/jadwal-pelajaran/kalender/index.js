@@ -1,4 +1,4 @@
-import { Badge, Calendar, Card, PageHeader } from "antd";
+import {Badge, Calendar, Card, notification, PageHeader, Spin} from "antd";
 import Search from "antd/lib/transfer/search";
 import { Fragment } from "react";
 import { useHistory } from "react-router-dom";
@@ -16,6 +16,9 @@ import { useState } from "react";
 export default function GuruKalender() {
 
     const [dataTanggal, setDataTanggal] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
 
     const userId = localStorage.getItem("user_id")
     const academicId = localStorage.getItem("academic_year");
@@ -25,7 +28,7 @@ export default function GuruKalender() {
     const dispatch = useDispatch();
     const _onSearch = value => console.log(value);
 
-    useEffect(() => {
+    const _getDataKalender = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": "rolegurugetkalender:1:7d6cc224-654d-11ed-bb6a-a2fb3d782380",
@@ -44,20 +47,42 @@ export default function GuruKalender() {
                     }
                 ]
             }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
             }
-        }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setDataTanggal(dataRes.data)
+            const responseData = dataRes.code;
+            if (responseData == true){
+                setLoading(false)
+                setDataSuccess(true)
+            }else{
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
+    const _loadingData = () => {
+        if(dataSuccess == false){
+            _getDataKalender()
+        }
+    }
+
+    if(countRender > 1 && countRender < 4){
+        setInterval(_loadingData, 5000)
+        console.log('5s')
+    }
+
+    useEffect(() => {
+        _getDataKalender()
     }, [userId, currentMonth, currentYear])
+
 
     const getListData = (value, dataTanggal) => {
         let listData;
-
         const forDate = '0' + value.date();
         const date = forDate.slice(-2)
         const forMonth = '0' + (value.month() + 1);
@@ -152,12 +177,14 @@ export default function GuruKalender() {
                                         </div>
                                     </div>
                                 </Card>
+                                <Spin tip="Loading..." spinning={loading}>
                                 <Calendar
                                     dateCellRender={dateCellRender}
                                     monthCellRender={monthCellRender}
                                     onSelect={selectKalender}
                                     headerRender={headerRender}
                                 />
+                                </Spin>
                             </div>
                         </div>
                     </div>

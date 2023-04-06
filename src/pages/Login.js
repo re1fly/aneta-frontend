@@ -12,7 +12,7 @@ import "firebase/messaging";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tokenFcm, setTokenFcm] = useState("");
+  // const [tokenFcm, setTokenFcm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   let router = useHistory();
   const loadingIcon = (
@@ -52,74 +52,33 @@ function Login() {
         const dataRes = JSON.parse(res?.data?.variables[2]?.value);
         const allProcDef = dataRes.data;
         allProcDef.map((data) => {
-          sessionStorage.setItem(data.key, data.proses_def_id);
+          localStorage.setItem(data.key, data.proses_def_id);
         });
       });
   };
 
-  const fbConfig = {
-    apiKey: "AIzaSyCZTgLpZkjyjb5YcweXVhOosHNASd3VGaM",
-    authDomain: "anetaapp-80352.firebaseapp.com",
-    databaseURL:
-      "https://anetaapp-80352-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "anetaapp-80352",
-    storageBucket: "anetaapp-80352.appspot.com",
-    messagingSenderId: "720796861195",
-    appId: "1:720796861195:web:a7fd2b72ab86a42287980e",
-    measurementId: "G-EY34WYS0T9",
-  };
-  if (!firebase.apps.length) {
-    firebase.initializeApp(fbConfig);
-  }
-  const messaging = firebase.messaging();
+  // const fbConfig = {
+  //   apiKey: "AIzaSyCZTgLpZkjyjb5YcweXVhOosHNASd3VGaM",
+  //   authDomain: "anetaapp-80352.firebaseapp.com",
+  //   databaseURL:
+  //     "https://anetaapp-80352-default-rtdb.asia-southeast1.firebasedatabase.app",
+  //   projectId: "anetaapp-80352",
+  //   storageBucket: "anetaapp-80352.appspot.com",
+  //   messagingSenderId: "720796861195",
+  //   appId: "1:720796861195:web:a7fd2b72ab86a42287980e",
+  //   measurementId: "G-EY34WYS0T9",
+  // };
+  // if (!firebase.apps.length) {
+  //   firebase.initializeApp(fbConfig);
+  // }
+  // const messaging = firebase.messaging();
 
   useEffect(() => {
     _getALlProcDef();
-    messaging.getToken().then((token) => {
-      setTokenFcm(token);
-    });
+    // messaging.getToken().then((token) => {
+    //   setTokenFcm(token);
+    // });
   }, []);
-
-  const testMessage = () => {
-    // axios.post('https://fcm.googleapis.com/v1/projects/anetaapp-80352/messages:send', {
-    //         "message": {
-    //             "token": "c1GqWkYtBIhAfUguWQdy9f:APA91bFCTRQyJdXSCaYNFgTsJ2t8ULwev9qCXEO_mZKTB2765dq2jpVnViPSKpwV8mUvnFgqvJgp0o97bli3nN6tdVXF8ysK5wMETBZJKg9hXkafgbeobyPvCVJodZr_F8VtBWusR3BC",
-    //             "notification": {
-    //                 "title": "testing",
-    //                 "body": "nice"
-    //             }
-    //         }
-    //     }, {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': 'Bearer AAAAp9LXQws:APA91bH_7-PplMf1Q50diSJhplpLcC1_MhzAB4eKI4nze1S2JP2ar9_-JdHNddC3X_34QFGbiWDyR6LtQcHPjv-QQQUc5qBT5VPJ8J1GIL-5Pn9UV-6WJ3wTk0OtYwbUhkuRSjXdgIye'
-    // }).then( (response) => {
-    //     console.log(response)
-    // })
-    axios
-      .post(
-        "https://fcm.googleapis.com/fcm/send",
-        {
-          registration_ids: [
-            "c1GqWkYtBIhAfUguWQdy9f:APA91bE8gc5oiFHbHe_-Ot1dEzet5YXu4Rn31QiyNRltDBkcmvOTV1aJj9nJCPJTwn9RjaBEkE62zyGZzy654p1RH9BHhOxEb_5LEFEAEu7wC7yalsdUKw-FVAf3YsT7xDInlAs5Qz7O",
-          ],
-          notification: {
-            title: "Tugas / Kuis - 03 November 2022",
-            body: "Sejarah Perjuangan 1 Kemerdekaan Republik Indonesia",
-          },
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "*/*",
-            Authorization:
-              "key=AAAAp9LXQws:APA91bH_7-PplMf1Q50diSJhplpLcC1_MhzAB4eKI4nze1S2JP2ar9_-JdHNddC3X_34QFGbiWDyR6LtQcHPjv-QQQUc5qBT5VPJ8J1GIL-5Pn9UV-6WJ3wTk0OtYwbUhkuRSjXdgIye",
-          },
-        }
-      )
-      .then((response) => {
-        console.log(response);
-      });
-  };
 
   const _handleLogin = (e) => {
     e.preventDefault();
@@ -140,7 +99,7 @@ function Login() {
             },
             {
               name: "fcm_token",
-              value: tokenFcm,
+              value: '',
             },
           ],
         },
@@ -157,7 +116,7 @@ function Login() {
         const dataLogin = JSON.parse(getData);
         console.log(dataLogin);
         const ciphertext = CryptoJS.AES.encrypt(password, "Secret Passphrase");
-        localStorage.setItem("token_fb", tokenFcm);
+        // localStorage.setItem("token_fb", tokenFcm);
 
         if (dataLogin.status === true) {
           localStorage.setItem("user_name", dataLogin.user.name);
@@ -166,8 +125,9 @@ function Login() {
           localStorage.setItem("user_id", dataLogin.user.id);
           localStorage.setItem("institute", dataLogin.user.institute_id);
           localStorage.setItem("is_walikelas", dataLogin.is_walikelas);
-          sessionStorage.setItem("user", email);
-          sessionStorage.setItem("key", ciphertext);
+          localStorage.setItem("user", email);
+          localStorage.setItem("key", ciphertext);
+          localStorage.setItem("walikelas_name", dataLogin.walikelas_name);
 
           axios
             .post(
@@ -267,14 +227,14 @@ function Login() {
             }
           >
             <div>
-              <div className="d-flex justify-content-center">
+              {/* <div className="d-flex justify-content-center">
                 <img
                   className="w300"
                   src={`assets/images/logo/logo_pelindo_anper_bb.png`}
                   alt="edii logo"
                 ></img>
-              </div>
-              <div className="d-flex justify-content-center mt-5">
+              </div> */}
+              <div className="d-flex justify-content-center">
                 <img
                   className="w300"
                   src={`assets/images/logo/aneta.png`}
@@ -382,9 +342,8 @@ function Login() {
                   </div>
                   <div className="form-group mb-1">
                     <a
-                      // href="/login"
+                      href="/login"
                       className="form-control text-left style2-input text-white fw-600 bg-twiiter border-0 p-0 "
-                      onClick={testMessage}
                     >
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/c/cd/Facebook_logo_%28square%29.png"

@@ -4,7 +4,7 @@ import {
     Button,
     Card,
     Col,
-    PageHeader,
+    PageHeader, Progress,
     Row,
     Space,
     Table, Tag, Tooltip,
@@ -28,6 +28,7 @@ import {useHistory, useParams} from 'react-router-dom';
 const SiswaPertemuanTugas = () => {
     const [grid, setGrid] = useState(false);
     const [dataPertemuan, setDataPertemuan] = useState([]);
+    const [percentage, setPercentage] = useState("");
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
@@ -71,9 +72,11 @@ const SiswaPertemuanTugas = () => {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            console.log(response)
             setDataPertemuan(dataRes?.data);
             const pagination = dataRes?.data?.links;
             setBtnPagination(pagination)
+            setPercentage(dataRes.persentase)
         })
     }
 
@@ -110,8 +113,8 @@ const SiswaPertemuanTugas = () => {
             no: index + 1,
             id: data.contents_id,
             namaPertemuan: data.meeting_name,
-            tanggalPertemuan: data.date,
-            jam: `${data.time_start} - ${data.time_end}`,
+            startDate: data.date_mulai,
+            endDate: data.date_akhir,
             menit: data.menit,
             status: data.status,
             statusSiswa: data.status_siswa,
@@ -139,13 +142,13 @@ const SiswaPertemuanTugas = () => {
             align: 'center',
         },
         {
-            title: 'Tanggal Pertemuan',
-            dataIndex: 'tanggalPertemuan',
+            title: 'Tanggal Mulai',
+            dataIndex: 'startDate',
             align: 'center',
         },
         {
-            title: 'Jam',
-            dataIndex: 'jam',
+            title: 'Tanggal Berakhir',
+            dataIndex: 'endDate',
             align: 'center',
         },
         {
@@ -222,6 +225,21 @@ const SiswaPertemuanTugas = () => {
                         </Col>
                     </Row>
                 </Card>
+
+                <Row>
+                    <Col span={8}>
+                        <div className="my-4 ml-2">
+                            Progress materi :
+                            <Progress
+                                percent={percentage} success={{
+                                percent: {percentage},
+                            }}
+                            />
+                        </div>
+                    </Col>
+                    <Col span={12}>
+                    </Col>
+                </Row>
 
                 <Table className=""
                        columns={columns}

@@ -198,9 +198,7 @@ function DataGuruAdmin() {
         }
     }
 
-
     const getListGuru = () => {
-
         axios.post(url_by_institute,
             {
                 "processDefinitionId": global_join_sub_where_get,
@@ -972,18 +970,17 @@ function DataGuruAdmin() {
                 }
             }
         ).then(function (response) {
-            console.log("Insert :", response);
             const valueRes = response.data.variables[2].value;
             const valueResObj = JSON.parse(valueRes);
-            console.log(valueResObj);
             if (valueResObj.status == 200) {
                 setIsViewCreate(false)
-                setIsViewGuru(true)  
+                setIsViewGuru(true)
                 notification.success({
                     message: 'Sukses',
                     description: 'Guru berhasil ditambahkan.',
                     placement: 'top'
                 });
+                getListGuru();
             } else {
                 notification.error({
                     message: 'Error',
@@ -1096,7 +1093,7 @@ function DataGuruAdmin() {
                 "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
         }).then(function (response) {
-            const valueRes = response.data.variables[8].value
+            // const valueRes = response.data.variables[8].value
             // console.log(valueRes);
             // const status = JSON.parse(valueRes)
             // console.log(status);
@@ -1108,7 +1105,7 @@ function DataGuruAdmin() {
                     description: 'Data guru berhasil di update.',
                     placement: 'top'
                 })
-                // pageLoad()
+                getListGuru();
             } else {
                 notification.error({
                     message: 'Error',
@@ -1153,13 +1150,24 @@ function DataGuruAdmin() {
                 }
                 ).then(function (response) {
                     console.log(response);
-                    getListGuru()
-                    Swal.fire(
-                        'Data telah terhapus!',
-                        'Menghapus data guru bernama ' + record.namaGuru,
-                        'success'
-                    )
-                    // pageLoad()
+                    const valueRes = response.data.variables[2].value;
+                    const valueResObj = JSON.parse(valueRes);
+                    const status = valueResObj.status
+                    if (status == "success") {
+                        Swal.fire(
+                            'Data telah terhapus!',
+                            'Menghapus data guru bernama ' + record.namaGuru,
+                            'success'
+                        )
+                        getListGuru();
+                    } else {
+                        Swal.fire(
+                            'Gagal menghapus data!',
+                            'data tidak ditemukan',
+                            'error'
+                        )
+                    }
+
                 })
             }
         })

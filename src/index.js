@@ -142,6 +142,7 @@ import DataEkstrakurikuler from "./pages/admin/ekstrakurikuler/DataEkstrakurikul
 import InputNilaiEkskul from "./pages/admin/ekstrakurikuler/InputNilaiEkskul";
 import InputDataDeskripsiSikap from "./pages/admin/penilaian/InputDataDeskripsiSikap";
 import GuruCreateMateri from "./pages/guru/data-materi/createMateri";
+import ForumGuru from "./pages/guru/forum";
 import MateriGuru from "./pages/guru/guruMateri";
 import GuruPenilaian from "./pages/guru/nilai-tugas/Penilaian";
 import SiswaStatusPenilaian from "./pages/siswa/E-Rapor/StatusPenilaian";
@@ -187,7 +188,6 @@ import GuruJadwalPelajaranMapelMateri from "./pages/guru/jadwal-pelajaran/listMa
 import GuruJadwalPelajaranMapelTugas from "./pages/guru/jadwal-pelajaran/listMapelTugas";
 import GuruListPertemuanMateri from "./pages/guru/jadwal-pelajaran/listPertemuanMateri";
 import GuruListPertemuanTugas from "./pages/guru/jadwal-pelajaran/listPertemuanTugas";
-import { FormAdminJadwalPelajaranJam } from "./components/form/AdminJadwalPelajaranJam";
 import GuruNilaiTugas from "./pages/guru/nilai-tugas/tugas";
 import SiswaNilaiPelajaran from "./pages/siswa/tugas-nilai/mapel";
 import SiswaNilaiTugas from "./pages/siswa/tugas-nilai/Tugas";
@@ -205,6 +205,12 @@ import GuruKalenderTugas from "./pages/guru/jadwal-pelajaran/kalender/pertemuanT
 import SiswaKalenderMateri from "./pages/siswa/jadwal-pelajaran/kalender/pertemuanMateri";
 import SiswaKalenderTugas from "./pages/siswa/jadwal-pelajaran/kalender/pertemuanTugas";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import EditJadwalPelajaran from "./pages/admin/jadwal-pelajaran/EditDetail";
+import GuruNilaiPertemuan from "./pages/guru/nilai-tugas/pertemuanTugas";
+import ForumSiswa from "./pages/siswa/forum";
+import PrivacyPolicy from "./pages/Privacy.js";
+import PenilaianEkskul from "./pages/guru/E-Rapor/PenilaianEkskul.js";
+import PenilaianPrestasi from "./pages/guru/E-Rapor/PenilaianPrestasi.js";
 
 class Root extends Component {
   render() {
@@ -228,6 +234,11 @@ class Root extends Component {
       <Provider store={store}>
         <BrowserRouter basename={"/"}>
           <Switch>
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/privacypolicy`}
+                component={PrivacyPolicy}
+            />
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/superadmin-verification`}
@@ -300,8 +311,8 @@ class Root extends Component {
             />
             <Route
               exact
-              path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-jam`}
-              component={FormAdminJadwalPelajaranJam}
+              path={`${process.env.PUBLIC_URL}/admin-jadwal-pelajaran-edit-:id`}
+              component={EditJadwalPelajaran}
             />
             <Route
               exact
@@ -375,6 +386,11 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/guru-create-materi`}
               component={GuruCreateMateri}
             />
+            <Route
+              exact
+              path={`${process.env.PUBLIC_URL}/guru-forum`}
+              component={ForumGuru}
+          />
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/guru-data-tugas`}
@@ -482,6 +498,11 @@ class Root extends Component {
             />
             <Route
               exact
+              path={`${process.env.PUBLIC_URL}/guru-nilai-pertemuan-:id`}
+              component={GuruNilaiPertemuan}
+            />
+            <Route
+              exact
               path={`${process.env.PUBLIC_URL}/guru-penilaian-:id`}
               component={GuruPenilaian}
             />
@@ -574,6 +595,18 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/guru-submit-rapor`}
               component={GuruSubmitRapor}
+            />
+
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/guru-nilai-ekskul`}
+                component={PenilaianEkskul}
+            />
+
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/guru-nilai-prestasi`}
+                component={PenilaianPrestasi}
             />
 
             <Route
@@ -676,6 +709,12 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/siswa-kompetensi`}
               component={KompetensiSiswa}
+            />
+
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/siswa-forum`}
+                component={ForumSiswa}
             />
 
             <Route

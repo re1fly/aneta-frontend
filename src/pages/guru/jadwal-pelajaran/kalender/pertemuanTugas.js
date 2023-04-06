@@ -17,7 +17,7 @@ import {
     Table,
     Tag,
     Upload,
-    Select,
+    Select, Spin,
 } from "antd";
 import Link from "react-router-dom/es/Link";
 import {
@@ -35,11 +35,16 @@ import Navheader from "../../../../components/Navheader";
 import Appheader from "../../../../components/Appheader";
 import { global_join_sub_where_get, url_by_institute } from '../../../../api/reference';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
+import {Modal} from "react-bootstrap";
 
 function GuruKalenderTugas() {
     const [grid, setGrid] = useState(false);
     const [tugas, setGetTugas] = useState([])
-
+    const [getSiswa, setGetSiswa] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
 
@@ -54,8 +59,10 @@ function GuruKalenderTugas() {
 
     const dataTugas = useSelector((state) => state.dataPathKalenderGuru.allPath)
 
-
-    useEffect(() => {
+    const showDataStudent = (record) => {
+        setGetSiswa([])
+        setLoading(true)
+        handleShow()
         axios.post(url_by_institute,
             {
                 "processDefinitionId": global_join_sub_where_get,
@@ -65,46 +72,41 @@ function GuruKalenderTugas() {
                         "name": "global_join_where_sub",
                         "type": "json",
                         "value": {
-                            "tbl_induk": "x_academic_subjects_schedule_contents_meeting",
+                            "tbl_induk": "x_academic_subjects_schedule_contents_meeting_status",
                             "select": [
-                                "x_academic_subjects_schedule_contents_meeting.id",
-                                "x_academic_subjects_schedule_contents_meeting.meeting_name",
-                                "x_academic_subjects_schedule_date.date",
-                                "x_academic_subjects_schedule_time.time_start",
-                                "x_academic_subjects_schedule_time.time_end"
+                                "x_academic_subjects_schedule_contents_meeting_status.status",
+                                "users.name"
                             ],
-                            "paginate": 10,
+                            "paginate": 100,
+
                             "join": [
                                 {
-                                    "tbl_join": "x_academic_subjects_schedule_date",
+                                    "tbl_join": "x_academic_students",
                                     "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
-                                    "foregenkey": "schedule_date_id"
-                                },
-                                {
-                                    "tbl_join": "x_academic_subjects_schedule_time",
-                                    "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
-                                    "foregenkey": "schedule_time_id"
+                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting_status",
+                                    "foregenkey": "student_id"
                                 }, {
-                                    "tbl_join": "x_academic_subjects_schedule_contents",
+                                    "tbl_join": "users",
                                     "refkey": "id",
-                                    "tbl_join2": "x_academic_subjects_schedule_contents_meeting",
-                                    "foregenkey": "contents_id"
-
+                                    "tbl_join2": "x_academic_students",
+                                    "foregenkey": "user_id"
                                 }
                             ],
                             "where": [
                                 {
-                                    "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting",
-                                    "tbl_field": "contents_id",
-                                    "tbl_value": idTugas,
+                                    "tbl_coloumn": "x_academic_students",
+                                    "tbl_field": "deleted_at",
+                                    "tbl_value": "",
+                                    "operator": "="
+                                }, {
+                                    "tbl_coloumn": "x_academic_subjects_schedule_contents_meeting_status",
+                                    "tbl_field": "meeting_id",
+                                    "tbl_value": record.id,
                                     "operator": "="
                                 }
-
                             ],
-                            "order_coloumn": "x_academic_subjects_schedule_contents_meeting.updated_at",
-                            "order_by": "desc"
+                            "order_coloumn": "users.name",
+                            "order_by": "asc"
                         }
                     },
                     {
@@ -114,15 +116,44 @@ function GuruKalenderTugas() {
                     }
                 ]
             }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
             }
-        }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-            const dataMateri = dataRes?.data?.data
-            setGetTugas(dataMateri)
+            const data = dataRes?.data?.data
+            setGetSiswa(data)
+            setLoading(false)
+        })
+    }
+
+    useEffect(() => {
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": "rolegurugetpertemuan:1:7bf57b89-c7a5-11ed-845a-4a8d2a16230d",
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_content": idTugas
+                        }
+
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            const dataTugas = dataRes?.data
+            setGetTugas(dataTugas)
             const pagination = dataRes?.data?.links;
             setBtnPagination(pagination)
         })
@@ -138,8 +169,19 @@ function GuruKalenderTugas() {
             no: index + 1,
             id: data.id,
             namaPertemuan: data.meeting_name,
-            tanggal: data.date,
-            jam: `${data.time_start} - ${data.time_end}`,
+            startDate: data.date_start,
+            endDate: data.date_end,
+            progress: data.persentase
+            // tanggal: data.date,
+            // jam: `${data.time_start} - ${data.time_end}`,
+        }
+    })
+
+    const dataSiswa = getSiswa.map((data, index) => {
+        return {
+            no: index + 1,
+            namaSiswa: data.name,
+            statusSiswa: data.status
         }
     })
 
@@ -155,26 +197,70 @@ function GuruKalenderTugas() {
             align: 'center',
         },
         {
-            title: 'Tanggal',
-            dataIndex: 'tanggal',
-            align: 'center',
+            title: "Tanggal Mulai",
+            dataIndex: "startDate",
+            align: "center",
         },
         {
-            title: 'Jam',
-            dataIndex: 'jam',
-            align: 'center',
+            title: "Tanggal Selesai",
+            dataIndex: "endDate",
+            align: "center",
+        },
+        {
+            title: "Progress",
+            dataIndex: "progress",
+            align: "center",
+            render: (text, record, progress, index) => (
+                <>
+                    <Space size="middle" style={{cursor: "pointer"}}>
+                        <Progress
+                            percent={record.progress} success={{
+                            percent: {progress},
+                        }}
+                            onClick={() => showDataStudent(record)}
+                        />
+                    </Space>
+                </>
+            )
         },
         {
             title: 'Aksi',
             key: 'action',
             responsive: ['sm'],
             render: (text, record) => (
-                <Space size="middle">
-                    <EyeOutlined onClick={() => handleRouter(record.id)} style={{ color: "black" }} />
+                <Space size="middle" className='cursor-pointer'>
+                    <EyeOutlined onClick={() => handleRouter(record.id, record.namaPertemuan)}
+                                 style={{color: "black"}}/>
                 </Space>
             ),
         },
     ];
+
+    const columnsSiswa = [
+        {
+            title: 'No',
+            dataIndex: 'no',
+            align: 'center',
+        },
+        {
+            title: 'Nama',
+            dataIndex: 'namaSiswa',
+            align: 'center',
+        },
+        {
+            title: "Status",
+            dataIndex: "statusSiswa",
+            align: "center",
+            render: (statusSiswa, record) => {
+                let color = statusSiswa == 0 ? "red" : statusSiswa == 1 ? "blue" : "green";
+                return (
+                    <Tag style={{borderRadius: "15px"}} color={color} key={statusSiswa}>
+                        {statusSiswa == 0 ? "Belum Dikerjakan" : statusSiswa == 1 ? "Sedang Dikerjakan" : "Telah Dikerjakan"}
+                    </Tag>
+                );
+            }
+        },
+    ]
 
     function onChangeTable(pagination, filters, sorter, extra) {
         console.log('params', pagination, filters, sorter, extra);
@@ -249,6 +335,31 @@ function GuruKalenderTugas() {
                 <Navheader />
                 <div className="main-content">
                     <Appheader />
+                    <Modal show={show} onHide={handleClose} size="lg"
+                           aria-labelledby="contained-modal-title-vcenter"
+                           centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title id="contained-modal-title-vcenter">
+                                <h3>List Siswa</h3>
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Spin tip="Loading..." spinning={loading}>
+                                <Table className=""
+                                       columns={columnsSiswa}
+                                       dataSource={dataSiswa}
+                                       onChange={onChangeTable}
+                                       pagination={false}
+                                       scroll={{ y: 500 }}
+                                       rowClassName="bg-greylight text-grey-900"/>
+                            </Spin>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                     <ViewMateri />
                 </div>
             </div>

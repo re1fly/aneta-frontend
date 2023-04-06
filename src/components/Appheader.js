@@ -19,8 +19,8 @@ function Appheader() {
   const [isWalikelas, setIsWalikelas] = useState("");
   const [dataNotif, setDataNotif] = useState([]);
   let router = useHistory();
-  const email = sessionStorage.getItem("user");
-  const key = sessionStorage.getItem("key");
+  const email = localStorage.getItem("user");
+  const key = localStorage.getItem("key");
   const decrypted = CryptoJS.AES.decrypt(key, "Secret Passphrase");
   const originalText = decrypted.toString(CryptoJS.enc.Utf8);
   const isEkskul = localStorage.getItem("is_ekskul");
@@ -32,29 +32,29 @@ function Appheader() {
   const navClass = `${isOpen ? " nav-active" : ""}`;
   const searchClass = `${isActive ? " show" : ""}`;
 
-  const fbConfig = {
-    apiKey: "AIzaSyCZTgLpZkjyjb5YcweXVhOosHNASd3VGaM",
-    authDomain: "anetaapp-80352.firebaseapp.com",
-    databaseURL:
-      "https://anetaapp-80352-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "anetaapp-80352",
-    storageBucket: "anetaapp-80352.appspot.com",
-    messagingSenderId: "720796861195",
-    appId: "1:720796861195:web:a7fd2b72ab86a42287980e",
-    measurementId: "G-EY34WYS0T9",
-  };
-  if (!firebase.apps.length) {
-    firebase.initializeApp(fbConfig);
-  }
+  // const fbConfig = {
+  //   apiKey: "AIzaSyCZTgLpZkjyjb5YcweXVhOosHNASd3VGaM",
+  //   authDomain: "anetaapp-80352.firebaseapp.com",
+  //   databaseURL:
+  //     "https://anetaapp-80352-default-rtdb.asia-southeast1.firebasedatabase.app",
+  //   projectId: "anetaapp-80352",
+  //   storageBucket: "anetaapp-80352.appspot.com",
+  //   messagingSenderId: "720796861195",
+  //   appId: "1:720796861195:web:a7fd2b72ab86a42287980e",
+  //   measurementId: "G-EY34WYS0T9",
+  // };
+  // if (!firebase.apps.length) {
+  //   firebase.initializeApp(fbConfig);
+  // }
 
-  const messaging = firebase.messaging();
+  // const messaging = firebase.messaging();
 
-  const onMessageListener = () =>
-    new Promise((resolve) => {
-      messaging.onMessage((payload) => {
-        resolve(payload);
-      });
-    });
+  // const onMessageListener = () =>
+  //   new Promise((resolve) => {
+  //     messaging.onMessage((payload) => {
+  //       resolve(payload);
+  //     });
+  //   });
 
   const _getAllNotif = () => {
     axios
@@ -135,16 +135,16 @@ function Appheader() {
       });
   };
 
-  onMessageListener()
-    .then((payload) => {
-      _getAllNotif();
-      notification.info({
-        message: "Notifikasi baru",
-        description: payload.notification.title,
-        placement: "topRight",
-      });
-    })
-    .catch((err) => console.log("failed: ", err));
+  // onMessageListener()
+  //   .then((payload) => {
+  //     _getAllNotif();
+  //     notification.info({
+  //       message: "Notifikasi baru",
+  //       description: payload.notification.title,
+  //       placement: "topRight",
+  //     });
+  //   })
+  //   .catch((err) => console.log("failed: ", err));
 
   useEffect(() => {
     const getStorageRole = localStorage.getItem("role");
@@ -632,6 +632,28 @@ function Appheader() {
                       <span>LMS</span>
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink
+                        activeClassName="active"
+                        to="/guru-forum"
+                        data-tab="archived"
+                        className="nav-content-bttn open-font"
+                    >
+                      <i className="feather-message-square mr-3"></i>
+                      <span>Forum</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                        activeClassName="active"
+                        to="/guru-kompetensi"
+                        data-tab="archived"
+                        className="nav-content-bttn open-font"
+                    >
+                      <i className="feather-book mr-3"></i>
+                      <span>Kompetensi</span>
+                    </NavLink>
+                  </li>
                   <li className="has-droupdown nav-item">
                     <Link to="#" className="navi-link">
                       <i className="feather-book mr-2 droupdown-toggle"></i>
@@ -729,14 +751,6 @@ function Appheader() {
                       <li className="nav-item">
                         <NavLink
                           className="navi-link nav-content-bttn open-font"
-                          to="/guru-kompetensi"
-                        >
-                          <span>Kompetensi</span>
-                        </NavLink>
-                      </li>
-                      <li className="nav-item">
-                        <NavLink
-                          className="navi-link nav-content-bttn open-font"
                           to="/guru-capaian-penilaian"
                         >
                           <span>Capaian Penilaian</span>
@@ -810,6 +824,26 @@ function Appheader() {
                           </NavLink>
                         </li>
                       </ul>
+                      <ul className="submenu">
+                        <li className="nav-item">
+                          <NavLink
+                              className="navi-link nav-content-bttn open-font"
+                              to="/guru-nilai-ekskul"
+                          >
+                            <span>Penilaian Ekstrakurikuler</span>
+                          </NavLink>
+                        </li>
+                      </ul>
+                      <ul className="submenu">
+                        <li className="nav-item">
+                          <NavLink
+                              className="navi-link nav-content-bttn open-font"
+                              to="/guru-nilai-prestasi"
+                          >
+                            <span>Penilaian Prestasi</span>
+                          </NavLink>
+                        </li>
+                      </ul>
                     </li>
                   ) : null}
                   {/* <li>
@@ -864,6 +898,17 @@ function Appheader() {
                     >
                       <i className="feather-file-text mr-3"></i>
                       <span>Kelas Saya</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                        activeClassName="active"
+                        to="/siswa-forum"
+                        data-tab="archived"
+                        className="nav-content-bttn open-font"
+                    >
+                      <i className="feather-message-square mr-3"></i>
+                      <span>Forum</span>
                     </NavLink>
                   </li>
                   {/* <li>

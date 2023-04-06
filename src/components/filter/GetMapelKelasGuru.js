@@ -29,6 +29,7 @@ export const GetMapelKelasGuru = (props) => {
               type: "json",
               value: {
                 user_id: userId,
+                academic_year_id: academic
               },
             },
           ],
@@ -41,6 +42,7 @@ export const GetMapelKelasGuru = (props) => {
         }
       )
       .then(function (response) {
+        console.log(response)
         const dataKelas = JSON.parse(response.data.variables[2].value);
         setDataClass(dataKelas.data);
       });
@@ -59,6 +61,7 @@ export const GetMapelKelasGuru = (props) => {
               value: {
                 user_id: userId,
                 id_class: selectedClass,
+                academic_year_id: academic
               },
             },
           ],

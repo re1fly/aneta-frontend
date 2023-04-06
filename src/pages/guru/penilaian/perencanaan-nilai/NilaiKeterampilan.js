@@ -46,6 +46,7 @@ function GuruNilaiKeterampilan() {
               value: {
                 user_id: userId,
                 id_class: selectedClass,
+                academic_year_id: academic
               },
             },
           ],
@@ -77,6 +78,7 @@ function GuruNilaiKeterampilan() {
               type: "json",
               value: {
                 user_id: userId,
+                academic_year_id: academic
               },
             },
           ],

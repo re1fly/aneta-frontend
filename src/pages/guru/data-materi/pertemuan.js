@@ -27,7 +27,7 @@ import {
   get_where_no_join,
   role_guru_get_matpel,
   role_guru_get_sub_class,
-  global_update,
+  global_update, role_guru_create_pertemuan,
 } from "../../../api/reference";
 
 import axios from "axios";
@@ -36,18 +36,18 @@ import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import { FormCreatePertemuanMateri } from "../../../components/form/GuruPertemuanMateri";
 import { pageLoad } from "../../../components/misc/loadPage";
+import Swal from "sweetalert2";
+import { dateNow } from "../../../components/misc/date";
 
 const GuruPertemuan = () => {
   const [grid, setGrid] = useState(false);
   const [dataPertemuan, setDataPertemuan] = useState([]);
-  console.log(dataPertemuan);
   const [isViewPertemuan, setIsViewPertemuan] = useState(true);
   const [isViewEdit, setIsViewEdit] = useState(false);
   const [isViewCreate, setIsViewCreate] = useState(false);
   const [isViewDetail, setIsViewDetail] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
-  console.log(selectedUser);
   const [refreshState, setRefreshState] = useState(false);
 
   const [getKelas, setGetKelas] = useState(null);
@@ -127,10 +127,67 @@ const GuruPertemuan = () => {
       });
   };
 
-  useEffect(() => {
-    _getDataKelas();
-    _getDataMapel();
+  const deletePertemuan = (record) => {
+    console.log(record.namaPertemuan);
+    Swal.fire({
+      title: "Apakah anda yakin menghapus data?",
+      text: "Anda tidak dapat mengembalikan data yang sudah terhapus",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Batalkan",
+      confirmButtonText: "Hapus",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .post(
+            url_by_institute,
+            {
+              processDefinitionId:
+                "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+              returnVariables: true,
+              variables: [
+                {
+                  name: "global_updatedata",
+                  type: "json",
+                  value: {
+                    tbl_name:
+                      "x_academic_subjects_schedule_contents_meetingModel",
+                    id: record.id,
+                    tbl_coloumn: {
+                      deleted_at: dateNow,
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Basic YWRtaW46TWFuYWczciE=",
+              },
+            }
+          )
+          .then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            const code = dataRes.status;
+            if (code == "success") {
+              getListPertemuan();
+              Swal.fire(
+                "Data telah terhapus!",
+                "Menghapus data pertemuan " + record.namaPertemuan,
+                "success"
+              );
+            } else {
+              Swal.fire("Data not found!", "Error");
+            }
+          });
+      }
+    });
+  };
 
+  const getListPertemuan = () => {
     axios
       .post(
         url_by_institute,
@@ -150,10 +207,19 @@ const GuruPertemuan = () => {
                   "x_academic_subjects_schedule_time.time_start",
                   "x_academic_subjects_schedule_time.time_end",
                   "x_academic_subjects_schedule_contents.tittle",
+                  "r_class_type.class_type",
+                  "x_academic_class.sub_class",
+                  "x_academic_subjects_schedule_contents_files.file_name"
                 ],
                 paginate: 10,
 
                 join: [
+                  {
+                    tbl_join: "x_academic_subjects_schedule_contents_files",
+                    refkey: "subjects_schedule_contents_id",
+                    tbl_join2: "x_academic_subjects_schedule_contents_meeting",
+                    foregenkey: "id",
+                  },
                   {
                     tbl_join: "x_academic_subjects_schedule_date",
                     refkey: "id",
@@ -172,6 +238,18 @@ const GuruPertemuan = () => {
                     tbl_join2: "x_academic_subjects_schedule_contents_meeting",
                     foregenkey: "contents_id",
                   },
+                  {
+                    tbl_join: "x_academic_class",
+                    refkey: "id",
+                    tbl_join2: "x_academic_subjects_schedule_contents",
+                    foregenkey: "class_id",
+                  },
+                  {
+                    tbl_join: "r_class_type",
+                    refkey: "id",
+                    tbl_join2: "x_academic_class",
+                    foregenkey: "class",
+                  },
                 ],
                 where: [
                   {
@@ -184,6 +262,25 @@ const GuruPertemuan = () => {
                     tbl_coloumn: "x_academic_subjects_schedule_contents",
                     tbl_field: "created_by",
                     tbl_value: userId,
+                    operator: "=",
+                  },
+                  {
+                    tbl_coloumn: "x_academic_subjects_schedule_contents",
+                    tbl_field: "deleted_at",
+                    tbl_value: "",
+                    operator: "=",
+                  },
+                  {
+                    tbl_coloumn:
+                      "x_academic_subjects_schedule_contents_meeting",
+                    tbl_field: "deleted_at",
+                    tbl_value: "",
+                    operator: "=",
+                  },
+                  {
+                    tbl_coloumn: "x_academic_subjects_schedule_contents",
+                    tbl_field: "academic_year_id",
+                    tbl_value: academic_year_id,
                     operator: "=",
                   },
                 ],
@@ -212,6 +309,13 @@ const GuruPertemuan = () => {
         const pagination = dataRes?.data?.links;
         setBtnPagination(pagination);
       });
+  }
+
+  useEffect(() => {
+    _getDataKelas();
+    _getDataMapel();
+    getListPertemuan();
+
   }, [userId, paramsPage, selectedClass]);
 
   const columns = [
@@ -220,6 +324,11 @@ const GuruPertemuan = () => {
       dataIndex: "no",
       defaultSortOrder: "ascend",
       responsive: ["sm"],
+    },
+    {
+      title: "Kelas",
+      dataIndex: "kelas",
+      align: "center",
     },
     {
       title: "Nama Materi",
@@ -257,7 +366,10 @@ const GuruPertemuan = () => {
             style={{ color: "blue" }}
             onClick={() => viewEditPertemuan(record)}
           />
-          <DeleteOutlined style={{ color: "red" }} />
+          <DeleteOutlined
+            style={{ color: "red" }}
+            onClick={() => deletePertemuan(record)}
+          />
         </Space>
       ),
     },
@@ -269,8 +381,10 @@ const GuruPertemuan = () => {
       id: data.id,
       namaMateri: data.tittle,
       namaPertemuan: data.meeting_name,
+      kelas: `${data.class_type} / ${data.sub_class}`,
       tanggalPertemuan: data.date,
       jam: `${data.time_start} - ${data.time_end}`,
+      embed: data.file_name
     };
   });
 
@@ -376,8 +490,8 @@ const GuruPertemuan = () => {
                 {dataMapel == null
                   ? null
                   : dataMapel?.map((data) => (
-                      <option value={data.id}>{data.nama_mata}</option>
-                    ))}
+                    <option value={data.id}>{data.nama_mata}</option>
+                  ))}
               </select>
             </div>
           </div>
@@ -427,25 +541,32 @@ const GuruPertemuan = () => {
     for (const el of e.target.elements) {
       if (el.name !== "") data[el.name] = el.value;
     }
-    console.log(data);
     const idJam = data.jam_pertemuan?.split(",")?.map(Number);
-    console.log(idJam);
+    const idKompetensi = data.id_kompetensi?.split(",")?.map(Number) < 1 ? null : data.id_kompetensi?.split(",")?.map(Number);
+    const idMateri = data.nama_materi.split(",")[0]
+    const iFrame = data.embed_materi;
+    const id = iFrame?.split("id=")[1];
+    const id_content_wp = id?.split('" width=')[0];
+
 
     axios
       .post(
         url_by_institute,
         {
-          processDefinitionId: role_guru_create_data_pertemuan_materi,
+          processDefinitionId: role_guru_create_pertemuan,
           returnVariables: true,
           variables: [
             {
               name: "data",
               type: "json",
               value: {
-                id_content: data.nama_materi,
+                id_content: idMateri,
                 nama_pertemuan: data.nama_pertemuan,
                 id_date: data.tanggal_pertemuan,
                 id_jam: idJam,
+                embed_materi: data.embed_materi,
+                id_content_wp: id_content_wp,
+                id_kompetensi: idKompetensi,
               },
             },
           ],
@@ -461,12 +582,11 @@ const GuruPertemuan = () => {
         console.log("Insert :", response);
         const valueRes = response.data.variables[2].value;
         const valueResObj = JSON.parse(valueRes);
-        // console.log(valueResObj);
         if (valueResObj.message == "success insert") {
           setIsViewCreate(false);
           setIsViewPertemuan(true);
           setRefreshState(true);
-          pageLoad();
+          getListPertemuan();
           localStorage.removeItem("idJam");
           notification.success({
             message: "Sukses",
@@ -523,15 +643,14 @@ const GuruPertemuan = () => {
         }
       )
       .then(function (response) {
-        console.log("Update :", response);
+        // console.log("Update :", response);
         const valueRes = response.data.variables[2].value;
         const valueResObj = JSON.parse(valueRes);
-        console.log(valueResObj);
         if (valueResObj.message == "succes update data") {
           setIsViewCreate(false);
           setIsViewPertemuan(true);
           setRefreshState(true);
-          pageLoad();
+          getListPertemuan();
           notification.success({
             message: "Sukses",
             description: "Pertemuan berhasil diupdate.",
@@ -580,6 +699,7 @@ const GuruPertemuan = () => {
         title="Tambah Data Pertemuan"
         submit={CreatePertemuan}
         isDisabled={false}
+        form="Materi"
       />
     );
   };
@@ -590,6 +710,7 @@ const GuruPertemuan = () => {
         setView={() => setIsViewPertemuan(true)}
         title="Edit Data Pertemuan"
         submit={EditPertemuan}
+        embed={selectedUser.embed}
         isDisabled={true}
         titleDisable={false}
         disabledButton={false}
@@ -613,6 +734,7 @@ const GuruPertemuan = () => {
         namaPertemuan={selectedUser.namaPertemuan}
         tanggalPertemuan={selectedUser.tanggalPertemuan}
         jam={selectedUser.jam}
+        embed={selectedUser.embed}
       />
     );
   };

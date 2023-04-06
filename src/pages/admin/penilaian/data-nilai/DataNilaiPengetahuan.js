@@ -122,6 +122,7 @@ function DataNilaiPengetahuan() {
             .then(function (response) {
                 const dataRes = JSON.parse(response.data.variables[2].value);
                 const resCode = dataRes.code;
+                console.log(response)
                 if (resCode === true) {
                     notification.success({
                         message: "Sukses",

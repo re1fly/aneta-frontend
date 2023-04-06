@@ -396,7 +396,9 @@ function DataSiswaAdmin() {
                         "type": "json",
                         "value": {
                             "file_base64": getLinkUrl,
-                            "file_type": "xlsx"
+                            "file_type": "xlsx",
+                            "institute_id": institute,
+                            "type": "update"
 
                         }
                     }
@@ -1138,7 +1140,7 @@ function DataSiswaAdmin() {
                             "nipd_siswa": data.nipd_siswa,
                             "nama_siswa": data.nama_siswa,
                             "kewarganegaraan_siswa": data.kewarganegaraan_siswa,
-                            "jk_siswa": data.jk_siswa,
+                            "gender": data.jk_siswa,
                             "nik_siswa": data.nik_siswa,
                             "agama_siswa": data.agama_siswa,
                             "tempatlahir_siswa": data.tempatlahir_siswa,

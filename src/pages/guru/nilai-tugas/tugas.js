@@ -31,8 +31,7 @@ import {
 } from "../../../api/reference";
 
 export default function GuruNilaiTugas() {
-  const [grid, setGrid] = useState(false);
-  const [getMateri, setGetMateri] = useState([]);
+  const [getTugas, setGetTugas] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const academicYear = localStorage.getItem("academic_year");
@@ -41,11 +40,10 @@ export default function GuruNilaiTugas() {
 
   const _onSearch = (value) => console.log(value);
 
-  const params = useParams();
-  const idMapel = params.id;
-  const location = useLocation();
-  // const dataKelas = location.state.dataKelas
-  // const mapel = location.state.mapel
+  const params = useParams()
+  const paramsId = params?.id?.split('-');
+  const idSubClass = paramsId[0]
+  const idMapel = paramsId[1]
 
   const dispatch = useDispatch();
   const PathNilaiGuru = useSelector((state) => state.dataPathNilaiGuru);
@@ -75,105 +73,101 @@ export default function GuruNilaiTugas() {
   };
 
   useEffect(() => {
-    axios
-      .post(
-        url_by_institute,
-        {
-          processDefinitionId: global_join_sub_where_get,
-          returnVariables: true,
-          variables: [
-            {
-              name: "global_join_where_sub",
-              type: "json",
-              value: {
-                tbl_induk: "x_academic_subjects_schedule_contents_meeting",
-                select: [
-                  "x_academic_subjects_schedule_contents_meeting.contents_id as id",
-                  "x_academic_subjects_schedule_contents_meeting.meeting_name",
-                  "x_academic_subjects_schedule_date.date",
-                  "x_academic_subjects_schedule_time.time_start",
-                  "x_academic_subjects_schedule_time.time_end",
-                  "x_academic_subjects_schedule_contents.is_upload",
-                ],
-                paginate: 10,
-                join: [
-                  {
-                    tbl_join: "x_academic_subjects_schedule_date",
-                    refkey: "id",
-                    tbl_join2: "x_academic_subjects_schedule_contents_meeting",
-                    foregenkey: "schedule_date_id",
-                  },
-                  {
-                    tbl_join: "x_academic_subjects_schedule_time",
-                    refkey: "id",
-                    tbl_join2: "x_academic_subjects_schedule_contents_meeting",
-                    foregenkey: "schedule_time_id",
-                  },
-                  {
-                    tbl_join: "x_academic_subjects_schedule_contents",
-                    refkey: "id",
-                    tbl_join2: "x_academic_subjects_schedule_contents_meeting",
-                    foregenkey: "contents_id",
-                  },
-                ],
-                where: [
-                  {
-                    tbl_coloumn: "x_academic_subjects_schedule_contents",
-                    tbl_field: "subjects_content_type_id",
-                    tbl_value: "2",
-                    operator: "=",
-                  },
-                  {
-                    tbl_coloumn: "x_academic_subjects_schedule_contents",
-                    tbl_field: "created_by",
-                    tbl_value: userId,
-                    operator: "=",
-                  },
-                  {
-                    tbl_coloumn: "x_academic_subjects_schedule_contents",
-                    tbl_field: "subjects_master_id",
-                    tbl_value: idMapel,
-                    operator: "=",
-                  },
-                ],
-                order_coloumn:
-                  "x_academic_subjects_schedule_contents_meeting.updated_at",
-                order_by: "desc",
-              },
-            },
-            {
-              name: "page",
-              type: "string",
-              value: "1",
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Basic YWRtaW46TWFuYWczciE=",
+    axios.post(url_by_institute,
+      {
+        "processDefinitionId": global_join_sub_where_get,
+        "returnVariables": true,
+        "variables": [
+          {
+            "name": "global_join_where_sub",
+            "type": "json",
+            "value": {
+              "tbl_induk": "x_academic_subjects_schedule_contents",
+              "select": [
+                "x_academic_subjects_schedule_contents.id",
+                "x_academic_subjects_schedule_contents.tittle"
+              ],
+              "paginate": 1000,
+              "join": [
+                {
+                  "tbl_join": "r_subjects_content_type",
+                  "refkey": "id",
+                  "tbl_join2": "x_academic_subjects_schedule_contents",
+                  "foregenkey": "subjects_content_type_id"
+                },
+              ],
+              "where": [
+                {
+                  "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                  "tbl_field": "subjects_content_type_id",
+                  "tbl_value": "2",
+                  "operator": "="
+                }, {
+                  "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                  "tbl_field": "created_by",
+                  "tbl_value": userId,
+                  "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                  "tbl_field": "class_id",
+                  "tbl_value": idSubClass,
+                  "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                  "tbl_field": "subjects_master_id",
+                  "tbl_value": idMapel,
+                  "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                  "tbl_field": "status",
+                  "tbl_value": "publish",
+                  "operator": "="
+                },
+                {
+                  "tbl_coloumn": "x_academic_subjects_schedule_contents",
+                  "tbl_field": "deleted_at",
+                  "tbl_value": "",
+                  "operator": "=",
+                },
+              ],
+              "order_coloumn": "x_academic_subjects_schedule_contents.updated_at",
+              "order_by": "desc"
+            }
           },
-        }
-      )
-      .then(function (response) {
-        const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-        const materi = dataRes?.data?.data;
-        setGetMateri(materi);
-      });
+          {
+            "name": "page",
+            "type": "string",
+            "value": "1"
+          }
+        ]
+      }, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Basic YWRtaW46TWFuYWczciE="
+      }
+    }
+    ).then(function (response) {
+      const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+      const mapel = dataRes?.data?.data
+      console.log('test data: ', mapel);
+      setGetTugas(mapel);
+    })
   }, [academicYear]);
 
-  const channelList = getMateri?.map((data, index) => {
+  const channelList = getTugas?.map((data, index) => {
     return {
       id: data.id,
-      materi: data.meeting_name,
-      isUpload: data.is_upload,
+      tugas: data.tittle,
     };
   });
 
   let history = useHistory();
-  const handleSubClass = (id, isUpload, tugas) => {
+  const handleSubClass = (idSubClass, idMapel, idTugas, tugas) => {
     dispatch(PathTugasNilaiGuru(tugas));
-    history.push(`/guru-penilaian-${id}-${isUpload}`);
+    history.push(`/guru-nilai-pertemuan-${idSubClass}-${idMapel}-${idTugas}`);
   };
 
   const _exportDataExcel = () => {
@@ -188,12 +182,12 @@ export default function GuruNilaiTugas() {
             value: {
               id_user: userId,
               id_matpel: idMapel,
+              class_id: idSubClass,
             },
           },
         ],
       })
       .then((response) => {
-        console.log(response);
         const resData = JSON.parse(response.data.variables[2].value);
         console.log(resData);
         if (resData != 0) {
@@ -240,31 +234,18 @@ export default function GuruNilaiTugas() {
               title={`Data Nilai / Kelas ${kelas} / ${subKelas} / ${mapel}`}
             />
             <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
-              <Row>
-                <Col span={8}>
-                  {/* <Button className="mr-4" style={{ backgroundColor: '#00a629', color: 'white' }}
-                                        shape="round" size='middle'
-                                        onClick={() => _exportDataExcel()}>
-                                        Download Nilai
-                                    </Button> */}
-                  <Button
-                    className="mr-4"
-                    style={{ backgroundColor: "#00a629", color: "white" }}
-                    loading={isLoading}
-                    shape="round"
-                    size="middle"
-                    onClick={() => downloadLoading()}
-                  >
-                    Download Nilai
-                  </Button>
-                </Col>
-                {/* <Col span={4}>
-                            <div className="float-right">
-                                <Search className="mr-5" placeholder="Cari kata kunci" allowClear
-                                    onSearch={_onSearch} style={{ width: 250, lineHeight: '20px' }} />
-                            </div>
-                        </Col> */}
-              </Row>
+              <div className="row">
+                <div className="col-lg-8 col-md-6 my-2"></div>
+                <div className="col-lg-4 col-md-6 my-2">
+                  <Search
+                    className="mr-3"
+                    placeholder="Cari kata kunci"
+                    allowClear
+                    onSearch={_onSearch}
+                    style={{ width: "80%" }}
+                  />
+                </div>
+              </div>
             </Card>
 
             <div className="px-1 py-2 ">
@@ -275,11 +256,11 @@ export default function GuruNilaiTugas() {
                       <div
                         className="d-flex align-items-center justify-content-center card mb-4 d-block h150 w-100 shadow-md rounded-xl p-xxl-5 text-center"
                         onClick={() =>
-                          handleSubClass(value.id, value.isUpload, value.materi)
+                          handleSubClass(idSubClass, idMapel, value.id, value.tugas)
                         }
                       >
                         <h2 className="ml-auto mr-auto font-weight-bold mb-0">
-                          {value.materi}
+                          {value.tugas}
                         </h2>
                       </div>
                     </div>

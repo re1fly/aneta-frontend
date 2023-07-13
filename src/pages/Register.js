@@ -3,6 +3,7 @@ import {notification} from "antd";
 import axios from "axios";
 import {BASE_URL} from "../api/Url";
 import bcrypt from 'bcryptjs';
+import {registerUser} from "../api/reference.js";
 
 function Register() {
     const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ function Register() {
         } else {
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": "authregister:1:987def29-2cc6-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": registerUser,
                     "returnVariables": true,
                     "variables": [
                         {

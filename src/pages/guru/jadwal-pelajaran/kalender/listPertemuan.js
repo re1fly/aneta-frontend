@@ -23,7 +23,7 @@ import {
 import Search from "antd/es/input/Search";
 import Navheader from "../../../../components/Navheader";
 import Appheader from "../../../../components/Appheader";
-import { url_by_institute } from '../../../../api/reference';
+import {role_guru_get_kalender_detail, url_by_institute} from '../../../../api/reference';
 import { useHistory } from 'react-router-dom';
 
 function GuruListPertemuanKalender() {
@@ -43,7 +43,7 @@ function GuruListPertemuanKalender() {
     useEffect(() => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "rolegurugetkalenderdetail:1:1f6a41e1-655b-11ed-bb6a-a2fb3d782380",
+                "processDefinitionId": role_guru_get_kalender_detail,
                 "returnVariables": true,
                 "variables": [
                     {

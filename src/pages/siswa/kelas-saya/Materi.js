@@ -11,8 +11,6 @@ import {CountdownCircleTimer} from 'react-countdown-circle-timer'
 
 export default function MateriSiswa() {
     const [getContent, setGetContent] = useState([])
-    const [duration, setDuration] = useState(getContent.duration_minute)
-    console.log('conteeeent', getContent);
 
     const userId = localStorage.getItem('user_id');
     const academic_year_id = localStorage.getItem('academic_year')
@@ -83,9 +81,10 @@ export default function MateriSiswa() {
                 }
             }
         ).then(function (response) {
-            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetContent(dataRes?.data);
+            console.log(dataRes.data)
+
         })
     }, [userId])
 

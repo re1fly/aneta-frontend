@@ -1,5 +1,5 @@
-import React, { Fragment, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, {Fragment, useState, useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import Adminfooter from "../../../components/Adminfooter";
 import {
     Button,
@@ -16,7 +16,7 @@ import {
     Table,
     Tag,
     Upload,
-    Select,
+    Select, Spin,
 } from "antd";
 import Link from "react-router-dom/es/Link";
 import {
@@ -41,10 +41,10 @@ import axios from "axios";
 import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
-import { FormCreatePertemuanTugas } from "../../../components/form/GuruPertemuanTugas";
-import { pageLoad } from "../../../components/misc/loadPage";
+import {FormCreatePertemuanTugas} from "../../../components/form/GuruPertemuanTugas";
+import {pageLoad} from "../../../components/misc/loadPage";
 import Swal from "sweetalert2";
-import { dateNow } from "../../../components/misc/date";
+import {dateNow} from "../../../components/misc/date";
 
 const GuruPertemuan = () => {
     const [grid, setGrid] = useState(false);
@@ -57,10 +57,14 @@ const GuruPertemuan = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [refreshState, setRefreshState] = useState(false);
 
-    const [getKelas, setGetKelas] = useState(null);
-    const [dataMapel, setDataMapel] = useState(null);
-    const [selectedClass, setSelectedClass] = useState(null);
-    const [selectedMapel, setSelectedMapel] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
+
+    /*    const [getKelas, setGetKelas] = useState(null);
+        const [dataMapel, setDataMapel] = useState(null);
+        const [selectedClass, setSelectedClass] = useState(null);
+        const [selectedMapel, setSelectedMapel] = useState(null);*/
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
@@ -68,7 +72,7 @@ const GuruPertemuan = () => {
     const userId = localStorage.getItem("user_id");
     const academic_year_id = localStorage.getItem("academic_year");
 
-    const { Option } = Select;
+    const {Option} = Select;
     const children = [];
 
     children.push(
@@ -82,66 +86,66 @@ const GuruPertemuan = () => {
         console.log(`selected ${value}`);
     };
 
-    const _getDataKelas = () => {
-        axios
-            .post(
-                url_by_institute,
-                {
-                    processDefinitionId: role_guru_get_sub_class,
-                    returnVariables: true,
-                    variables: [
-                        {
-                            name: "get_sub_kelas_guru",
-                            type: "json",
-                            value: {
-                                user_id: userId,
-                            },
-                        },
-                    ],
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
-                    },
-                }
-            )
-            .then(function (response) {
-                const data = JSON.parse(response.data.variables[2].value);
-                setGetKelas(data?.data);
-            });
-    };
-    const _getDataMapel = () => {
-        axios
-            .post(
-                url_by_institute,
-                {
-                    processDefinitionId: role_guru_get_matpel,
-                    returnVariables: true,
-                    variables: [
-                        {
-                            name: "update_jadwal_pelajaran",
-                            type: "json",
-                            value: {
-                                user_id: userId,
-                                id_class: selectedClass,
-                            },
-                        },
-                    ],
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
-                    },
-                }
-            )
-            .then(function (response) {
-                const dataMapelApi = JSON.parse(response.data.variables[2].value);
-                const getMapel = dataMapelApi?.data;
-                setDataMapel(getMapel);
-            });
-    };
+    /* const _getDataKelas = () => {
+         axios
+             .post(
+                 url_by_institute,
+                 {
+                     processDefinitionId: role_guru_get_sub_class,
+                     returnVariables: true,
+                     variables: [
+                         {
+                             name: "get_sub_kelas_guru",
+                             type: "json",
+                             value: {
+                                 user_id: userId,
+                             },
+                         },
+                     ],
+                 },
+                 {
+                     headers: {
+                         "Content-Type": "application/json",
+                         Authorization: "Basic YWRtaW46TWFuYWczciE=",
+                     },
+                 }
+             )
+             .then(function (response) {
+                 const data = JSON.parse(response.data.variables[2].value);
+                 setGetKelas(data?.data);
+             });
+     };
+     const _getDataMapel = () => {
+         axios
+             .post(
+                 url_by_institute,
+                 {
+                     processDefinitionId: role_guru_get_matpel,
+                     returnVariables: true,
+                     variables: [
+                         {
+                             name: "update_jadwal_pelajaran",
+                             type: "json",
+                             value: {
+                                 user_id: userId,
+                                 id_class: selectedClass,
+                             },
+                         },
+                     ],
+                 },
+                 {
+                     headers: {
+                         "Content-Type": "application/json",
+                         Authorization: "Basic YWRtaW46TWFuYWczciE=",
+                     },
+                 }
+             )
+             .then(function (response) {
+                 const dataMapelApi = JSON.parse(response.data.variables[2].value);
+                 const getMapel = dataMapelApi?.data;
+                 setDataMapel(getMapel);
+             });
+     };*/
 
     const deletePertemuan = (record) => {
         Swal.fire({
@@ -307,18 +311,39 @@ const GuruPertemuan = () => {
             )
             .then(function (response) {
                 const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-                console.log(dataRes)
+                const responseData = dataRes.message;
                 setDataPertemuan(dataRes?.data?.data);
                 const pagination = dataRes?.data?.links;
                 setBtnPagination(pagination);
+                if (responseData == "Success Found") {
+                    setLoading(false)
+                    setDataSuccess(true)
+                } else {
+                    setDataSuccess(false)
+                    setCountRender(countRender + 1)
+                }
             });
     }
 
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            getListPertemuan()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
+    }
+
+    /* useEffect(() => {
+         _getDataKelas();
+         _getDataMapel();
+         getListPertemuan();
+     }, [userId, paramsPage, selectedClass, refreshState]);*/
+
     useEffect(() => {
-        _getDataKelas();
-        _getDataMapel();
         getListPertemuan();
-    }, [userId, paramsPage, selectedClass, refreshState]);
+    }, [userId, paramsPage, refreshState]);
 
     const columns = [
         {
@@ -361,15 +386,15 @@ const GuruPertemuan = () => {
                         <EyeOutlined style={{ color: "black" }} />
                     </Link> */}
                     <EyeOutlined
-                        style={{ color: "black" }}
+                        style={{color: "black"}}
                         onClick={() => viewDetailPertemuan(record)}
                     />
                     <EditOutlined
-                        style={{ color: "blue" }}
+                        style={{color: "blue"}}
                         onClick={() => viewEditPertemuan(record)}
                     />
                     <DeleteOutlined
-                        style={{ color: "red" }}
+                        style={{color: "red"}}
                         onClick={() => deletePertemuan(record)}
                     />
                 </Space>
@@ -441,7 +466,7 @@ const GuruPertemuan = () => {
                                     placeholder="Cari kata kunci"
                                     allowClear
                                     onSearch={_onSearch}
-                                    style={{ width: 250, lineHeight: "20px" }}
+                                    style={{width: 250, lineHeight: "20px"}}
                                 />
                                 {/* {grid == false ?
                                     <a>
@@ -457,7 +482,7 @@ const GuruPertemuan = () => {
                     </Row>
                 </Card>
 
-                <div className="row">
+                {/* <div className="row">
                     <div className="col-lg-3 mb-3">
                         <div className="form-group">
                             <select
@@ -493,42 +518,44 @@ const GuruPertemuan = () => {
                             </select>
                         </div>
                     </div>
-                </div>
+                </div>*/}
 
-                <Table
-                    className=""
-                    columns={columns}
-                    dataSource={data}
-                    onChange={onChangeTable}
-                    pagination={false}
-                    rowClassName="bg-greylight text-grey-900"
-                />
-                <div className="text-center mt-4">
-                    {btnPagination?.map((dataBtn) => {
-                        const labelBtn = dataBtn.label;
-                        const label = labelBtn
-                            .replace(/(&laquo\;)/g, "")
-                            .replace(/(&raquo\;)/g, "");
-                        let linkUrl = dataBtn.url;
+                <Spin tip="Loading..." spinning={loading}>
+                    <Table
+                        className=""
+                        columns={columns}
+                        dataSource={data}
+                        onChange={onChangeTable}
+                        pagination={false}
+                        rowClassName="bg-greylight text-grey-900"
+                    />
+                    <div className="text-center mt-4">
+                        {btnPagination?.map((dataBtn) => {
+                            const labelBtn = dataBtn.label;
+                            const label = labelBtn
+                                .replace(/(&laquo\;)/g, "")
+                                .replace(/(&raquo\;)/g, "");
+                            let linkUrl = dataBtn.url;
 
-                        if (linkUrl != null) {
-                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
-                        }
+                            if (linkUrl != null) {
+                                linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                            }
 
-                        return (
-                            <Button
-                                className="btn btn-primary mr-2 font-xssss fw-600"
-                                disabled={linkUrl == null ? true : false}
-                                onClick={() => {
-                                    setParamsPage(linkUrl);
-                                }}
-                            >
-                                {label}
-                            </Button>
-                        );
-                    })}
-                </div>
-                <Adminfooter />
+                            return (
+                                <Button
+                                    className="btn btn-primary mr-2 font-xssss fw-600"
+                                    disabled={linkUrl == null ? true : false}
+                                    onClick={() => {
+                                        setParamsPage(linkUrl);
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            );
+                        })}
+                    </div>
+                </Spin>
+                <Adminfooter/>
             </div>
         );
     };
@@ -740,19 +767,19 @@ const GuruPertemuan = () => {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
+                    <Appheader/>
                     {isViewPertemuan ? (
-                        <ViewPertemuan />
+                        <ViewPertemuan/>
                     ) : isViewCreate ? (
-                        <FormCreate />
+                        <FormCreate/>
                     ) : isViewEdit ? (
-                        <FormEdit />
+                        <FormEdit/>
                     ) : isViewDetail ? (
-                        <FormDetail />
+                        <FormDetail/>
                     ) : (
-                        <ViewPertemuan />
+                        <ViewPertemuan/>
                     )}
                     {/* {isViewPertemuan ? <ViewMateri /> : <TambahMateri />} */}
                 </div>

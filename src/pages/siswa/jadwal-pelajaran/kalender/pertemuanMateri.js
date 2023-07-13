@@ -1,6 +1,6 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import React, {Fragment, useState, useEffect} from 'react';
+import {useSelector} from 'react-redux';
+import {useHistory, useParams} from 'react-router-dom';
 import Adminfooter from "../../../../components/Adminfooter";
 import {
     Button,
@@ -8,7 +8,7 @@ import {
     Col,
     PageHeader,
     Row,
-    Space,
+    Space, Spin,
     Table, Tag, Tooltip,
 
 } from "antd";
@@ -33,6 +33,9 @@ const SiswaKalenderMateri = () => {
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
 
     const userId = localStorage.getItem('user_id');
     const academicId = localStorage.getItem('academic_id')
@@ -42,7 +45,7 @@ const SiswaKalenderMateri = () => {
 
     const dataMateri = useSelector((state) => state.dataPathKalenderSiswa.allPath)
 
-    useEffect(() => {
+    const _getDataPertemuan = () => {
         axios.post(url_by_institute, {
                 "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
@@ -53,7 +56,7 @@ const SiswaKalenderMateri = () => {
                         "value": {
                             "tbl_induk": "x_academic_subjects_schedule_contents_meeting",
                             "select": [
-                                "x_academic_subjects_schedule_contents_meeting.contents_id",
+                                "x_academic_subjects_schedule_contents_meeting.id",
                                 "x_academic_subjects_schedule_contents_meeting.meeting_name",
                                 "x_academic_subjects_schedule_date.date",
                                 "x_academic_subjects_schedule_time.time_start",
@@ -110,11 +113,33 @@ const SiswaKalenderMateri = () => {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            const responseData = dataRes.message;
             setDataPertemuan(dataRes?.data);
             const pagination = dataRes?.links;
             setBtnPagination(pagination)
+            console.log(response)
+            if (responseData == "Success Found") {
+                setLoading(false)
+                setDataSuccess(true)
+            } else {
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
 
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getDataPertemuan()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
+    }
+
+    useEffect(() => {
+        _getDataPertemuan()
     }, [idMateri])
 
     let history = useHistory();
@@ -125,7 +150,7 @@ const SiswaKalenderMateri = () => {
     const data = dataPertemuan?.map((data, index) => {
         return {
             no: index + 1,
-            id: data.contents_id,
+            id: data.id,
             namaPertemuan: data.meeting_name,
             tanggalPertemuan: data.date,
             jam: `${data.time_start} - ${data.time_end}`,
@@ -159,7 +184,7 @@ const SiswaKalenderMateri = () => {
             responsive: ['sm'],
             render: (text, record) => (
                 <Space size="middle">
-                    <EyeOutlined onClick={() => handleRouter(record.id)} style={{ color: "black" }} />
+                    <EyeOutlined onClick={() => handleRouter(record.id)} style={{color: "black"}}/>
                 </Space>
             ),
         },
@@ -196,38 +221,40 @@ const SiswaKalenderMateri = () => {
                     </Row>
                 </Card>
 
-                <Table className=""
-                    columns={columns}
-                    dataSource={data}
-                    onChange={onChangeTable}
-                    pagination={false}
-                    rowClassName="bg-greylight text-grey-900" />
-                <div className='text-center mt-4'>
-                    {btnPagination?.map((dataBtn) => {
-                        const labelBtn = dataBtn.label;
-                        const label = labelBtn
-                            .replace(/(&laquo\;)/g, "")
-                            .replace(/(&raquo\;)/g, "");
-                        let linkUrl = dataBtn.url;
+                <Spin tip="Loading..." spinning={loading}>
+                    <Table className=""
+                           columns={columns}
+                           dataSource={data}
+                           onChange={onChangeTable}
+                           pagination={false}
+                           rowClassName="bg-greylight text-grey-900"/>
+                    <div className='text-center mt-4'>
+                        {btnPagination?.map((dataBtn) => {
+                            const labelBtn = dataBtn.label;
+                            const label = labelBtn
+                                .replace(/(&laquo\;)/g, "")
+                                .replace(/(&raquo\;)/g, "");
+                            let linkUrl = dataBtn.url;
 
-                        if (linkUrl != null) {
-                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
-                        }
+                            if (linkUrl != null) {
+                                linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                            }
 
-                        return (
-                            <Button
-                                className="btn btn-primary mr-2 font-xssss fw-600"
-                                disabled={linkUrl == null ? true : false}
-                                onClick={() => {
-                                    setParamsPage(linkUrl);
-                                }}
-                            >
-                                {label}
-                            </Button>
-                        );
-                    })}
-                </div>
-                <Adminfooter />
+                            return (
+                                <Button
+                                    className="btn btn-primary mr-2 font-xssss fw-600"
+                                    disabled={linkUrl == null ? true : false}
+                                    onClick={() => {
+                                        setParamsPage(linkUrl);
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            );
+                        })}
+                    </div>
+                </Spin>
+                <Adminfooter/>
             </div>
         )
     }
@@ -235,10 +262,10 @@ const SiswaKalenderMateri = () => {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
-                    <ViewPertemuan />
+                    <Appheader/>
+                    <ViewPertemuan/>
                 </div>
             </div>
         </Fragment>

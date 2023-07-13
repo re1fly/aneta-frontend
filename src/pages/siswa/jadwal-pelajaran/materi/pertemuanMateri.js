@@ -7,7 +7,7 @@ import {
     Col,
     PageHeader, Progress,
     Row,
-    Space,
+    Space, Spin,
     Table, Tag, Tooltip,
 
 } from "antd";
@@ -17,6 +17,7 @@ import {
     EyeOutlined, EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import {
+    fitur_presentase_pengerjaan_role_siswa,
     global_join_sub_where_get, role_siswa_get_pertemuan,
     url_by_institute,
 } from '../../../../api/reference';
@@ -30,6 +31,9 @@ const SiswaPertemuanMateri = () => {
     const [grid, setGrid] = useState(false);
     const [dataPertemuan, setDataPertemuan] = useState([])
     const [percentage, setPercentage] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
     const userId = localStorage.getItem('user_id');
@@ -42,33 +46,7 @@ const SiswaPertemuanMateri = () => {
     const mapel = path[1]
     const materi = path[2]
 
-    const progressPercentage = () => {
-        axios.post(url_by_institute, {
-                "processDefinitionId": "8f80d8f9-cc71-11ed-845a-4a8d2a16230d",
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "data",
-                        "type": "json",
-                        "value": {
-                            "id_content": idMateri,
-                            "email": userEmail
-                        }
-                    }
-                ]
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                }
-            }
-        ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            setPercentage(dataRes.persentase)
-        })
-    }
-
-    useEffect(() => {
+    const _getDataPertemuan = () => {
         axios.post(url_by_institute, {
                 "processDefinitionId": global_join_sub_where_get,
                 "returnVariables": true,
@@ -145,14 +123,58 @@ const SiswaPertemuanMateri = () => {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
+            const responseData = dataRes.message;
             setDataPertemuan(dataRes?.data);
             const pagination = dataRes?.links;
             setBtnPagination(pagination)
-            console.log(dataRes)
+            if (responseData == "Success Found") {
+                setLoading(false)
+                setDataSuccess(true)
+            } else {
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
+    const progressPercentage = () => {
+        axios.post(url_by_institute, {
+                "processDefinitionId": fitur_presentase_pengerjaan_role_siswa,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_content": idMateri,
+                            "email": userEmail
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            setPercentage(dataRes.persentase)
+        })
+    }
 
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getDataPertemuan()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
+    }
+
+    useEffect(() => {
+        _getDataPertemuan()
         progressPercentage()
-
     }, [idMateri])
 
     let history = useHistory();
@@ -264,37 +286,39 @@ const SiswaPertemuanMateri = () => {
                     </Col>
                 </Row>
 
-                <Table className=""
-                       columns={columns}
-                       dataSource={data}
-                       onChange={onChangeTable}
-                       pagination={false}
-                       rowClassName="bg-greylight text-grey-900"/>
-                <div className='text-center mt-4'>
-                    {btnPagination?.map((dataBtn) => {
-                        const labelBtn = dataBtn.label;
-                        const label = labelBtn
-                            .replace(/(&laquo\;)/g, "")
-                            .replace(/(&raquo\;)/g, "");
-                        let linkUrl = dataBtn.url;
+                <Spin tip="Loading..." spinning={loading}>
+                    <Table className=""
+                           columns={columns}
+                           dataSource={data}
+                           onChange={onChangeTable}
+                           pagination={false}
+                           rowClassName="bg-greylight text-grey-900"/>
+                    <div className='text-center mt-4'>
+                        {btnPagination?.map((dataBtn) => {
+                            const labelBtn = dataBtn.label;
+                            const label = labelBtn
+                                .replace(/(&laquo\;)/g, "")
+                                .replace(/(&raquo\;)/g, "");
+                            let linkUrl = dataBtn.url;
 
-                        if (linkUrl != null) {
-                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
-                        }
+                            if (linkUrl != null) {
+                                linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                            }
 
-                        return (
-                            <Button
-                                className="btn btn-primary mr-2 font-xssss fw-600"
-                                disabled={linkUrl == null ? true : false}
-                                onClick={() => {
-                                    setParamsPage(linkUrl);
-                                }}
-                            >
-                                {label}
-                            </Button>
-                        );
-                    })}
-                </div>
+                            return (
+                                <Button
+                                    className="btn btn-primary mr-2 font-xssss fw-600"
+                                    disabled={linkUrl == null ? true : false}
+                                    onClick={() => {
+                                        setParamsPage(linkUrl);
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            );
+                        })}
+                    </div>
+                </Spin>
                 <Adminfooter/>
             </div>
         )

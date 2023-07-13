@@ -126,6 +126,7 @@ function Login() {
           localStorage.setItem("institute", dataLogin.user.institute_id);
           localStorage.setItem("is_walikelas", dataLogin.is_walikelas);
           localStorage.setItem("user", email);
+          localStorage.setItem("role_id", dataLogin.user.user_role_id);
           localStorage.setItem("key", ciphertext);
           localStorage.setItem("walikelas_name", dataLogin.walikelas_name);
 
@@ -176,8 +177,6 @@ function Login() {
                 localStorage.setItem("url", dataRes.endpoint);
                 localStorage.setItem("school", dataRes.name);
               }
-              console.log(dataLogin);
-
               if (dataLogin.user.user_role_id === 1) {
                 localStorage.setItem("role", "admin");
                 localStorage.setItem(

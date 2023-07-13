@@ -4,7 +4,7 @@ import { Button, Modal, TimePicker, notification } from 'antd'
 
 import DatePicker from "react-multi-date-picker"
 import axios from "axios";
-import { url_by_institute } from "../../api/reference";
+import {insert_jadwal_pelajaran_time, url_by_institute} from "../../api/reference";
 import { useSelector } from "react-redux";
 import { pageLoad } from "../misc/loadPage";
 
@@ -34,7 +34,7 @@ export const FormAdminJadwalPelajaran = (props) => {
     const insertTime = () => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "insertjadwalpelajarantime:1:8961dc9b-49df-11ed-8f22-927b5be84510",
+                "processDefinitionId": insert_jadwal_pelajaran_time,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -78,7 +78,7 @@ export const FormAdminJadwalPelajaran = (props) => {
     const editDate = () => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "insertjadwalpelajarantime:1:8961dc9b-49df-11ed-8f22-927b5be84510",
+                "processDefinitionId": insert_jadwal_pelajaran_time,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -122,7 +122,7 @@ export const FormAdminJadwalPelajaran = (props) => {
     const editTime = () => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "insertjadwalpelajarantime:1:8961dc9b-49df-11ed-8f22-927b5be84510",
+                "processDefinitionId": insert_jadwal_pelajaran_time,
                 "returnVariables": true,
                 "variables": [
                     {

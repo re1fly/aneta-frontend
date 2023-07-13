@@ -168,8 +168,6 @@ function GuruNilaiPengetahuan() {
     const formData = new FormData(formCV);
 
     const teknikPenilaian = formData.getAll("teknik_penilaian");
-    console.log(teknikPenilaian);
-
     const bobotPenilaian = formData.getAll("bobot_penilaian");
     const namaPenilaian = formData.getAll("nama_penilaian");
     const classId = formData.get("id_class_filter");

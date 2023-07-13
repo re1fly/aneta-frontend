@@ -157,7 +157,6 @@ function CetakRapor() {
     }, [refreshState, academic])
 
     const handleDataErapor = () => {
-        console.log(selectAcademic, selectClass);
         setRefreshState(true)
         axios.post(url_by_institute,
             {
@@ -208,6 +207,7 @@ function CetakRapor() {
                 ]
             }
         ).then(function (response) {
+            console.log(response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value)
             setDataRapor(dataRes?.data)
         })

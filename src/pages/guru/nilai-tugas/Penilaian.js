@@ -36,7 +36,7 @@ import Search from "antd/es/input/Search";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import {
-    export_tugas,
+    export_tugas, role_guru_download_all_materi,
     role_guru_download_tugas,
     role_guru_get_list_penilaian_siswa_v2, role_guru_get_nilai_siswa_feedback,
     url_by_institute
@@ -58,11 +58,9 @@ function GuruPenilaian() {
     const userId = localStorage.getItem('user_id')
 
     const params = useParams()
-    console.log('params',params)
     const paramsId = params?.id?.split('-');
     const idContent = paramsId[0]
     const uploadTugas = paramsId[1]
-    console.log('uploadTugas',uploadTugas)
 
     const PathNilaiGuru = useSelector((state) => state.dataPathNilaiGuru)
     const kelas = PathNilaiGuru.kelas
@@ -107,6 +105,7 @@ function GuruPenilaian() {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const nilai = dataRes?.data
             setGetNilai(nilai);
+            console.log(dataRes)
         })
     }, [idContent, refreshState])
 
@@ -145,7 +144,7 @@ function GuruPenilaian() {
             }
         ).then(function (response) {
             const resData = JSON.parse(response?.data?.variables[2]?.value)
-            console.log(response);
+            console.log(resData);
             const dataFile = resData?.data?.decode
             const byteCharacters = atob(dataFile);
             const byteNumbers = new Array(byteCharacters.length);
@@ -158,6 +157,47 @@ function GuruPenilaian() {
             const link = document.createElement('a');
             link.href = url;
             link.setAttribute('download', `${record?.namaTugas} ${record?.namaSiswa}.${resData?.data?.extension}`); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        })
+    }
+
+    const _downloadAllFile = (record) => {
+        console.log(record.namaTugas)
+        axios.post(url_by_institute,
+            {
+                "processDefinitionId": role_guru_download_all_materi,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_content": idContent
+                        }
+                    }
+                ]
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
+            }
+        ).then(function (response) {
+            const resData = JSON.parse(response?.data?.variables[2]?.value)
+            console.log(resData);
+            const dataFile = resData?.decode
+           const byteCharacters = atob(dataFile);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], {type: 'application/octet-stream'});
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${PathNilaiGuru.pertemuan}.zip`); //or any other extension
             document.body.appendChild(link);
             link.click();
         })
@@ -279,7 +319,7 @@ function GuruPenilaian() {
                 idContent: data.id,
                 namaTugas: data.nama_materi,
                 namaSiswa: data.nama,
-                nilai: data.nilai,
+                nilai: Math.floor(data.nilai *100)/100,
                 keterangan: data.keterangan == true ? "Sudah Upload Tugas" : "Belum Upload Tugas",
                 isUpload: data.is_upload == true ? true : false,
                 id_wp: data.id_content_wp,
@@ -400,12 +440,16 @@ function GuruPenilaian() {
                                     onClick={() => _exportDataExcel()}>
                                 Download Nilai
                             </Button>
-                            <Button className="mr-4" style={{backgroundColor: '#00a629', color: 'white'}}
-                                    shape="round" size='middle'
-                                    disabled={getNilai.length < 1 ? true : false}
-                                    onClick={() => alert('tugas upload download')}>
-                                Download Semua File upload
-                            </Button>
+                            {
+                                uploadTugas == "true" ?
+                                    <Button className="mr-4" style={{backgroundColor: '#00a629', color: 'white'}}
+                                            shape="round" size='middle'
+                                            disabled={getNilai.length < 1 ? true : false}
+                                            onClick={_downloadAllFile}>
+                                        Download Semua File upload
+                                    </Button> : null
+                            }
+
 
                         </Col>
                         {/* <Col span={4}>
@@ -474,7 +518,7 @@ function GuruPenilaian() {
 
 
     const _getReview = (record) => {
-        console.log(record)
+        console.log('record',record)
         axios.post(url_by_institute, {
             "processDefinitionId": role_guru_get_nilai_siswa_feedback,
             "returnVariables": true,
@@ -524,6 +568,7 @@ function GuruPenilaian() {
     }
 
     const { Panel } = Collapse;
+
     const FormDetail = () => {
         return (
             <FormGuruNilaiTugas
@@ -547,46 +592,111 @@ function GuruPenilaian() {
 
                         const jawabanBenar = dataJawabanBenar == null ? dataJawabanBenar : dataJawabanBenar.join(', ');
                         const jawabanSiswa = dataJawabanSiswa == null ? dataJawabanSiswa : dataJawabanSiswa.join(', ');
+                        document.addEventListener("wheel", function(event) {
+                            if (document.activeElement.type === "number" &&
+                                document.activeElement.classList.contains("noscroll")) {
+                                document.activeElement.blur();
+                            }
+                        });
+                        if(data.image_file_path == null && data.audio_file_path == null && data.vidio_mime == "video/YouTube"){
+                            var sampleUrl = data.vidio_file_path;
+                            var ytId = sampleUrl.split("v=")[1].substring(0, 11)
+                        }
                         return (
                             <>
                                 {/*<Card title={index+1+'. ' + data.pertanyaan} bordered={false} style={{ width: 300 }}>*/}
                                 {/*    <p>{data.jawaban}</p>*/}
                                 {/*</Card>*/}
-                                    <h4>{index + 1 + '. ' + data.pertanyaan}</h4>
-                                <Collapse bordered={false} defaultActiveKey={['1', '3', '4']}>
+                                {
+                                    data.audio_file_path == null && data.vidio_file_path == null && data.image_file_path == null ? null :
+                                    data.audio_file_path == null && data.vidio_file_path == null ?
+                                    <img
+                                        src={`https://lms.aneta.id:8443/wp-content/uploads/h5p/content/${selectedUser.id_wp}/${data.image_file_path}`}
+                                        width={data.image_file_width}
+                                        height={data.image_file_height}
+                                        style={{maxWidth: 350, maxHeight: 350}}
+                                        className='d-block ml-auto mr-auto'
+                                    /> :
+                                    data.image_file_path == null && data.audio_file_path == null && data.vidio_mime == "video/YouTube"?
+                                        <iframe src={`https://www.youtube.com/embed/${ytId}`}
+                                                width="100%"
+                                                style={{ minHeight: '400px' }}
+                                                allowFullScreen
+                                                frameBorder={0}
+                                        /> :
+                                        data.image_file_path == null && data.audio_file_path == null && data.vidio_mime == "video/mp4"?
+                                            <iframe src={`https://lms.aneta.id:8443/wp-content/uploads/h5p/content/${selectedUser.id_wp}/${data.vidio_file_path}`}
+                                                    width="100%"
+                                                    style={{ minHeight: '400px' }}
+                                                    allowFullScreen
+                                                    frameBorder={0}
+                                            /> :
+                                        data.vidio_file_path  == null && data.image_file_path == null ?
+                                            <audio controls>
+                                                    <source src={`https://lms.aneta.id:8443/wp-content/uploads/h5p/content/${selectedUser.id_wp}/${data.audio_file_path}`} type="audio/mpeg"/>
+                                            </audio> : null
+                                }
+                                    <h4 className="mt-3">{index + 1 + '. ' + data.pertanyaan}</h4>
+                                <Collapse bordered={false} defaultActiveKey={['1', '3', '4', '5', '6']}>
                                     <Panel header="Jawaban Siswa" key="1">
-                                        {jawabanBenar}
-                                    </Panel>
-                                    <Panel header="Jawaban Benar" key="2">
                                         {jawabanSiswa}
                                     </Panel>
-                                    <Panel header="Nilai Siswa" key="3">
+                                    <Panel header="Jawaban Benar" key="2">
+                                        {jawabanBenar}
+                                    </Panel>
+                                    <Panel header="Nilai Siswa (Perhitungan lama)" key="3">
                                         <input
                                             type="hidden"
                                             name="id_review"
                                             className="form-control mb-1 w-25"
-                                            defaultValue={data.id}
+                                            value={data.id}
                                             required
                                         />
                                         <input
                                             type="number"
                                             name="nilai_review"
                                             className="form-control mb-1 w-25"
-                                            defaultValue={data.nilai}
-                                            required
+                                            value={data.nilai}
+                                            readOnly
                                         />
                                     </Panel>
-                                    <Panel header="Feedback" key="4">
+                                    <Panel header="Hasil Nilai Siswa (Perhitungan baru)" key="4">
+                                        <input
+                                            type="number"
+                                            name="nilai_siswa_baru"
+                                            className="form-control mb-1 w-25"
+                                            defaultValue={data.nilai_akumulasi}
+                                            disabled
+                                        />
+                                    </Panel>
+                                    <Panel header="Nilai Siswa" key="5">
+                                        <input
+                                            type="number"
+                                            name="nilai_bobot"
+                                            className="form-control mb-1 w-25 noscroll"
+                                            defaultValue={parseInt(data.bobot_siswa)}
+                                            required
+                                            onKeyUp={(e) => {
+                                                if (parseInt(e.target.value) > parseInt(data.passPersentase)) {
+                                                   e.target.value = parseInt(data.passPersentase);
+                                                }
+                                            }}
+                                        />
+                                        <div>
+                                            <span className="font-xssss" style={{color: 'red'}}>Note: Nilai tidak boleh lebih dari bobot soal</span>
+                                        </div>
+                                    </Panel>
+                                    <Panel header="Feedback" key="6">
                                          <textarea
                                              className="form-control mb-0 p-3 lh-16"
                                              rows="5"
-                                             placeholder=""
                                              name="feedback_review"
                                              defaultValue={data.feedback}
                                          ></textarea>
                                     </Panel>
                                 </Collapse>
                                 {/*<Badge key={index} color={'orange'} text={new Date(time).toUTCString()} />*/}
+                                <span className='float-left p-2 font-xsss font-weight-bold text-info'>Bobot soal : {data.passPersentase}</span>
                                 <span className='float-right p-2 font-xssss text-ornage'>{new Date(time).toUTCString()}</span>
 
                                 <Divider/>

@@ -5,7 +5,7 @@ import { Button, Modal, TimePicker, notification, Table } from 'antd'
 
 import DatePicker from "react-multi-date-picker"
 import axios from "axios";
-import { jadwal_pelajaran_get_date, url_by_institute } from "../../api/reference";
+import {insert_jadwal_pelajaran_time, jadwal_pelajaran_get_date, url_by_institute} from "../../api/reference";
 import { useSelector } from "react-redux";
 import { pageLoad } from "../misc/loadPage";
 import { Fragment } from "react";
@@ -46,7 +46,7 @@ export const FormAdminJadwalPelajaranJam = (props) => {
     const insertTime = () => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "insertjadwalpelajarantime:1:8961dc9b-49df-11ed-8f22-927b5be84510",
+                "processDefinitionId": insert_jadwal_pelajaran_time,
                 "returnVariables": true,
                 "variables": [
                     {

@@ -1,15 +1,18 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import React, {Fragment, useEffect, useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
 import Adminfooter from "../../../../components/Adminfooter";
 import Navheader from "../../../../components/Navheader";
 import Appheader from "../../../../components/Appheader";
 
 import axios from "axios";
-import { role_siswa_get_daftar_materi, url_by_institute } from "../../../../api/reference";
-import { PageHeader } from 'antd';
+import {role_siswa_get_daftar_materi, url_by_institute} from "../../../../api/reference";
+import {PageHeader, Spin} from 'antd';
 
 function SiswaDataTugas() {
     const [getTugas, setGetTugas] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
 
     const userId = localStorage.getItem('user_id');
     const institute = localStorage.getItem('institute');
@@ -20,23 +23,23 @@ function SiswaDataTugas() {
     const idMapel = path[0];
     const mapel = path[1];
 
-    useEffect(() => {
+    const _getPertemuanTugas = () => {
         axios.post(url_by_institute, {
-            "processDefinitionId": role_siswa_get_daftar_materi,
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "data",
-                    "type": "json",
-                    "value": {
-                        "id_academic": academicId,
-                        "id_user": userId,
-                        "id_matpel": idMapel,
-                        "type": 2
+                "processDefinitionId": role_siswa_get_daftar_materi,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_academic": academicId,
+                            "id_user": userId,
+                            "id_matpel": idMapel,
+                            "type": 2
+                        }
                     }
-                }
-            ]
-        },
+                ]
+            },
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -46,8 +49,29 @@ function SiswaDataTugas() {
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetTugas(dataRes?.data);
+            const responseCode = dataRes.code;
+            if (responseCode == 200) {
+                setLoading(false)
+                setDataSuccess(true)
+            } else {
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
 
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getPertemuanTugas()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
+    }
+
+    useEffect(() => {
+        _getPertemuanTugas()
     }, [userId, academicId, idMapel]);
 
     const data = getTugas?.map((data, index) => {
@@ -66,9 +90,9 @@ function SiswaDataTugas() {
     return (
         <Fragment>
             <div id="main-wrapper">
-                <Navheader />
+                <Navheader/>
                 <div className='main-content'>
-                    <Appheader />
+                    <Appheader/>
                     <div className="container px-3 py-4">
                         <div className="row mb-3">
                             <div className="col-lg-12">
@@ -95,28 +119,31 @@ function SiswaDataTugas() {
                                     </div>
                                 </div> */}
                                 <div className='mt-4'>
-                                    <div className="row">
-                                        {data?.map((value, index) => (
-                                            <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
-                                                {/* <Link to='/siswa-pertemuan-tugas'> */}
-                                                <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center"
-                                                    onClick={() => handleRouter(value.id, mapel, value.namaTugas)}>
-                                                    <h4 className="media fw-700 font-lg mt-1 mb-3">{value.namaTugas}</h4>
-                                                    <div className="clearfix "></div>
-                                                    <div className='media'>
-                                                        {value.tag1 ? (
-                                                            <span
-                                                                className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
+                                    <Spin tip="Loading..." spinning={loading} className='mt-5'>
+                                        <div className="row">
+                                            {data?.map((value, index) => (
+                                                <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
+                                                    {/* <Link to='/siswa-pertemuan-tugas'> */}
+                                                    <div
+                                                        className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center"
+                                                        onClick={() => handleRouter(value.id, mapel, value.namaTugas)}
+                                                        style={{minHeight: '180px'}}>
+                                                        <h4 className="media fw-700 font-lg mt-1 mb-3">{value.namaTugas}</h4>
+                                                        <div className="clearfix "></div>
+                                                        <div className='media'>
+                                                            {value.tag1 ? (
+                                                                <span
+                                                                    className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
                                                                 {value.tag1}
                                                             </span>
-                                                        ) : (
-                                                            <span
-                                                                className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
+                                                            ) : (
+                                                                <span
+                                                                    className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-success d-inline-block text-success mb-1 mr-1">
                                                                 {value.pertemuan} Pertemuan
                                                             </span>
-                                                        )}
-                                                        <div className='ml-2'></div>
-                                                        {/* {value.tag2 ? (
+                                                            )}
+                                                            <div className='ml-2'></div>
+                                                            {/* {value.tag2 ? (
                                                                 <span
                                                                     className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 bg-lightblue d-inline-block text-grey-800 mb-1 mr-1">
                                                                     {value.tag2}
@@ -127,25 +154,26 @@ function SiswaDataTugas() {
                                                                     Tugas Kosong
                                                                 </span>
                                                             )} */}
-                                                        {value.tag3 ? (
-                                                            <span
-                                                                className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-info d-inline-block text-info mb-6">
+                                                            {value.tag3 ? (
+                                                                <span
+                                                                    className="font-xsssss fw-700 pl-3 pr-3 lh-32 text-uppercase rounded-xxl ls-2 alert-info d-inline-block text-info mb-6">
                                                                 {value.tag3}
                                                             </span>
-                                                        ) : (
-                                                            ''
-                                                        )}
+                                                            ) : (
+                                                                ''
+                                                            )}
+                                                        </div>
                                                     </div>
+                                                    {/* </Link> */}
                                                 </div>
-                                                {/* </Link> */}
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    </Spin>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <Adminfooter />
+                    <Adminfooter/>
                 </div>
             </div>
         </Fragment>

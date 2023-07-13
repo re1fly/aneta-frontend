@@ -54,7 +54,7 @@ export default function DataEkstrakurikuler() {
 
     const _getEkskul = () => {
         axios.post(url_by_institute, {
-                "processDefinitionId": "getekstrakurikuler:2:6ed4a14b-6a2b-11ed-bb6a-a2fb3d782380",
+                "processDefinitionId": get_extrakurikuler,
                 "returnVariables": true,
                 "variables": [
                     {

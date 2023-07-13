@@ -143,8 +143,8 @@ export const FormAdminPelajaran = (props) => {
                                                     name="agama"
                                                     disabled={props.isDisabled}
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Agama
+                                                    <option value={props.valAgama} selected disabled>
+                                                        {props.valAgama == null ? "Pilih Agama" : props.agama}
                                                     </option>
                                                     <option value="islam">
                                                         Islam
@@ -178,9 +178,11 @@ export const FormAdminPelajaran = (props) => {
                                                     aria-label="Default select example"
                                                     name="kebutuhan_khusus"
                                                     disabled={props.isDisabled}
+                                                    onChange={handleChange}
+                                                    required
                                                 >
-                                                    <option value="" selected disabled>
-                                                        Pilih Jenis
+                                                    <option value={props.valKebutuhan} selected disabled>
+                                                        {props.kebutuhankhusus == null ? "Pilih Jenis" : props.kebutuhankhusus}
                                                     </option>
                                                     <option value={true}>
                                                         Iya

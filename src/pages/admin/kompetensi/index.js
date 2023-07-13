@@ -35,9 +35,10 @@ import Filter from "../../../components/Filter";
 import { FormKompetensi } from "../../../components/form/Adminkompetensi";
 import Swal from "sweetalert2";
 import {
+  export_kompetensi,
   get_data_pelajaran_by_tingkat,
   get_kompetensi_dashboard,
-  get_where_no_join, global_delete_record, insert_kompetensi,
+  get_where_no_join, global_delete_record, import_kompetensi, insert_kompetensi,
   url_by_institute
 } from "../../../api/reference";
 import { pageLoad } from "../../../components/misc/loadPage";
@@ -209,7 +210,7 @@ export default function KompetensiAdmin() {
 
   const _exportDataExcel = () => {
     axios.post(url_by_institute, {
-      "processDefinitionId": "exportkompetensi:1:da28dac1-9556-11ed-9c1d-6ea2a406192e",
+      "processDefinitionId": export_kompetensi,
       "returnVariables": true,
       "variables": [
         {
@@ -272,7 +273,7 @@ export default function KompetensiAdmin() {
 
     axios.post(url_by_institute,
       {
-        "processDefinitionId": "importkompetensi:1:90f2c61b-955d-11ed-9c1d-6ea2a406192e",
+        "processDefinitionId": import_kompetensi,
         "returnVariables": true,
         "variables": [
           {

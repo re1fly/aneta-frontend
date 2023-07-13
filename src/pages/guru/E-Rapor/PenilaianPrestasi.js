@@ -2,19 +2,19 @@ import axios from "axios";
 import Navheader from "../../../components/Navheader";
 import Appheader from "../../../components/Appheader";
 import Adminfooter from "../../../components/Adminfooter";
-import React, { Fragment, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getProcessId } from "../../../redux/Action";
-import { PageHeader, notification, Select, Card, Row, Table, Input } from "antd"
-import { GetMapelKelas } from "../../../components/filter/GetMapelKelas";
-import { DataNotFound } from "../../../components/misc/DataNotFound";
+import React, {Fragment, useState, useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {getProcessId} from "../../../redux/Action";
+import {PageHeader, notification, Select, Card, Row, Table, Input, Modal, Button} from "antd"
+import {GetMapelKelas} from "../../../components/filter/GetMapelKelas";
+import {DataNotFound} from "../../../components/misc/DataNotFound";
 import {
     get_input_deskripsi,
     global_join_sub_where_get,
-    input_data_deskripsi, role_guru_get_sub_class,
+    input_data_deskripsi, role_guru_get_prestasi, role_guru_get_sub_class, role_guru_insert_prestasi,
     url_by_institute
 } from "../../../api/reference";
-import { GetMapelKelasGuru } from "../../../components/filter/GetMapelKelasGuru";
+import {GetMapelKelasGuru} from "../../../components/filter/GetMapelKelasGuru";
 
 function PenilaianPrestasi() {
     const userId = localStorage.getItem("user_id");
@@ -27,7 +27,71 @@ function PenilaianPrestasi() {
     const [tingkatKelas, setTingkatKelas] = useState([])
     const [subKelas, setSubKelas] = useState([]);
     const [dataSiswa, setDataSiswa] = useState([])
+    const [selectedSiswa, setSelectedSiswa] = useState([])
+    const [selectedIdSiswa, setSelectedIdSiswa] = useState(null);
     console.log(JSON.stringify(deskripsiNilai, null, 2));
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [totalPrestasi, setTotalPrestasi] = useState(0);
+    const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+    const handleOk = () => {
+        setLoadingSubmit(true)
+
+        const formCV = document.querySelector("#form_prestasi");
+        const formData = new FormData(formCV);
+        const prestasi = formData.getAll("prestasi_new");
+        const keterangan_prestasi = formData.getAll("keterangan_prestasi_new");
+        const allPrestasi = [];
+        const idSiswa = selectedIdSiswa
+
+        for (let i = 0; i < totalPrestasi; i++) {
+            allPrestasi.push({
+                id: idSiswa,
+                jenis_prestasi: prestasi[i],
+                keterangan: keterangan_prestasi[i]
+            });
+        }
+        console.log(allPrestasi)
+
+        axios.post(url_by_institute, {
+            "processDefinitionId": role_guru_insert_prestasi,
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "data",
+                    "type": "json",
+                    "value": {
+                        "data": allPrestasi
+                    }
+                }
+            ]
+        })
+            .then(function (response) {
+                const dataApi = JSON.parse(response?.data?.variables[2]?.value);
+                const resCode = dataApi.code;
+                if (resCode == true) {
+                    notification.success({
+                        message: "Sukses",
+                        description: "Input Prestasi Sukses",
+                        placement: "top",
+                    });
+                    setLoadingSubmit(false)
+                    setIsModalOpen(false)
+                    setTotalPrestasi(0)
+                } else {
+                    notification.error({
+                        message: "Gagal",
+                        description: "Mohon cek kembali inputan anda",
+                        placement: "top",
+                    });
+                }
+            })
+
+        // setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
     const _getTingkatKelas = () => {
         axios
@@ -101,7 +165,7 @@ function PenilaianPrestasi() {
     }
     const _getSiswa = () => {
         axios.post(url_by_institute, {
-            "processDefinitionId": "rolegurugetprestasi:1:9b31c4ff-d1d6-11ed-953f-d2e8b005a012",
+            "processDefinitionId": role_guru_get_prestasi,
             "returnVariables": true,
             "variables": [
                 {
@@ -118,7 +182,64 @@ function PenilaianPrestasi() {
                 const dataApi = JSON.parse(response?.data?.variables[2]?.value);
                 const data = dataApi?.data;
                 setDataSiswa(data);
-                console.log(data)
+            })
+    }
+    const _getSiswaDetail = (id) => {
+        axios.post(url_by_institute, {
+            "processDefinitionId": "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
+            "returnVariables": true,
+            "variables": [
+                {
+                    "name": "global_join_where_sub",
+                    "type": "json",
+                    "value": {
+                        "tbl_induk": "x_eraport_prestasi",
+                        "select": [
+                            "x_eraport_prestasi.jenis_prestasi",
+                            "x_eraport_prestasi.keterangan"
+                        ],
+                        "paginate": false,
+                        "join": [
+                            {
+                                "tbl_join": "x_academic_students",
+                                "refkey": "id",
+                                "tbl_join2": "x_eraport_prestasi",
+                                "foregenkey": "student_id"
+                            }, {
+                                "tbl_join": "users",
+                                "refkey": "id",
+                                "tbl_join2": "x_academic_students",
+                                "foregenkey": "user_id"
+                            }
+                        ],
+                        "where": [
+                            {
+                                "tbl_coloumn": "x_eraport_prestasi",
+                                "tbl_field": "deleted_at",
+                                "tbl_value": "",
+                                "operator": "="
+                            }, {
+                                "tbl_coloumn": "x_eraport_prestasi",
+                                "tbl_field": "student_id",
+                                "tbl_value": id,
+                                "operator": "="
+                            }
+                        ],
+                        "order_coloumn": "users.name",
+                        "order_by": "asc"
+                    }
+                },
+                {
+                    "name": "page",
+                    "type": "string",
+                    "value": "1"
+                }
+            ]
+        })
+            .then(function (response) {
+                const dataApi = JSON.parse(response?.data?.variables[3]?.value);
+                const data = dataApi?.data;
+                setSelectedSiswa(data)
             })
     }
 
@@ -130,188 +251,6 @@ function PenilaianPrestasi() {
         console.log('search:', val);
     }
 
-    const _getDataDeskripsiNilai = (e) => {
-        e.preventDefault();
-        const data = {};
-        for (const el of e.target.elements) {
-            if (el.name !== "") data[el.name] = el.value;
-        }
-        console.log(data)
-        axios.post(url_by_institute,
-            {
-                "processDefinitionId": get_input_deskripsi,
-                "returnVariables": true,
-                "variables": [
-                    {
-                        "name": "get_data",
-                        "type": "json",
-                        "value": {
-                            "id_class": data.id_class_filter, // 86 untuk test data.id_class_filter
-                            "id_academic": academic,
-                            "id_matpel": data.id_mapel_filter // 219 untuk test data.id_mapel_filter
-                        }
-                    }
-                ]
-            }
-            ,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                },
-            }
-        ).then(function (response) {
-            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-            // console.log(dataRes.siswa);
-            setDeskripsiNilai(dataRes?.siswa)
-
-            // if (dataRes[0].data.length >= 2) {
-            //     setDeskripsiNilai(dataRes?.siswa)
-            //     notification.success({
-            //         message: "Data Ditemukan",
-            //         description: "Data Dapat dilihat dalam table",
-            //         placement: 'top'
-            //     })
-            // } else {
-            //     setDeskripsiNilai(null)
-            //     notification.info({
-            //         message: "Not Found",
-            //         description: "Data tidak ditemukan",
-            //         placement: 'top'
-            //     })
-            // }
-
-        }, [academic])
-    }
-
-    const _submitNilai = (e) => {
-        const formCV = document.querySelector('#form_deskripsi');
-        const formData = new FormData(formCV);
-
-        const deskripsiPengetahuan = formData.getAll('deskripsi_pengetahuan');
-        const deskripsiKeterampilan = formData.getAll('deskripsi_keterampilan');
-        const nilaiPengetahuan = formData.getAll('nilai_pengetahuan')
-        const nilaiKeterampilan = formData.getAll('nilai_keterampilan')
-
-        const allDeskripsi = [];
-        console.log(allDeskripsi);
-        const Pengetahuan = [];
-        const Keterampilan = [];
-
-        for (let i = 0; i < deskripsiPengetahuan.length; i++) {
-            Pengetahuan.push(
-                {
-                    // "assessment_header_id": 102,
-                    "id_aspect": 1,
-                    "competence_aspect": "Pengetahuan",
-                    "given_description": deskripsiPengetahuan[i]
-                },
-            );
-        }
-        for (let i = 0; i < deskripsiPengetahuan.length; i++) {
-            Keterampilan.push(
-                {
-                    // "assessment_header_id": 102,
-                    "id_aspect": 2,
-                    "competence_aspect": "Keterampilan",
-                    "given_description": deskripsiKeterampilan[i]
-                },
-            );
-        }
-        const checkDataFunc = () => {
-            let checkData1 =[];
-            deskripsiNilai.map((dd, i) => {
-                if (dd.data.length != 0) {
-                    checkData1.push('ada')
-                } else {
-                    checkData1.push('kosong')
-
-                }
-            })
-            return !checkData1.includes('kosong');
-        }
-        // console.log(checkDataFunc());
-
-        if (checkDataFunc()) {
-            deskripsiNilai.map((siswa, i) => {
-                allDeskripsi.push(
-                    {
-                        "nama_siswa": siswa.nama_siswa,
-                        "id_siswa": siswa.id_siswa,
-                        "data": [
-                            {
-                                ...Pengetahuan[i],
-                                "given_value": siswa?.data[0]?.given_value,
-                                "assessment_header_id": siswa?.data[0]?.assessment_header_id,
-
-                            },
-                            {
-                                ...Keterampilan[i],
-                                "given_value": siswa?.data[1]?.given_value,
-                                "assessment_header_id": siswa?.data[0]?.assessment_header_id,
-                            }
-                        ]
-                    },
-                );
-            });
-        }
-
-        console.log(JSON.stringify(allDeskripsi, null, 2));
-
-        if (checkDataFunc()) {
-            axios
-                .post(
-                    url_by_institute, {
-                        "processDefinitionId": input_data_deskripsi,
-                        "returnVariables": true,
-                        "variables": [
-                            {
-                                "name": "get_data",
-                                "type": "json",
-                                "value": {
-                                    "created_by": userId,
-                                    "siswa":
-                                    allDeskripsi,
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Basic YWRtaW46TWFuYWczciE="
-                        },
-                    }
-                )
-                .then(function (response) {
-                    const dataRes = JSON.parse(response.data.variables[2].value);
-                    // console.log(dataRes);
-                    const resCode = dataRes.code;
-                    // console.log(resCode);
-                    if (resCode === true) {
-                        notification.success({
-                            message: "Sukses",
-                            description: "Deskripsi nilai berhasil di input",
-                            placement: 'top'
-                        })
-                    } else {
-                        notification.info({
-                            message: "Gagal",
-                            description: "Deskripsi nilai tidak berhasil di input",
-                            placement: 'top'
-                        })
-                    }
-                })
-        } else {
-            console.log("data ada yang kosong");
-            notification.info({
-                message: "Gagal Simpan data",
-                description: "Data ada yang kosong",
-                placement: 'top'
-            })
-        }
-
-    }
 
     useEffect(() => {
         _getTingkatKelas();
@@ -328,9 +267,116 @@ function PenilaianPrestasi() {
     return (
         <Fragment>
             <div className="main-wrapper">
-                <Navheader />
+                <Modal title="List Prestasi" visible={isModalOpen} width={1000} footer={[
+                    <Button key="back" onClick={handleCancel}>
+                        Kembali
+                    </Button>,
+                    <Button key="submit" type="primary" loading={loadingSubmit} onClick={handleOk}>
+                        Submit
+                    </Button>,
+                ]}>
+                    <div className="table-responsive-xl">
+                        <form id="form_prestasi">
+                        <table className="table table-bordered">
+                            <thead>
+                            <tr className="bg-current text-light">
+                                <th scope="col" className="text-center">Jenis Prestasi</th>
+                                <th scope="col" className="text-center">
+                                    keterangan
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {selectedSiswa.map((value) => {
+                                return (
+                                    <tr>
+                                        <th>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                name="prestasi"
+                                                value={value.jenis_prestasi}
+                                                disabled
+                                            />
+                                        </th>
+                                        <th>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                name="keterangan_prestasi"
+                                                value={value.keterangan}
+                                                disabled
+                                            />
+                                        </th>
+                                    </tr>
+                                );
+                            })}
+                                {[...Array(Number(totalPrestasi)).keys()].map(
+                                    (data, index) => {
+                                        return (
+                                            <tr>
+                                                <th>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="prestasi_new"
+                                                    />
+                                                </th>
+                                                <th>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="keterangan_prestasi_new"
+                                                    />
+                                                </th>
+                                            </tr>
+                                        );
+                                    }
+                                )}
+                            </tbody>
+                            <div className="ml-3">
+                                <button
+                                    className="bg-facebook border-0 text-white font-xssss fw-600 p-3 mt-3 mb-3 rounded-lg"
+                                    onClick={() => {
+                                        setTotalPrestasi(totalPrestasi + 1)
+                                    }}
+                                    type="button"
+                                >
+                                    Tambah Prestasi
+                                </button>
+                                {totalPrestasi >= 1 ?
+                                    <button
+                                        className="bg-danger border-0 text-white font-xssss fw-600 p-3 m-3 rounded-lg"
+                                        onClick={() => {
+                                            setTotalPrestasi(totalPrestasi - 1)
+                                        }}
+                                        type="button"
+                                    >
+                                        Hapus Kolom Baru
+                                    </button> : null
+                                }
+                            </div>
+                        </table>
+                        </form>
+                        {/*<div className="mt-5 float-right">*/}
+                        {/*    <button*/}
+                        {/*        className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"*/}
+                        {/*        onClick={_submitPenilaian}*/}
+                        {/*    >*/}
+                        {/*        Submit Nilai*/}
+                        {/*    </button>*/}
+                        {/*    <a*/}
+                        {/*        onClick={() => window.history.back()}*/}
+                        {/*        className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"*/}
+                        {/*    >*/}
+                        {/*        Batal*/}
+                        {/*    </a>*/}
+                        {/*</div>*/}
+                    </div>
+                </Modal>
+                <Navheader/>
                 <div className="main-content">
-                    <Appheader />
+                    <Appheader/>
                     <div className="container px-3 py-4 ">
                         <PageHeader
                             className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
@@ -375,100 +421,77 @@ function PenilaianPrestasi() {
                                 </div>
                             </div>
                         </div>
-                        {deskripsiNilai == null || deskripsiNilai.length == 0 ?
-                            <DataNotFound />
-                            :
-                            <form id="form_deskripsi">
-                                <div className="mt-4">
+                        {dataSiswa.length >= 1 ?
+                            <div className="col-lg-12 pt-3">
+                                <div className="table-responsive-xl">
                                     <table className="table table-bordered">
                                         <thead>
-                                        <tr className="bg-current text-light text-center">
-                                            <th scope="col">No</th>
+                                        <tr className="bg-current text-light">
                                             <th scope="col">Nama Siswa</th>
-                                            <th scope="col">Jenis Prestasi</th>
-                                            <th scope="col">Keterangan</th>
+                                            <th scope="col" className="text-center">
+                                                Prestasi
+                                            </th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {deskripsiNilai?.map((siswa, index) => {
+                                        {dataSiswa.map((value) => {
                                             return (
                                                 <tr>
-                                                    <td className="text-center">
-                                                        {index + 1}
-                                                    </td>
-                                                    <th className="text-center">
-                                                        {siswa.nama_siswa}
+                                                    <th
+                                                        scope="row"
+                                                        style={{
+                                                            lineHeight: 3.5,
+                                                            textTransform: "capitalize",
+                                                        }}
+                                                    >
+                                                        {value.nama}
                                                     </th>
-                                                    {siswa?.data == null || siswa.data.length == 0 ? (
-                                                        <>
-                                                            <td className="text-center">
-
-                                                            </td>
-                                                            <td>
-                                                                    <textarea
-                                                                        className="form-control"
-                                                                        aria-label="Default"
-                                                                        name='deskripsi_pengetahuan'
-                                                                    />
-                                                            </td>
-                                                            <td className="text-center">
-
-                                                            </td>
-                                                            <td>
-                                                                    <textarea
-                                                                        className="form-control"
-                                                                        aria-label="Default"
-                                                                        name='deskripsi_keterampilan'
-                                                                    />
-                                                            </td>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <td>
-                                                                    <textarea
-                                                                        className="form-control"
-                                                                        aria-label="Default"
-                                                                        name='deskripsi_pengetahuan'
-                                                                        defaultValue={siswa?.data[0]?.given_description}
-                                                                    />
-                                                            </td>
-                                                            <td>
-                                                                    <textarea
-                                                                        className="form-control"
-                                                                        aria-label="Default"
-                                                                        name='deskripsi_keterampilan'
-                                                                        defaultValue={siswa?.data[1]?.given_description}
-                                                                    />
-                                                            </td>
-                                                        </>
-                                                    )}
-
+                                                    <td>
+                                                        <div className="text-center">
+                                                            <button
+                                                                className="bg-current border-0 text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
+                                                                onClick={() => {
+                                                                    setIsModalOpen(true);
+                                                                    _getSiswaDetail(value.id)
+                                                                    setSelectedIdSiswa(value.id)
+                                                                }}
+                                                                type="button"
+                                                            >
+                                                                List Prestasi
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <input
+                                                        type="hidden"
+                                                        className="form-control"
+                                                        name="id_siswa"
+                                                        required
+                                                        value={value.id}
+                                                    />
                                                 </tr>
-                                            )
+                                            );
                                         })}
-
                                         </tbody>
                                     </table>
+                                    {/*<div className="mt-5 float-right">*/}
+                                    {/*    <button*/}
+                                    {/*        className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"*/}
+                                    {/*        onClick={_submitPenilaian}*/}
+                                    {/*    >*/}
+                                    {/*        Submit Nilai*/}
+                                    {/*    </button>*/}
+                                    {/*    <a*/}
+                                    {/*        onClick={() => window.history.back()}*/}
+                                    {/*        className="ml-2 bg-lightblue text-center text-blue font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"*/}
+                                    {/*    >*/}
+                                    {/*        Batal*/}
+                                    {/*    </a>*/}
+                                    {/*</div>*/}
                                 </div>
-                            </form>
+                            </div> : <DataNotFound/>
                         }
-                        <div className="col-lg-12 mt-5 mb-5 d-flex justify-content-end">
-                            <button
-                                className="bg-current border-0 text-center text-white font-xsss p-3 fw-600 w150 rounded-xl d-inline-block mr-2 mt-5"
-                                type="submit"
-                                onClick={_submitNilai}
-                            >
-                                Simpan
-                            </button>
-                            <button
-                                className="bg-lightblue border-0 text-center font-xsss fw-600 p-3 w150 rounded-xl d-inline-block mt-5"
-                                onClick={() => setDeskripsiNilai(null)}
-                            >
-                                Batal
-                            </button>
-                        </div>
                     </div>
-                    <Adminfooter />
+                    <Adminfooter/>
                 </div>
             </div>
         </Fragment>

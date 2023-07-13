@@ -7,10 +7,13 @@ import Appheader from "../../../../components/Appheader";
 
 import axios from "axios";
 import { role_siswa_get_daftar_materi, url_by_institute } from "../../../../api/reference";
-import { PageHeader } from 'antd';
+import {PageHeader, Spin} from 'antd';
 
 function SiswaDataMateri() {
     const [getMateri, setGetMateri] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
 
     const userId = localStorage.getItem('user_id');
     const institute = localStorage.getItem('institute')
@@ -21,23 +24,23 @@ function SiswaDataMateri() {
     const idMapel = path[0]
     const mapel = path[1]
 
-    useEffect(() => {
+    const _getPertemuanMateri = () => {
         axios.post(url_by_institute, {
-            "processDefinitionId": role_siswa_get_daftar_materi,
-            "returnVariables": true,
-            "variables": [
-                {
-                    "name": "data",
-                    "type": "json",
-                    "value": {
-                        "id_academic": academicId,
-                        "id_user": userId,
-                        "id_matpel": idMapel,
-                        "type": 1
+                "processDefinitionId": role_siswa_get_daftar_materi,
+                "returnVariables": true,
+                "variables": [
+                    {
+                        "name": "data",
+                        "type": "json",
+                        "value": {
+                            "id_academic": academicId,
+                            "id_user": userId,
+                            "id_matpel": idMapel,
+                            "type": 1
+                        }
                     }
-                }
-            ]
-        },
+                ]
+            },
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -47,8 +50,29 @@ function SiswaDataMateri() {
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             setGetMateri(dataRes?.data);
+            const responseCode = dataRes.code;
+            if (responseCode == 200) {
+                setLoading(false)
+                setDataSuccess(true)
+            } else {
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
 
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getPertemuanMateri()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
+    }
+
+    useEffect(() => {
+        _getPertemuanMateri()
     }, [userId, academicId, idMapel]);
 
     const data = getMateri?.map((data, index) => {
@@ -96,10 +120,12 @@ function SiswaDataMateri() {
                                     </div>
                                 </div> */}
                                 <div className='mt-4'>
+                                    <Spin tip="Loading..." spinning={loading} className='mt-5'>
                                     <div className="row">
                                         {data?.map((value, index) => (
                                             <div className="col-xl-4 col-lg-6 col-md-6" key={index}>
                                                 <div className="card mb-4 d-block w-100 shadow-md rounded-lg p-xxl-5 p-4 border-0 text-center"
+                                                     style={{minHeight: '180px'}}
                                                     onClick={() => handleRouter(value.id, mapel, value.namaMateri)}>
                                                     <h4 className="media fw-700 font-lg mt-1 mb-3">{value.namaMateri}</h4>
                                                     <div className="clearfix "></div>
@@ -140,6 +166,7 @@ function SiswaDataMateri() {
                                             </div>
                                         ))}
                                     </div>
+                                    </Spin>
                                 </div>
                             </div>
                         </div>

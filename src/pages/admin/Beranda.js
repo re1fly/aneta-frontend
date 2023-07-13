@@ -13,7 +13,7 @@ import {BASE_URL} from "../../api/Url";
 import {Link, useHistory} from "react-router-dom";
 import {RequiredTooltip} from "../../components/misc/RequiredTooltip";
 import {ReactSearchAutocomplete} from "react-search-autocomplete";
-import {create_institute, dashboard_admin} from "../../api/reference";
+import {create_institute, dashboard_admin, get_where_no_join, get_where_no_join_first} from "../../api/reference";
 import {FormDaerah} from "../../components/form/FormDaerah.js";
 
 const lineChart = {
@@ -82,7 +82,7 @@ function BerandaAdmin() {
             //getacademic
             console.log('institute: ',institute)
             axios.post(BASE_URL, {
-                    "processDefinitionId": "getwherenojoin:1:3510ed73-2cc3-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": get_where_no_join,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -574,7 +574,7 @@ function BerandaAdmin() {
 
         const handleOnSearch = (string, results) => {
             axios.post(BASE_URL, {
-                    "processDefinitionId": "getwherenojoinfirst:1:84d5c713-2cc7-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": get_where_no_join_first,
                     "returnVariables": true,
                     "variables": [
                         {

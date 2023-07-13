@@ -36,7 +36,7 @@ import { FormKompetensi } from "../../../components/form/Adminkompetensi";
 import Swal from "sweetalert2";
 import {
     get_data_pelajaran_by_tingkat,
-    get_kompetensi_dashboard,
+    get_kompetensi_dashboard, get_kompetensi_pertemuan_role_guru,
     get_where_no_join, global_delete_record, global_join_sub_where_get, insert_kompetensi,
     role_guru_get_matpel,
     url_by_institute
@@ -324,7 +324,7 @@ export default function KompetensiGuru() {
 
     const _getKompetensiPertemuan = () => {
         axios.post(url_by_institute, {
-                "processDefinitionId": "e32d3db3-c6fa-11ed-845a-4a8d2a16230d",
+                "processDefinitionId": get_kompetensi_pertemuan_role_guru,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -347,7 +347,7 @@ export default function KompetensiGuru() {
 
     const _getKompetensiKompetensi = () => {
         axios.post(url_by_institute, {
-                "processDefinitionId": "e32d3db3-c6fa-11ed-845a-4a8d2a16230d",
+                "processDefinitionId": get_kompetensi_pertemuan_role_guru,
                 "returnVariables": true,
                 "variables": [
                     {

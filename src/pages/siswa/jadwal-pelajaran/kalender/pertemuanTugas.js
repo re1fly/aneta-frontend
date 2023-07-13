@@ -1,5 +1,5 @@
 import React, {Fragment, useState, useEffect} from 'react';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import Adminfooter from "../../../../components/Adminfooter";
 import {
     Button,
@@ -7,7 +7,7 @@ import {
     Col,
     PageHeader,
     Row,
-    Space,
+    Space, Spin,
     Table, Tag, Tooltip,
 } from "antd";
 import {
@@ -32,13 +32,16 @@ const SiswaKalenderTugas = () => {
 
     const [btnPagination, setBtnPagination] = useState([]);
     const [paramsPage, setParamsPage] = useState("1");
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
 
     const userId = localStorage.getItem('user_id');
     const academicId = localStorage.getItem('academic_id')
 
     const params = useParams()
     const idTugas = params.id
-    
+
     const dataTugas = useSelector((state) => state.dataPathKalenderSiswa.allPath)
 
     const _getDataPertemuan = () => {
@@ -69,11 +72,30 @@ const SiswaKalenderTugas = () => {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[3]?.value);
-            setDataPertemuan(dataRes?.data);
-            console.log(dataRes.data)
             const pagination = dataRes?.data?.links;
+            const responseData = dataRes.code;
+
+            setDataPertemuan(dataRes?.data);
             setBtnPagination(pagination)
+
+            if (responseData == 200) {
+                setLoading(false)
+                setDataSuccess(true)
+            } else {
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
+
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getDataPertemuan()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
     }
 
     useEffect(() => {
@@ -84,24 +106,27 @@ const SiswaKalenderTugas = () => {
 
     let history = useHistory();
     const handleRouter = (id, record) => {
-        let myWindow;
-        if (record.menit == 0) {
-            myWindow = window.open(
-                "https://lms.aneta.id:8443/wp-login.php?action=logout",
-                "_blank",
-                "location=yes,height=50,width=100,scrollbars=yes,status=yes"
-            );
-            setTimeout(function () {
-                myWindow.close();
-            }, 2000);
+        // let myWindow;
+        // if (record.menit == 0) {
+        //     myWindow = window.open(
+        //         "https://lms.aneta.id:8443/wp-login.php?action=logout",
+        //         "_blank",
+        //         "location=yes,height=50,width=100,scrollbars=yes,status=yes"
+        //     );
+        //     setTimeout(function () {
+        //         myWindow.close();
+        //     }, 2000);
+        //     history.push(`/siswa-kelas-tugas-${id}`, {
+        //         dataTugas: record,
+        //     });
+        // } else {
+        //     history.push(`/siswa-kelas-tugas-${id}`, {
+        //         dataTugas: record,
+        //     });
+        // }
             history.push(`/siswa-kelas-tugas-${id}`, {
                 dataTugas: record,
             });
-        } else {
-            history.push(`/siswa-kelas-tugas-${id}`, {
-                dataTugas: record,
-            });
-        }
     };
 
     const data = dataPertemuan?.map((data, index) => {
@@ -125,7 +150,7 @@ const SiswaKalenderTugas = () => {
         }
     });
 
-    const textStatus = <span>Tugas dapat dikerjakan, tetapi tidak akan mendapat nilai</span>;
+    const textStatus = <span>Waktu telah habis, namun tetap dapat dikerjakan</span>;
 
     const columns = [
         {
@@ -155,7 +180,7 @@ const SiswaKalenderTugas = () => {
                 let color = statusSiswa == 0 ? "green" : statusSiswa == 1 ? "red" : "orange";
                 return (
                     <Tag style={{borderRadius: "15px"}} color={color} key={statusSiswa}>
-                        {record.status == 2 && record.statusSiswa == 1 ? "Waktu Telah Habis" :statusSiswa == 0 ? "Tugas belum dikerjakan" : statusSiswa == 1 ? "Tugas sedang dikerjakan" : "Tugas sudah dikerjakan"}
+                        {record.status == 2 && record.statusSiswa == 1 ? "Waktu Telah Habis" : statusSiswa == 0 ? "Tugas belum dikerjakan" : statusSiswa == 1 ? "Tugas sedang dikerjakan" : "Tugas sudah dikerjakan"}
                     </Tag>
                 );
             }
@@ -222,37 +247,39 @@ const SiswaKalenderTugas = () => {
                     </Row>
                 </Card>
 
-                <Table className=""
-                       columns={columns}
-                       dataSource={data}
-                       onChange={onChangeTable}
-                       pagination={false}
-                       rowClassName="bg-greylight text-grey-900"/>
-                <div className='text-center mt-4'>
-                    {btnPagination?.map((dataBtn) => {
-                        const labelBtn = dataBtn.label;
-                        const label = labelBtn
-                            .replace(/(&laquo\;)/g, "")
-                            .replace(/(&raquo\;)/g, "");
-                        let linkUrl = dataBtn.url;
+                <Spin tip="Loading..." spinning={loading}>
+                    <Table className=""
+                           columns={columns}
+                           dataSource={data}
+                           onChange={onChangeTable}
+                           pagination={false}
+                           rowClassName="bg-greylight text-grey-900"/>
+                    <div className='text-center mt-4'>
+                        {btnPagination?.map((dataBtn) => {
+                            const labelBtn = dataBtn.label;
+                            const label = labelBtn
+                                .replace(/(&laquo\;)/g, "")
+                                .replace(/(&raquo\;)/g, "");
+                            let linkUrl = dataBtn.url;
 
-                        if (linkUrl != null) {
-                            linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
-                        }
+                            if (linkUrl != null) {
+                                linkUrl = linkUrl.substr(linkUrl.indexOf("=") + 1);
+                            }
 
-                        return (
-                            <Button
-                                className="btn btn-primary mr-2 font-xssss fw-600"
-                                disabled={linkUrl == null ? true : false}
-                                onClick={() => {
-                                    setParamsPage(linkUrl);
-                                }}
-                            >
-                                {label}
-                            </Button>
-                        );
-                    })}
-                </div>
+                            return (
+                                <Button
+                                    className="btn btn-primary mr-2 font-xssss fw-600"
+                                    disabled={linkUrl == null ? true : false}
+                                    onClick={() => {
+                                        setParamsPage(linkUrl);
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            );
+                        })}
+                    </div>
+                </Spin>
                 <Adminfooter/>
             </div>
         )

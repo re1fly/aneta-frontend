@@ -2,9 +2,14 @@ import React, {Fragment, useEffect, useState} from "react";
 import Navheader from "../../../components/Navheader.js";
 import Appheader from "../../../components/Appheader.js";
 import Adminfooter from "../../../components/Adminfooter.js";
-import {Card, Divider, notification, PageHeader} from "antd";
+import {Card, Collapse, Divider, notification, PageHeader, Spin} from "antd";
 import axios from "axios";
-import {url_by_institute} from "../../../api/reference.js";
+import {
+    global_insert,
+    role_guru_get_forum_detail,
+    role_siswa_get_forum,
+    url_by_institute
+} from "../../../api/reference.js";
 import {DataNotFound} from "../../../components/misc/DataNotFound.js";
 
 function ForumSiswa() {
@@ -18,7 +23,10 @@ function ForumSiswa() {
     const [selectedForum, setSelectedForum] = useState()
     const [selectedDataForum, setSelectedDataForum] = useState({})
     const [viewForum, setViewForum] = useState(true);
-
+    const [loading, setLoading] = useState(false);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
+    const {Panel} = Collapse;
 
     const _getPertemuan = (e) => {
         axios
@@ -57,7 +65,7 @@ function ForumSiswa() {
             .post(
                 url_by_institute,
                 {
-                    "processDefinitionId": "rolesiswagetforum:1:d6b0fd24-ac14-11ed-9c1d-6ea2a406192e",
+                    "processDefinitionId": role_siswa_get_forum,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -76,8 +84,16 @@ function ForumSiswa() {
             )
             .then(function (response) {
                 const data = JSON.parse(response.data.variables[2].value);
-                console.log(data.data)
-                setDataForum(data.data)
+                const datas = data.data
+                setDataForum(datas)
+                if (datas.length >= 1) {
+                    setLoading(false)
+                    setDataSuccess(true)
+                } else {
+                    setDataSuccess(false)
+                    setLoading(false)
+                    setCountRender(countRender + 1)
+                }
             });
     }
 
@@ -86,7 +102,7 @@ function ForumSiswa() {
             .post(
                 url_by_institute,
                 {
-                    "processDefinitionId": "rolegurugetforumdetail:1:ab83f418-a92c-11ed-9c1d-6ea2a406192e",
+                    "processDefinitionId": role_guru_get_forum_detail,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -107,8 +123,15 @@ function ForumSiswa() {
             )
             .then(function (response) {
                 const data = JSON.parse(response.data.variables[2].value);
+                const responseData = data.message;
                 setDetailForum(data.data)
-                console.log(detailForum)
+                if (responseData == "succes get data") {
+                    setLoading(false)
+                    setDataSuccess(true)
+                } else {
+                    setDataSuccess(false)
+                    setCountRender(countRender + 1)
+                }
             });
     }
 
@@ -121,7 +144,7 @@ function ForumSiswa() {
         axios
             .post(
                 url_by_institute, {
-                    "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_insert,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -156,6 +179,60 @@ function ForumSiswa() {
                         placement: "top",
                     });
                     _getDetailForum()
+                } else {
+                    notification.error({
+                        message: "Error",
+                        description: "Error harap hubungi Admin.",
+                        placement: "top",
+                    });
+                }
+            });
+    }
+
+    const _submitReply = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        axios
+            .post(
+                url_by_institute, {
+                    "processDefinitionId": global_insert,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_Insert",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_subjects_schedule_contents_meeting_forum_reply_subModel",
+                                "tbl_coloumn": {
+                                    "id_reply": data.id_reply,
+                                    "id_user": userId,
+                                    "reply": data.reply_forum
+                                }
+                            }
+                        }
+                    ]
+                }
+                ,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+                if (dataRes.status == 'success') {
+                    notification.success({
+                        message: "Sukses",
+                        description: "Comment berhasil dibuat.",
+                        placement: "top",
+                    });
+                    _getDetailForum()
+                    document.getElementById("reply_forum").value = "";
                 } else {
                     notification.error({
                         message: "Error",
@@ -262,108 +339,159 @@ function ForumSiswa() {
                                             <button
                                                 className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 rounded-lg d-inline-block"
                                                 type='button'
-                                                onClick={() => _getForum()}
+                                                onClick={() => {
+                                                    setLoading(true)
+                                                    _getForum()
+                                                }}
                                             >
                                                 Cari Forum
                                             </button>
                                         </div>
                                     </div>
-                                    { dataForum.length >= 1 ?
-                                        dataForum.map((data) => {
-                                            const id = data.id
-                                            return (
-                                                <Card type="inner"
-                                                      title={data.topic}
-                                                      className='text-capitalize mb-3'
-                                                      style={{borderRadius: '15px'}}
-                                                      hoverable
-                                                      extra={<button className='btn btn-primary'>
-                                                          <i className="feather-message-circle w350"> {data.jumlah_reply}</i>
-                                                      </button>}
-                                                      onClick={() => {
-                                                          setSelectedForum(data.id)
-                                                          setViewForum(false)
-                                                          setSelectedDataForum({
-                                                              id: data.id,
-                                                              topic: data.topic,
-                                                              desc: data.description,
-                                                              tingkat: data.tingkat,
-                                                              subClass: data.sub_class,
-                                                              namaMapel: data.nama_mata,
-                                                              namaMeet: data.meeting_name
-                                                          })
-                                                      }}
-                                                >
-                                                    <p className='mb-5'>{data.description}</p>
-                                                    <p className='text-grey-600 float-right'>
+
+                                    <Spin tip="Loading..." spinning={loading} className='mt-5'>
+                                        {dataForum.length >= 1 ?
+                                            dataForum.map((data) => {
+                                                const id = data.id
+                                                return (
+                                                    <Card type="inner"
+                                                          title={data.topic}
+                                                          className='text-capitalize mb-3'
+                                                          style={{borderRadius: '15px'}}
+                                                          hoverable
+                                                          extra={<button className='btn btn-primary'>
+                                                              <i className="feather-message-circle w350"> {data.jumlah_reply}</i>
+                                                          </button>}
+                                                          onClick={() => {
+                                                              setLoading(true)
+                                                              setSelectedForum(data.id)
+                                                              setViewForum(false)
+                                                              setSelectedDataForum({
+                                                                  id: data.id,
+                                                                  topic: data.topic,
+                                                                  desc: data.description,
+                                                                  tingkat: data.tingkat,
+                                                                  subClass: data.sub_class,
+                                                                  namaMapel: data.nama_mata,
+                                                                  namaMeet: data.meeting_name
+                                                              })
+                                                          }}
+                                                    >
+                                                        <p className='mb-5'>{data.description}</p>
+                                                        <p className='text-grey-600 float-right'>
                                                 <span
                                                     className='text-ornage'>{data.tingkat} / {data.sub_class}</span> | <span
-                                                        className='text-ornage'>{data.nama_mata}</span> | <span
-                                                        className='text-ornage'>{data.meeting_name}</span>
-                                                    </p>
-                                                </Card>
-                                            )
-                                        }) :
-                                        <DataNotFound />
-                                    }
+                                                            className='text-ornage'>{data.nama_mata}</span> | <span
+                                                            className='text-ornage'>{data.meeting_name}</span>
+                                                        </p>
+                                                    </Card>
+                                                )
+                                            }) :
+                                            <DataNotFound/>
+                                        }
+                                    </Spin>
                                 </> :
-                        <>
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <PageHeader
-                                        className="site-page-header card bg-lightblue text-grey-900 fw-700 "
-                                        onBack={() => setViewForum(true)}
-                                        title="Forum Diskusi Detail"
-                                    />
-                                </div>
-                            </div>
-                            <Card type="inner"
-                                  title={selectedDataForum.topic}
-                                  className='text-capitalize mb-3 mt-3'
-                                  style={{borderRadius: '15px'}}
-                                  hoverable
-                            >
-                                <p className='mb-5'>{selectedDataForum.desc}</p>
-                                <p className='text-grey-600 float-right'>
+                                <>
+                                    <div className="row">
+                                        <div className="col-lg-12">
+                                            <PageHeader
+                                                className="site-page-header card bg-lightblue text-grey-900 fw-700 "
+                                                onBack={() => setViewForum(true)}
+                                                title="Forum Diskusi Detail"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Card type="inner"
+                                          title={selectedDataForum.topic}
+                                          className='text-capitalize mb-3 mt-3'
+                                          style={{borderRadius: '15px'}}
+                                          hoverable
+                                    >
+                                        <p className='mb-5'>{selectedDataForum.desc}</p>
+                                        <p className='text-grey-600 float-right'>
                                                 <span
                                                     className='text-ornage'>{selectedDataForum.tingkat} / {selectedDataForum.subClass}</span> | <span
-                                    className='text-ornage'>{selectedDataForum.namaMapel}</span> | <span
-                                    className='text-ornage'>{selectedDataForum.namaMeet}</span>
-                                </p>
-                            </Card>
-                            <Divider className="text-primary">Comments</Divider>
-                            <form onSubmit={_submitComment}>
+                                            className='text-ornage'>{selectedDataForum.namaMapel}</span> | <span
+                                            className='text-ornage'>{selectedDataForum.namaMeet}</span>
+                                        </p>
+                                    </Card>
+                                    <Divider className="text-primary">Comments</Divider>
+                                    <form onSubmit={_submitComment}>
                      <textarea
                          className="form-control mb-0 p-3 bg-greylight lh-16"
                          rows="5"
                          placeholder="Balas Forum..."
                          name="reply_forum"
-                     ></textarea>
-                                <button
-                                    className="btn bg-current text-white mt-3 mb-4 position-relative float-right"
-                                    type="submit"
-                                >
-                                    Comment
-                                </button>
-                            </form>
+                         id="reply_forum"/>
+                                        <button
+                                            className="btn bg-current text-white mt-3 mb-4 position-relative float-right"
+                                            type="submit"
+                                        >
+                                            Comment
+                                        </button>
+                                    </form>
 
-                            <div className="clearfix"></div>
-
-                            {detailForum.map((data) => {
-                                const id = data.id
-                                return (
-                                    <Card type="inner"
-                                          title={data.name}
-                                          className='text-capitalize mb-3'
-                                          style={{borderRadius: '5px'}}
-                                          hoverable
-                                          extra={<i className="feather-message-circle w350 text-primary"></i>}
-                                    >
-                                        <p>{data.reply}</p>
-                                    </Card>
-                                )
-                            })}
-                        </>
+                                    <div className="clearfix"></div>
+                                    <Spin tip="Loading..." spinning={loading} className='mt-5'>
+                                        {detailForum.map((data) => {
+                                            const id = data.id
+                                            return (
+                                                <Card type="inner"
+                                                      title={data.name}
+                                                      className='text-capitalize mb-3'
+                                                      style={{borderRadius: '5px'}}
+                                                      hoverable
+                                                      extra={<i
+                                                          className="feather-message-circle w350 text-primary"></i>}
+                                                >
+                                                    <p>{data.reply}</p>
+                                                    <Collapse size="small">
+                                                        <Panel
+                                                            header={`Baca Balasan Komentar (${data.sub_reply.length})`}
+                                                            key="1">
+                                                            {
+                                                                data.sub_reply.map((value) => {
+                                                                    return (
+                                                                        <>
+                                                                            <Card type="inner"
+                                                                                  title={value.name}
+                                                                                  className='text-capitalize mb-3'
+                                                                                  style={{borderRadius: '5px'}}
+                                                                                  hoverable
+                                                                                  extra={<i
+                                                                                      className="feather-message-square w350 text-success"></i>}
+                                                                            >
+                                                                                <p>{value.reply}</p>
+                                                                            </Card>
+                                                                        </>
+                                                                    )
+                                                                })
+                                                            }
+                                                            <form onSubmit={e => _submitReply(e)}>
+                                                                <h4 className="mt-4">Balas Komentar ini</h4>
+                                                                <textarea
+                                                                    className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                                    rows="5"
+                                                                    placeholder="Balas komentar..."
+                                                                    name="reply_forum"
+                                                                ></textarea>
+                                                                <input name="id_reply" type="hidden"
+                                                                       value={data.id_reply}/>
+                                                                <button
+                                                                    className="btn bg-current text-white mt-3 mb-4 position-relative float-right"
+                                                                    type="submit"
+                                                                    // onClick={() => _submitReply(data.id_reply)}
+                                                                >
+                                                                    Comment
+                                                                </button>
+                                                            </form>
+                                                        </Panel>
+                                                    </Collapse>
+                                                </Card>
+                                            )
+                                        })}
+                                    </Spin>
+                                </>
                         }
                     </div>
                     <Adminfooter/>

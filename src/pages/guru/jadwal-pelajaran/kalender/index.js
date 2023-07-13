@@ -1,6 +1,6 @@
-import {Badge, Calendar, Card, notification, PageHeader, Spin} from "antd";
+import {Badge, Calendar, Card, DatePicker, notification, PageHeader, Spin} from "antd";
 import Search from "antd/lib/transfer/search";
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import { useHistory } from "react-router-dom";
 import Adminfooter from "../../../../components/Adminfooter";
 import Appheader from "../../../../components/Appheader";
@@ -9,7 +9,7 @@ import moment from "moment";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { TanggalKalenderGuru } from "../../../../redux/Action";
-import { url_by_institute } from "../../../../api/reference";
+import {role_guru_get_kalender, url_by_institute} from "../../../../api/reference";
 import axios from "axios";
 import { useState } from "react";
 
@@ -22,8 +22,9 @@ export default function GuruKalender() {
 
     const userId = localStorage.getItem("user_id")
     const academicId = localStorage.getItem("academic_year");
-    const currentMonth = 1 + moment().month();
-    const currentYear = moment().year();
+    const [currentMonth, setCurrentMonth] = useState( moment().format('MM'));
+    const [currentYear, setCurrentYear] = useState(moment().year());
+
 
     const dispatch = useDispatch();
     const _onSearch = value => console.log(value);
@@ -31,7 +32,7 @@ export default function GuruKalender() {
     const _getDataKalender = () => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "rolegurugetkalender:1:7d6cc224-654d-11ed-bb6a-a2fb3d782380",
+                "processDefinitionId": role_guru_get_kalender,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -54,6 +55,8 @@ export default function GuruKalender() {
             }
         ).then(function (response) {
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
+            console.log(currentMonth)
+            console.log(currentYear)
             setDataTanggal(dataRes.data)
             const responseData = dataRes.code;
             if (responseData == true){
@@ -79,6 +82,8 @@ export default function GuruKalender() {
     useEffect(() => {
         _getDataKalender()
     }, [userId, currentMonth, currentYear])
+
+    const headerRender = () => null;
 
 
     const getListData = (value, dataTanggal) => {
@@ -129,8 +134,6 @@ export default function GuruKalender() {
         ) : null;
     };
 
-    const headerRender = () => null;
-
     const dateCellRender = (value) => {
         const listData = getListData(value, dataTanggal);
 
@@ -154,6 +157,14 @@ export default function GuruKalender() {
         })
     }
 
+    const onChangeDate = (date, dateString) => {
+        setLoading(true)
+        const month = dateString.split('-')[0];
+        const year = dateString.split('-')[1];
+        setCurrentMonth(month)
+        setCurrentYear(year)
+    };
+
     return (
         <Fragment>
             <div className="main-wrapper">
@@ -167,18 +178,21 @@ export default function GuruKalender() {
                                     className="mb-3 site-page-header card bg-lightblue text-grey-900 fw-700 "
                                     title="Jadwal Pelajaran Kalender"
                                 />
-                                <Card className="card bg-lightblue border-0 mb-4 text-grey-900">
-                                    <div className="row">
-                                        <div className="col-lg-8 col-md-6 my-2">
-                                        </div>
-                                        <div className="col-lg-4 col-md-6 my-2">
-                                            <Search className="mr-3" placeholder="Cari kata kunci" allowClear
-                                                onSearch={_onSearch} style={{ width: '80%' }} />
-                                        </div>
+                                <div className="d-flex justify-content-between">
+                                    <div></div>
+                                    <div className="mr-3">
+                                        <DatePicker onChange={onChangeDate}
+                                                    picker="month"
+                                                    format="MM-YYYY"
+                                                    placeholder="Filter Bulan & Tahun"
+                                                    size="middle"
+                                                    style={{width: '200px'}}
+                                        />
                                     </div>
-                                </Card>
+                                </div>
                                 <Spin tip="Loading..." spinning={loading}>
                                 <Calendar
+                                    className="mt-5"
                                     dateCellRender={dateCellRender}
                                     monthCellRender={monthCellRender}
                                     onSelect={selectKalender}

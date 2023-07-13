@@ -8,19 +8,17 @@ import {BASE_URL} from "../../../api/Url";
 import {notification, PageHeader} from "antd";
 import {
     global_insert,
-    global_join_sub_where_get, insert_or_update_nilai_extra_kurikuler, role_guru_get_sub_class,
+    global_join_sub_where_get, role_guru_get_absensi, role_guru_get_sub_class, role_guru_insert_absensi,
     url_by_institute,
 } from "../../../api/reference";
 
-export default function PenilaianEkskul() {
+export default function PenilaianAbsensi() {
     const academic = localStorage.getItem("academic_year");
     const instituteId = localStorage.getItem('institute');
     const userId = localStorage.getItem("user_id");
-    const [dataEkskul, setDataEkskul] = useState([]);
     const [dataSiswa, setDataSiswa] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSubClass, setSelectedSubClass] = useState(null);
-    const [selectedEkskul, setSelectedEkskul] = useState(null);
     const [tingkatKelas, setTingkatKelas] = useState([])
     const [subKelas, setSubKelas] = useState([]);
 
@@ -94,87 +92,23 @@ export default function PenilaianEkskul() {
                 console.log(response)
             })
     }
-    const _getDataEkskul = () => {
-        axios
-            .post(
-                url_by_institute,
-                {
-                    processDefinitionId:
-                        "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
-                    returnVariables: true,
-                    variables: [
-                        {
-                            name: "global_join_where_sub",
-                            type: "json",
-                            value: {
-                                tbl_induk: "x_ekstrakurikuler_master",
-                                select: [
-                                    "x_ekstrakurikuler_master.id",
-                                    "x_ekstrakurikuler_master.name",
-                                ],
-                                paginate: false,
-                                join: [
-                                    {
-                                        tbl_join: "x_academic_year",
-                                        refkey: "id",
-                                        tbl_join2: "x_ekstrakurikuler_master",
-                                        foregenkey: "academic_year_id",
-                                    },
-                                ],
-                                kondisi: [
-                                    {
-                                        keterangan: "deleted_at",
-                                        kolom: "x_ekstrakurikuler_master.deleted_at",
-                                    },
-                                ],
-                                where: [
-                                    {
-                                        tbl_coloumn: "x_ekstrakurikuler_master",
-                                        tbl_field: "academic_year_id",
-                                        tbl_value: academic,
-                                        operator: "=",
-                                    },
-                                ],
-                                order_coloumn: "x_ekstrakurikuler_master.name",
-                                order_by: "asc",
-                            },
-                        },
-                        {
-                            name: "page",
-                            type: "string",
-                            value: "1",
-                        },
-                    ],
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
-                    },
-                }
-            )
-            .then(function (response) {
-                const resData = JSON.parse(response.data.variables[3].value);
-                setDataEkskul(resData.data);
-            });
-    };
     const _getDataSiswa = () => {
         axios
             .post(
                 url_by_institute,
                 {
-                    processDefinitionId: "62eb9f70-6bcd-11ed-bb6a-a2fb3d782380",
-                    returnVariables: true,
-                    variables: [
+                    "processDefinitionId": role_guru_get_absensi,
+                    "returnVariables": true,
+                    "variables": [
                         {
-                            name: "data",
-                            type: "json",
-                            value: {
-                                id_extrakurikuler: selectedEkskul,
-                                id_class: selectedSubClass,
-                            },
-                        },
-                    ],
+                            "name": "data",
+                            "type": "json",
+                            "value": {
+                                "id_class": selectedSubClass,
+                                "id_academic": academic
+                            }
+                        }
+                    ]
                 },
                 {
                     headers: {
@@ -186,32 +120,36 @@ export default function PenilaianEkskul() {
             .then(function (response) {
                 const resData = JSON.parse(response.data.variables[2].value);
                 setDataSiswa(resData.data);
-                console.log(resData.data)
+                console.log(response)
             });
     };
 
     const _submitPenilaian = (e) => {
         const formCV = document.querySelector('#form_ekskul');
         const formData = new FormData(formCV);
-        const id = formData.getAll('id_ekskul');
         const idSiswa = formData.getAll('id_siswa');
-        const predikat = formData.getAll('predikat');
-        const deskripsi = formData.getAll('deskripsi');
+        const sakit = formData.getAll('sakit');
+        const izin = formData.getAll('izin');
+        const tanpaKeterangan = formData.getAll('tanpa_keterangan');
+        const saran = formData.getAll('saran');
+        const naikKelas = formData.getAll('naik_kelas');
 
         const allPenilaian = [];
 
         for (let i = 0; i < dataSiswa.length; i++) {
             allPenilaian.push({
-                id: id[i],
-                indicator_id: predikat[i],
-                id_siswa: idSiswa[i],
-                description: deskripsi[i]
+                id: idSiswa[i],
+                sakit: sakit[i],
+                izin: izin[i],
+                tanpa_keterangan: tanpaKeterangan[i],
+                saran: saran[i],
+                naik_kelas: naikKelas[i]
             });
         }
 
         axios.post(url_by_institute,
             {
-                "processDefinitionId": insert_or_update_nilai_extra_kurikuler,
+                "processDefinitionId": role_guru_insert_absensi,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -231,10 +169,10 @@ export default function PenilaianEkskul() {
             console.log(response)
             const resData = JSON.parse(response?.data?.variables[2]?.value)
 
-            if (resData.status == "success") {
+            if (resData.code == true) {
                 notification.success({
                     message: "Sukses",
-                    description: "Nilai ekstrakurikuler berhasil diinput.",
+                    description: "Nilai Absensi berhasil diinput.",
                     placement: "top",
                 });
             } else {
@@ -255,14 +193,14 @@ export default function PenilaianEkskul() {
         _getSubKelas();
     }, [selectedClass]);
 
-    useEffect(() => {
-        _getDataEkskul();
-    }, [selectedSubClass]);
 
 
     useEffect(() => {
+        console.log('get data')
+        console.log(selectedClass)
+        console.log(selectedSubClass)
         _getDataSiswa();
-    }, [selectedEkskul]);
+    }, [selectedSubClass]);
 
     return (
         <Fragment>
@@ -276,7 +214,7 @@ export default function PenilaianEkskul() {
                                 <PageHeader
                                     className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                                     onBack={() => window.history.back()}
-                                    title="Input Nilai Ekstrakurikuler"
+                                    title="Input Nilai Absensi"
                                 />
                             </div>
                         </div>
@@ -320,22 +258,6 @@ export default function PenilaianEkskul() {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="col-lg-4 mb-3">
-                                    <div className="form-group ml-4">
-                                        <select
-                                            className="form-control"
-                                            key="id_ekskul_filter"
-                                            onChange={(e) => setSelectedEkskul(e.target.value)}
-                                        >
-                                            <option value="" selected disabled>
-                                                Pilih Nama Ekstrakurikuler
-                                            </option>
-                                            {dataEkskul.map((data) => (
-                                                <option value={data.id}>{data.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
                                 { dataSiswa.length >= 1 ?
                                     <div className="col-lg-12 pt-3">
                                         <div className="table-responsive-xl">
@@ -346,10 +268,19 @@ export default function PenilaianEkskul() {
                                                     <tr className="bg-current text-light">
                                                         <th scope="col">Nama Siswa</th>
                                                         <th scope="col" className="text-center">
-                                                            Predikat
+                                                            Sakit
                                                         </th>
                                                         <th scope="col" className="text-center">
-                                                            Deskripsi
+                                                            Izin
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Tanpa Keterangan
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Saran
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Naik Kelas
                                                         </th>
                                                     </tr>
                                                     </thead>
@@ -364,49 +295,66 @@ export default function PenilaianEkskul() {
                                                                         textTransform: "capitalize",
                                                                     }}
                                                                 >
-                                                                    {value.name}
+                                                                    {value.nama}
                                                                 </th>
-                                                                <td style={{maxWidth: "70px"}}>
-                                                                    <select
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
                                                                         className="form-control"
-                                                                        aria-label="Default"
-                                                                        name="predikat"
-                                                                        defaultValue={value.indicator_id}
-                                                                    >
-                                                                        {value.indicator_id == null ?
-                                                                            <option value="" selected disabled>
-                                                                                Pilih Predikat
-                                                                            </option> : <></>
-                                                                        }
-                                                                        <option value="2">Kurang</option>
-                                                                        <option value="3">Cukup</option>
-                                                                        <option value="4">Baik</option>
-                                                                        <option value="5">Sangat Baik</option>
-                                                                    </select>
+                                                                        name="sakit"
+                                                                        required
+                                                                        defaultValue={value.sakit}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        name="izin"
+                                                                        required
+                                                                        defaultValue={value.izin}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        name="tanpa_keterangan"
+                                                                        required
+                                                                        defaultValue={value.tanpa_keterangan}
+                                                                    />
                                                                 </td>
                                                                 <td>
                                                                     <input
                                                                         type="text"
                                                                         className="form-control"
-                                                                        name="deskripsi"
-                                                                        placeholder="Tulis Deskripsi..."
+                                                                        name="saran"
                                                                         required
-                                                                        defaultValue={value.description}
+                                                                        defaultValue={value.saran}
                                                                     />
                                                                 </td>
-                                                                <input
-                                                                    type="hidden"
-                                                                    className="form-control"
-                                                                    name="id_ekskul"
-                                                                    required
-                                                                    value={value.id}
-                                                                />
+                                                                <td style={{maxWidth: "70px"}}>
+                                                                    <select
+                                                                        className="form-control"
+                                                                        aria-label="Default"
+                                                                        name="naik_kelas"
+                                                                        defaultValue={value.naik_kelas}
+                                                                    >
+                                                                        {value.indicator_id == null ?
+                                                                            <option value="" selected disabled>
+                                                                                Naik Kelas
+                                                                            </option> : <></>
+                                                                        }
+                                                                        <option value={true}>Ya</option>
+                                                                        <option value={false}>Tidak</option>
+                                                                    </select>
+                                                                </td>
                                                                 <input
                                                                     type="hidden"
                                                                     className="form-control"
                                                                     name="id_siswa"
                                                                     required
-                                                                    value={value.id_siswa}
+                                                                    value={value.id}
                                                                 />
                                                             </tr>
                                                         );

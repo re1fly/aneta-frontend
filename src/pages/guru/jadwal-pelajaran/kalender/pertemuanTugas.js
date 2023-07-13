@@ -33,7 +33,7 @@ import {
 import Search from "antd/es/input/Search";
 import Navheader from "../../../../components/Navheader";
 import Appheader from "../../../../components/Appheader";
-import { global_join_sub_where_get, url_by_institute } from '../../../../api/reference';
+import {global_join_sub_where_get, role_guru_get_pertemuan, url_by_institute} from '../../../../api/reference';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import {Modal} from "react-bootstrap";
 
@@ -132,7 +132,7 @@ function GuruKalenderTugas() {
     useEffect(() => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "rolegurugetpertemuan:1:7bf57b89-c7a5-11ed-845a-4a8d2a16230d",
+                "processDefinitionId": role_guru_get_pertemuan,
                 "returnVariables": true,
                 "variables": [
                     {

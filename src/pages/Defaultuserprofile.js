@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs";
 import {notification} from "antd";
 import axios from "axios";
 import {BASE_URL} from "../api/Url";
+import {changepassword} from "../api/reference.js";
 
 const memberList = [
     {
@@ -297,7 +298,7 @@ function Defaultuserprofile() {
         } else {
             axios.post(BASE_URL,
                 {
-                    "processDefinitionId": "changepassword:1:2dfef290-694b-11ed-bb6a-a2fb3d782380",
+                    "processDefinitionId": changepassword,
                     "returnVariables": true,
                     "variables": [
                         {

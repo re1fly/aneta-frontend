@@ -7,20 +7,19 @@ import axios from "axios";
 import {BASE_URL} from "../../../api/Url";
 import {notification, PageHeader} from "antd";
 import {
+    get_data_siswa_penilaian_kesehatan,
     global_insert,
-    global_join_sub_where_get, insert_or_update_nilai_extra_kurikuler, role_guru_get_sub_class,
+    global_join_sub_where_get, role_guru_get_sub_class, submit_fitur_penilaian_kesehatan,
     url_by_institute,
 } from "../../../api/reference";
 
-export default function PenilaianEkskul() {
+export default function PenilaianKesehatan() {
     const academic = localStorage.getItem("academic_year");
     const instituteId = localStorage.getItem('institute');
     const userId = localStorage.getItem("user_id");
-    const [dataEkskul, setDataEkskul] = useState([]);
     const [dataSiswa, setDataSiswa] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSubClass, setSelectedSubClass] = useState(null);
-    const [selectedEkskul, setSelectedEkskul] = useState(null);
     const [tingkatKelas, setTingkatKelas] = useState([])
     const [subKelas, setSubKelas] = useState([]);
 
@@ -94,87 +93,23 @@ export default function PenilaianEkskul() {
                 console.log(response)
             })
     }
-    const _getDataEkskul = () => {
-        axios
-            .post(
-                url_by_institute,
-                {
-                    processDefinitionId:
-                        "globaljoinsubwhereget:2:ffda1ab3-2cc0-11ed-aacc-9a44706f3589",
-                    returnVariables: true,
-                    variables: [
-                        {
-                            name: "global_join_where_sub",
-                            type: "json",
-                            value: {
-                                tbl_induk: "x_ekstrakurikuler_master",
-                                select: [
-                                    "x_ekstrakurikuler_master.id",
-                                    "x_ekstrakurikuler_master.name",
-                                ],
-                                paginate: false,
-                                join: [
-                                    {
-                                        tbl_join: "x_academic_year",
-                                        refkey: "id",
-                                        tbl_join2: "x_ekstrakurikuler_master",
-                                        foregenkey: "academic_year_id",
-                                    },
-                                ],
-                                kondisi: [
-                                    {
-                                        keterangan: "deleted_at",
-                                        kolom: "x_ekstrakurikuler_master.deleted_at",
-                                    },
-                                ],
-                                where: [
-                                    {
-                                        tbl_coloumn: "x_ekstrakurikuler_master",
-                                        tbl_field: "academic_year_id",
-                                        tbl_value: academic,
-                                        operator: "=",
-                                    },
-                                ],
-                                order_coloumn: "x_ekstrakurikuler_master.name",
-                                order_by: "asc",
-                            },
-                        },
-                        {
-                            name: "page",
-                            type: "string",
-                            value: "1",
-                        },
-                    ],
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
-                    },
-                }
-            )
-            .then(function (response) {
-                const resData = JSON.parse(response.data.variables[3].value);
-                setDataEkskul(resData.data);
-            });
-    };
     const _getDataSiswa = () => {
         axios
             .post(
                 url_by_institute,
                 {
-                    processDefinitionId: "62eb9f70-6bcd-11ed-bb6a-a2fb3d782380",
-                    returnVariables: true,
-                    variables: [
+                    "processDefinitionId": get_data_siswa_penilaian_kesehatan,
+                    "returnVariables": true,
+                    "variables": [
                         {
-                            name: "data",
-                            type: "json",
-                            value: {
-                                id_extrakurikuler: selectedEkskul,
-                                id_class: selectedSubClass,
-                            },
-                        },
-                    ],
+                            "name": "data",
+                            "type": "json",
+                            "value": {
+                                "id_class": selectedSubClass,
+                                "id_academic": academic
+                            }
+                        }
+                    ]
                 },
                 {
                     headers: {
@@ -186,32 +121,42 @@ export default function PenilaianEkskul() {
             .then(function (response) {
                 const resData = JSON.parse(response.data.variables[2].value);
                 setDataSiswa(resData.data);
-                console.log(resData.data)
+                console.log(response)
             });
     };
 
     const _submitPenilaian = (e) => {
         const formCV = document.querySelector('#form_ekskul');
         const formData = new FormData(formCV);
-        const id = formData.getAll('id_ekskul');
         const idSiswa = formData.getAll('id_siswa');
-        const predikat = formData.getAll('predikat');
-        const deskripsi = formData.getAll('deskripsi');
+        const pendengaran = formData.getAll('pendengaran');
+        const penglihatan = formData.getAll('penglihatan');
+        const gigi = formData.getAll('gigi');
+        const lainnya = formData.getAll('lainnya');
+        const tinggibadan_smt1 = formData.getAll('tinggibadan_smt1');
+        const beratbadan_smt1 = formData.getAll('beratbadan_smt1');
+        const tinggibadan_smt2 = formData.getAll('tinggibadan_smt2');
+        const beratbadan_smt2 = formData.getAll('beratbadan_smt2');
 
         const allPenilaian = [];
 
         for (let i = 0; i < dataSiswa.length; i++) {
             allPenilaian.push({
-                id: id[i],
-                indicator_id: predikat[i],
-                id_siswa: idSiswa[i],
-                description: deskripsi[i]
+                id: idSiswa[i],
+                pendengaran: pendengaran[i],
+                penglihatan: penglihatan[i],
+                gigi: gigi[i],
+                lainnya: lainnya[i],
+                tinggi_badan_semester1: tinggibadan_smt1[i],
+                berat_badan_semester1: beratbadan_smt1[i],
+                tinggi_badan_semester2: tinggibadan_smt2[i],
+                berat_badan_semester2: beratbadan_smt2[i]
             });
         }
 
         axios.post(url_by_institute,
             {
-                "processDefinitionId": insert_or_update_nilai_extra_kurikuler,
+                "processDefinitionId": submit_fitur_penilaian_kesehatan,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -231,10 +176,10 @@ export default function PenilaianEkskul() {
             console.log(response)
             const resData = JSON.parse(response?.data?.variables[2]?.value)
 
-            if (resData.status == "success") {
+            if (resData.code == true) {
                 notification.success({
                     message: "Sukses",
-                    description: "Nilai ekstrakurikuler berhasil diinput.",
+                    description: "Kondisi Kesehatan berhasil diinput.",
                     placement: "top",
                 });
             } else {
@@ -255,14 +200,14 @@ export default function PenilaianEkskul() {
         _getSubKelas();
     }, [selectedClass]);
 
-    useEffect(() => {
-        _getDataEkskul();
-    }, [selectedSubClass]);
 
 
     useEffect(() => {
+        console.log('get data')
+        console.log(selectedClass)
+        console.log(selectedSubClass)
         _getDataSiswa();
-    }, [selectedEkskul]);
+    }, [selectedSubClass]);
 
     return (
         <Fragment>
@@ -276,7 +221,7 @@ export default function PenilaianEkskul() {
                                 <PageHeader
                                     className="site-page-header card bg-lightblue text-grey-900 fw-700 "
                                     onBack={() => window.history.back()}
-                                    title="Input Nilai Ekstrakurikuler"
+                                    title="Input Kondisi Kesehatan"
                                 />
                             </div>
                         </div>
@@ -320,22 +265,6 @@ export default function PenilaianEkskul() {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="col-lg-4 mb-3">
-                                    <div className="form-group ml-4">
-                                        <select
-                                            className="form-control"
-                                            key="id_ekskul_filter"
-                                            onChange={(e) => setSelectedEkskul(e.target.value)}
-                                        >
-                                            <option value="" selected disabled>
-                                                Pilih Nama Ekstrakurikuler
-                                            </option>
-                                            {dataEkskul.map((data) => (
-                                                <option value={data.id}>{data.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
                                 { dataSiswa.length >= 1 ?
                                     <div className="col-lg-12 pt-3">
                                         <div className="table-responsive-xl">
@@ -346,10 +275,28 @@ export default function PenilaianEkskul() {
                                                     <tr className="bg-current text-light">
                                                         <th scope="col">Nama Siswa</th>
                                                         <th scope="col" className="text-center">
-                                                            Predikat
+                                                            Pendengaran
                                                         </th>
                                                         <th scope="col" className="text-center">
-                                                            Deskripsi
+                                                            Penglihatan
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Gigi
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Lainnya
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Tinggi Badan (Smt 1)
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Berat Badan (Smt 1)
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Tinggi Badan (Smt 2)
+                                                        </th>
+                                                        <th scope="col" className="text-center">
+                                                            Berat Badan (Smt 2)
                                                         </th>
                                                     </tr>
                                                     </thead>
@@ -364,49 +311,87 @@ export default function PenilaianEkskul() {
                                                                         textTransform: "capitalize",
                                                                     }}
                                                                 >
-                                                                    {value.name}
+                                                                    {value.nama}
                                                                 </th>
-                                                                <td style={{maxWidth: "70px"}}>
-                                                                    <select
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
                                                                         className="form-control"
-                                                                        aria-label="Default"
-                                                                        name="predikat"
-                                                                        defaultValue={value.indicator_id}
-                                                                    >
-                                                                        {value.indicator_id == null ?
-                                                                            <option value="" selected disabled>
-                                                                                Pilih Predikat
-                                                                            </option> : <></>
-                                                                        }
-                                                                        <option value="2">Kurang</option>
-                                                                        <option value="3">Cukup</option>
-                                                                        <option value="4">Baik</option>
-                                                                        <option value="5">Sangat Baik</option>
-                                                                    </select>
+                                                                        name="pendengaran"
+                                                                        required
+                                                                        defaultValue={value.pendengaran}
+                                                                    />
                                                                 </td>
                                                                 <td>
                                                                     <input
                                                                         type="text"
                                                                         className="form-control"
-                                                                        name="deskripsi"
-                                                                        placeholder="Tulis Deskripsi..."
+                                                                        name="penglihatan"
                                                                         required
-                                                                        defaultValue={value.description}
+                                                                        defaultValue={value.penglihatan}
                                                                     />
                                                                 </td>
-                                                                <input
-                                                                    type="hidden"
-                                                                    className="form-control"
-                                                                    name="id_ekskul"
-                                                                    required
-                                                                    value={value.id}
-                                                                />
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        name="gigi"
+                                                                        required
+                                                                        defaultValue={value.gigi}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        name="lainnya"
+                                                                        required
+                                                                        defaultValue={value.lainnya}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        name="tinggibadan_smt1"
+                                                                        required
+                                                                        defaultValue={value.tinggi_badan_semester1}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        name="beratbadan_smt1"
+                                                                        required
+                                                                        defaultValue={value.berat_badan_semester1}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        name="tinggibadan_smt2"
+                                                                        required
+                                                                        defaultValue={value.tinggi_badan_semester2}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        name="beratbadan_smt2"
+                                                                        required
+                                                                        defaultValue={value.berat_badan_semester2}
+                                                                    />
+                                                                </td>
+
                                                                 <input
                                                                     type="hidden"
                                                                     className="form-control"
                                                                     name="id_siswa"
                                                                     required
-                                                                    value={value.id_siswa}
+                                                                    value={value.id}
                                                                 />
                                                             </tr>
                                                         );

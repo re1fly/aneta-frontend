@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react"
 import {
     Card,
-    PageHeader
+    PageHeader, Spin
 } from "antd";
 import {
     AppstoreOutlined,
@@ -24,6 +24,10 @@ export default function SiswaNilaiTugas() {
     const academicYear = localStorage.getItem('academic_id');
     const instituteId = localStorage.getItem('institute');
 
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
+
     const params = useParams();
     const path = params.id.split("-");
     const idMapel = path[0];
@@ -31,7 +35,7 @@ export default function SiswaNilaiTugas() {
 
     const _onSearch = value => console.log(value);
 
-    useEffect(() => {
+    const _getTugas = () => {
         axios.post(url_by_institute,
             {
                 "processDefinitionId": role_siswa_get_nilai_materi,
@@ -48,17 +52,38 @@ export default function SiswaNilaiTugas() {
                     }
                 ]
             }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Basic YWRtaW46TWFuYWczciE="
+                }
             }
-        }
         ).then(function (response) {
-            console.log('nilai',response)
             const dataRes = JSON.parse(response?.data?.variables[2]?.value);
             const materi = dataRes?.data
+            const responseCode = dataRes.code;
             setGetMateri(materi);
+            if (responseCode == 200) {
+                setLoading(false)
+                setDataSuccess(true)
+            } else {
+                setDataSuccess(false)
+                setCountRender(countRender + 1)
+            }
         })
+    }
+
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getTugas()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
+    }
+
+    useEffect(() => {
+       _getTugas()
     }, [academicYear])
 
     let history = useHistory();
@@ -88,6 +113,7 @@ export default function SiswaNilaiTugas() {
                         </Card>
 
                         <div className="px-1 py-2 ">
+                            <Spin tip="Loading..." spinning={loading} className='mt-5'>
                             <div className="row">
                                 {getMateri?.map((value, index) => {
                                     return (
@@ -102,6 +128,7 @@ export default function SiswaNilaiTugas() {
                                     )
                                 })}
                             </div>
+                            </Spin>
                         </div>
                     </div>
                 </div>

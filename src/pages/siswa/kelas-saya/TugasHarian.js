@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {useHistory, useLocation, useParams} from 'react-router-dom';
 
-import {PageHeader, Upload, notification} from "antd";
+import {PageHeader, Upload, notification, Spin} from "antd";
 
 import Navheader from '../../../components/Navheader';
 import Appheader from '../../../components/Appheader';
@@ -10,10 +10,10 @@ import axios from 'axios';
 import {
     global_join_sub_first,
     role_siswa_get_pertemuan,
-    role_siswa_update_status_tugas,
+    role_siswa_update_status_tugas, role_siswa_upload_tugas_2,
     url_by_institute
 } from '../../../api/reference';
-import {InboxOutlined} from '@ant-design/icons';
+import {InboxOutlined, LoadingOutlined} from '@ant-design/icons';
 import {pageLoad} from '../../../components/misc/loadPage';
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import CryptoJS from "crypto-js";
@@ -25,13 +25,13 @@ export default function TugasiSiswa() {
     const history = useHistory();
     const idContent = params.id
     const selectedContent = location.state.dataTugas
-    // console.log(selectedContent)
     // console.log(window.location.pathname)
     const [duration, setDuration] = useState(selectedContent.menit)
     const [isFinished, setIsfinished] = useState(false)
     const [isSubmited, setIsSubmited] = useState(false)
     const [fileUrl, setFileUrl] = useState('');
     const [typeFile, setTypeFile] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const iFrame = selectedContent?.file_name
     const forWidth = iFrame?.split('width="')[1]
@@ -39,6 +39,11 @@ export default function TugasiSiswa() {
 
     const userId = localStorage.getItem('user_id');
     const academicId = localStorage.getItem('academic_id')
+    const emailUser = localStorage.getItem('email')
+
+    const loadingIcon = (
+        <LoadingOutlined style={{ fontSize: 20, color: "white" }} spin />
+    );
 
 
     const renderTime = ({remainingTime}) => {
@@ -128,6 +133,7 @@ export default function TugasiSiswa() {
     }
 
     const _finishedTaskEnd = () => {
+        setIsLoading(true)
         axios.post(url_by_institute, {
             "processDefinitionId": role_siswa_update_status_tugas,
             "returnVariables": true,
@@ -139,7 +145,8 @@ export default function TugasiSiswa() {
                         "id_siswa": userId,
                         "id": selectedContent.id,
                         "status": 2,
-                        "id_academic": academicId
+                        "id_academic": academicId,
+                        "email": emailUser
                     }
                 }
             ]
@@ -149,20 +156,32 @@ export default function TugasiSiswa() {
                 "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
         }).then(response => {
-                console.log(response)
+            console.log(response)
+            const dataRes = JSON.parse(response?.data?.variables[2]?.value);
                 if (isSubmited == true) {
                     notification.info({
                         message: "Informasi",
                         description: "Tugas telah di submit !",
                         placement: 'topRight',
-                        duration: 10
                     })
+                    setTimeout(() => {
+                        window.history.back()
+                    }, 1500)
                 }else if(isFinished == true) {
                     notification.info({
                         message: "Informasi",
                         description: "Waktu mengerjakan tugas telah habis",
                         placement: 'topRight'
                     })
+                }else if(dataRes.code == 200){
+                    notification.info({
+                        message: "Informasi",
+                        description: "Tugas telah di submit !",
+                        placement: 'topRight',
+                    })
+                    setTimeout(() => {
+                        window.history.back()
+                    }, 1500)
                 }
             }
         )
@@ -174,25 +193,25 @@ export default function TugasiSiswa() {
         }
     }, [isFinished === true]);
 
-    useEffect(() => {
-        const unlisten = history.listen((location) => {
-            // React.createElement('form',{method: 'post', id: 'form_wp', action: 'https://lms.aneta.id:8443/wp-login.php'},
-            //     [
-            //         React.createElement('input',{id: 'log', name: 'log', type: 'hidden',value: email}),
-            //         React.createElement('input', {id: 'pwd', name: 'pwd', type: 'hidden',value: originalText}),
-            //     ]
-            // )
-            console.log('new location: ', location)
-            document.getElementById("form_wp").submit();
-            console.log('after login')
-            setTimeout(function () {
-                console.log('timer')
-            }, 3000);
-        })
-        return function cleanup() {
-            unlisten()
-        }
-    }, [])
+    // useEffect(() => {
+    //     const unlisten = history.listen((location) => {
+    //         // React.createElement('form',{method: 'post', id: 'form_wp', action: 'https://lms.aneta.id:8443/wp-login.php'},
+    //         //     [
+    //         //         React.createElement('input',{id: 'log', name: 'log', type: 'hidden',value: email}),
+    //         //         React.createElement('input', {id: 'pwd', name: 'pwd', type: 'hidden',value: originalText}),
+    //         //     ]
+    //         // )
+    //         console.log('new location: ', location)
+    //         document.getElementById("form_wp").submit();
+    //         console.log('after login')
+    //         setTimeout(function () {
+    //             console.log('timer')
+    //         }, 3000);
+    //     })
+    //     return function cleanup() {
+    //         unlisten()
+    //     }
+    // }, [])
 
 
     const convertBase64 = (uploaded) => {
@@ -225,7 +244,7 @@ export default function TugasiSiswa() {
     const handleSubmitUpload = () => {
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "rolesiswauploadtugas:1:293f0e1e-5423-11ed-8f22-927b5be84510",
+                "processDefinitionId": role_siswa_upload_tugas_2,
                 "returnVariables": true,
                 "variables": [
                     {
@@ -253,12 +272,15 @@ export default function TugasiSiswa() {
             const resCode = resData.message
             if (resCode == "success upload") {
                 // setRefreshState(true);
-                pageLoad()
+                // pageLoad()
                 notification.success({
                     message: "Sukses",
                     description: 'Tugas berhasil di Upload',
                     placement: 'top'
                 })
+                setTimeout(() => {
+                    window.history.back()
+                }, 1500)
             } else {
                 notification.error({
                     message: "Error",
@@ -305,21 +327,30 @@ export default function TugasiSiswa() {
                                                     src={`https://lms.aneta.id:8443/wp-admin/admin-ajax.php?action=h5p_embed&id=${selectedContent?.file_path}`}
                                                     width="1000" frameBorder="0"
                                                     allowFullScreen="allowfullscreen"
-                                                    style={{minHeight: '600px'}}
+                                                    style={{minHeight: '550px'}}
                                                     title="test soal multiple"></iframe>
                                                 <script
                                                     src="https://lms.aneta.id:8443/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js"
                                                     charSet="UTF-8"></script>
                                             </div>
-                                            {selectedContent.statusSiswa == 1 && selectedContent.status == 1 && selectedContent.is_upload == false || selectedContent.statusSiswa == 0 && selectedContent.status == 1 && selectedContent.is_upload == false? <div className="text-center">
+                                            {selectedContent.statusSiswa == 1 && selectedContent.status == 1 && selectedContent.is_upload == false ||
+                                            selectedContent.statusSiswa == 0 && selectedContent.status == 1 && selectedContent.is_upload == false ||
+                                            selectedContent.statusSiswa == 1 && selectedContent.status == 2 && selectedContent.is_upload == false
+                                                ?
+                                                <div className="text-center">
                                                 <button
-                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 mt-2 w175 rounded-lg d-inline-block"
+                                                    className="bg-current border-0 text-center text-white font-xsss fw-600 p-3 w175 rounded-lg d-inline-block"
                                                     onClick={() => {
                                                         setIsSubmited(true)
                                                         _finishedTaskEnd()
                                                     }}
+                                                    disabled={ isLoading ? true : false}
                                                 >
-                                                    Selesaikan
+                                                    {!isLoading ? (
+                                                        ""
+                                                    ) : (
+                                                        <Spin indicator={loadingIcon} />
+                                                    )} Selesaikan
                                                 </button>
                                             </div> : null
                                             }

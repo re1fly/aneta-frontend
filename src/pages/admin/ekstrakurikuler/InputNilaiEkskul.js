@@ -8,7 +8,7 @@ import {BASE_URL} from "../../../api/Url";
 import {notification, PageHeader} from "antd";
 import {
     global_insert,
-    global_join_sub_where_get,
+    global_join_sub_where_get, insert_or_update_nilai_extra_kurikuler,
     url_by_institute,
 } from "../../../api/reference";
 import Data from "bootstrap/js/src/dom/data";
@@ -202,7 +202,7 @@ export default function InputNilaiEkskul() {
 
         axios.post(url_by_institute,
             {
-                "processDefinitionId": "b7f75249-6bcd-11ed-bb6a-a2fb3d782380",
+                "processDefinitionId": insert_or_update_nilai_extra_kurikuler,
                 "returnVariables": true,
                 "variables": [
                     {

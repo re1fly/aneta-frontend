@@ -211,6 +211,10 @@ import ForumSiswa from "./pages/siswa/forum";
 import PrivacyPolicy from "./pages/Privacy.js";
 import PenilaianEkskul from "./pages/guru/E-Rapor/PenilaianEkskul.js";
 import PenilaianPrestasi from "./pages/guru/E-Rapor/PenilaianPrestasi.js";
+import PenilaianAbsensi from "./pages/guru/E-Rapor/PenilaianAbsensi.js";
+import PenilaianKesehatan from "./pages/guru/E-Rapor/PenilaianKesehatan.js";
+import TandaRapor from "./pages/admin/E-Rapor/TandaRapor.js";
+import SiswaRekapTugas from "./pages/siswa/jadwal-pelajaran/tugas/RekapTugas.js";
 
 class Root extends Component {
   render() {
@@ -608,6 +612,16 @@ class Root extends Component {
                 path={`${process.env.PUBLIC_URL}/guru-nilai-prestasi`}
                 component={PenilaianPrestasi}
             />
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/guru-nilai-kesehatan`}
+                component={PenilaianKesehatan}
+            />
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/guru-nilai-absensi`}
+                component={PenilaianAbsensi}
+            />
 
             <Route
               exact
@@ -669,6 +683,11 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/siswa-jadwal-tugas`}
               component={SiswaJadwalTugas}
+            />
+            <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/siswa-rekap-tugas`}
+                component={SiswaRekapTugas}
             />
             <Route
               exact
@@ -814,10 +833,16 @@ class Root extends Component {
               component={Admin}
             />
             <Route
+                exact
+                path={`${process.env.PUBLIC_URL}/admin-tanda-rapor`}
+                component={TandaRapor}
+            />
+           {/* <Route
               exact
               path={`${process.env.PUBLIC_URL}/admin-email`}
               component={Adminemail}
             />
+
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/admin-chat`}
@@ -875,7 +900,7 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/admin-review`}
               component={Adminreview}
-            />
+            />*/}
 
             <Route
               exact
@@ -893,17 +918,17 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/forgot`}
               component={Forgot}
             />
-            <Route
-              exact
-              path={`${process.env.PUBLIC_URL}/coming-soon`}
-              component={Coming}
-            />
+            {/*<Route*/}
+            {/*  exact*/}
+            {/*  path={`${process.env.PUBLIC_URL}/coming-soon`}*/}
+            {/*  component={Coming}*/}
+            {/*/>*/}
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/notfound`}
               component={Notfound}
             />
-            <Route
+           {/* <Route
               exact
               path={`${process.env.PUBLIC_URL}/blog`}
               component={Blog}
@@ -927,7 +952,7 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/contact-2`}
               component={Contacttwo}
-            />
+            />*/}
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/about`}
@@ -944,7 +969,7 @@ class Root extends Component {
               component={Price}
             />
 
-            <Route
+            {/*<Route
               exact
               path={`${process.env.PUBLIC_URL}/shop-1`}
               component={Shopone}
@@ -1032,14 +1057,14 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/default-course-two`}
               component={Defaultcoursetwo}
-            />
+            />*/}
 
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/default-user-profile`}
               component={Defaultuserprofile}
             />
-            <Route
+            {/*<Route
               exact
               path={`${process.env.PUBLIC_URL}/default-analytics`}
               component={Defaultanalytics}
@@ -1074,13 +1099,13 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/payment`}
               component={Payment}
-            />
+            />*/}
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/password`}
               component={Password}
             />
-            <Route
+           {/* <Route
               exact
               path={`${process.env.PUBLIC_URL}/email-box`}
               component={Email}
@@ -1110,13 +1135,13 @@ class Root extends Component {
               exact
               path={`${process.env.PUBLIC_URL}/courses-grid-3`}
               component={Coursesgridthree}
-            />
+            />*/}
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/user-profile`}
               component={Userprofile}
             />
-            <Route
+           {/* <Route
               exact
               path={`${process.env.PUBLIC_URL}/author-profile`}
               component={Authorprofile}
@@ -1131,7 +1156,7 @@ class Root extends Component {
               path={`${process.env.PUBLIC_URL}/course-details-2`}
               component={Coursedetailstwo}
             />
-
+*/}
             <Route
               exact
               path={`${process.env.PUBLIC_URL}/home-3`}

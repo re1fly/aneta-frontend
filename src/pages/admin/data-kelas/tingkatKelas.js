@@ -31,7 +31,7 @@ import {
 
     global_delete_record,
     global_insert,
-    global_join_sub_where_get,
+    global_join_sub_where_get, global_update,
     url_by_institute
 } from "../../../api/reference";
 import { FormAdminTingkatKelas } from '../../../components/form/AdminTingkatKelas';
@@ -501,7 +501,7 @@ export default function AdminTingkatKelas() {
             if (el.name !== "") data[el.name] = el.value;
         }
         axios.post(url_by_institute, {
-            "processDefinitionId": "GlobalUpdateRecord:2:184b8903-2ccb-11ed-aacc-9a44706f3589",
+            "processDefinitionId": global_update,
             "returnVariables": true,
             "variables": [
                 {

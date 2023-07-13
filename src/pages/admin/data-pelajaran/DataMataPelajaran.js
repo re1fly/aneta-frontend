@@ -279,7 +279,6 @@ export default function DataMataPelajaranAdmin() {
 
     const CardDataPelajaran = () => {
         const channelList = getPelajaran.map((pelajaran, index) => {
-            console.log(pelajaran);
             return {
                 imageUrl: 'user.png',
                 namaPelajaran: pelajaran.nama_mata,
@@ -288,7 +287,7 @@ export default function DataMataPelajaranAdmin() {
                 tag3: '',
                 kelompok: pelajaran.kelompok,
                 noUrutRapor: pelajaran.urut_lapor,
-                status: [pelajaran.status],
+                status: [pelajaran.status]
             }
         })
 
@@ -424,6 +423,8 @@ export default function DataMataPelajaranAdmin() {
                 jumlahPertemuan: pelajaran.jumlah_pertemuan,
                 kurikulum: pelajaran.max_student,
                 status: [JSON.stringify(pelajaran.status)],
+                agama: pelajaran.agama,
+                kebutuhanKhusus: pelajaran.kebutuhan_khusus
             }
         })
 
@@ -742,7 +743,6 @@ export default function DataMataPelajaranAdmin() {
             if (el.name !== "") data[el.name] = el.value;
         }
         const dateNow = new Date().toLocaleString()
-        console.log(data)
 
         axios.post(url_by_institute, {
             "processDefinitionId": data_mata_pelajaran_insert,
@@ -781,7 +781,9 @@ export default function DataMataPelajaranAdmin() {
                             "status": data.status,
                             "kel_id": data.kelompok,
                             "updated_at": dateNow,
-                            "jumlah_pertemuan": data.jumlah_pertemuan
+                            "jumlah_pertemuan": data.jumlah_pertemuan,
+                            "agama" : data.agama,
+                            "kebutuhan_khusus" : data.kebutuhan_khusus
                         }
                     }
                 },
@@ -791,7 +793,7 @@ export default function DataMataPelajaranAdmin() {
                     "value": academicYear
                 },
                 {
-                    "name": "image_data",
+                    "name": "image_data"    ,
                     "type": "json",
                     "value": {
                         "image": "bb",
@@ -806,10 +808,8 @@ export default function DataMataPelajaranAdmin() {
                 "Authorization": "Basic YWRtaW46TWFuYWczciE="
             }
         }).then(function (response) {
-            console.log("insert :", response);
             const valueRes = response.data.variables[10].value
             const valueResObj = JSON.parse(valueRes)
-            console.log(valueResObj);
             if (valueResObj.status == 'success') {
                 setIsViewCreate(false)
                 setIsViewPelajaran(true)
@@ -835,8 +835,6 @@ export default function DataMataPelajaranAdmin() {
         for (const el of e.target.elements) {
             if (el.name !== "") data[el.name] = el.value;
         }
-        console.log(data)
-        // console.log(selectedUser.idKelompok);
 
         axios.post(url_by_institute, {
             "processDefinitionId": update_mata_pelajaran,
@@ -853,7 +851,9 @@ export default function DataMataPelajaranAdmin() {
                         "urut_lapor": data.noUrut_rapor,
                         "status": data.status,
                         "kel_id": data.kelompok,
-                        "jumlah_pertemuan": data.jumlah_pertemuan
+                        "jumlah_pertemuan": data.jumlah_pertemuan,
+                        "agama" : data.agama,
+                        "kebutuhan_khusus" : data.kebutuhan_khusus
                     }
                 }
             ]
@@ -865,7 +865,6 @@ export default function DataMataPelajaranAdmin() {
         }).then(function (response) {
             const valueRes = response.data.variables[2].value
             const valueResObj = JSON.parse(valueRes)
-            console.log(valueResObj);
             if (valueResObj.code == true) {
                 setIsViewCreate(false)
                 setIsViewPelajaran(true)
@@ -917,7 +916,6 @@ export default function DataMataPelajaranAdmin() {
                     }
                 }
                 ).then(function (response) {
-                    console.log(response);
                     setRefreshState(true);
                     Swal.fire(
                         'Data telah terhapus!',
@@ -970,6 +968,8 @@ export default function DataMataPelajaranAdmin() {
     const FormEdit = () => {
         const idStatus = selectedUser.status == "true" ? 1 : 2
         const status = selectedUser.status == "true" ? "Aktif" : "Tidak Aktif"
+        const kebutuhanKhusus = selectedUser.kebutuhanKhusus == true ? "Iya" : "Tidak"
+        const valKebutuhanKhusus = selectedUser.kebutuhanKhusus == true ? true : false
         return (
             <FormAdminPelajaran
                 setView={() => setIsViewPelajaran(true)}
@@ -982,11 +982,15 @@ export default function DataMataPelajaranAdmin() {
                 kode={selectedUser.kode}
                 idKelompok={selectedUser.idKelompok}
                 kelompok={selectedUser.kelompok}
+                valAgama={selectedUser.agama}
+                agama={capitalizeFirstLetter(selectedUser.agama)}
                 noUrutRapor={selectedUser.noUrutRapor}
                 jumlahPertemuan={selectedUser.jumlahPertemuan}
                 kurikulum={selectedUser.kurikulum}
                 idStatus={idStatus}
                 status={status}
+                kebutuhankhusus={kebutuhanKhusus}
+                valKebutuhan={valKebutuhanKhusus}
                 isDisabled={false}
             />
         )
@@ -994,6 +998,7 @@ export default function DataMataPelajaranAdmin() {
 
     const FormDetail = () => {
         const status = selectedUser.status == "true" ? "Aktif" : "Tidak Aktif"
+        const kebutuhanKhusus = selectedUser.kebutuhanKhusus == true ? "Iya" : "Tidak"
         return (
             <FormAdminPelajaran
                 setView={() => setIsViewPelajaran(true)}
@@ -1007,6 +1012,9 @@ export default function DataMataPelajaranAdmin() {
                 jumlahPertemuan={selectedUser.jumlahPertemuan}
                 kurikulum={selectedUser.kurikulum}
                 status={status}
+                agama={capitalizeFirstLetter(selectedUser.agama)}
+                valAgama={selectedUser.agama}
+                kebutuhankhusus={kebutuhanKhusus}
                 isDisabled={true}
             />
         )

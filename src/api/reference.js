@@ -225,6 +225,36 @@ export const role_guru_create_pertemuan = localStorage.getItem('role_guru_create
 export const role_guru_get_list_penilaian_siswa_v2 = localStorage.getItem('role_guru_get_list_penilaian_siswa_v2')
 export const role_guru_download_tugas = localStorage.getItem('role_guru_download_tugas')
 export const role_guru_get_nilai_siswa_feedback = localStorage.getItem('role_guru_get_nilai_siswa_feedback')
+export const insert_jadwal_pelajaran_time = localStorage.getItem("insert_jadwal_pelajaran_time")
+export const changepassword = localStorage.getItem("changepassword")
+export const registerUser = localStorage.getItem("register")
+
+export const role_guru_submit_penilaian_tugas_siswa = localStorage.getItem("role_guru_submit_penilaian_tugas_siswa")
+export const role_guru_get_kalender = localStorage.getItem("role_guru_get_kalender")
+export const role_guru_get_pertemuan = localStorage.getItem("role_guru_get_pertemuan")
+export const role_guru_get_kalender_detail = localStorage.getItem("role_guru_get_kalender_detail")
+export const export_kompetensi = localStorage.getItem("export_kompetensi")
+export const import_kompetensi = localStorage.getItem("import_kompetensi")
+export const role_guru_get_absensi = localStorage.getItem("role_guru_get_absensi")
+export const role_guru_insert_absensi = localStorage.getItem("role_guru_insert_absensi")
+export const role_guru_insert_prestasi = localStorage.getItem("role_guru_insert_prestasi")
+export const role_guru_get_prestasi = localStorage.getItem("role_guru_get_prestasi")
+export const role_guru_get_forum = localStorage.getItem("role_guru_get_forum")
+export const role_guru_get_forum_detail = localStorage.getItem("role_guru_get_forum_detail")
+export const get_kompetensi_pertemuan_role_guru = localStorage.getItem("get_kompetensi_pertemuan_role_guru")
+export const role_guru_download_all_materi = localStorage.getItem("role_guru_download_all_materi")
+export const submit_fitur_penilaian_kesehatan = localStorage.getItem("submit_fitur_penilaian_kesehatan")
+
+
+
+export const role_siswa_get_notif = localStorage.getItem("role_siswa_get_notif")
+export const get_data_siswa_penilaian_kesehatan = localStorage.getItem("get_data_siswa_penilaian_kesehatan")
+export const role_siswa_get_forum = localStorage.getItem("role_siswa_get_forum")
+export const fitur_presentase_pengerjaan_role_siswa = localStorage.getItem("fitur_presentase_pengerjaan_role_siswa")
+export const role_siswa_get_rekap_tugas = localStorage.getItem("role_siswa_get_rekap_tugas")
+export const role_siswa_upload_tugas_2 = localStorage.getItem("role_siswa_upload_tugas_2")
+export const role_siswa_get_nilai_siswa_2 = localStorage.getItem("role_siswa_get_nilai_siswa_2")
+
 
 
 

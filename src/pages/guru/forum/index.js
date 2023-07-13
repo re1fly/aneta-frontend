@@ -1,13 +1,13 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import {Button, Card, Col, Divider, notification, PageHeader} from "antd";
+import {Button, Card, Col, Collapse, Divider, notification, PageHeader, Spin} from "antd";
 import Navheader from "../../../components/Navheader.js";
 import Appheader from "../../../components/Appheader.js";
 import Adminfooter from "../../../components/Adminfooter.js";
 import axios from "axios";
 import {
-    get_where_no_join,
-    global_join_sub_where_get,
+    get_where_no_join, global_insert,
+    global_join_sub_where_get, role_guru_get_forum, role_guru_get_forum_detail,
     role_guru_get_sub_class,
     url_by_institute
 } from "../../../api/reference.js";
@@ -26,13 +26,17 @@ function ForumGuru() {
     const [viewCreate, setViewCreate] = useState(false);
     const [viewForum, setViewForum] = useState(true);
     const [isMeetingTugas, setIsMeetingTugas] = useState("")
+    const [loading, setLoading] = useState(true);
+    const [countRender, setCountRender] = useState(0)
+    const [dataSuccess, setDataSuccess] = useState(false)
+    const {Panel} = Collapse;
 
     const _getDataForum = () => {
         axios
             .post(
                 url_by_institute,
                 {
-                    "processDefinitionId": "rolegurugetforum:1:0a63c8c5-a92c-11ed-9c1d-6ea2a406192e",
+                    "processDefinitionId": role_guru_get_forum,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -54,8 +58,16 @@ function ForumGuru() {
             )
             .then(function (response) {
                 const data = JSON.parse(response.data.variables[2].value);
-                setDataForum(data.data)
-                console.log(response)
+                const datas = data.data
+                setDataForum(datas)
+                if (datas.length >= 1) {
+                    setLoading(false)
+                    setDataSuccess(true)
+                } else {
+                    setDataSuccess(false)
+                    setLoading(false)
+                    setCountRender(countRender + 1)
+                }
             });
     }
 
@@ -64,7 +76,7 @@ function ForumGuru() {
             .post(
                 url_by_institute,
                 {
-                    "processDefinitionId": "rolegurugetforumdetail:1:ab83f418-a92c-11ed-9c1d-6ea2a406192e",
+                    "processDefinitionId": role_guru_get_forum_detail,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -85,8 +97,15 @@ function ForumGuru() {
             )
             .then(function (response) {
                 const data = JSON.parse(response.data.variables[2].value);
+                const responseData = data.message;
                 setDetailForum(data.data)
-                console.log(detailForum)
+                if (responseData == "succes get data") {
+                    setLoading(false)
+                    setDataSuccess(true)
+                } else {
+                    setDataSuccess(false)
+                    setCountRender(countRender + 1)
+                }
             });
     }
 
@@ -342,7 +361,7 @@ function ForumGuru() {
         axios
             .post(
                 url_by_institute, {
-                    "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_insert,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -369,7 +388,6 @@ function ForumGuru() {
             )
             .then(function (response) {
                 const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-                console.log(response)
                 if (dataRes.status == 'success') {
                     notification.success({
                         message: "Sukses",
@@ -398,7 +416,7 @@ function ForumGuru() {
         axios
             .post(
                 url_by_institute, {
-                    "processDefinitionId": "GlobalInsertRecord:1:f45afc4a-2ccb-11ed-aacc-9a44706f3589",
+                    "processDefinitionId": global_insert,
                     "returnVariables": true,
                     "variables": [
                         {
@@ -425,7 +443,59 @@ function ForumGuru() {
             )
             .then(function (response) {
                 const dataRes = JSON.parse(response?.data?.variables[2]?.value);
-                console.log(response)
+                if (dataRes.status == 'success') {
+                    notification.success({
+                        message: "Sukses",
+                        description: "Comment berhasil dibuat.",
+                        placement: "top",
+                    });
+                    _getDetailForum()
+                } else {
+                    notification.error({
+                        message: "Error",
+                        description: "Error harap hubungi Admin.",
+                        placement: "top",
+                    });
+                }
+            });
+    }
+
+    const _submitReply = (e) => {
+        e.preventDefault();
+        const data = {};
+        for (const el of e.target.elements) {
+            if (el.name !== "") data[el.name] = el.value;
+        }
+        axios
+            .post(
+                url_by_institute, {
+                    "processDefinitionId": global_insert,
+                    "returnVariables": true,
+                    "variables": [
+                        {
+                            "name": "global_Insert",
+                            "type": "json",
+                            "value": {
+                                "tbl_name": "x_academic_subjects_schedule_contents_meeting_forum_reply_subModel",
+                                "tbl_coloumn": {
+                                    "id_reply": data.id_reply,
+                                    "id_user": userId,
+                                    "reply": data.reply_forum
+                                }
+                            }
+                        }
+                    ]
+                }
+                ,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Basic YWRtaW46TWFuYWczciE=",
+                    },
+                }
+            )
+            .then(function (response) {
+                const dataRes = JSON.parse(response?.data?.variables[2]?.value);
                 if (dataRes.status == 'success') {
                     notification.success({
                         message: "Sukses",
@@ -652,20 +722,60 @@ function ForumGuru() {
 
                 <div className="clearfix"></div>
 
-                {detailForum.map((data) => {
-                    const id = data.id
-                    return (
-                        <Card type="inner"
-                              title={data.name}
-                              className='text-capitalize mb-3'
-                              style={{borderRadius: '5px'}}
-                              hoverable
-                              extra={<i className="feather-message-circle w350 text-primary"></i>}
-                        >
-                            <p>{data.reply}</p>
-                        </Card>
-                    )
-                })}
+                <Spin tip="Loading..." spinning={loading} className='mt-5'>
+                    {detailForum.map((data) => {
+                        const id = data.id
+                        const idReply = data.idreply
+                        return (
+                            <Card type="inner"
+                                  title={data.name}
+                                  className='text-capitalize mb-3'
+                                  style={{borderRadius: '5px'}}
+                                  hoverable
+                                  extra={<i className="feather-message-circle w350 text-primary"></i>}
+                            >
+                                <p>{data.reply}</p>
+                                <Collapse size="small">
+                                    <Panel header={`Baca Balasan Komentar (${data.sub_reply.length})`} key="1">
+                                        {
+                                            data.sub_reply.map((value) => {
+                                                return(
+                                                <>
+                                                <Card type="inner"
+                                                      title={value.name}
+                                                      className='text-capitalize mb-3'
+                                                      style={{borderRadius: '5px'}}
+                                                      hoverable
+                                                      extra={<i className="feather-message-square w350 text-success"></i>}
+                                                >
+                                                    <p>{value.reply}</p>
+                                                </Card>
+                                                </>
+                                            )})
+                                        }
+                                        <form onSubmit={e => _submitReply(e)}>
+                                        <h4 className="mt-4">Balas Komentar ini</h4>
+                                                         <textarea
+                                                             className="form-control mb-0 p-3 bg-greylight lh-16"
+                                                             rows="5"
+                                                             placeholder="Balas komentar..."
+                                                             name="reply_forum"
+                                                         ></textarea>
+                                            <input name="id_reply" type="hidden" value={data.id_reply} />
+                                            <button
+                                                className="btn bg-current text-white mt-3 mb-4 position-relative float-right"
+                                                type="submit"
+                                                // onClick={() => _submitReply(data.id_reply)}
+                                            >
+                                                Comment
+                                            </button>
+                                        </form>
+                                    </Panel>
+                                </Collapse>
+                            </Card>
+                        )
+                    })}
+                </Spin>
             </>
         )
     }
@@ -697,47 +807,61 @@ function ForumGuru() {
                     }
 
                 </div>
-                {
-                    viewDetail !== true ?
-                        dataForum.map((data) => {
-                            const id = data.id
-                            return (
-                                <Card type="inner"
-                                      title={data.topic}
-                                      className='text-capitalize mb-3'
-                                      style={{borderRadius: '15px'}}
-                                      hoverable
-                                      extra={<button className='btn btn-primary'>
-                                          <i className="feather-message-circle w350"> {data.jumlah_reply}</i>
-                                      </button>}
-                                      onClick={() => {
-                                          setSelectedForum(data.id)
-                                          setViewDetail(true)
-                                          setSelectedDataForum({
-                                              id: data.id,
-                                              topic: data.topic,
-                                              desc: data.description,
-                                              tingkat: data.tingkat,
-                                              subClass: data.sub_class,
-                                              namaMapel: data.nama_mata,
-                                              namaMeet: data.meeting_name
-                                          })
-                                      }}
-                                >
-                                    <p className='mb-5'>{data.description}</p>
-                                    <p className='text-grey-600 float-right'>
+
+                <Spin tip="Loading..." spinning={loading} className='mt-5'>
+                    {
+                        viewDetail !== true ?
+                            dataForum.map((data) => {
+                                const id = data.id
+                                return (
+                                    <Card type="inner"
+                                          title={data.topic}
+                                          className='text-capitalize mb-3'
+                                          style={{borderRadius: '15px'}}
+                                          hoverable
+                                          extra={<button className='btn btn-primary'>
+                                              <i className="feather-message-circle w350"> {data.jumlah_reply}</i>
+                                          </button>}
+                                          onClick={() => {
+                                              setLoading(true)
+                                              setSelectedForum(data.id)
+                                              setViewDetail(true)
+                                              setSelectedDataForum({
+                                                  id: data.id,
+                                                  topic: data.topic,
+                                                  desc: data.description,
+                                                  tingkat: data.tingkat,
+                                                  subClass: data.sub_class,
+                                                  namaMapel: data.nama_mata,
+                                                  namaMeet: data.meeting_name
+                                              })
+                                          }}
+                                    >
+                                        <p className='mb-5'>{data.description}</p>
+                                        <p className='text-grey-600 float-right'>
                                                 <span
                                                     className='text-ornage'>{data.tingkat} / {data.sub_class}</span> | <span
-                                        className='text-ornage'>{data.nama_mata}</span> | <span
-                                        className='text-ornage'>{data.meeting_name}</span>
-                                    </p>
-                                </Card>
-                            )
-                        }) : <ViewDetailForum />
+                                            className='text-ornage'>{data.nama_mata}</span> | <span
+                                            className='text-ornage'>{data.meeting_name}</span>
+                                        </p>
+                                    </Card>
+                                )
+                            }) : <ViewDetailForum/>
 
-                }
+                    }
+                </Spin>
             </div>
         )
+    }
+
+    const _loadingData = () => {
+        if (dataSuccess == false) {
+            _getDataForum()
+        }
+    }
+
+    if (countRender > 1 && countRender < 4) {
+        setInterval(_loadingData, 5000)
     }
 
     useEffect(() => {

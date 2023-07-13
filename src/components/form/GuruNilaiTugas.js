@@ -4,7 +4,7 @@ import React from "react";
 import {useEffect, useState} from "react";
 import {
     role_guru_edit_penilaian,
-    role_guru_get_edit_penilaian,
+    role_guru_get_edit_penilaian, role_guru_submit_penilaian_tugas_siswa,
     url_by_institute,
 } from "../../api/reference";
 import {pageLoad} from "../misc/loadPage";
@@ -152,21 +152,24 @@ export const FormGuruNilaiTugas = (props) => {
         const nilaiReview = formData.getAll("nilai_review");
         const idReview = formData.getAll("id_review");
         const feedbackReview = formData.getAll("feedback_review");
+        const bobotSiswa = formData.getAll("nilai_bobot");
 
-        const arrayReview = [];
+        let arrayReview = [];
 
         for (let i = 0; i < nilaiReview.length; i++) {
             arrayReview.push({
                 nilai: nilaiReview[i],
                 id: idReview[i],
-                feedback: feedbackReview[i]
+                feedback: feedbackReview[i],
+                bobot_siswa: bobotSiswa[i]
             });
         }
+        console.log(arrayReview)
         axios
             .post(
                 url_by_institute,
                 {
-                    "processDefinitionId": "9abf6f49-a6b2-11ed-9c1d-6ea2a406192e",
+                    "processDefinitionId": role_guru_submit_penilaian_tugas_siswa,
                     "returnVariables": true,
                     "variables": [
                         {
